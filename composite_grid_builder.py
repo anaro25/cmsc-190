@@ -46,3 +46,13 @@ def add_cyclic_map(composite_grid):
 					cyclic_composite_grid[r][c] = '↑'
 
 	return cyclic_composite_grid
+
+
+def overlay_base_grid(composite_grid, base_grid):
+    updated_composite_grid = [row[:] for row in composite_grid]
+
+    for r in range(len(base_grid)):
+        for c in range(len(base_grid[r])):
+            updated_composite_grid[2 * r][2 * c] = base_grid[r][c]
+
+    return updated_composite_grid

@@ -13,7 +13,7 @@ def print_cyclic_various_sizes():
         print(f"composite_grid size = {comp_size}x{comp_size}")
 
         composite_grid = [['·' for _ in range(comp_size)] for _ in range(comp_size)]
-        cyclic_composite_grid = add_cyclic_map(composite_grid)
+        composite_grid = add_cyclic_map(composite_grid)
 
-        print_grid(cyclic_composite_grid)
+        print_grid(composite_grid)
         print()
