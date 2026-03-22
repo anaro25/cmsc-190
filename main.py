@@ -1,3 +1,4 @@
+
 def print_grid(grid):
     for row in grid:
         print(' '.join(str(cell) for cell in row))
@@ -49,28 +50,20 @@ def add_cyclic_map(composite_grid):
                 elif c % 4 == 0 and c != 0:
                     cyclic_composite_grid[r][c] = '↑'
 
-    return cyclic_composite_grid
+    return cyclic_composite_grid 
 
 
 def main():
-    # for now, let's manually initialize the base grid
-    base_grid = [
-        ['0', '0', '0', '0', '1'],
-        ['0', '0', '0', '0', '0'],
-        ['0', '0', '0', '0', '0'],
-        ['0', '0', '0', '0', '0'],
-        ['1', '0', '0', '0', '0']
-    ]
+    test_sizes = [3, 5, 7, 9]
 
-    base_size = len(base_grid)
-    comp_size = (2 * base_size) - 1
+    for comp_size in test_sizes:
+        print(f"composite_grid size = {comp_size}x{comp_size}")
 
-    # initialize the composite grid
-    composite_grid = [['·' for _ in range(comp_size)] for _ in range(comp_size)]
+        composite_grid = [['·' for _ in range(comp_size)] for _ in range(comp_size)]
+        cyclic_composite_grid = add_cyclic_map(composite_grid)
 
-    cyclic_composite_grid = add_cyclic_map(composite_grid)
-
-    print_grid(cyclic_composite_grid)
+        print_grid(cyclic_composite_grid)
+        print()
 
 
 if __name__ == "__main__":
