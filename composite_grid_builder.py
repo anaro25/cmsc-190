@@ -1,4 +1,24 @@
 
+def build_composite_grid():
+	
+    base_grid = [
+        ['o', 'o', 'o', 'o', '#'],
+        ['o', 'o', 'o', 'o', 'o'],
+        ['o', 'o', 'o', 'o', 'o'],
+        ['o', 'o', 'o', 'o', 'o'],
+        ['#', 'o', 'o', 'o', 'o']
+    ]
+
+    base_size = len(base_grid)
+    comp_size = (2 * base_size) - 1
+    
+    composite_grid = [['·' for _ in range(comp_size)] for _ in range(comp_size)]
+    composite_grid = add_cyclic_map(composite_grid)
+    composite_grid = overlay_base_grid(composite_grid, base_grid)
+    
+    return composite_grid
+
+
 def add_cyclic_map(composite_grid):
 	n = len(composite_grid)
 	cyclic_composite_grid = [row[:] for row in composite_grid]

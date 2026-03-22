@@ -1,10 +1,10 @@
 from .composite_grid_builder import add_cyclic_map
 
-
 def print_grid(grid):
     for row in grid:
         print(' '.join(str(cell) for cell in row))
-
+    print("------------------------")
+    
 
 def print_cyclic_various_sizes():
     test_sizes = [3, 5, 7, 9]
