@@ -56,21 +56,26 @@ def _reconstruct_path(came_from, current):
 
 def _build_frames(original_grid, path):
     astar_frames = []
-    start = path[0]
     goal = path[-1]
+    visited_path = []
 
     for position in path:
         frame = [row[:] for row in original_grid]
 
-        # remove original A from copied frame
-        frame[start[0]][start[1]] = 'o'
+        # mark all previously visited path cells as trace
+        for r, c in visited_path:
+            frame[r][c] = 'a'
 
         # keep B visible until A reaches it
         if position != goal:
             frame[goal[0]][goal[1]] = 'B'
 
+        # current agent position
         frame[position[0]][position[1]] = 'A'
         astar_frames.append(frame)
+
+        # after leaving this cell in the next frame, it becomes 'a'
+        visited_path.append(position)
 
     return astar_frames
 
