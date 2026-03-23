@@ -20,24 +20,25 @@ def _get_neighbors(grid, position):
     n = len(grid)
     neighbors = []
 
-    directions = [
-        (-2, 0, '↑'),
-        (2, 0, '↓'),
-        (0, -2, '←'),
-        (0, 2, '→'),
+    # (dr, dc, transition row offset, transition col offset, valid transition symbols)
+    move_specs = [
+        (-2, 0, -1, 0, {'↑', '↕'}),   # move up
+        (2, 0, 1, 0, {'↓', '↕'}),     # move down
+        (0, -2, 0, -1, {'←', '↔'}),   # move left
+        (0, 2, 0, 1, {'→', '↔'}),     # move right
     ]
 
-    for dr, dc, required_arrow in directions:
+    for dr, dc, tr, tc, valid_transitions in move_specs:
         nr, nc = r + dr, c + dc
-        arrow_r, arrow_c = r + (dr // 2), c + (dc // 2)
+        transition_r, transition_c = r + tr, c + tc
 
         if not (0 <= nr < n and 0 <= nc < n):
             continue
 
         destination = grid[nr][nc]
-        transition = grid[arrow_r][arrow_c]
+        transition = grid[transition_r][transition_c]
 
-        if transition == required_arrow and destination in {'o', 'B'}:
+        if transition in valid_transitions and destination in {'o', 'A', 'B'}:
             neighbors.append((nr, nc))
 
     return neighbors
