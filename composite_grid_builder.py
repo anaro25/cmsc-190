@@ -1,78 +1,29 @@
+from .transitions_overlayer import overlay_classical_transitions, overlay_cyclic_transitions
 
-def build_composite_grid():
+def build_composite_grids(base_grid):
+
+	base_size = len(base_grid)
+	comp_size = (2 * base_size) - 1
 	
-    base_grid = [
-        ['o', 'o', 'o', 'o', '#'],
-        ['o', 'o', 'o', 'o', 'o'],
-        ['o', 'o', 'o', 'o', 'o'],
-        ['o', 'o', 'o', 'o', 'o'],
-        ['#', 'o', 'o', 'o', 'o']
-    ]
-
-    base_size = len(base_grid)
-    comp_size = (2 * base_size) - 1
-    
-    composite_grid = [['·' for _ in range(comp_size)] for _ in range(comp_size)]
-    composite_grid = add_cyclic_map(composite_grid)
-    composite_grid = overlay_base_grid(composite_grid, base_grid)
-    
-    return composite_grid
-
-
-def add_cyclic_map(composite_grid):
-	n = len(composite_grid)
-	cyclic_composite_grid = [row[:] for row in composite_grid]
-
-	for r in range(n):
-		for c in range(n):
-
-			# rows with right arrows
-			if r % 4 == 0:
-				if r == 0:
-					# top row
-					if c % 4 == 1:
-						cyclic_composite_grid[r][c] = '→'
-				elif r == n - 1:
-					# bottom row
-					if c % 4 == 3:
-						cyclic_composite_grid[r][c] = '→'
-				else:
-					# middle rows
-					if c % 2 == 1:
-						cyclic_composite_grid[r][c] = '→'
-
-			# rows with left arrows
-			elif r % 4 == 2:
-				if r == n - 1:
-					# bottom row when bottom row is a left-arrow row
-					if c % 4 == 1:
-						cyclic_composite_grid[r][c] = '←'
-				else:
-					if c % 2 == 1:
-						cyclic_composite_grid[r][c] = '←'
-
-			# rows like: ↑ · ↓ · ↑ · ↓ ...
-			elif r % 4 == 1:
-				if c % 4 == 0 and c != n - 1:
-					cyclic_composite_grid[r][c] = '↑'
-				elif c % 4 == 2:
-					cyclic_composite_grid[r][c] = '↓'
-
-			# rows like: · · ↓ · ↑ · ↓ · ↑
-			elif r % 4 == 3:
-				if c % 4 == 2 and c != n - 1:
-					cyclic_composite_grid[r][c] = '↓'
-				elif c % 4 == 0 and c != 0:
-					cyclic_composite_grid[r][c] = '↑'
-
-	return cyclic_composite_grid
+	# populate grid with middle dots as placeholder
+	composite_grid = [['·' for _ in range(comp_size)] for _ in range(comp_size)]
+	
+	# overlay base grid
+	composite_grid = overlay_base_grid(composite_grid, base_grid)
+	
+	# overlay transitions
+	classical_composite_grid = overlay_classical_transitions(composite_grid)
+	cyclic_composite_grid = overlay_cyclic_transitions(composite_grid)
+	
+	return classical_composite_grid, cyclic_composite_grid
 
 
 def overlay_base_grid(composite_grid, base_grid):
-    updated_composite_grid = [row[:] for row in composite_grid]
+	updated_composite_grid = [row[:] for row in composite_grid]
 
-    for r in range(len(base_grid)):
-        for c in range(len(base_grid[r])):
-            updated_composite_grid[2 * r][2 * c] = base_grid[r][c]
+	for r in range(len(base_grid)):
+		for c in range(len(base_grid[r])):
+			updated_composite_grid[2 * r][2 * c] = base_grid[r][c]
 
-    return updated_composite_grid
+	return updated_composite_grid
+
