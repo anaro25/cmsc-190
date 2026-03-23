@@ -1,5 +1,6 @@
 from .transitions_overlayer import overlay_classical_transitions, overlay_cyclic_transitions
 
+
 def build_composite_grids(base_grid):
 
 	base_size = len(base_grid)
@@ -26,4 +27,3 @@ def overlay_base_grid(composite_grid, base_grid):
 			updated_composite_grid[2 * r][2 * c] = base_grid[r][c]
 
 	return updated_composite_grid
-

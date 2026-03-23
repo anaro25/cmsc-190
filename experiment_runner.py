@@ -1,5 +1,4 @@
 import random
-
 from .astar_runner import run_astar
 
 
