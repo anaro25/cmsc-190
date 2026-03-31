@@ -12,8 +12,8 @@ def run_classical_astar(classical_composite_grid, num_targets):
 	)
 
 	# print_astar_frames(classical_astar_frames) # keep this commented out
-	animate_astar_frames(classical_astar_frames)
-
+	# animate_astar_frames(classical_astar_frames)
+	print_grid(classical_composite_grid)
 
 def run_cyclic_astar(cyclic_composite_grid, num_targets):
 	cyclic_astar_frames = run_astar_successive_targets(
@@ -22,18 +22,23 @@ def run_cyclic_astar(cyclic_composite_grid, num_targets):
 	)
 
 	# print_astar_frames(cyclic_astar_frames) # keep this commented out
-	animate_astar_frames(cyclic_astar_frames)
+	# animate_astar_frames(cyclic_astar_frames)
+	print_grid(cyclic_composite_grid)
 	
 
 def main():
-	base_grid = get_base_grid()
-	classical_composite_grid, cyclic_composite_grid = build_composite_grids(base_grid)
+	# one-time run (comment this out after use)
+	reduce_campus_resolution(
 	
-	num_targets = 10
+	# base_grid = get_base_grid()
+	# classical_composite_grid, cyclic_composite_grid = build_composite_grids(base_grid)
 	
-	run_classical_astar(classical_composite_grid, num_targets)
-	# print('*' * 50)
-	run_cyclic_astar(cyclic_composite_grid, num_targets)
+	# num_targets = 10
+	
+	# run_classical_astar(classical_composite_grid, num_targets)
+	# # print('*' * 50)
+	# run_cyclic_astar(cyclic_composite_grid, num_targets)
+
 
 if __name__ == "__main__":
 	main()
