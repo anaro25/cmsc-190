@@ -1,14 +1,9 @@
-from _1_base_map_matrix_text_formats_assembly.base_map_matrix_text_formats_assembler import assemble_base_map_matrix_text_formats
+from base_map_assembly.base_map_assembler import assemble_base_maps
 
 def main():
-	# assemble_base_map_matrix_text_formats()
-	
-	# --- EXECUTED ^^
+	base_maps = assemble_base_maps()
 	
 	
-	
-	# vertex map = base map + additional obstacles (if any)
-	# dynamic_vertex_map_looping_matrices = assemble_dynamic_vertex_map_looping_matrices()
 	
 if __name__ == "__main__":
 	main()
