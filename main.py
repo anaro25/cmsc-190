@@ -1,4 +1,4 @@
-from 1_base_map_matrices_assembly.base_map_matrices_assembler import assemble_base_map_matrices
+from _1_base_map_matrices_assembly.base_map_matrices_assembler import assemble_base_map_matrices
 
 def main():
 	base_map_matrices = assemble_base_map_matrices()
