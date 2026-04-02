@@ -1,0 +1,10 @@
+
+The dynamic loop sequence is the sequence of frames that can be looped indefinitely.
+
+For instance, we have the sequence ABCDE.
+We can loop such as in the following ways:
+	ABCDEABCDE
+	ABC
+	ABCDEAB
+
+This is important since we don't know how many frames we will need.
