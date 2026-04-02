@@ -1,10 +1,10 @@
 from pathlib import Path
 
 from composite_elements import (
-    Vertex,
-    Special,
-    VerticalTransition,
     HorizontalTransition,
+    Special,
+    Vertex,
+    VerticalTransition,
 )
 
 
@@ -53,4 +53,13 @@ def write_cyclic_composites(cyclic_maps, output_dir="cyclic_logs"):
 
     for map_name, composite_map in cyclic_maps.items():
         output_path = output_dir / f"{map_name}_cyclic.xml"
+        write_composite_map(composite_map, output_path)
+
+
+def write_classical_composites(classical_maps, output_dir="classical_logs"):
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for map_name, composite_map in classical_maps.items():
+        output_path = output_dir / f"{map_name}_classical.xml"
         write_composite_map(composite_map, output_path)

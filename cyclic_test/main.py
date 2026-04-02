@@ -9,5 +9,6 @@ def main():
     cyclic_maps = apply_cyclic_mapping(base_maps)
     write_cyclic_composites(cyclic_maps)
 
+
 if __name__ == "__main__":
     main()
