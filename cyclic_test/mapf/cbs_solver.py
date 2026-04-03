@@ -138,7 +138,7 @@ def make_cbs_node(constraints, paths_by_agent):
     }
 
 
-def solve_mapf_with_cbs(cyclic_map, agents):
+def solve_mapf_with_cbs(composite_map, agents):
     """
     Vanilla CBS for disappearing agents.
 
@@ -152,7 +152,7 @@ def solve_mapf_with_cbs(cyclic_map, agents):
 
     for agent in agents:
         path = find_path_for_agent(
-            cyclic_map=cyclic_map,
+            cyclic_map=composite_map,
             agent_id=agent["id"],
             start=agent["start"],
             goal=agent["goal"],
@@ -165,6 +165,7 @@ def solve_mapf_with_cbs(cyclic_map, agents):
         root_paths[agent["id"]] = path
 
     root_node = make_cbs_node(root_constraints, root_paths)
+    num_conflicts_detected = 0
 
     open_heap = []
     counter = itertools.count()
@@ -176,7 +177,12 @@ def solve_mapf_with_cbs(cyclic_map, agents):
         conflict = detect_first_conflict(current_node["paths"])
 
         if conflict is None:
-            return current_node["paths"]
+            return {
+                "paths_by_agent": current_node["paths"],
+                "num_conflicts_detected": num_conflicts_detected,
+            }
+
+        num_conflicts_detected += 1
 
         new_constraints = split_conflict_into_constraints(conflict)
 
@@ -190,7 +196,7 @@ def solve_mapf_with_cbs(cyclic_map, agents):
             agent = next(agent for agent in agents if agent["id"] == constrained_agent_id)
 
             new_path = find_path_for_agent(
-                cyclic_map=cyclic_map,
+                cyclic_map=composite_map,
                 agent_id=agent["id"],
                 start=agent["start"],
                 goal=agent["goal"],
