@@ -2,9 +2,13 @@ from copy import deepcopy
 
 
 def get_path_position(path, time_step):
+    """
+    Disappearing-agent model:
+        return None after the agent's path ends.
+    """
     if time_step < len(path):
         return path[time_step]
-    return path[-1]
+    return None
 
 
 def get_makespan(paths_by_agent):
@@ -20,6 +24,9 @@ def build_frame_for_time(cyclic_map, agents, paths_by_agent, time_step):
     Overlay priority:
         1. target letters (lowercase)
         2. agent letters (uppercase) overwrite targets if occupying same cell
+
+    Since agents disappear after reaching their targets, an agent is shown
+    only while its path still has a position at this timestep.
     """
     frame = deepcopy(cyclic_map)
 
@@ -29,7 +36,12 @@ def build_frame_for_time(cyclic_map, agents, paths_by_agent, time_step):
 
     for agent in agents:
         path = paths_by_agent[agent["id"]]
-        current_i, current_j = get_path_position(path, time_step)
+        current_position = get_path_position(path, time_step)
+
+        if current_position is None:
+            continue
+
+        current_i, current_j = current_position
         frame[current_i][current_j] = agent["label"]
 
     return frame

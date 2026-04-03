@@ -8,24 +8,24 @@
                             ↓   ↑   ↓   ↑   ↓   ↑                            
 #   #   #   #   o   #   #   o → o → o → o → o → o → o   o → o   #   #   #   #
                 ↕               ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓                
-#   #   #   #   o   #   #   #   o ← o   o ← B ← o ← o ← o ← o ← o   #   #   #
+#   #   #   #   o   #   #   #   o ← o   o ← o ← o ← o ← o ← o ← o   #   #   #
                 ↕                           ↓   ↑   ↓   ↑   ↓   ↑            
-#   #   #   o   o → o   #   o   o   #   o → A → o → o → o → o → o   #   #   o
+#   #   #   o   o → o   #   o   o   #   o → o → o → o → o → o → o   #   #   o
             ↕   ↑   ↓       ↕   ↕       ↑   ↓   ↑   ↓   ↑   ↓               ↕
-#   #   #   o ↔ b ← o   o   o ← o   C ← h ← H ← o ← o ← o ← o ↔ o   #   #   o
+#   #   #   o ↔ b ← o   o   o ← o   o ← h ← o ← o ← o ← o ← o ↔ o   #   #   o
                 ↕       ↕   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑                   ↕
 #   #   #   #   o   #   o ↔ o → o → o → o → o → o → o → o → o   #   o   o → o
                 ↕               ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓       ↕   ↑   ↓
 #   #   o   o ← o   #   #   #   o ← o ← o ← o ← o ← o ← o ← o ← o   o ← o ← o
         ↕   ↓   ↑                   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑    
-o ↔ o   o → o → o   #   #   o   o → E → o → o → o → o → o → G → g ↔ o → o ↔ o
+o ↔ o   o → o → B   #   #   o   o → o → o → o → o → o → o → o → g ↔ o → o ↔ o
     ↕   ↑   ↓               ↕   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓           ↕    
 #   o ↔ o ← o ← o   o   #   o ← o ← o ← o ← o ← o ← o ← o ← o ← o   #   o   #
             ↓   ↑   ↕       ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑       ↕    
 #   #   o → o → o → o   o → o → o → o → o → o → o → o → f → o → o   #   o   #
         ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓           ↕    
-#   #   a ← o ← o ← o ← o ← o ← D ← o ← o ← o ← o ← o ← o ← o ↔ o   #   o   #
+#   #   a ← o ← o ← o ← o ← o ← o ← o ← o ← o ← o ← o ← o ← o ↔ o   #   o   #
             ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑                    
-o   #   o → o → o → o → o → o → d → F → o → o → o → o → o → o   #   #   #   #
+o   #   o → o → o → o → o → o → d → o → o → o → o → o → o → o   #   #   #   #
 ↕       ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓   ↑   ↓                
 o ↔ o ↔ o ← o   o ← e   o ← o   o ← c   o ← o   o ← o   o ← o ↔ o ↔ o   #   #

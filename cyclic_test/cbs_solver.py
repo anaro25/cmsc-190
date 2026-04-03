@@ -5,9 +5,13 @@ from mapf_low_level_astar import find_path_for_agent
 
 
 def get_path_position(path, time_step):
+    """
+    Disappearing-agent model:
+        return None after the agent's path ends.
+    """
     if time_step < len(path):
         return path[time_step]
-    return path[-1]
+    return None
 
 
 def compute_solution_cost(paths_by_agent):
@@ -21,6 +25,9 @@ def detect_first_conflict(paths_by_agent):
     Conflict types:
         * vertex conflict
         * edge conflict (swap)
+
+    Disappearing-agent model:
+        agents do not occupy any vertex after their final timestep.
     """
     if not paths_by_agent:
         return None
@@ -29,11 +36,13 @@ def detect_first_conflict(paths_by_agent):
     max_time = max(len(path) for path in paths_by_agent.values())
 
     for time_step in range(max_time):
-        # Vertex conflicts
         occupied_positions = {}
 
         for agent_id in agent_ids:
             position = get_path_position(paths_by_agent[agent_id], time_step)
+
+            if position is None:
+                continue
 
             if position in occupied_positions:
                 other_agent_id = occupied_positions[position]
@@ -46,7 +55,6 @@ def detect_first_conflict(paths_by_agent):
 
             occupied_positions[position] = agent_id
 
-        # Edge conflicts
         if time_step == 0:
             continue
 
@@ -56,12 +64,17 @@ def detect_first_conflict(paths_by_agent):
             prev_position = get_path_position(paths_by_agent[agent_id], time_step - 1)
             current_position = get_path_position(paths_by_agent[agent_id], time_step)
 
+            if prev_position is None or current_position is None:
+                continue
+
             edge = (prev_position, current_position)
             reverse_edge = (current_position, prev_position)
 
             if reverse_edge in transitions:
                 other_agent_id = transitions[reverse_edge]
-                if prev_position != current_position or other_agent_id != agent_id:
+
+                # Ignore both agents waiting in place.
+                if prev_position != current_position:
                     return {
                         "type": "edge",
                         "time": time_step,
@@ -127,9 +140,9 @@ def make_cbs_node(constraints, paths_by_agent):
 
 def solve_mapf_with_cbs(cyclic_map, agents):
     """
-    Vanilla CBS.
+    Vanilla CBS for disappearing agents.
 
-    Each high-level node contains:
+    High-level node:
         * constraints
         * paths
         * cost

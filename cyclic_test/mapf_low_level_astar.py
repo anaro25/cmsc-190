@@ -1,7 +1,7 @@
 import heapq
 import itertools
 
-from cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
+from cyclic_grid_navigation import get_outgoing_neighbors
 
 
 def manhattan_vertex_distance(a, b):
@@ -70,35 +70,28 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
     Actions:
         * move to reachable directed neighbor
         * wait in place
+
+    Disappearing-agent model:
+        Once the agent reaches its goal and satisfies all of its own
+        time-indexed constraints up to that point, the path ends there.
+        The agent is considered absent afterward.
     """
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
     if violates_vertex_constraint(agent_constraints, start, 0):
         return None
 
-    free_vertices = get_all_free_vertices(cyclic_map)
     latest_constraint_time = get_latest_constraint_time(agent_constraints)
-
-    # Generous but finite horizon for this project.
-    # This is not meant to be the most aggressive optimization.
-    max_time = max(
-        latest_constraint_time + len(free_vertices) * 2,
-        manhattan_vertex_distance(start, goal) + len(free_vertices),
-        50,
-    )
 
     open_heap = []
     counter = itertools.count()
 
     start_state = (start, 0)
-
-    g_score = {start_state: 0}
     came_from = {start_state: None}
+    best_g = {start_state: 0}
 
     start_f = manhattan_vertex_distance(start, goal)
     heapq.heappush(open_heap, (start_f, 0, next(counter), start_state))
-
-    visited_best_g = {start_state: 0}
 
     while open_heap:
         _, current_g, _, current_state = heapq.heappop(open_heap)
@@ -106,9 +99,6 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
 
         if current_position == goal and current_time >= latest_constraint_time:
             return reconstruct_path(came_from, current_state)
-
-        if current_time >= max_time:
-            continue
 
         next_time = current_time + 1
 
@@ -130,12 +120,11 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
             next_state = (next_position, next_time)
             tentative_g = current_g + 1
 
-            if tentative_g >= visited_best_g.get(next_state, float("inf")):
+            if tentative_g >= best_g.get(next_state, float("inf")):
                 continue
 
-            visited_best_g[next_state] = tentative_g
+            best_g[next_state] = tentative_g
             came_from[next_state] = current_state
-            g_score[next_state] = tentative_g
 
             h_value = manhattan_vertex_distance(next_position, goal)
             f_value = tentative_g + h_value
