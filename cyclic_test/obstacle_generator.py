@@ -33,68 +33,44 @@ def get_adjacent_vertex_positions(position, max_rows, max_cols):
     return valid_neighbors
 
 
-def generate_clumped_obstacle_positions(composite_map, obstacle_ratio=0.40):
+def generate_connected_free_positions(composite_map, obstacle_ratio=0.40):
     vertex_positions = get_vertex_positions(composite_map)
     total_vertices = len(vertex_positions)
+
     target_obstacle_count = int(total_vertices * obstacle_ratio)
+    target_free_count = total_vertices - target_obstacle_count
 
-    if target_obstacle_count == 0:
+    if target_free_count <= 0:
         return set()
-
-    obstacle_positions = set()
-
-    seed_count = max(1, target_obstacle_count // 12)
-    seed_positions = random.sample(
-        vertex_positions,
-        min(seed_count, len(vertex_positions))
-    )
-
-    frontier = []
-
-    for seed in seed_positions:
-        obstacle_positions.add(seed)
-        frontier.append(seed)
 
     max_rows = len(composite_map)
     max_cols = len(composite_map[0])
 
-    while len(obstacle_positions) < target_obstacle_count:
-        if frontier:
-            current = random.choice(frontier)
-        else:
-            remaining_positions = [
-                pos for pos in vertex_positions if pos not in obstacle_positions
-            ]
-            if not remaining_positions:
-                break
-            current = random.choice(remaining_positions)
-            obstacle_positions.add(current)
-            frontier.append(current)
-            continue
+    free_positions = set()
 
-        neighbors = get_adjacent_vertex_positions(current, max_rows, max_cols)
-        random.shuffle(neighbors)
+    start = random.choice(vertex_positions)
+    free_positions.add(start)
 
-        grew_cluster = False
+    while len(free_positions) < target_free_count:
+        frontier = set()
 
-        for neighbor in neighbors:
-            if neighbor not in obstacle_positions:
-                obstacle_positions.add(neighbor)
-                frontier.append(neighbor)
-                grew_cluster = True
-                break
+        for free_pos in free_positions:
+            neighbors = get_adjacent_vertex_positions(free_pos, max_rows, max_cols)
+            for neighbor in neighbors:
+                if neighbor not in free_positions:
+                    frontier.add(neighbor)
 
-            if len(obstacle_positions) >= target_obstacle_count:
-                break
+        if not frontier:
+            break
 
-        if not grew_cluster:
-            frontier.remove(current)
+        next_free = random.choice(list(frontier))
+        free_positions.add(next_free)
 
-    return obstacle_positions
+    return free_positions
 
 
 def apply_randomized_vertices(composite_map, obstacle_ratio=0.40):
-    obstacle_positions = generate_clumped_obstacle_positions(
+    free_positions = generate_connected_free_positions(
         composite_map,
         obstacle_ratio=obstacle_ratio
     )
@@ -102,9 +78,9 @@ def apply_randomized_vertices(composite_map, obstacle_ratio=0.40):
     for i in range(len(composite_map)):
         for j in range(len(composite_map[i])):
             if i % 2 == 0 and j % 2 == 0:
-                if (i, j) in obstacle_positions:
-                    composite_map[i][j] = Vertex.OBSTACLE
-                else:
+                if (i, j) in free_positions:
                     composite_map[i][j] = Vertex.FREE_SPACE
+                else:
+                    composite_map[i][j] = Vertex.OBSTACLE
 
     return composite_map
