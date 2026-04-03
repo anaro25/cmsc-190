@@ -1,8 +1,8 @@
-from base_map_config import MAP_SPECS
-from base_map_factory import assemble_base_maps
-from cyclic_mapper import apply_cyclic_mapping
-from map_logger import write_cyclic_composites
-from mapf_runner import run_single_mapf_for_selected_map
+from cyclic_test.config.base_map_config import MAP_SPECS
+from cyclic_test.maps.base_map_factory import assemble_base_maps
+from cyclic_test.maps.cyclic_mapper import apply_cyclic_mapping
+from cyclic_test.maps.map_logger import write_cyclic_composites
+from cyclic_test.mapf.mapf_runner import run_single_mapf_for_selected_map
 
 
 def main():

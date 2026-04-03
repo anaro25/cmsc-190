@@ -3,3 +3,5 @@ __pycache__/
 
 # Compiled Python files
 *.pyc
+
+cyclic_test/mapf_runs/
