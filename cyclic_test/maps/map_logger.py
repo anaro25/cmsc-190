@@ -6,6 +6,7 @@ from cyclic_test.core.composite_elements import (
     Vertex,
     VerticalTransition,
 )
+from cyclic_test.paths import CLASSICAL_LOGS_DIR, CYCLIC_LOGS_DIR
 
 
 def convert_element_to_log_symbol(element):
@@ -36,6 +37,7 @@ def convert_element_to_log_symbol(element):
         return " "
 
     return str(element)
+from cyclic_test.paths import CLASSICAL_LOGS_DIR, CYCLIC_LOGS_DIR
 
 
 def write_composite_map(composite_map, output_path):
@@ -45,18 +47,20 @@ def write_composite_map(composite_map, output_path):
         for row in composite_map:
             row_symbols = [convert_element_to_log_symbol(element) for element in row]
             file.write(" ".join(row_symbols) + "\n")
+from cyclic_test.paths import CLASSICAL_LOGS_DIR, CYCLIC_LOGS_DIR
 
 
-def write_cyclic_composites(cyclic_maps, output_dir="outputs/cyclic_logs"):
+def write_cyclic_composites(cyclic_maps, output_dir=CYCLIC_LOGS_DIR):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for map_name, composite_map in cyclic_maps.items():
         output_path = output_dir / f"{map_name}_cyclic.xml"
         write_composite_map(composite_map, output_path)
+from cyclic_test.paths import CLASSICAL_LOGS_DIR, CYCLIC_LOGS_DIR
 
 
-def write_classical_composites(classical_maps, output_dir="outputs/classical_logs"):
+def write_classical_composites(classical_maps, output_dir=CLASSICAL_LOGS_DIR):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 

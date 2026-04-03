@@ -6,6 +6,7 @@ from cyclic_test.core.composite_elements import (
     Vertex,
     VerticalTransition,
 )
+from cyclic_test.paths import MAPF_RUNS_DIR
 
 
 def convert_element_to_log_symbol(element):
@@ -40,6 +41,7 @@ def convert_element_to_log_symbol(element):
         return " "
 
     return str(element)
+from cyclic_test.paths import MAPF_RUNS_DIR
 
 
 def write_mapf_frame(frame, output_path):
@@ -50,9 +52,10 @@ def write_mapf_frame(frame, output_path):
         for row in frame:
             row_symbols = [convert_element_to_log_symbol(element) for element in row]
             file.write(" ".join(row_symbols) + "\n")
+from cyclic_test.paths import MAPF_RUNS_DIR
 
 
-def write_mapf_frames(map_name, frames, output_root="outputs/mapf_runs"):
+def write_mapf_frames(map_name, frames, output_root=MAPF_RUNS_DIR):
     map_output_dir = Path(output_root) / map_name
     map_output_dir.mkdir(parents=True, exist_ok=True)
 

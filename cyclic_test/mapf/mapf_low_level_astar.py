@@ -1,7 +1,7 @@
 import heapq
 import itertools
 
-from cyclic_test.navigation.cyclic_grid_navigation import get_outgoing_neighbors
+from cyclic_test.navigation.cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
 
 
 def manhattan_vertex_distance(a, b):
@@ -75,6 +75,12 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
         Once the agent reaches its goal and satisfies all of its own
         time-indexed constraints up to that point, the path ends there.
         The agent is considered absent afterward.
+
+    Important practical bound:
+        Because a wait action exists, unbounded time would create infinitely
+        many distinct states at the same vertex. We therefore cap the search
+        horizon to a conservative finite value based on map size plus the
+        latest relevant constraint time.
     """
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
@@ -82,6 +88,11 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
         return None
 
     latest_constraint_time = get_latest_constraint_time(agent_constraints)
+    num_free_vertices = len(get_all_free_vertices(cyclic_map))
+    max_time_horizon = max(
+        latest_constraint_time,
+        (num_free_vertices * 4) + latest_constraint_time + 4,
+    )
 
     open_heap = []
     counter = itertools.count()
@@ -99,6 +110,9 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
 
         if current_position == goal and current_time >= latest_constraint_time:
             return reconstruct_path(came_from, current_state)
+
+        if current_time >= max_time_horizon:
+            continue
 
         next_time = current_time + 1
 
