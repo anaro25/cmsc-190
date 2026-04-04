@@ -6,7 +6,7 @@ from cyclic_test.maps.map_logger import write_classical_composites, write_cyclic
 from cyclic_test.mapf.mapf_runner import run_single_mapf_for_selected_map
 
 
-DEFAULT_NUM_AGENTS = 8
+DEFAULT_AGENT_DENSITY = 0.10
 DEFAULT_MAX_SOLVER_RUNTIME_SECONDS = 10.0
 
 
@@ -19,22 +19,25 @@ def main():
     write_classical_composites({"map_1": classical_maps["map_1"]})
     write_cyclic_composites({"map_1": cyclic_maps["map_1"]})
 
-    run_single_mapf_for_selected_map(
+    cyclic_result = run_single_mapf_for_selected_map(
         mapping_name="cyclic",
         mapped_grids=cyclic_maps,
         selected_map_name="map_1",
-        num_agents=DEFAULT_NUM_AGENTS,
+        agent_density=DEFAULT_AGENT_DENSITY,
         seed=None,
         max_solver_runtime_seconds=DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
     )
 
+    if cyclic_result is None:
+        return
+
     print()
 
-    run_single_mapf_for_selected_map(
+    classical_result = run_single_mapf_for_selected_map(
         mapping_name="classical",
         mapped_grids=classical_maps,
         selected_map_name="map_1",
-        num_agents=DEFAULT_NUM_AGENTS,
+        agent_density=DEFAULT_AGENT_DENSITY,
         seed=None,
         max_solver_runtime_seconds=DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
     )

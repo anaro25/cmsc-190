@@ -1,19 +1,27 @@
+import math
 import random
 
 from cyclic_test.navigation.cyclic_grid_navigation import get_all_free_vertices
 
 
+AGENT_LABEL_POOL = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") + list("ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ")
+GOAL_LABEL_POOL = list("abcdefghijklmnopqrstuvwxyz") + list("αβγδεζηθικλμνξοπρστυφχψω")
+
+
 def build_agent_labels(num_agents=8):
-    uppercase = [chr(ord("A") + index) for index in range(num_agents)]
-    lowercase = [chr(ord("a") + index) for index in range(num_agents)]
+    if num_agents > len(AGENT_LABEL_POOL) or num_agents > len(GOAL_LABEL_POOL):
+        raise ValueError(
+            "Not enough single-character labels for the requested number of agents. "
+            f"Requested={num_agents}, supported={min(len(AGENT_LABEL_POOL), len(GOAL_LABEL_POOL))}."
+        )
 
     labels = []
     for agent_id in range(num_agents):
         labels.append(
             {
                 "id": agent_id,
-                "label": uppercase[agent_id],
-                "goal_label": lowercase[agent_id],
+                "label": AGENT_LABEL_POOL[agent_id],
+                "goal_label": GOAL_LABEL_POOL[agent_id],
             }
         )
 
@@ -22,6 +30,19 @@ def build_agent_labels(num_agents=8):
 
 def collect_free_vertices(composite_map):
     return get_all_free_vertices(composite_map)
+
+
+def compute_num_agents_from_density(composite_map, density):
+    if density < 0.0 or density > 1.0:
+        raise ValueError(f"Density must be between 0.0 and 1.0. Got {density}.")
+
+    num_free_vertices = len(collect_free_vertices(composite_map))
+    num_agents = math.floor(density * num_free_vertices)
+
+    if density > 0.0 and num_free_vertices > 0:
+        num_agents = max(1, num_agents)
+
+    return num_agents
 
 
 def sample_agent_start_goal_pairs(composite_map, num_agents=8, rng=None):

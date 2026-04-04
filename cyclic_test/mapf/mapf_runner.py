@@ -2,7 +2,10 @@ import random
 import shutil
 from pathlib import Path
 
-from cyclic_test.mapf.agent_assignment import sample_agent_start_goal_pairs
+from cyclic_test.mapf.agent_assignment import (
+    compute_num_agents_from_density,
+    sample_agent_start_goal_pairs,
+)
 from cyclic_test.mapf.cbs_solver import solve_mapf_with_cbs
 from cyclic_test.mapf.mapf_frame_builder import build_all_frames
 from cyclic_test.mapf.mapf_logger import write_mapf_frames
@@ -27,6 +30,7 @@ def print_mapping_summary(mapping_name, map_name, summary):
         print("Status: not solved")
         return
 
+    print(f"Number of agents: {summary['num_agents']}")
     print(f"Number of conflicts detected: {summary['num_conflicts_detected']}")
     print(f"Total path length: {summary['total_path_length']}")
 
@@ -73,7 +77,8 @@ def run_single_mapf_for_map(
     map_name,
     mapping_name,
     composite_map,
-    num_agents=8,
+    num_agents=None,
+    agent_density=None,
     rng=None,
     max_solver_runtime_seconds=10.0,
 ):
@@ -86,6 +91,14 @@ def run_single_mapf_for_map(
     """
     if rng is None:
         rng = random.Random()
+
+    if agent_density is not None:
+        num_agents = compute_num_agents_from_density(
+            composite_map=composite_map,
+            density=agent_density,
+        )
+    elif num_agents is None:
+        raise ValueError("Either num_agents or agent_density must be provided.")
 
     clear_previous_mapping_run(map_name=map_name, mapping_name=mapping_name)
 
@@ -107,9 +120,7 @@ def run_single_mapf_for_map(
             map_name=map_name,
             result=result,
         )
-        raise RuntimeError(
-            f"{mapping_name}/{map_name} terminated because the MAPF solve did not finish successfully."
-        )
+        return None
 
     frames = build_all_frames(
         cyclic_map=composite_map,
@@ -134,7 +145,8 @@ def run_single_mapf_for_selected_map(
     mapping_name,
     mapped_grids,
     selected_map_name="map_1",
-    num_agents=8,
+    num_agents=None,
+    agent_density=None,
     seed=None,
     max_solver_runtime_seconds=10.0,
 ):
@@ -148,6 +160,7 @@ def run_single_mapf_for_selected_map(
         mapping_name=mapping_name,
         composite_map=mapped_grids[selected_map_name],
         num_agents=num_agents,
+        agent_density=agent_density,
         rng=rng,
         max_solver_runtime_seconds=max_solver_runtime_seconds,
     )
