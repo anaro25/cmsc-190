@@ -241,6 +241,8 @@ class PillowMapfRenderer:
             current_position = get_path_position(paths_by_agent[agent["id"]], time_step)
             if current_position is None:
                 continue
+            if current_position == agent["goal"]:
+                continue
 
             row_index, column_index = current_position
             bounds = self._get_cell_bounds(row_index, column_index)
@@ -280,6 +282,10 @@ class PillowMapfRenderer:
         arrow_color,
         is_active=False,
         background_color=FREE_SPACE_COLOR,
+        center_override=None,
+        head_side_override=None,
+        shaft_length_override=None,
+        shaft_thickness_override=None,
     ):
         left, top, right, bottom = bounds
         width = right - left + 1
@@ -288,10 +294,18 @@ class PillowMapfRenderer:
 
         center_x = (left + right) / 2
         center_y = (top + bottom) / 2
+        if center_override is not None:
+            center_x, center_y = center_override
 
         head_side = max(7.0, min_dimension * (0.60 if is_active else 0.56))
         shaft_thickness = max(2.0, head_side * (0.22 if is_active else 0.16))
         shaft_length = max(6.0, head_side * (0.74 if is_active else 0.66))
+        if head_side_override is not None:
+            head_side = head_side_override
+        if shaft_thickness_override is not None:
+            shaft_thickness = shaft_thickness_override
+        if shaft_length_override is not None:
+            shaft_length = shaft_length_override
         if direction in {"left", "right"}:
             shaft_length = min(shaft_length, max(5.0, width * 0.40))
         else:
@@ -429,19 +443,64 @@ class PillowMapfRenderer:
         center_y = (top + bottom) / 2
 
         if orientation == "horizontal":
-            half_width = max(5.0, width * (0.44 if is_active else 0.40))
-            half_height = max(4.0, height * (0.28 if is_active else 0.24))
-        else:
-            half_width = max(4.0, width * (0.28 if is_active else 0.24))
-            half_height = max(5.0, height * (0.44 if is_active else 0.40))
+            offset = max(4.0, width * (0.22 if is_active else 0.20))
+            head_side = max(7.0, min(width, height) * (0.52 if is_active else 0.48))
+            shaft_thickness = max(2.0, head_side * (0.20 if is_active else 0.16))
+            shaft_length = max(4.0, width * (0.11 if is_active else 0.10))
+            self._draw_arrow(
+                draw=draw,
+                bounds=bounds,
+                direction="left",
+                arrow_color=symbol_color,
+                is_active=is_active,
+                background_color=FREE_SPACE_COLOR,
+                center_override=(center_x - offset, center_y),
+                head_side_override=head_side,
+                shaft_length_override=shaft_length,
+                shaft_thickness_override=shaft_thickness,
+            )
+            self._draw_arrow(
+                draw=draw,
+                bounds=bounds,
+                direction="right",
+                arrow_color=symbol_color,
+                is_active=is_active,
+                background_color=FREE_SPACE_COLOR,
+                center_override=(center_x + offset, center_y),
+                head_side_override=head_side,
+                shaft_length_override=shaft_length,
+                shaft_thickness_override=shaft_thickness,
+            )
+            return
 
-        diamond = [
-            (center_x, center_y - half_height),
-            (center_x + half_width, center_y),
-            (center_x, center_y + half_height),
-            (center_x - half_width, center_y),
-        ]
-        draw.polygon(diamond, fill=symbol_color)
+        offset = max(4.0, height * (0.22 if is_active else 0.20))
+        head_side = max(7.0, min(width, height) * (0.52 if is_active else 0.48))
+        shaft_thickness = max(2.0, head_side * (0.20 if is_active else 0.16))
+        shaft_length = max(4.0, height * (0.11 if is_active else 0.10))
+        self._draw_arrow(
+            draw=draw,
+            bounds=bounds,
+            direction="up",
+            arrow_color=symbol_color,
+            is_active=is_active,
+            background_color=FREE_SPACE_COLOR,
+            center_override=(center_x, center_y - offset),
+            head_side_override=head_side,
+            shaft_length_override=shaft_length,
+            shaft_thickness_override=shaft_thickness,
+        )
+        self._draw_arrow(
+            draw=draw,
+            bounds=bounds,
+            direction="down",
+            arrow_color=symbol_color,
+            is_active=is_active,
+            background_color=FREE_SPACE_COLOR,
+            center_override=(center_x, center_y + offset),
+            head_side_override=head_side,
+            shaft_length_override=shaft_length,
+            shaft_thickness_override=shaft_thickness,
+        )
 
     def _build_equilateral_triangle(
         self,
@@ -488,6 +547,8 @@ class PillowMapfRenderer:
         for agent in agents:
             current_position = get_path_position(paths_by_agent[agent["id"]], time_step)
             if current_position is None:
+                continue
+            if current_position == agent["goal"]:
                 continue
 
             row_index, column_index = current_position
