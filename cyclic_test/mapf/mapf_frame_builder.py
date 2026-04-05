@@ -22,8 +22,8 @@ def build_frame_for_time(cyclic_map, agents, paths_by_agent, time_step):
     Builds one composite-map frame for a single timestep.
 
     Overlay priority:
-        1. target letters (lowercase)
-        2. agent letters (uppercase) overwrite targets if occupying same cell
+        1. target symbols (▲)
+        2. agent symbols (■) overwrite targets if occupying same cell
 
     Since agents disappear after reaching their targets, an agent is shown
     only while its path still has a position at this timestep.

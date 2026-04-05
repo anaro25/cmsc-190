@@ -2,15 +2,15 @@ import random
 import shutil
 from pathlib import Path
 
-from cyclic_test.mapf.agent_assignment import (
-    compute_num_agents_from_density,
-    sample_agent_start_goal_pairs,
-)
+from cyclic_test.mapf.agent_assignment import sample_agent_start_goal_pairs
 from cyclic_test.mapf.cbs_solver import solve_mapf_with_cbs
 from cyclic_test.mapf.mapf_frame_builder import build_all_frames
 from cyclic_test.mapf.mapf_logger import write_mapf_frames
 from cyclic_test.mapf.metrics import summarize_mapf_result
 from cyclic_test.paths import MAPF_RUNS_DIR
+
+
+PROGRESS_LOG_INTERVAL_SECONDS = 5
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root=MAPF_RUNS_DIR):
@@ -22,17 +22,30 @@ def clear_previous_mapping_run(map_name, mapping_name, output_root=MAPF_RUNS_DIR
     mapping_output_dir.mkdir(parents=True, exist_ok=True)
 
 
-def print_mapping_summary(mapping_name, map_name, summary):
-    title = f"{mapping_name.upper()} | {map_name}"
-    print(f"\n=== {title} ===")
+def format_path_length(value):
+    if value is None:
+        return "None"
 
+    if isinstance(value, (int, float)) and float(value).is_integer():
+        return str(int(value))
+
+    return f"{value:.2f}"
+
+
+def print_mapping_header(mapping_name, map_name, num_agents):
+    title = f"{mapping_name.upper()} | {map_name}"
+    print(f"=== {title} ===")
+    print(f"Number of agents: {num_agents}")
+
+
+def print_mapping_summary(summary):
     if not summary["solved"]:
-        print("Status: not solved")
+        print("[Failed]")
         return
 
-    print(f"Number of agents: {summary['num_agents']}")
+    print("[Success]")
     print(f"Number of conflicts detected: {summary['num_conflicts_detected']}")
-    print(f"Total path length: {summary['total_path_length']}")
+    print(f"Average path length: {format_path_length(summary['average_path_length'])}")
 
 
 def build_run_result(agents, solved_result, frames):
@@ -49,28 +62,33 @@ def solve_single_mapf_instance(
     composite_map,
     agents,
     max_solver_runtime_seconds=10.0,
+    progress_callback=None,
 ):
     return solve_mapf_with_cbs(
         composite_map=composite_map,
         agents=agents,
         max_runtime_seconds=max_solver_runtime_seconds,
+        progress_callback=progress_callback,
     )
 
 
-def print_bad_setup_message(mapping_name, map_name, result):
+def build_elapsed_time_reporter(interval_seconds=PROGRESS_LOG_INTERVAL_SECONDS):
+    def report(elapsed_seconds):
+        if elapsed_seconds % interval_seconds == 0:
+            print(f"{elapsed_seconds}...")
+
+    return report
+
+
+def print_bad_setup_message(result):
     status = result["status"]
-    conflicts = result["num_conflicts_detected"]
-    expanded = result["num_high_level_nodes_expanded"]
 
     if status == "bad_setup_timeout":
-        reason_text = "solver timeout has been reached"
+        print("[Failed: solver timeout reached]")
     else:
-        reason_text = "assignment not solved"
+        print("[Failed: assignment not solved]")
 
-    print(
-        f"[{mapping_name} | {map_name}] {reason_text} "
-        f"| conflicts_seen={conflicts} | high_level_nodes={expanded}"
-    )
+    print(f"Number of conflicts detected: {result['num_conflicts_detected']}")
 
 
 def run_single_mapf_for_map(
@@ -92,13 +110,12 @@ def run_single_mapf_for_map(
     if rng is None:
         rng = random.Random()
 
-    if agent_density is not None:
-        num_agents = compute_num_agents_from_density(
-            composite_map=composite_map,
-            density=agent_density,
-        )
-    elif num_agents is None:
-        raise ValueError("Either num_agents or agent_density must be provided.")
+    if num_agents is None:
+        if agent_density is not None:
+            raise ValueError(
+                "Agent density is no longer supported. Please provide num_agents instead."
+            )
+        raise ValueError("num_agents must be provided.")
 
     clear_previous_mapping_run(map_name=map_name, mapping_name=mapping_name)
 
@@ -108,18 +125,21 @@ def run_single_mapf_for_map(
         rng=rng,
     )
 
+    print_mapping_header(
+        mapping_name=mapping_name,
+        map_name=map_name,
+        num_agents=num_agents,
+    )
+
     result = solve_single_mapf_instance(
         composite_map=composite_map,
         agents=agents,
         max_solver_runtime_seconds=max_solver_runtime_seconds,
+        progress_callback=build_elapsed_time_reporter(),
     )
 
     if result["status"] != "solved":
-        print_bad_setup_message(
-            mapping_name=mapping_name,
-            map_name=map_name,
-            result=result,
-        )
+        print_bad_setup_message(result=result)
         return None
 
     frames = build_all_frames(
@@ -136,7 +156,7 @@ def run_single_mapf_for_map(
 
     run_result = build_run_result(agents=agents, solved_result=result, frames=frames)
     summary = summarize_mapf_result(run_result)
-    print_mapping_summary(mapping_name=mapping_name, map_name=map_name, summary=summary)
+    print_mapping_summary(summary=summary)
 
     return run_result
 

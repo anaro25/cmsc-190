@@ -2,26 +2,17 @@ import math
 import random
 
 from cyclic_test.navigation.cyclic_grid_navigation import get_all_free_vertices
-
-
-AGENT_LABEL_POOL = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") + list("ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ")
-GOAL_LABEL_POOL = list("abcdefghijklmnopqrstuvwxyz") + list("αβγδεζηθικλμνξοπρστυφχψω")
+from cyclic_test.utils.log_symbols import AGENT_LOG_SYMBOL, TARGET_LOG_SYMBOL
 
 
 def build_agent_labels(num_agents=8):
-    if num_agents > len(AGENT_LABEL_POOL) or num_agents > len(GOAL_LABEL_POOL):
-        raise ValueError(
-            "Not enough single-character labels for the requested number of agents. "
-            f"Requested={num_agents}, supported={min(len(AGENT_LABEL_POOL), len(GOAL_LABEL_POOL))}."
-        )
-
     labels = []
     for agent_id in range(num_agents):
         labels.append(
             {
                 "id": agent_id,
-                "label": AGENT_LABEL_POOL[agent_id],
-                "goal_label": GOAL_LABEL_POOL[agent_id],
+                "label": AGENT_LOG_SYMBOL,
+                "goal_label": TARGET_LOG_SYMBOL,
             }
         )
 

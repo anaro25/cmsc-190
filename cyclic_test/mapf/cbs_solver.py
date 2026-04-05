@@ -172,10 +172,24 @@ def build_cbs_failure(reason, num_conflicts_detected, num_high_level_nodes_expan
     }
 
 
+def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback):
+    if progress_callback is None:
+        return next_report_seconds
+
+    elapsed_seconds = time.perf_counter() - start_time
+
+    while elapsed_seconds >= next_report_seconds:
+        progress_callback(next_report_seconds)
+        next_report_seconds += 5
+
+    return next_report_seconds
+
+
 def solve_mapf_with_cbs(
     composite_map,
     agents,
     max_runtime_seconds=10.0,
+    progress_callback=None,
 ):
     """
     Vanilla CBS for disappearing agents, with practical bad-setup detection.
@@ -185,10 +199,20 @@ def solve_mapf_with_cbs(
     the setup and resample a new assignment.
     """
     start_time = time.perf_counter()
+    next_report_seconds = 5
     root_constraints = []
     root_paths = {}
 
+    if progress_callback is not None:
+        progress_callback(0)
+
     for agent in agents:
+        next_report_seconds = maybe_report_elapsed_time(
+            start_time=start_time,
+            next_report_seconds=next_report_seconds,
+            progress_callback=progress_callback,
+        )
+
         if time.perf_counter() - start_time > max_runtime_seconds:
             return build_cbs_failure(
                 reason="bad_setup_timeout",
@@ -223,6 +247,12 @@ def solve_mapf_with_cbs(
     heapq.heappush(open_heap, (root_node["cost"], next(counter), root_node))
 
     while open_heap:
+        next_report_seconds = maybe_report_elapsed_time(
+            start_time=start_time,
+            next_report_seconds=next_report_seconds,
+            progress_callback=progress_callback,
+        )
+
         elapsed_seconds = time.perf_counter() - start_time
         if elapsed_seconds > max_runtime_seconds:
             return build_cbs_failure(
@@ -249,6 +279,12 @@ def solve_mapf_with_cbs(
         new_constraints = split_conflict_into_constraints(conflict)
 
         for added_constraint in new_constraints:
+            next_report_seconds = maybe_report_elapsed_time(
+                start_time=start_time,
+                next_report_seconds=next_report_seconds,
+                progress_callback=progress_callback,
+            )
+
             if time.perf_counter() - start_time > max_runtime_seconds:
                 return build_cbs_failure(
                     reason="bad_setup_timeout",
