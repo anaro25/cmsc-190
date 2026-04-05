@@ -2,6 +2,8 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+from cyclic_test.visualization.composite_grid_geometry import CompositeGridGeometry
+
 from cyclic_test.core.composite_elements import (
     HorizontalTransition,
     Special,
@@ -13,15 +15,18 @@ from cyclic_test.visualization.color_palette import build_distinct_rgb_palette
 
 
 DEFAULT_CELL_SIZE = 32
-GRID_LINE_COLOR = (210, 210, 210)
 FREE_SPACE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (0, 0, 0)
 ARROW_COLOR = (70, 70, 70)
 
 
 class PillowMapfRenderer:
-    def __init__(self, cell_size=DEFAULT_CELL_SIZE):
+    def __init__(self, cell_size=DEFAULT_CELL_SIZE, transition_scale=0.5):
         self.cell_size = cell_size
+        self.geometry = CompositeGridGeometry(
+            cell_size=cell_size,
+            transition_scale=transition_scale,
+        )
 
     def render_all_frames(self, composite_map, agents, paths_by_agent, output_dir):
         output_dir = Path(output_dir)
@@ -54,12 +59,9 @@ class PillowMapfRenderer:
         output_path,
         agent_colors,
     ):
-        height = len(composite_map)
-        width = len(composite_map[0]) if height > 0 else 0
-
         image = Image.new(
             mode="RGB",
-            size=(width * self.cell_size, height * self.cell_size),
+            size=self.geometry.get_total_size(composite_map),
             color=FREE_SPACE_COLOR,
         )
         draw = ImageDraw.Draw(image)
@@ -88,7 +90,6 @@ class PillowMapfRenderer:
             for column_index, cell_value in enumerate(row):
                 bounds = self._get_cell_bounds(row_index, column_index)
                 self._draw_cell_background(draw=draw, bounds=bounds, cell_value=cell_value)
-                self._draw_grid_outline(draw=draw, bounds=bounds)
                 self._draw_transition_symbol(
                     draw=draw,
                     bounds=bounds,
@@ -102,8 +103,6 @@ class PillowMapfRenderer:
 
         draw.rectangle(bounds, fill=fill_color)
 
-    def _draw_grid_outline(self, draw, bounds):
-        draw.rectangle(bounds, outline=GRID_LINE_COLOR, width=1)
 
     def _draw_transition_symbol(self, draw, bounds, cell_value):
         if cell_value == HorizontalTransition.LEFT:
@@ -147,7 +146,7 @@ class PillowMapfRenderer:
 
     def _draw_circle(self, draw, bounds, fill):
         left, top, right, bottom = bounds
-        margin = max(4, self.cell_size // 6)
+        margin = max(4, min((right - left + 1), (bottom - top + 1)) // 6)
         draw.ellipse(
             (left + margin, top + margin, right - margin, bottom - margin),
             fill=fill,
@@ -156,7 +155,7 @@ class PillowMapfRenderer:
     def _draw_triangle(self, draw, bounds, fill):
         left, top, right, bottom = bounds
         center_x = (left + right) / 2
-        margin = max(5, self.cell_size // 6)
+        margin = max(5, min((right - left + 1), (bottom - top + 1)) // 6)
         points = [
             (center_x, top + margin),
             (left + margin, bottom - margin),
@@ -168,9 +167,12 @@ class PillowMapfRenderer:
         left, top, right, bottom = bounds
         center_x = (left + right) / 2
         center_y = (top + bottom) / 2
-        shaft_margin = max(5, self.cell_size // 5)
-        head_size = max(4, self.cell_size // 6)
-        shaft_width = max(2, self.cell_size // 14)
+        cell_width = right - left + 1
+        cell_height = bottom - top + 1
+        base_size = min(cell_width, cell_height)
+        shaft_margin = max(3, base_size // 5)
+        head_size = max(3, base_size // 5)
+        shaft_width = max(2, base_size // 8)
 
         if direction == "right":
             start = (left + shaft_margin, center_y)
@@ -211,8 +213,4 @@ class PillowMapfRenderer:
         draw.polygon(head, fill=ARROW_COLOR)
 
     def _get_cell_bounds(self, row_index, column_index):
-        left = column_index * self.cell_size
-        top = row_index * self.cell_size
-        right = left + self.cell_size - 1
-        bottom = top + self.cell_size - 1
-        return (left, top, right, bottom)
+        return self.geometry.get_cell_bounds(row_index, column_index)
