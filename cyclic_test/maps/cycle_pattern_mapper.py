@@ -1,6 +1,6 @@
 
-from cyclic_test.core.composite_elements import HorizontalTransition, VerticalTransition
-from cyclic_test.core.transition_utils import is_horizontal_slot, is_vertical_slot
+from cyclic_test.core.composite_elements import HorizontalTransition, VerticalTransition, Vertex
+from cyclic_test.core.transition_utils import get_adjacent_vertices, is_horizontal_slot, is_transition_slot, is_vertical_slot
 
 
 def initialize_transition_elements(composite_grid):
@@ -21,6 +21,16 @@ def overlay_classical_transitions(composite_grid):
 
     for i in range(len(classical_grid)):
         for j in range(len(classical_grid[i])):
+            if not is_transition_slot(i, j):
+                continue
+
+            vertex_a, vertex_b = get_adjacent_vertices(i, j)
+            value_a = classical_grid[vertex_a[0]][vertex_a[1]]
+            value_b = classical_grid[vertex_b[0]][vertex_b[1]]
+
+            if value_a != Vertex.FREE_SPACE or value_b != Vertex.FREE_SPACE:
+                continue
+
             if is_horizontal_slot(i, j):
                 classical_grid[i][j] = HorizontalTransition.LEFT_AND_RIGHT
             elif is_vertical_slot(i, j):

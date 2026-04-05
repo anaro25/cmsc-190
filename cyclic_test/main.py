@@ -6,8 +6,9 @@ from cyclic_test.maps.map_logger import write_classical_composites, write_cyclic
 from cyclic_test.mapf.mapf_runner import run_single_mapf_for_selected_map
 
 
-DEFAULT_AGENT_DENSITY = 0.10
-DEFAULT_MAX_SOLVER_RUNTIME_SECONDS = 10.0
+# DEFAULT_AGENT_DENSITY = 0.10
+DEFAULT_AGENT_DENSITY = 0.05
+DEFAULT_MAX_SOLVER_RUNTIME_SECONDS = 20.0
 
 
 def main():
