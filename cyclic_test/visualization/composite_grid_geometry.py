@@ -1,5 +1,5 @@
 class CompositeGridGeometry:
-    def __init__(self, cell_size, transition_scale=0.5):
+    def __init__(self, cell_size, transition_scale=2 / 3):
         self.cell_size = cell_size
         self.transition_scale = transition_scale
         self.transition_size = max(1, int(round(cell_size * transition_scale)))
