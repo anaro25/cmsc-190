@@ -18,7 +18,7 @@ DEFAULT_CELL_SIZE = 32
 FREE_SPACE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (0, 0, 0)
 OBSTACLE_FILLER_COLOR = (105, 105, 105)
-DEFAULT_ARROW_COLOR = (215, 215, 215)
+DEFAULT_ARROW_COLOR = (228, 228, 228)
 ACTIVE_ARROW_COLOR = (0, 0, 0)
 
 
@@ -183,11 +183,12 @@ class PillowMapfRenderer:
                 background_color=background_color,
             )
         elif cell_value == HorizontalTransition.LEFT_AND_RIGHT:
-            self._draw_bidirectional_symbol(
+            self._draw_bidirectional_transition(
                 draw=draw,
                 bounds=bounds,
-                symbol_color=(ACTIVE_ARROW_COLOR if active_directions else DEFAULT_ARROW_COLOR),
-                is_active=bool(active_directions),
+                orientation="horizontal",
+                active_directions=active_directions,
+                background_color=background_color,
             )
         elif cell_value == VerticalTransition.UP:
             self._draw_arrow(
@@ -208,11 +209,12 @@ class PillowMapfRenderer:
                 background_color=background_color,
             )
         elif cell_value == VerticalTransition.UP_AND_DOWN:
-            self._draw_bidirectional_symbol(
+            self._draw_bidirectional_transition(
                 draw=draw,
                 bounds=bounds,
-                symbol_color=(ACTIVE_ARROW_COLOR if active_directions else DEFAULT_ARROW_COLOR),
-                is_active=bool(active_directions),
+                orientation="vertical",
+                active_directions=active_directions,
+                background_color=background_color,
             )
         elif cell_value in {
             HorizontalTransition.NO_HORIZONTAL_TRANSITION,
@@ -287,13 +289,13 @@ class PillowMapfRenderer:
         center_x = (left + right) / 2
         center_y = (top + bottom) / 2
 
-        head_side = max(7, min_dimension * 0.72)
-        shaft_thickness = max(2.0, head_side * (0.20 if is_active else 0.15))
-        shaft_length = max(5.0, head_side * (0.52 if is_active else 0.46))
+        head_side = max(7.0, min_dimension * (0.60 if is_active else 0.56))
+        shaft_thickness = max(2.0, head_side * (0.22 if is_active else 0.16))
+        shaft_length = max(6.0, head_side * (0.74 if is_active else 0.66))
         if direction in {"left", "right"}:
-            shaft_length = min(shaft_length, max(4.0, width * 0.34))
+            shaft_length = min(shaft_length, max(5.0, width * 0.40))
         else:
-            shaft_length = min(shaft_length, max(4.0, height * 0.34))
+            shaft_length = min(shaft_length, max(5.0, height * 0.40))
 
         head_points, shaft_bounds = self._build_arrow_geometry(
             center_x=center_x,
@@ -381,21 +383,63 @@ class PillowMapfRenderer:
 
         raise ValueError(f"Unsupported arrow direction: {direction}")
 
-    def _draw_bidirectional_symbol(self, draw, bounds, symbol_color, is_active=False):
+    def _draw_bidirectional_transition(
+        self,
+        draw,
+        bounds,
+        orientation,
+        active_directions,
+        background_color=FREE_SPACE_COLOR,
+    ):
+        active_count = len(active_directions)
+
+        if active_count == 1:
+            direction = next(iter(active_directions))
+            self._draw_arrow(
+                draw=draw,
+                bounds=bounds,
+                direction=direction,
+                arrow_color=ACTIVE_ARROW_COLOR,
+                is_active=True,
+                background_color=background_color,
+            )
+            return
+
+        self._draw_bidirectional_symbol(
+            draw=draw,
+            bounds=bounds,
+            symbol_color=(ACTIVE_ARROW_COLOR if active_count >= 2 else DEFAULT_ARROW_COLOR),
+            orientation=orientation,
+            is_active=bool(active_directions),
+        )
+
+    def _draw_bidirectional_symbol(
+        self,
+        draw,
+        bounds,
+        symbol_color,
+        orientation,
+        is_active=False,
+    ):
         left, top, right, bottom = bounds
         width = right - left + 1
         height = bottom - top + 1
-        min_dimension = min(width, height)
 
         center_x = (left + right) / 2
         center_y = (top + bottom) / 2
-        radius = max(4.0, min_dimension * (0.34 if is_active else 0.30))
+
+        if orientation == "horizontal":
+            half_width = max(5.0, width * (0.44 if is_active else 0.40))
+            half_height = max(4.0, height * (0.28 if is_active else 0.24))
+        else:
+            half_width = max(4.0, width * (0.28 if is_active else 0.24))
+            half_height = max(5.0, height * (0.44 if is_active else 0.40))
 
         diamond = [
-            (center_x, center_y - radius),
-            (center_x + radius, center_y),
-            (center_x, center_y + radius),
-            (center_x - radius, center_y),
+            (center_x, center_y - half_height),
+            (center_x + half_width, center_y),
+            (center_x, center_y + half_height),
+            (center_x - half_width, center_y),
         ]
         draw.polygon(diamond, fill=symbol_color)
 
