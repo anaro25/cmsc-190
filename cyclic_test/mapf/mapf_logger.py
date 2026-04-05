@@ -1,23 +1,25 @@
 from pathlib import Path
 
 from cyclic_test.paths import MAPF_RUNS_DIR
-from cyclic_test.utils.log_symbols import convert_element_to_log_symbol
+from cyclic_test.visualization.pillow_mapf_renderer import PillowMapfRenderer
 
 
-def write_mapf_frame(frame, output_path):
-    output_path = Path(output_path)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with output_path.open("w", encoding="utf-8") as file:
-        for row in frame:
-            row_symbols = [convert_element_to_log_symbol(element) for element in row]
-            file.write(" ".join(row_symbols) + "\n")
+DEFAULT_PNG_CELL_SIZE = 32
 
 
-def write_mapf_frames(map_name, frames, output_root=MAPF_RUNS_DIR):
+def write_mapf_frames(
+    map_name,
+    composite_map,
+    agents,
+    paths_by_agent,
+    output_root=MAPF_RUNS_DIR,
+    cell_size=DEFAULT_PNG_CELL_SIZE,
+):
     map_output_dir = Path(output_root) / map_name
-    map_output_dir.mkdir(parents=True, exist_ok=True)
-
-    for time_step, frame in enumerate(frames):
-        output_path = map_output_dir / f"frame_{time_step:03d}.xml"
-        write_mapf_frame(frame, output_path)
+    renderer = PillowMapfRenderer(cell_size=cell_size)
+    return renderer.render_all_frames(
+        composite_map=composite_map,
+        agents=agents,
+        paths_by_agent=paths_by_agent,
+        output_dir=map_output_dir,
+    )
