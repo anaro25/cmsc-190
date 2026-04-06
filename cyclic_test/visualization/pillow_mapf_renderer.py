@@ -15,6 +15,7 @@ from cyclic_test.visualization.color_palette import build_distinct_rgb_palette
 
 
 DEFAULT_CELL_SIZE = 32
+DEFAULT_OUTER_MARGIN_RATIO = 1 / 6
 FREE_SPACE_COLOR = (255, 255, 255)
 OBSTACLE_COLOR = (0, 0, 0)
 OBSTACLE_FILLER_COLOR = (105, 105, 105)
@@ -25,8 +26,14 @@ FREE_SPACE_DOT_COLOR = (210, 210, 210)
 
 
 class PillowMapfRenderer:
-    def __init__(self, cell_size=DEFAULT_CELL_SIZE, transition_scale=2 / 3):
+    def __init__(
+        self,
+        cell_size=DEFAULT_CELL_SIZE,
+        transition_scale=2 / 3,
+        outer_margin_ratio=DEFAULT_OUTER_MARGIN_RATIO,
+    ):
         self.cell_size = cell_size
+        self.outer_margin = max(1, int(round(cell_size * outer_margin_ratio)))
         self.geometry = CompositeGridGeometry(
             cell_size=cell_size,
             transition_scale=transition_scale,
@@ -41,15 +48,8 @@ class PillowMapfRenderer:
 
         rendered_paths = []
 
-        showcase_output_path = output_dir / "frame_000.png"
-        self.render_showcase_frame(
-            composite_map=composite_map,
-            output_path=showcase_output_path,
-        )
-        rendered_paths.append(showcase_output_path)
-
         for time_step in range(makespan + 1):
-            output_path = output_dir / f"frame_{time_step + 1:03d}.png"
+            output_path = output_dir / f"frame_{time_step:03d}.png"
             self.render_frame(
                 composite_map=composite_map,
                 agents=agents,
@@ -62,12 +62,22 @@ class PillowMapfRenderer:
 
         return rendered_paths
 
-    def render_showcase_frame(self, composite_map, output_path):
-        image = Image.new(
-            mode="RGB",
-            size=self.geometry.get_total_size(composite_map),
-            color=FREE_SPACE_COLOR,
+    def render_obstacle_only_frame(self, composite_map, output_path):
+        image = self._create_base_image(composite_map)
+        draw = ImageDraw.Draw(image)
+
+        self._draw_base_grid(
+            draw=draw,
+            composite_map=composite_map,
+            active_arrows={},
+            transition_mode="hidden",
+            draw_free_space_dots=False,
         )
+
+        image.save(output_path)
+
+    def render_showcase_frame(self, composite_map, output_path):
+        image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
 
         self._draw_base_grid(
@@ -76,6 +86,38 @@ class PillowMapfRenderer:
             active_arrows={},
             transition_mode="showcase",
             draw_free_space_dots=False,
+        )
+
+        image.save(output_path)
+
+    def render_setup_frame(
+        self,
+        composite_map,
+        agents,
+        output_path,
+        agent_colors,
+    ):
+        image = self._create_base_image(composite_map)
+        draw = ImageDraw.Draw(image)
+
+        self._draw_base_grid(
+            draw=draw,
+            composite_map=composite_map,
+            active_arrows={},
+            transition_mode="normal",
+            draw_free_space_dots=False,
+        )
+        self._draw_targets(
+            draw=draw,
+            agents=agents,
+            agent_colors=agent_colors,
+            paths_by_agent=None,
+            time_step=None,
+        )
+        self._draw_agents_at_start(
+            draw=draw,
+            agents=agents,
+            agent_colors=agent_colors,
         )
 
         image.save(output_path)
@@ -89,11 +131,7 @@ class PillowMapfRenderer:
         output_path,
         agent_colors,
     ):
-        image = Image.new(
-            mode="RGB",
-            size=self.geometry.get_total_size(composite_map),
-            color=FREE_SPACE_COLOR,
-        )
+        image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
 
         active_arrows = self._get_active_arrow_directions(
@@ -126,6 +164,20 @@ class PillowMapfRenderer:
         )
 
         image.save(output_path)
+
+    def _create_base_image(self, composite_map):
+        return Image.new(
+            mode="RGB",
+            size=self._get_image_size(composite_map),
+            color=FREE_SPACE_COLOR,
+        )
+
+    def _get_image_size(self, composite_map):
+        base_width, base_height = self.geometry.get_total_size(composite_map)
+        return (
+            base_width + (2 * self.outer_margin),
+            base_height + (2 * self.outer_margin),
+        )
 
     def _build_agent_color_map(self, agents):
         palette = build_distinct_rgb_palette(len(agents))
@@ -177,10 +229,23 @@ class PillowMapfRenderer:
         fill_color = FREE_SPACE_COLOR
         if cell_value == Vertex.OBSTACLE:
             fill_color = OBSTACLE_COLOR
-        elif self._should_fill_obstacle_gap(composite_map, row_index, column_index):
+            draw.rectangle(bounds, fill=fill_color)
+            return fill_color
+
+        if self._should_fill_obstacle_gap(composite_map, row_index, column_index):
             fill_color = OBSTACLE_FILLER_COLOR
+            draw.rectangle(bounds, fill=fill_color)
+            return fill_color
 
         draw.rectangle(bounds, fill=fill_color)
+        self._draw_partial_obstacle_gap(
+            draw=draw,
+            composite_map=composite_map,
+            row_index=row_index,
+            column_index=column_index,
+            bounds=bounds,
+            cell_value=cell_value,
+        )
         return fill_color
 
     def _should_fill_obstacle_gap(self, composite_map, row_index, column_index):
@@ -213,6 +278,58 @@ class PillowMapfRenderer:
                 return False
         return True
 
+    def _draw_partial_obstacle_gap(
+        self,
+        draw,
+        composite_map,
+        row_index,
+        column_index,
+        bounds,
+        cell_value,
+    ):
+        left, top, right, bottom = bounds
+        midpoint_x = (left + right) / 2
+        midpoint_y = (top + bottom) / 2
+
+        if row_index % 2 == 0 and column_index % 2 == 1:
+            left_is_obstacle = self._vertex_is_obstacle(composite_map, row_index, column_index - 1)
+            right_is_obstacle = self._vertex_is_obstacle(composite_map, row_index, column_index + 1)
+            if left_is_obstacle ^ right_is_obstacle:
+                if left_is_obstacle:
+                    fill_bounds = (left, top, midpoint_x, bottom)
+                else:
+                    fill_bounds = (midpoint_x, top, right, bottom)
+                draw.rectangle(fill_bounds, fill=OBSTACLE_FILLER_COLOR)
+            return
+
+        if row_index % 2 == 1 and column_index % 2 == 0:
+            upper_is_obstacle = self._vertex_is_obstacle(composite_map, row_index - 1, column_index)
+            lower_is_obstacle = self._vertex_is_obstacle(composite_map, row_index + 1, column_index)
+            if upper_is_obstacle ^ lower_is_obstacle:
+                if upper_is_obstacle:
+                    fill_bounds = (left, top, right, midpoint_y)
+                else:
+                    fill_bounds = (left, midpoint_y, right, bottom)
+                draw.rectangle(fill_bounds, fill=OBSTACLE_FILLER_COLOR)
+            return
+
+        if row_index % 2 == 1 and column_index % 2 == 1:
+            diagonal_quadrants = [
+                (self._vertex_is_obstacle(composite_map, row_index - 1, column_index - 1), (left, top, midpoint_x, midpoint_y)),
+                (self._vertex_is_obstacle(composite_map, row_index - 1, column_index + 1), (midpoint_x, top, right, midpoint_y)),
+                (self._vertex_is_obstacle(composite_map, row_index + 1, column_index - 1), (left, midpoint_y, midpoint_x, bottom)),
+                (self._vertex_is_obstacle(composite_map, row_index + 1, column_index + 1), (midpoint_x, midpoint_y, right, bottom)),
+            ]
+            for has_obstacle, fill_bounds in diagonal_quadrants:
+                if has_obstacle:
+                    draw.rectangle(fill_bounds, fill=OBSTACLE_FILLER_COLOR)
+            return
+
+    def _vertex_is_obstacle(self, composite_map, row_index, column_index):
+        if not self._cell_is_in_bounds(composite_map, row_index, column_index):
+            return False
+        return composite_map[row_index][column_index] == Vertex.OBSTACLE
+
     def _draw_transition_symbol(
         self,
         draw,
@@ -222,6 +339,8 @@ class PillowMapfRenderer:
         background_color,
         transition_mode="normal",
     ):
+        if transition_mode == "hidden":
+            return
         if cell_value == HorizontalTransition.LEFT:
             self._draw_arrow(
                 draw,
@@ -286,6 +405,8 @@ class PillowMapfRenderer:
             return
 
     def _get_arrow_color(self, direction, active_directions, transition_mode="normal"):
+        if transition_mode == "hidden":
+            return None
         if transition_mode == "showcase":
             return SHOWCASE_ARROW_COLOR
         if direction in active_directions:
@@ -296,17 +417,25 @@ class PillowMapfRenderer:
         for agent in agents:
             row_index, column_index = agent["goal"]
             bounds = self._get_cell_bounds(row_index, column_index)
-            reached_goal = self._agent_has_reached_goal(
-                path=paths_by_agent[agent["id"]],
-                goal_position=agent["goal"],
-                time_step=time_step,
-            )
+            reached_goal = False
+            if paths_by_agent is not None and time_step is not None:
+                reached_goal = self._agent_has_reached_goal(
+                    path=paths_by_agent[agent["id"]],
+                    goal_position=agent["goal"],
+                    time_step=time_step,
+                )
             self._draw_target_triangle(
                 draw,
                 bounds,
                 fill=agent_colors[agent["id"]],
                 inverted=reached_goal,
             )
+
+    def _draw_agents_at_start(self, draw, agents, agent_colors):
+        for agent in agents:
+            row_index, column_index = agent["start"]
+            bounds = self._get_cell_bounds(row_index, column_index)
+            self._draw_circle(draw, bounds, fill=agent_colors[agent["id"]])
 
     def _draw_agents(self, draw, agents, paths_by_agent, time_step, agent_colors):
         for agent in agents:
@@ -545,7 +674,7 @@ class PillowMapfRenderer:
 
         if orientation == "horizontal":
             offset = max(4.0, width * (0.22 if is_active else 0.20))
-            head_side = max(7.0, min(width, height) * (0.52 if is_active else 0.48))
+            head_side = max(6.0, min(width, height) * (0.38 if is_active else 0.34))
             shaft_thickness = max(2.0, head_side * (0.20 if is_active else 0.16))
             shaft_length = max(4.0, width * (0.11 if is_active else 0.10))
             self._draw_arrow(
@@ -575,7 +704,7 @@ class PillowMapfRenderer:
             return
 
         offset = max(4.0, height * (0.22 if is_active else 0.20))
-        head_side = max(7.0, min(width, height) * (0.52 if is_active else 0.48))
+        head_side = max(6.0, min(width, height) * (0.38 if is_active else 0.34))
         shaft_thickness = max(2.0, head_side * (0.20 if is_active else 0.16))
         shaft_length = max(4.0, height * (0.11 if is_active else 0.10))
         self._draw_arrow(
@@ -688,11 +817,17 @@ class PillowMapfRenderer:
         }
         return cell_value in direction_to_supported_values[direction]
 
+    def _get_cell_bounds(self, row_index, column_index):
+        left, top, right, bottom = self.geometry.get_cell_bounds(row_index, column_index)
+        return (
+            left + self.outer_margin,
+            top + self.outer_margin,
+            right + self.outer_margin,
+            bottom + self.outer_margin,
+        )
+
     def _cell_is_in_bounds(self, composite_map, row_index, column_index):
         return (
             0 <= row_index < len(composite_map)
             and 0 <= column_index < len(composite_map[0])
         )
-
-    def _get_cell_bounds(self, row_index, column_index):
-        return self.geometry.get_cell_bounds(row_index, column_index)

@@ -4,7 +4,12 @@ from pathlib import Path
 
 from cyclic_test.mapf.agent_assignment import sample_agent_start_goal_pairs
 from cyclic_test.mapf.cbs_solver import solve_mapf_with_cbs
-from cyclic_test.mapf.mapf_logger import write_mapf_frames, write_showcase_frame
+from cyclic_test.mapf.mapf_logger import (
+    write_empty_map_config_frame,
+    write_mapf_frames,
+    write_setup_frame,
+    write_showcase_frame,
+)
 from cyclic_test.mapf.metrics import summarize_mapf_result
 from cyclic_test.paths import MAPF_RUNS_DIR
 
@@ -118,6 +123,12 @@ def run_single_mapf_for_map(
 
     clear_previous_mapping_run(map_name=map_name, mapping_name=mapping_name)
 
+    write_empty_map_config_frame(
+        map_name=map_name,
+        composite_map=composite_map,
+        output_root=MAPF_RUNS_DIR / mapping_name,
+    )
+
     write_showcase_frame(
         map_name=map_name,
         composite_map=composite_map,
@@ -128,6 +139,13 @@ def run_single_mapf_for_map(
         composite_map=composite_map,
         num_agents=num_agents,
         rng=rng,
+    )
+
+    write_setup_frame(
+        map_name=map_name,
+        composite_map=composite_map,
+        agents=agents,
+        output_root=MAPF_RUNS_DIR / mapping_name,
     )
 
     print_mapping_header(
