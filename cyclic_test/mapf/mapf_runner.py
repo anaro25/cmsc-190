@@ -103,6 +103,7 @@ def run_single_mapf_for_map(
     agent_density=None,
     rng=None,
     max_solver_runtime_seconds=10.0,
+    agents=None,
 ):
     """
     Samples one random assignment and attempts one CBS solve.
@@ -135,11 +136,12 @@ def run_single_mapf_for_map(
         output_root=MAPF_RUNS_DIR / mapping_name,
     )
 
-    agents = sample_agent_start_goal_pairs(
-        composite_map=composite_map,
-        num_agents=num_agents,
-        rng=rng,
-    )
+    if agents is None:
+        agents = sample_agent_start_goal_pairs(
+            composite_map=composite_map,
+            num_agents=num_agents,
+            rng=rng,
+        )
 
     write_setup_frame(
         map_name=map_name,
@@ -188,6 +190,7 @@ def run_single_mapf_for_selected_map(
     agent_density=None,
     seed=None,
     max_solver_runtime_seconds=10.0,
+    agents=None,
 ):
     if selected_map_name not in mapped_grids:
         raise ValueError(f"Map '{selected_map_name}' not found in mapped_grids.")
@@ -202,4 +205,5 @@ def run_single_mapf_for_selected_map(
         agent_density=agent_density,
         rng=rng,
         max_solver_runtime_seconds=max_solver_runtime_seconds,
+        agents=agents,
     )

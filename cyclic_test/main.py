@@ -2,6 +2,7 @@ from cyclic_test.config.base_map_config import MAP_SPECS
 from cyclic_test.maps.base_map_factory import assemble_base_maps
 from cyclic_test.maps.classical_mapper import apply_classical_mapping
 from cyclic_test.maps.cyclic_mapper import apply_cyclic_mapping
+from cyclic_test.mapf.agent_assignment import sample_agent_start_goal_pairs
 from cyclic_test.mapf.mapf_runner import run_single_mapf_for_selected_map
 
 
@@ -15,14 +16,20 @@ def main():
     classical_maps = apply_classical_mapping(base_maps)
     cyclic_maps = apply_cyclic_mapping(base_maps)
 
+    selected_map_name = "map_1"
+    shared_agents = sample_agent_start_goal_pairs(
+        composite_map=base_maps[selected_map_name],
+        num_agents=DEFAULT_NUM_OF_AGENTS,
+    )
 
     cyclic_result = run_single_mapf_for_selected_map(
         mapping_name="cyclic",
         mapped_grids=cyclic_maps,
-        selected_map_name="map_1",
+        selected_map_name=selected_map_name,
         num_agents=DEFAULT_NUM_OF_AGENTS,
         seed=None,
         max_solver_runtime_seconds=DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
+        agents=shared_agents,
     )
 
     if cyclic_result is None:
@@ -33,10 +40,11 @@ def main():
     run_single_mapf_for_selected_map(
         mapping_name="classical",
         mapped_grids=classical_maps,
-        selected_map_name="map_1",
+        selected_map_name=selected_map_name,
         num_agents=DEFAULT_NUM_OF_AGENTS,
         seed=None,
         max_solver_runtime_seconds=DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
+        agents=shared_agents,
     )
 
 
