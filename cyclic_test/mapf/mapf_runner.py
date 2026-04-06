@@ -4,7 +4,7 @@ from pathlib import Path
 
 from cyclic_test.mapf.agent_assignment import sample_agent_start_goal_pairs
 from cyclic_test.mapf.cbs_solver import solve_mapf_with_cbs
-from cyclic_test.mapf.mapf_logger import write_mapf_frames
+from cyclic_test.mapf.mapf_logger import write_mapf_frames, write_showcase_frame
 from cyclic_test.mapf.metrics import summarize_mapf_result
 from cyclic_test.paths import MAPF_RUNS_DIR
 
@@ -117,6 +117,12 @@ def run_single_mapf_for_map(
         raise ValueError("num_agents must be provided.")
 
     clear_previous_mapping_run(map_name=map_name, mapping_name=mapping_name)
+
+    write_showcase_frame(
+        map_name=map_name,
+        composite_map=composite_map,
+        output_root=MAPF_RUNS_DIR / mapping_name,
+    )
 
     agents = sample_agent_start_goal_pairs(
         composite_map=composite_map,

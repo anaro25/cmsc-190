@@ -20,6 +20,8 @@ OBSTACLE_COLOR = (0, 0, 0)
 OBSTACLE_FILLER_COLOR = (105, 105, 105)
 DEFAULT_ARROW_COLOR = (228, 228, 228)
 ACTIVE_ARROW_COLOR = (0, 0, 0)
+SHOWCASE_ARROW_COLOR = (90, 90, 90)
+FREE_SPACE_DOT_COLOR = (210, 210, 210)
 
 
 class PillowMapfRenderer:
@@ -38,8 +40,16 @@ class PillowMapfRenderer:
         agent_colors = self._build_agent_color_map(agents)
 
         rendered_paths = []
+
+        showcase_output_path = output_dir / "frame_000.png"
+        self.render_showcase_frame(
+            composite_map=composite_map,
+            output_path=showcase_output_path,
+        )
+        rendered_paths.append(showcase_output_path)
+
         for time_step in range(makespan + 1):
-            output_path = output_dir / f"frame_{time_step:03d}.png"
+            output_path = output_dir / f"frame_{time_step + 1:03d}.png"
             self.render_frame(
                 composite_map=composite_map,
                 agents=agents,
@@ -51,6 +61,24 @@ class PillowMapfRenderer:
             rendered_paths.append(output_path)
 
         return rendered_paths
+
+    def render_showcase_frame(self, composite_map, output_path):
+        image = Image.new(
+            mode="RGB",
+            size=self.geometry.get_total_size(composite_map),
+            color=FREE_SPACE_COLOR,
+        )
+        draw = ImageDraw.Draw(image)
+
+        self._draw_base_grid(
+            draw=draw,
+            composite_map=composite_map,
+            active_arrows={},
+            transition_mode="showcase",
+            draw_free_space_dots=False,
+        )
+
+        image.save(output_path)
 
     def render_frame(
         self,
@@ -79,8 +107,16 @@ class PillowMapfRenderer:
             draw=draw,
             composite_map=composite_map,
             active_arrows=active_arrows,
+            transition_mode="normal",
+            draw_free_space_dots=False,
         )
-        self._draw_targets(draw=draw, agents=agents, agent_colors=agent_colors)
+        self._draw_targets(
+            draw=draw,
+            agents=agents,
+            agent_colors=agent_colors,
+            paths_by_agent=paths_by_agent,
+            time_step=time_step,
+        )
         self._draw_agents(
             draw=draw,
             agents=agents,
@@ -95,7 +131,14 @@ class PillowMapfRenderer:
         palette = build_distinct_rgb_palette(len(agents))
         return {agent["id"]: palette[index] for index, agent in enumerate(agents)}
 
-    def _draw_base_grid(self, draw, composite_map, active_arrows):
+    def _draw_base_grid(
+        self,
+        draw,
+        composite_map,
+        active_arrows,
+        transition_mode="normal",
+        draw_free_space_dots=False,
+    ):
         for row_index, row in enumerate(composite_map):
             for column_index, cell_value in enumerate(row):
                 bounds = self._get_cell_bounds(row_index, column_index)
@@ -113,7 +156,14 @@ class PillowMapfRenderer:
                     cell_value=cell_value,
                     active_directions=active_arrows.get((row_index, column_index), set()),
                     background_color=background_color,
+                    transition_mode=transition_mode,
                 )
+                if draw_free_space_dots:
+                    self._draw_free_space_dot(
+                        draw=draw,
+                        bounds=bounds,
+                        cell_value=cell_value,
+                    )
 
     def _draw_cell_background(
         self,
@@ -163,13 +213,21 @@ class PillowMapfRenderer:
                 return False
         return True
 
-    def _draw_transition_symbol(self, draw, bounds, cell_value, active_directions, background_color):
+    def _draw_transition_symbol(
+        self,
+        draw,
+        bounds,
+        cell_value,
+        active_directions,
+        background_color,
+        transition_mode="normal",
+    ):
         if cell_value == HorizontalTransition.LEFT:
             self._draw_arrow(
                 draw,
                 bounds,
                 direction="left",
-                arrow_color=self._get_arrow_color("left", active_directions),
+                arrow_color=self._get_arrow_color("left", active_directions, transition_mode=transition_mode),
                 is_active=("left" in active_directions),
                 background_color=background_color,
             )
@@ -178,7 +236,7 @@ class PillowMapfRenderer:
                 draw,
                 bounds,
                 direction="right",
-                arrow_color=self._get_arrow_color("right", active_directions),
+                arrow_color=self._get_arrow_color("right", active_directions, transition_mode=transition_mode),
                 is_active=("right" in active_directions),
                 background_color=background_color,
             )
@@ -189,13 +247,14 @@ class PillowMapfRenderer:
                 orientation="horizontal",
                 active_directions=active_directions,
                 background_color=background_color,
+                transition_mode=transition_mode,
             )
         elif cell_value == VerticalTransition.UP:
             self._draw_arrow(
                 draw,
                 bounds,
                 direction="up",
-                arrow_color=self._get_arrow_color("up", active_directions),
+                arrow_color=self._get_arrow_color("up", active_directions, transition_mode=transition_mode),
                 is_active=("up" in active_directions),
                 background_color=background_color,
             )
@@ -204,7 +263,7 @@ class PillowMapfRenderer:
                 draw,
                 bounds,
                 direction="down",
-                arrow_color=self._get_arrow_color("down", active_directions),
+                arrow_color=self._get_arrow_color("down", active_directions, transition_mode=transition_mode),
                 is_active=("down" in active_directions),
                 background_color=background_color,
             )
@@ -215,6 +274,7 @@ class PillowMapfRenderer:
                 orientation="vertical",
                 active_directions=active_directions,
                 background_color=background_color,
+                transition_mode=transition_mode,
             )
         elif cell_value in {
             HorizontalTransition.NO_HORIZONTAL_TRANSITION,
@@ -225,16 +285,28 @@ class PillowMapfRenderer:
         }:
             return
 
-    def _get_arrow_color(self, direction, active_directions):
+    def _get_arrow_color(self, direction, active_directions, transition_mode="normal"):
+        if transition_mode == "showcase":
+            return SHOWCASE_ARROW_COLOR
         if direction in active_directions:
             return ACTIVE_ARROW_COLOR
         return DEFAULT_ARROW_COLOR
 
-    def _draw_targets(self, draw, agents, agent_colors):
+    def _draw_targets(self, draw, agents, agent_colors, paths_by_agent, time_step):
         for agent in agents:
             row_index, column_index = agent["goal"]
             bounds = self._get_cell_bounds(row_index, column_index)
-            self._draw_target_triangle(draw, bounds, fill=agent_colors[agent["id"]])
+            reached_goal = self._agent_has_reached_goal(
+                path=paths_by_agent[agent["id"]],
+                goal_position=agent["goal"],
+                time_step=time_step,
+            )
+            self._draw_target_triangle(
+                draw,
+                bounds,
+                fill=agent_colors[agent["id"]],
+                inverted=reached_goal,
+            )
 
     def _draw_agents(self, draw, agents, paths_by_agent, time_step, agent_colors):
         for agent in agents:
@@ -248,11 +320,32 @@ class PillowMapfRenderer:
             bounds = self._get_cell_bounds(row_index, column_index)
             self._draw_circle(draw, bounds, fill=agent_colors[agent["id"]])
 
+
+    def _agent_has_reached_goal(self, path, goal_position, time_step):
+        capped_time_step = min(time_step, len(path) - 1)
+        for index in range(capped_time_step + 1):
+            if path[index] == goal_position:
+                return True
+        return False
+
+    def _draw_free_space_dot(self, draw, bounds, cell_value):
+        if cell_value != Vertex.FREE_SPACE:
+            return
+
+        left, top, right, bottom = bounds
+        center_x = (left + right) / 2
+        center_y = (top + bottom) / 2
+        radius = max(2, int(round(min(right - left + 1, bottom - top + 1) * 0.10)))
+        draw.ellipse(
+            (center_x - radius, center_y - radius, center_x + radius, center_y + radius),
+            fill=FREE_SPACE_DOT_COLOR,
+        )
+
     def _draw_circle(self, draw, bounds, fill):
         left, top, right, bottom = bounds
         draw.ellipse((left, top, right, bottom), fill=fill)
 
-    def _draw_target_triangle(self, draw, bounds, fill):
+    def _draw_target_triangle(self, draw, bounds, fill, inverted=False):
         left, top, right, bottom = bounds
         width = right - left + 1
         height = bottom - top + 1
@@ -267,11 +360,18 @@ class PillowMapfRenderer:
         base_y = center_y + (triangle_height / 3)
         half_base = side_length / 2
 
-        triangle = [
-            (center_x, top_y),
-            (center_x - half_base, base_y),
-            (center_x + half_base, base_y),
-        ]
+        if inverted:
+            triangle = [
+                (center_x, base_y),
+                (center_x - half_base, top_y),
+                (center_x + half_base, top_y),
+            ]
+        else:
+            triangle = [
+                (center_x, top_y),
+                (center_x - half_base, base_y),
+                (center_x + half_base, base_y),
+            ]
         draw.polygon(triangle, fill=fill)
 
     def _draw_arrow(
@@ -297,9 +397,9 @@ class PillowMapfRenderer:
         if center_override is not None:
             center_x, center_y = center_override
 
-        head_side = max(7.0, min_dimension * (0.60 if is_active else 0.56))
+        head_side = max(6.0, min_dimension * (0.52 if is_active else 0.48))
         shaft_thickness = max(2.0, head_side * (0.22 if is_active else 0.16))
-        shaft_length = max(6.0, head_side * (0.74 if is_active else 0.66))
+        shaft_length = max(8.0, head_side * (1.15 if is_active else 1.00))
         if head_side_override is not None:
             head_side = head_side_override
         if shaft_thickness_override is not None:
@@ -307,9 +407,9 @@ class PillowMapfRenderer:
         if shaft_length_override is not None:
             shaft_length = shaft_length_override
         if direction in {"left", "right"}:
-            shaft_length = min(shaft_length, max(5.0, width * 0.40))
+            shaft_length = min(shaft_length, max(7.0, width * 0.48))
         else:
-            shaft_length = min(shaft_length, max(5.0, height * 0.40))
+            shaft_length = min(shaft_length, max(7.0, height * 0.48))
 
         head_points, shaft_bounds = self._build_arrow_geometry(
             center_x=center_x,
@@ -404,6 +504,7 @@ class PillowMapfRenderer:
         orientation,
         active_directions,
         background_color=FREE_SPACE_COLOR,
+        transition_mode="normal",
     ):
         active_count = len(active_directions)
 
@@ -422,7 +523,7 @@ class PillowMapfRenderer:
         self._draw_bidirectional_symbol(
             draw=draw,
             bounds=bounds,
-            symbol_color=(ACTIVE_ARROW_COLOR if active_count >= 2 else DEFAULT_ARROW_COLOR),
+            symbol_color=(SHOWCASE_ARROW_COLOR if transition_mode == "showcase" else (ACTIVE_ARROW_COLOR if active_count >= 2 else DEFAULT_ARROW_COLOR)),
             orientation=orientation,
             is_active=bool(active_directions),
         )

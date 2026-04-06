@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from cyclic_test.paths import CLASSICAL_LOGS_DIR, CYCLIC_LOGS_DIR
+from cyclic_test.paths import OUTPUTS_ROOT
 from cyclic_test.utils.log_symbols import convert_element_to_log_symbol
 
 
@@ -13,7 +13,7 @@ def write_composite_map(composite_map, output_path):
             file.write(" ".join(row_symbols) + "\n")
 
 
-def write_cyclic_composites(cyclic_maps, output_dir=CYCLIC_LOGS_DIR):
+def write_cyclic_composites(cyclic_maps, output_dir=OUTPUTS_ROOT / "cyclic_logs"):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -22,7 +22,7 @@ def write_cyclic_composites(cyclic_maps, output_dir=CYCLIC_LOGS_DIR):
         write_composite_map(composite_map, output_path)
 
 
-def write_classical_composites(classical_maps, output_dir=CLASSICAL_LOGS_DIR):
+def write_classical_composites(classical_maps, output_dir=OUTPUTS_ROOT / "classical_logs"):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
