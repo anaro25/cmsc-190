@@ -23,7 +23,7 @@ def clear_previous_mapping_run(map_name, mapping_name, output_root):
 
 def build_elapsed_time_reporter(interval_seconds=PROGRESS_LOG_INTERVAL_SECONDS):
     def report(elapsed_seconds):
-        if elapsed_seconds % interval_seconds == 0:
+        if elapsed_seconds > 0 and elapsed_seconds % interval_seconds == 0:
             print(f"{elapsed_seconds}...")
     return report
 
@@ -36,9 +36,8 @@ def format_path_length(value):
     return f"{value:.2f}"
 
 
-def print_mapping_header(mapping_name, map_name, num_agents):
-    print(f"=== {mapping_name.upper()} | {map_name} ===")
-    print(f"Number of agents: {num_agents}")
+def print_mapping_header(mapping_name, context_label):
+    print(f"=== {mapping_name.upper()} | {context_label} ===")
 
 
 def print_mapping_summary(summary):
@@ -63,34 +62,34 @@ def run_time_expanded_mapf_for_loop(
     mapping_name,
     mapped_loop,
     dynamic_matrix_loop,
+    setup_composite_map,
     agents,
     output_root,
     max_solver_runtime_seconds=10.0,
+    context_label=None,
 ):
     clear_previous_mapping_run(map_name=map_name, mapping_name=mapping_name, output_root=output_root)
     mapping_output_root = Path(output_root) / mapping_name
 
     write_dynamic_obstacle_only_frame(
         map_name=map_name,
-        composite_loop=mapped_loop,
-        dynamic_matrix_loop=dynamic_matrix_loop,
+        composite_map=setup_composite_map,
         output_root=mapping_output_root,
     )
     write_dynamic_showcase_frame(
         map_name=map_name,
-        composite_loop=mapped_loop,
-        dynamic_matrix_loop=dynamic_matrix_loop,
+        composite_map=setup_composite_map,
         output_root=mapping_output_root,
     )
     write_dynamic_setup_frame(
         map_name=map_name,
-        composite_loop=mapped_loop,
-        dynamic_matrix_loop=dynamic_matrix_loop,
+        composite_map=setup_composite_map,
         agents=agents,
         output_root=mapping_output_root,
     )
 
-    print_mapping_header(mapping_name=mapping_name, map_name=map_name, num_agents=len(agents))
+    print_mapping_header(mapping_name=mapping_name, context_label=context_label or map_name)
+    print("0...")
     result = solve_time_expanded_mapf_with_cbs(
         mapped_loop=mapped_loop,
         agents=agents,

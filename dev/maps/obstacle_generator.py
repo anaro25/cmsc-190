@@ -33,7 +33,10 @@ def get_adjacent_vertex_positions(position, max_rows, max_cols):
     return valid_neighbors
 
 
-def generate_connected_free_positions(composite_map, obstacle_ratio=0.40):
+def generate_connected_free_positions(composite_map, obstacle_ratio=0.40, rng=None):
+    if rng is None:
+        rng = random
+
     vertex_positions = get_vertex_positions(composite_map)
     total_vertices = len(vertex_positions)
 
@@ -48,7 +51,7 @@ def generate_connected_free_positions(composite_map, obstacle_ratio=0.40):
 
     free_positions = set()
 
-    start = random.choice(vertex_positions)
+    start = rng.choice(vertex_positions)
     free_positions.add(start)
 
     while len(free_positions) < target_free_count:
@@ -63,16 +66,17 @@ def generate_connected_free_positions(composite_map, obstacle_ratio=0.40):
         if not frontier:
             break
 
-        next_free = random.choice(list(frontier))
+        next_free = rng.choice(list(frontier))
         free_positions.add(next_free)
 
     return free_positions
 
 
-def apply_artificial_vertices(composite_map, obstacle_ratio=0.40):
+def apply_artificial_vertices(composite_map, obstacle_ratio=0.40, rng=None):
     free_positions = generate_connected_free_positions(
         composite_map,
-        obstacle_ratio=obstacle_ratio
+        obstacle_ratio=obstacle_ratio,
+        rng=rng,
     )
 
     for i in range(len(composite_map)):

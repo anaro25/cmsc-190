@@ -35,10 +35,9 @@ def format_path_length(value):
     return f"{value:.2f}"
 
 
-def print_mapping_header(mapping_name, map_name, num_agents):
-    title = f"{mapping_name.upper()} | {map_name}"
+def print_mapping_header(mapping_name, context_label):
+    title = f"{mapping_name.upper()} | {context_label}"
     print(f"=== {title} ===")
-    print(f"Number of agents: {num_agents}")
 
 
 def print_mapping_summary(summary):
@@ -77,7 +76,7 @@ def solve_single_mapf_instance(
 
 def build_elapsed_time_reporter(interval_seconds=PROGRESS_LOG_INTERVAL_SECONDS):
     def report(elapsed_seconds):
-        if elapsed_seconds % interval_seconds == 0:
+        if elapsed_seconds > 0 and elapsed_seconds % interval_seconds == 0:
             print(f"{elapsed_seconds}...")
 
     return report
@@ -104,14 +103,8 @@ def run_single_mapf_for_map(
     rng=None,
     max_solver_runtime_seconds=10.0,
     agents=None,
+    context_label=None,
 ):
-    """
-    Samples one random assignment and attempts one CBS solve.
-
-    If the solver times out or fails, the program reports it and stops for this
-    mapping run. The user can manually restart the whole program for another
-    random setup.
-    """
     if rng is None:
         rng = random.Random()
 
@@ -158,9 +151,9 @@ def run_single_mapf_for_map(
 
     print_mapping_header(
         mapping_name=mapping_name,
-        map_name=map_name,
-        num_agents=num_agents,
+        context_label=context_label or map_name,
     )
+    print("0...")
 
     result = solve_single_mapf_instance(
         composite_map=composite_map,
@@ -202,6 +195,7 @@ def run_single_mapf_for_selected_map(
     seed=None,
     max_solver_runtime_seconds=10.0,
     agents=None,
+    context_label=None,
 ):
     if selected_map_name not in mapped_grids:
         raise ValueError(f"Map '{selected_map_name}' not found in mapped_grids.")
@@ -218,4 +212,5 @@ def run_single_mapf_for_selected_map(
         rng=rng,
         max_solver_runtime_seconds=max_solver_runtime_seconds,
         agents=agents,
+        context_label=context_label,
     )

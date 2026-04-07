@@ -1,4 +1,3 @@
-
 from dev.core.composite_elements import Special
 from dev.maps.obstacle_generator import apply_artificial_vertices
 
@@ -18,13 +17,13 @@ def create_empty_composite_map(base_rows, base_cols):
     ]
 
 
-def create_base_map(base_rows, base_cols, obstacle_ratio=0.40):
+def create_base_map(base_rows, base_cols, obstacle_ratio=0.40, rng=None):
     composite_map = create_empty_composite_map(base_rows, base_cols)
-    apply_artificial_vertices(composite_map, obstacle_ratio=obstacle_ratio)
+    apply_artificial_vertices(composite_map, obstacle_ratio=obstacle_ratio, rng=rng)
     return composite_map
 
 
-def assemble_base_maps(map_specs, obstacle_ratio=0.40):
+def assemble_base_maps(map_specs, obstacle_ratio=0.40, rng=None):
     base_maps = {}
 
     for spec in map_specs:
@@ -35,7 +34,8 @@ def assemble_base_maps(map_specs, obstacle_ratio=0.40):
         base_maps[map_name] = create_base_map(
             base_rows=base_rows,
             base_cols=base_cols,
-            obstacle_ratio=obstacle_ratio
+            obstacle_ratio=obstacle_ratio,
+            rng=rng,
         )
 
     return base_maps

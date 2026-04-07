@@ -26,37 +26,34 @@ def _dynamic_cells_to_composite_positions(dynamic_matrix):
     return positions
 
 
-def write_dynamic_obstacle_only_frame(map_name, composite_loop, dynamic_matrix_loop, output_root, cell_size=DEFAULT_PNG_CELL_SIZE):
+def write_dynamic_obstacle_only_frame(map_name, composite_map, output_root, cell_size=DEFAULT_PNG_CELL_SIZE):
     renderer = _build_renderer(cell_size)
     output_path = _get_map_output_dir(map_name, output_root) / 'config_000.png'
     renderer.render_obstacle_only_frame(
-        composite_loop[0],
+        composite_map,
         output_path,
-        dynamic_vertex_positions=_dynamic_cells_to_composite_positions(dynamic_matrix_loop[0]),
     )
     return output_path
 
 
-def write_dynamic_showcase_frame(map_name, composite_loop, dynamic_matrix_loop, output_root, cell_size=DEFAULT_PNG_CELL_SIZE):
+def write_dynamic_showcase_frame(map_name, composite_map, output_root, cell_size=DEFAULT_PNG_CELL_SIZE):
     renderer = _build_renderer(cell_size)
     output_path = _get_map_output_dir(map_name, output_root) / 'config_001.png'
     renderer.render_showcase_frame(
-        composite_loop[0],
+        composite_map,
         output_path,
-        dynamic_vertex_positions=_dynamic_cells_to_composite_positions(dynamic_matrix_loop[0]),
     )
     return output_path
 
 
-def write_dynamic_setup_frame(map_name, composite_loop, dynamic_matrix_loop, agents, output_root, cell_size=DEFAULT_PNG_CELL_SIZE):
+def write_dynamic_setup_frame(map_name, composite_map, agents, output_root, cell_size=DEFAULT_PNG_CELL_SIZE):
     renderer = _build_renderer(cell_size)
     output_path = _get_map_output_dir(map_name, output_root) / 'config_002.png'
     renderer.render_setup_frame(
-        composite_loop[0],
+        composite_map,
         agents,
         output_path,
         renderer._build_agent_color_map(agents),
-        dynamic_vertex_positions=_dynamic_cells_to_composite_positions(dynamic_matrix_loop[0]),
     )
     return output_path
 
