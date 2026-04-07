@@ -87,6 +87,8 @@ def print_bad_setup_message(result):
 
     if status == "bad_setup_timeout":
         print("[Failed: solver timeout reached]")
+    elif status == "no_solution":
+        print("[Failed: no feasible path for this assignment]")
     else:
         print("[Failed: assignment not solved]")
 

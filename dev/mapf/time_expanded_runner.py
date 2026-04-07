@@ -50,8 +50,11 @@ def print_mapping_summary(summary):
 
 
 def print_bad_setup_message(result):
-    if result["status"] == "bad_setup_timeout":
+    status = result["status"]
+    if status == "bad_setup_timeout":
         print("[Failed: solver timeout reached]")
+    elif status == "no_solution":
+        print("[Failed: no feasible path for this assignment]")
     else:
         print("[Failed: assignment not solved]")
     print(f"Number of conflicts detected: {result['num_conflicts_detected']}")

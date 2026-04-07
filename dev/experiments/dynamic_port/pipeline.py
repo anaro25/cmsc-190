@@ -63,7 +63,7 @@ def get_shared_assignment_map(classical_loop):
     return classical_loop[0]
 
 
-def summarize_dynamic_loop(raw_obstacle_matrix, static_matrix, dynamic_loop_frames, num_agents, target_static_obstacle_density, target_dynamic_obstacle_density):
+def summarize_dynamic_loop(raw_obstacle_matrix, static_matrix, dynamic_loop_frames, num_agents, target_static_obstacle_density, target_dynamic_obstacle_density, seed=None):
     rows = len(dynamic_loop_frames[0])
     cols = len(dynamic_loop_frames[0][0])
     total_cells = rows * cols
@@ -80,6 +80,7 @@ def summarize_dynamic_loop(raw_obstacle_matrix, static_matrix, dynamic_loop_fram
     print(f"S-obstacle cells per frame: {static_count}")
     print(f"D-obstacle cells per frame: {dynamic_counts[0] if dynamic_counts else 0}")
     print(f"Loop sequence length: {len(dynamic_loop_frames)}")
+    print(f"Seed: {seed}")
 
 
 def run_dynamic_port_experiment(
@@ -113,54 +114,64 @@ def run_dynamic_port_experiment(
 
     rng = random.Random(seed)
 
-    while True:
-        _clear_terminal_screen()
-        summarize_dynamic_loop(
-            raw_obstacle_matrix=raw_obstacle_matrix,
-            static_matrix=preprocessed_static_matrix,
-            dynamic_loop_frames=dynamic_loop_frames,
-            num_agents=num_agents,
-            target_static_obstacle_density=target_static_obstacle_density,
-            target_dynamic_obstacle_density=target_dynamic_obstacle_density,
-        )
-        print()
-        shared_agents = sample_agent_start_goal_pairs(
-            composite_map=get_shared_assignment_map(classical_loop),
-            num_agents=num_agents,
-            rng=rng,
-        )
+    _clear_terminal_screen()
+    summarize_dynamic_loop(
+        raw_obstacle_matrix=raw_obstacle_matrix,
+        static_matrix=preprocessed_static_matrix,
+        dynamic_loop_frames=dynamic_loop_frames,
+        num_agents=num_agents,
+        target_static_obstacle_density=target_static_obstacle_density,
+        target_dynamic_obstacle_density=target_dynamic_obstacle_density,
+        seed=seed,
+    )
+    print()
+    shared_agents = sample_agent_start_goal_pairs(
+        composite_map=get_shared_assignment_map(classical_loop),
+        num_agents=num_agents,
+        rng=rng,
+    )
 
-        cyclic_result = run_time_expanded_mapf_for_loop(
-            map_name=selected_map_name,
-            mapping_name="cyclic",
-            mapped_loop=cyclic_loop,
-            dynamic_matrix_loop=dynamic_loop_frames,
-            setup_composite_map=cyclic_setup_map,
-            agents=shared_agents,
-            output_root=DYNAMIC_PORT_DIR,
-            max_solver_runtime_seconds=max_solver_runtime_seconds,
-            context_label="[Dynamic | Port Map]",
-        )
+    cyclic_result = run_time_expanded_mapf_for_loop(
+        map_name=selected_map_name,
+        mapping_name="cyclic",
+        mapped_loop=cyclic_loop,
+        dynamic_matrix_loop=dynamic_loop_frames,
+        setup_composite_map=cyclic_setup_map,
+        agents=shared_agents,
+        output_root=DYNAMIC_PORT_DIR,
+        max_solver_runtime_seconds=max_solver_runtime_seconds,
+        context_label="[Dynamic | Port Map]",
+    )
 
-        if cyclic_result is not None:
-            print()
-            classical_result = run_time_expanded_mapf_for_loop(
-                map_name=selected_map_name,
-                mapping_name="classical",
-                mapped_loop=classical_loop,
-                dynamic_matrix_loop=dynamic_loop_frames,
-                setup_composite_map=classical_setup_map,
-                agents=shared_agents,
-                output_root=DYNAMIC_PORT_DIR,
-                max_solver_runtime_seconds=max_solver_runtime_seconds,
-                context_label="[Dynamic | Port Map]",
-            )
-            return {
-                "status": "completed" if classical_result is not None else "failed",
-                "context": "dynamic_port",
-                "condition": CONDITION_NAME,
-                "selected_map_name": selected_map_name,
-                "seed": seed,
-                "agents": shared_agents,
-                "results": {"cyclic": cyclic_result, "classical": classical_result},
-            }
+    if cyclic_result is None:
+        return {
+            "status": "failed",
+            "context": "dynamic_port",
+            "condition": CONDITION_NAME,
+            "selected_map_name": selected_map_name,
+            "seed": seed,
+            "agents": shared_agents,
+            "results": {"cyclic": None, "classical": None},
+        }
+
+    print()
+    classical_result = run_time_expanded_mapf_for_loop(
+        map_name=selected_map_name,
+        mapping_name="classical",
+        mapped_loop=classical_loop,
+        dynamic_matrix_loop=dynamic_loop_frames,
+        setup_composite_map=classical_setup_map,
+        agents=shared_agents,
+        output_root=DYNAMIC_PORT_DIR,
+        max_solver_runtime_seconds=max_solver_runtime_seconds,
+        context_label="[Dynamic | Port Map]",
+    )
+    return {
+        "status": "completed" if classical_result is not None else "failed",
+        "context": "dynamic_port",
+        "condition": CONDITION_NAME,
+        "selected_map_name": selected_map_name,
+        "seed": seed,
+        "agents": shared_agents,
+        "results": {"cyclic": cyclic_result, "classical": classical_result},
+    }
