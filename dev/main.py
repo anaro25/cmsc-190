@@ -2,8 +2,7 @@ from dev.experiments.dynamic_port.pipeline import run_dynamic_port_experiment
 from dev.experiments.static_artificial.pipeline import run_static_artificial_experiment
 
 
-# Edit only this line:
-RUN_CONTEXT = "static_artificial"  # "static_artificial" | "dynamic_port" | "both"
+RUN_CONTEXT = "dynamic_port"  # "static_artificial" | "dynamic_port" | "both"
 
 
 def main():

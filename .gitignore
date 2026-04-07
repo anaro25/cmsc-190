@@ -4,4 +4,4 @@ __pycache__/
 # Compiled Python files
 *.pyc
 
-cyclic_test/outputs/
+dev/outputs/

@@ -62,7 +62,7 @@ class PillowMapfRenderer:
 
         return rendered_paths
 
-    def render_obstacle_only_frame(self, composite_map, output_path):
+    def render_obstacle_only_frame(self, composite_map, output_path, dynamic_vertex_positions=None):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
 
@@ -72,11 +72,12 @@ class PillowMapfRenderer:
             active_arrows={},
             transition_mode="hidden",
             draw_free_space_dots=False,
+            dynamic_vertex_positions=dynamic_vertex_positions,
         )
 
         image.save(output_path)
 
-    def render_showcase_frame(self, composite_map, output_path):
+    def render_showcase_frame(self, composite_map, output_path, dynamic_vertex_positions=None):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
 
@@ -86,6 +87,7 @@ class PillowMapfRenderer:
             active_arrows={},
             transition_mode="showcase",
             draw_free_space_dots=False,
+            dynamic_vertex_positions=dynamic_vertex_positions,
         )
 
         image.save(output_path)
@@ -96,6 +98,7 @@ class PillowMapfRenderer:
         agents,
         output_path,
         agent_colors,
+        dynamic_vertex_positions=None,
     ):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
@@ -106,6 +109,7 @@ class PillowMapfRenderer:
             active_arrows={},
             transition_mode="normal",
             draw_free_space_dots=False,
+            dynamic_vertex_positions=dynamic_vertex_positions,
         )
         self._draw_targets(
             draw=draw,
@@ -130,6 +134,7 @@ class PillowMapfRenderer:
         time_step,
         output_path,
         agent_colors,
+        dynamic_vertex_positions=None,
     ):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
@@ -147,6 +152,7 @@ class PillowMapfRenderer:
             active_arrows=active_arrows,
             transition_mode="normal",
             draw_free_space_dots=False,
+            dynamic_vertex_positions=dynamic_vertex_positions,
         )
         self._draw_targets(
             draw=draw,
@@ -190,6 +196,7 @@ class PillowMapfRenderer:
         active_arrows,
         transition_mode="normal",
         draw_free_space_dots=False,
+        dynamic_vertex_positions=None,
     ):
         for row_index, row in enumerate(composite_map):
             for column_index, cell_value in enumerate(row):
@@ -201,6 +208,7 @@ class PillowMapfRenderer:
                     column_index=column_index,
                     bounds=bounds,
                     cell_value=cell_value,
+                    dynamic_vertex_positions=dynamic_vertex_positions or set(),
                 )
                 self._draw_transition_symbol(
                     draw=draw,
@@ -225,6 +233,7 @@ class PillowMapfRenderer:
         column_index,
         bounds,
         cell_value,
+        dynamic_vertex_positions,
     ):
         fill_color = FREE_SPACE_COLOR
         if cell_value == Vertex.OBSTACLE:
@@ -245,6 +254,7 @@ class PillowMapfRenderer:
             column_index=column_index,
             bounds=bounds,
             cell_value=cell_value,
+            dynamic_vertex_positions=dynamic_vertex_positions,
         )
         return fill_color
 
@@ -286,6 +296,7 @@ class PillowMapfRenderer:
         column_index,
         bounds,
         cell_value,
+        dynamic_vertex_positions,
     ):
         left, top, right, bottom = bounds
         midpoint_x = (left + right) / 2

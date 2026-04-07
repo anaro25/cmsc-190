@@ -1,0 +1,1 @@
+Replace port_map.png with the actual black-and-white port raster when ready.\nBlack pixels = obstacle, white pixels = free space.\n

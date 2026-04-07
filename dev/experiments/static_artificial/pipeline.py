@@ -11,7 +11,7 @@ from dev.mapf.mapf_runner import run_single_mapf_for_selected_map
 from dev.maps.base_map_factory import assemble_base_maps
 from dev.maps.classical_mapper import apply_classical_mapping
 from dev.maps.cyclic_mapper import apply_cyclic_mapping
-from dev.paths import STATIC_ARTIFICIAL_DIR
+from dev.paths import STATIC_ARTIFICIAL_DIR, clear_output_dir
 
 
 def run_static_artificial_experiment(
@@ -21,6 +21,7 @@ def run_static_artificial_experiment(
     max_solver_runtime_seconds=DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
 ):
     print(f"\n[Static | Artificial map | {CONDITION_NAME}]")
+    clear_output_dir(STATIC_ARTIFICIAL_DIR)
 
     base_maps = assemble_base_maps(MAP_SPECS, obstacle_ratio=obstacle_ratio)
     classical_maps = apply_classical_mapping(base_maps)
