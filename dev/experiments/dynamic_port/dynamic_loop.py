@@ -1,3 +1,4 @@
+
 import random
 from collections import deque
 
@@ -51,30 +52,7 @@ def _free_neighbor_count(base_matrix, cell):
     return sum(1 for nr, nc in get_neighbors(base_matrix, r, c) if base_matrix[nr][nc] == 0)
 
 
-def _choose_distributed_centers(base_matrix, group_count, rng):
-    candidates = [cell for cell in _free_cells(base_matrix) if _free_neighbor_count(base_matrix, cell) >= 2]
-    if not candidates:
-        candidates = list(_free_cells(base_matrix))
-    rng.shuffle(candidates)
-    candidates.sort(key=lambda cell: (_free_neighbor_count(base_matrix, cell), rng.random()), reverse=True)
-
-    centers = []
-    min_distance = max(4, min(len(base_matrix), len(base_matrix[0])) // 4)
-    for cell in candidates:
-        if all((shortest_path_distance(base_matrix, cell, other) or 999) >= min_distance for other in centers):
-            centers.append(cell)
-            if len(centers) == group_count:
-                return centers
-
-    for cell in candidates:
-        if cell not in centers:
-            centers.append(cell)
-            if len(centers) == group_count:
-                return centers
-    return centers
-
-
-def _ordered_frontier(base_matrix, group_cells, center, occupied_cells, rng):
+def _ordered_frontier(base_matrix, group_cells, center, blocked_cells, rng):
     frontier = []
     if not group_cells:
         frontier.append(center)
@@ -83,7 +61,7 @@ def _ordered_frontier(base_matrix, group_cells, center, occupied_cells, rng):
             for neighbor in get_neighbors(base_matrix, cell[0], cell[1]):
                 if base_matrix[neighbor[0]][neighbor[1]] != 0:
                     continue
-                if neighbor in group_cells or neighbor in occupied_cells or neighbor in frontier:
+                if neighbor in group_cells or neighbor in blocked_cells or neighbor in frontier:
                     continue
                 frontier.append(neighbor)
     rng.shuffle(frontier)
@@ -97,16 +75,17 @@ def _ordered_frontier(base_matrix, group_cells, center, occupied_cells, rng):
     return frontier
 
 
-def _grow_group_patch(base_matrix, center, target_count, occupied_cells, rng):
+def _grow_group_patch(base_matrix, center, target_count, blocked_cells, rng):
     group_cells = set()
     attempts = 0
-    while len(group_cells) < target_count and attempts < max(80, target_count * 40):
+    limit = max(120, target_count * 50)
+    while len(group_cells) < target_count and attempts < limit:
         attempts += 1
-        frontier = _ordered_frontier(base_matrix, group_cells, center, occupied_cells, rng)
+        frontier = _ordered_frontier(base_matrix, group_cells, center, blocked_cells, rng)
         added = False
         for cell in frontier:
             candidate = group_cells | {cell}
-            if frame_is_valid(base_matrix, occupied_cells | candidate):
+            if frame_is_valid(base_matrix, blocked_cells | candidate):
                 group_cells.add(cell)
                 added = True
                 break
@@ -115,169 +94,152 @@ def _grow_group_patch(base_matrix, center, target_count, occupied_cells, rng):
     return group_cells
 
 
-def _build_group_patches(base_matrix, target_dynamic_cells, preferred_group_range, seed):
+def _candidate_centers(base_matrix, rng):
+    candidates = [cell for cell in _free_cells(base_matrix) if _free_neighbor_count(base_matrix, cell) >= 2]
+    if not candidates:
+        candidates = list(_free_cells(base_matrix))
+    rng.shuffle(candidates)
+    candidates.sort(key=lambda cell: (_free_neighbor_count(base_matrix, cell), rng.random()), reverse=True)
+    return candidates
+
+
+def _build_patch_bank(base_matrix, group_sizes, seed, patches_per_group=90):
     rng = random.Random(seed)
-    min_groups, max_groups = preferred_group_range
-    group_count = rng.randint(min_groups, max_groups)
-    centers = _choose_distributed_centers(base_matrix, group_count, rng)
-
-    target_sizes = [target_dynamic_cells // group_count for _ in range(group_count)]
-    for index in range(target_dynamic_cells % group_count):
-        target_sizes[index] += 1
-
-    patches = []
-    occupied_cells = set()
-    for group_index, (center, target_size) in enumerate(zip(centers, target_sizes)):
-        patch_rng = random.Random(seed + 1000 + group_index * 97)
-        patch = _grow_group_patch(
-            base_matrix=base_matrix,
-            center=center,
-            target_count=max(target_size * 2, target_size + 8),
-            occupied_cells=occupied_cells,
-            rng=patch_rng,
-        )
-        if not patch:
+    centers = _candidate_centers(base_matrix, rng)
+    patch_bank = []
+    for group_index, target_size in enumerate(group_sizes):
+        group_rng = random.Random(seed + 1000 + group_index * 997)
+        entries = []
+        attempts = 0
+        while len(entries) < patches_per_group and attempts < patches_per_group * 8:
+            attempts += 1
+            center = centers[group_rng.randrange(len(centers))]
             patch = _grow_group_patch(
                 base_matrix=base_matrix,
                 center=center,
-                target_count=max(target_size, 1),
-                occupied_cells=occupied_cells,
-                rng=patch_rng,
+                target_count=target_size,
+                blocked_cells=set(),
+                rng=random.Random(seed + 5000 + group_index * 10000 + attempts),
             )
-        ordered_patch = list(patch)
-        patch_rng.shuffle(ordered_patch)
-        ordered_patch.sort(
-            key=lambda cell: (
-                abs(cell[0] - center[0]) + abs(cell[1] - center[1]),
-                -_free_neighbor_count(base_matrix, cell),
-                patch_rng.random(),
-            )
-        )
-        patches.append({
-            "center": center,
-            "cells": ordered_patch,
-        })
-        occupied_cells.update(ordered_patch)
-
-    return patches
-
-
-def _select_frame_dynamic_cells(base_matrix, patches, target_dynamic_cells, frame_seed):
-    frame_rng = random.Random(frame_seed)
-    frame_cells = set()
-    group_indices = list(range(len(patches)))
-    frame_rng.shuffle(group_indices)
-
-    active_groups = []
-    for group_index in group_indices:
-        if frame_rng.random() < 0.55:
-            active_groups.append(group_index)
-
-    if not active_groups and patches:
-        active_groups = [group_indices[0]]
-
-    remaining = target_dynamic_cells
-    groups_left = len(active_groups)
-
-    for group_index in active_groups:
-        groups_left -= 1
-        patch_cells = patches[group_index]["cells"]
-        if not patch_cells:
-            continue
-
-        max_take = min(len(patch_cells), remaining)
-        min_take = 1 if groups_left == 0 else 0
-        if max_take <= 0:
-            continue
-
-        desired = frame_rng.randint(min_take, max_take)
-        ordered_cells = list(patch_cells)
-        frame_rng.shuffle(ordered_cells)
-        ordered_cells.sort(
-            key=lambda cell: (
-                abs(cell[0] - patches[group_index]["center"][0]) + abs(cell[1] - patches[group_index]["center"][1]),
-                frame_rng.random(),
-            )
-        )
-        for cell in ordered_cells[:desired]:
-            candidate = frame_cells | {cell}
-            if frame_is_valid(base_matrix, candidate):
-                frame_cells.add(cell)
-        remaining = target_dynamic_cells - len(frame_cells)
-
-    if len(frame_cells) < target_dynamic_cells:
-        fallback_candidates = []
-        for group in patches:
-            fallback_candidates.extend(group["cells"])
-        # de-duplicate while preserving order
-        seen = set()
-        ordered_candidates = []
-        for cell in fallback_candidates:
-            if cell not in seen:
-                seen.add(cell)
-                ordered_candidates.append(cell)
-        frame_rng.shuffle(ordered_candidates)
-        ordered_candidates.sort(key=lambda cell: (_free_neighbor_count(base_matrix, cell), frame_rng.random()), reverse=True)
-
-        for cell in ordered_candidates:
-            if len(frame_cells) >= target_dynamic_cells:
-                break
-            if cell in frame_cells:
+            if len(patch) != target_size:
                 continue
-            candidate = frame_cells | {cell}
-            if frame_is_valid(base_matrix, candidate):
-                frame_cells.add(cell)
+            entries.append({
+                'center': center,
+                'cells': tuple(sorted(patch)),
+            })
+        if not entries:
+            raise RuntimeError('Unable to build dynamic obstacle patch bank.')
+        patch_bank.append(entries)
+    return patch_bank
 
-    if len(frame_cells) != target_dynamic_cells or not frame_is_valid(base_matrix, frame_cells):
-        frame_cells = set()
-        fallback_candidates = []
-        for group in patches:
-            fallback_candidates.extend(group["cells"])
-        seen = set()
-        ordered_candidates = []
-        for cell in fallback_candidates:
-            if cell not in seen:
-                seen.add(cell)
-                ordered_candidates.append(cell)
-        ordered_candidates.sort(key=lambda cell: (_free_neighbor_count(base_matrix, cell), frame_rng.random()), reverse=True)
-        for cell in ordered_candidates:
-            if len(frame_cells) >= target_dynamic_cells:
-                break
-            candidate = frame_cells | {cell}
-            if frame_is_valid(base_matrix, candidate):
-                frame_cells.add(cell)
 
-    return frame_cells
+def _patch_distance(base_matrix, patch_a, patch_b):
+    center_a = patch_a['center']
+    center_b = patch_b['center']
+    distance = shortest_path_distance(base_matrix, center_a, center_b)
+    if distance is None:
+        return 0
+    return distance
+
+
+def _choose_patch_for_group(base_matrix, group_index, time_step, current_patches, patch_bank, stay_durations, rng):
+    previous_patch = current_patches[group_index]
+    blocked_by_others = set()
+    for other_index, patch in enumerate(current_patches):
+        if other_index == group_index or patch is None:
+            continue
+        blocked_by_others.update(patch['cells'])
+
+    candidates = list(patch_bank[group_index])
+    rng.shuffle(candidates)
+    candidates.sort(
+        key=lambda patch: (
+            0 if previous_patch is None else -_patch_distance(base_matrix, previous_patch, patch),
+            rng.random(),
+        )
+    )
+
+    min_distance = max(5, min(len(base_matrix), len(base_matrix[0])) // 4)
+    relaxed_candidates = []
+    for patch in candidates:
+        patch_cells = set(patch['cells'])
+        if patch_cells & blocked_by_others:
+            continue
+        if previous_patch is not None and patch['cells'] == previous_patch['cells']:
+            continue
+        if previous_patch is not None and _patch_distance(base_matrix, previous_patch, patch) >= min_distance:
+            if frame_is_valid(base_matrix, blocked_by_others | patch_cells):
+                return patch
+        relaxed_candidates.append(patch)
+
+    for patch in relaxed_candidates:
+        patch_cells = set(patch['cells'])
+        if frame_is_valid(base_matrix, blocked_by_others | patch_cells):
+            return patch
+
+    if previous_patch is not None and frame_is_valid(base_matrix, blocked_by_others | set(previous_patch['cells'])):
+        return previous_patch
+
+    raise RuntimeError(
+        f'Unable to place dynamic obstacle group {group_index + 1} at timestep {time_step}. '
+        f'Stay duration={stay_durations[group_index]}.'
+    )
 
 
 def build_dynamic_loop(
     base_matrix,
     dynamic_density,
     loop_length,
-    preferred_group_range=(2, 3),
+    group_stay_durations=(3, 4, 5),
     seed=42,
 ):
     total_cells = len(base_matrix) * len(base_matrix[0])
     target_dynamic_cells = int(round(dynamic_density * total_cells))
-    if target_dynamic_cells <= 0:
-        return [apply_dynamic_cells(base_matrix, set()) for _ in range(max(1, loop_length))]
-
     loop_length = max(1, loop_length)
-    patches = _build_group_patches(
+
+    if target_dynamic_cells <= 0:
+        return [apply_dynamic_cells(base_matrix, set()) for _ in range(loop_length)]
+
+    if not group_stay_durations:
+        raise ValueError('group_stay_durations must not be empty.')
+
+    group_count = len(group_stay_durations)
+    group_sizes = [target_dynamic_cells // group_count for _ in range(group_count)]
+    for index in range(target_dynamic_cells % group_count):
+        group_sizes[index] += 1
+
+    patch_bank = _build_patch_bank(
         base_matrix=base_matrix,
-        target_dynamic_cells=target_dynamic_cells,
-        preferred_group_range=preferred_group_range,
+        group_sizes=group_sizes,
         seed=seed,
     )
 
+    schedule_rng = random.Random(seed + 20000)
+    current_patches = [None for _ in range(group_count)]
     frames = []
+
     for time_step in range(loop_length):
-        dynamic_cells = _select_frame_dynamic_cells(
-            base_matrix=base_matrix,
-            patches=patches,
-            target_dynamic_cells=target_dynamic_cells,
-            frame_seed=seed + time_step * 1009,
-        )
+        for group_index, stay_duration in enumerate(group_stay_durations):
+            if current_patches[group_index] is None or time_step % stay_duration == 0:
+                current_patches[group_index] = _choose_patch_for_group(
+                    base_matrix=base_matrix,
+                    group_index=group_index,
+                    time_step=time_step,
+                    current_patches=current_patches,
+                    patch_bank=patch_bank,
+                    stay_durations=group_stay_durations,
+                    rng=random.Random(seed + 30000 + group_index * 1000 + time_step),
+                )
+
+        dynamic_cells = set()
+        for patch in current_patches:
+            dynamic_cells.update(patch['cells'])
+
+        if len(dynamic_cells) != target_dynamic_cells or not frame_is_valid(base_matrix, dynamic_cells):
+            raise RuntimeError(
+                'Dynamic loop generation produced an invalid frame. '
+                f'Expected {target_dynamic_cells} dynamic cells, got {len(dynamic_cells)}.'
+            )
         frames.append(apply_dynamic_cells(base_matrix, dynamic_cells))
 
     return frames

@@ -6,10 +6,10 @@ from dev.experiments.dynamic_port.config import (
     DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
     DEFAULT_NUM_OF_AGENTS,
     DEFAULT_SELECTED_MAP_NAME,
+    GROUP_STAY_DURATIONS,
     LOOP_SEQUENCE_LENGTH,
     PORT_MAP_IMAGE_PATH,
     PORT_MAP_THRESHOLD,
-    PREFERRED_DYNAMIC_GROUP_COUNT_RANGE,
     TARGET_DYNAMIC_OBSTACLE_DENSITY,
     TARGET_STATIC_OBSTACLE_DENSITY,
 )
@@ -90,6 +90,8 @@ def run_dynamic_port_experiment(
     target_dynamic_obstacle_density=TARGET_DYNAMIC_OBSTACLE_DENSITY,
     max_solver_runtime_seconds=DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
     seed=None,
+    loop_sequence_length=LOOP_SEQUENCE_LENGTH,
+    group_stay_durations=GROUP_STAY_DURATIONS,
 ):
     clear_output_dir(DYNAMIC_PORT_DIR)
 
@@ -105,8 +107,8 @@ def run_dynamic_port_experiment(
     dynamic_loop_frames = build_dynamic_loop(
         base_matrix=preprocessed_static_matrix,
         dynamic_density=target_dynamic_obstacle_density,
-        loop_length=LOOP_SEQUENCE_LENGTH,
-        preferred_group_range=PREFERRED_DYNAMIC_GROUP_COUNT_RANGE,
+        loop_length=loop_sequence_length,
+        group_stay_durations=group_stay_durations,
         seed=seed,
     )
     classical_loop, cyclic_loop = build_mapped_loop(dynamic_loop_frames)
