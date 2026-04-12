@@ -58,7 +58,7 @@ def build_fallback_port_matrix(rows=25, cols=25):
     return grid
 
 
-def load_port_obstacle_matrix(image_path, threshold=127):
+def load_port_obstacle_matrix(image_path, threshold=127, resize_longest_side=None):
     image_path = Path(image_path)
 
     if not image_path.exists():
@@ -66,6 +66,14 @@ def load_port_obstacle_matrix(image_path, threshold=127):
 
     with Image.open(image_path) as image:
         grayscale_image = image.convert("L")
+        if resize_longest_side is not None and resize_longest_side > 0:
+            width, height = grayscale_image.size
+            longest_side = max(width, height)
+            if longest_side > resize_longest_side:
+                scale = resize_longest_side / float(longest_side)
+                resized_width = max(1, int(round(width * scale)))
+                resized_height = max(1, int(round(height * scale)))
+                grayscale_image = grayscale_image.resize((resized_width, resized_height), Image.NEAREST)
         width, height = grayscale_image.size
         pixels = grayscale_image.load()
 
