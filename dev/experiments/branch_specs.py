@@ -5,9 +5,11 @@ from pathlib import Path
 from typing import Any
 
 
-STATIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-DYNAMIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+# STATIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
 
+STATIC_AGENT_NUMBERS = [8, 12, 16, 20] # temporary
+
+DYNAMIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
 
 @dataclass(frozen=True)
 class BranchSpec:
