@@ -1,0 +1,104 @@
+from __future__ import annotations
+
+from dev.experiments.branch_specs import BranchSpec
+from dev.experiments.study.io_utils import ExperimentLogger
+from dev.experiments.study.models import ConditionAggregate, DynamicBranchState, MappingRunRecord
+
+
+def mapping_label(mapping_name: str) -> str:
+    return "Classical" if mapping_name == "classical" else "Cyclic"
+
+
+def status_label(record: MappingRunRecord) -> str:
+    if record.success:
+        return "success"
+    return record.failure_reason or record.status
+
+
+def format_metric(value: float | int | None) -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, float):
+        return f"{value:.4f}"
+    return str(value)
+
+
+def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None:
+    logger.log("=" * 88)
+    logger.log(f"Branch: {branch_spec.display_name} ({branch_spec.map_type})")
+    logger.log(f"Map obstacle type: {branch_spec.map_obstacle_type}")
+    logger.log(f"Documented target type: {branch_spec.target_type_documented}")
+    logger.log(f"Active target type: {branch_spec.target_type_active}")
+    logger.log(f"Required successes (n): {branch_spec.required_successes}")
+    logger.log(f"Maximum classical attempts (m): {branch_spec.max_classical_attempts}")
+    logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.1f}s")
+    logger.log(f"Agent numbers: {branch_spec.agent_numbers}")
+    if branch_spec.notes:
+        logger.log(f"Notes: {branch_spec.notes}")
+    logger.log("=" * 88)
+
+
+def log_dynamic_state(
+    logger: ExperimentLogger,
+    branch_spec: BranchSpec,
+    dynamic_state: DynamicBranchState,
+) -> None:
+    rows = len(dynamic_state.static_matrix)
+    cols = len(dynamic_state.static_matrix[0]) if rows else 0
+    total_cells = max(1, rows * cols)
+    raw_static_count = sum(cell == 1 for row in dynamic_state.raw_obstacle_matrix for cell in row)
+    static_count = sum(cell == 1 for row in dynamic_state.static_matrix for cell in row)
+    dynamic_count = (
+        sum(cell == 2 for row in dynamic_state.dynamic_loop_frames[0] for cell in row)
+        if dynamic_state.dynamic_loop_frames
+        else 0
+    )
+
+    logger.log("Shared dynamic map prepared:")
+    logger.log(f"  Image path: {branch_spec.image_path}")
+    if branch_spec.image_resize_longest_side is not None:
+        logger.log(f"  Resized longest side: {branch_spec.image_resize_longest_side}")
+    logger.log(f"  Dimensions: {rows}x{cols}")
+    logger.log(f"  Raw static density: {raw_static_count / total_cells:.4f}")
+    if branch_spec.dynamic_target_static_obstacle_density is None:
+        logger.log("  Target static density: preserved from source image")
+    else:
+        logger.log(f"  Target static density: {branch_spec.dynamic_target_static_obstacle_density:.4f}")
+    logger.log(
+        f"  Dynamic density target: {(branch_spec.dynamic_target_dynamic_obstacle_density or 0.0):.4f}"
+    )
+    logger.log(f"  Static obstacle cells per frame: {static_count}")
+    logger.log(f"  Dynamic obstacle cells per frame: {dynamic_count}")
+    logger.log(f"  Loop length: {len(dynamic_state.dynamic_loop_frames)}")
+    logger.log(f"  Shared schedule seed: {dynamic_state.schedule_seed}")
+    logger.log(f"  Dynamic generation mode: {dynamic_state.generation_mode}")
+
+
+def log_mapping_record(logger: ExperimentLogger, record: MappingRunRecord) -> None:
+    logger.log(
+        "      "
+        f"{mapping_label(record.mapping_name)} | {record.mapping_record_id} | "
+        f"status={status_label(record)} | time={record.computation_time_seconds:.4f}s | "
+        f"conflicts={format_metric(record.num_conflicts_detected)} | "
+        f"avg_path={format_metric(record.average_path_length)} | "
+        f"paired={record.paired_run}"
+    )
+
+
+def print_aggregate_block(logger: ExperimentLogger, aggregate: ConditionAggregate) -> None:
+    logger.log(
+        "    Condition aggregate | "
+        f"{aggregate.condition_id} | agent_number={aggregate.agent_number} | "
+        f"classical_successes={aggregate.num_classical_successes}/{aggregate.num_classical_attempts} | "
+        f"cyclic_successes={aggregate.num_cyclic_successes}/{aggregate.num_cyclic_attempts} | "
+        f"paired={aggregate.paired_comparison}"
+    )
+    logger.log(
+        "      Averages | "
+        f"classical_time={format_metric(aggregate.classical_avg_computation_time)} | "
+        f"cyclic_time={format_metric(aggregate.cyclic_avg_computation_time)} | "
+        f"classical_conflicts={format_metric(aggregate.classical_avg_conflicts)} | "
+        f"cyclic_conflicts={format_metric(aggregate.cyclic_avg_conflicts)} | "
+        f"classical_path={format_metric(aggregate.classical_avg_path_length)} | "
+        f"cyclic_path={format_metric(aggregate.cyclic_avg_path_length)}"
+    )
