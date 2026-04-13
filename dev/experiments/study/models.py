@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from typing import Any
 
 
@@ -125,3 +125,18 @@ class DynamicBranchState:
     map_identifier: str
     schedule_seed: int
     generation_mode: str
+
+
+@dataclass
+class SamplingConditionResult:
+    accepted_for_reporting: bool
+    stop_branch: bool
+    stop_reason: str | None = None
+    stop_message: str = ""
+    classical_records: list[MappingRunRecord] = field(default_factory=list)
+    cyclic_records: list[MappingRunRecord] = field(default_factory=list)
+    run_configurations: list[dict[str, Any]] = field(default_factory=list)
+    run_records: list[dict[str, Any]] = field(default_factory=list)
+    retained_pairs: int = 0
+    total_paired_sampling_attempts: int = 0
+    consecutive_failed_paired_sampling_attempts: int = 0

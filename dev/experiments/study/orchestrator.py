@@ -2,20 +2,34 @@ from __future__ import annotations
 
 from typing import Any
 
-from dev.experiments.branch_specs import BranchSpec, get_branch_spec
+from dev.experiments.branch_specs import get_branch_spec
 from dev.experiments.study.aggregation import build_condition_aggregate
-from dev.experiments.study.constants import INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
-from dev.experiments.study.io_utils import BranchOutputManager, ExperimentLogger, write_csv, write_json
+from dev.experiments.study.constants import (
+    CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT,
+    INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD,
+)
+from dev.experiments.study.io_utils import (
+    BranchOutputManager,
+    BufferedExperimentLogger,
+    ExperimentLogger,
+    write_csv,
+    write_json,
+)
 from dev.experiments.study.logging_utils import (
     log_branch_header,
     log_dynamic_state,
     log_mapping_record,
     print_aggregate_block,
 )
-from dev.experiments.study.models import ConditionAggregate, DynamicBranchState, MappingRunRecord, PreparedRunContext
+from dev.experiments.study.models import (
+    ConditionAggregate,
+    DynamicBranchState,
+    MappingRunRecord,
+    PreparedRunContext,
+    SamplingConditionResult,
+)
 from dev.experiments.study.plotting import generate_graphs
 from dev.experiments.study.preparation import (
-    build_failure_run_configuration,
     prepare_dynamic_branch_state,
     prepare_dynamic_run_context,
     prepare_static_run_context,
@@ -25,7 +39,7 @@ from dev.experiments.study.runtime import build_mapping_record, run_dynamic_mapp
 
 def _prepare_run_context(
     *,
-    branch_spec: BranchSpec,
+    branch_spec,
     dynamic_state: DynamicBranchState | None,
     agent_number: int,
     agent_number_index: int,
@@ -54,11 +68,11 @@ def _prepare_run_context(
 
 def _execute_mapping(
     *,
-    branch_spec: BranchSpec,
+    branch_spec,
     dynamic_state: DynamicBranchState | None,
     prepared_context: PreparedRunContext,
     mapping_name: str,
-    logger: ExperimentLogger,
+    logger,
 ) -> tuple[dict[str, Any] | None, float, str]:
     label = f"{mapping_name.title()} {prepared_context.run_configuration.run_config_id}"
     if branch_spec.is_dynamic:
@@ -85,67 +99,27 @@ def _execute_mapping(
     )
 
 
-def _record_setup_failure(
+def _run_jointly_viable_sampling(
     *,
-    branch_spec: BranchSpec,
-    dynamic_state: DynamicBranchState | None,
-    seed_base: int,
-    agent_number: int,
-    agent_number_index: int,
-    run_index: int,
-    mapping_name: str,
-    comparison_case: str,
-    run_configurations: list[dict[str, Any]],
-    run_records: list[dict[str, Any]],
-    record_bucket: list[MappingRunRecord],
-    logger: ExperimentLogger,
-    exc: Exception,
-    paired_run: bool,
-) -> None:
-    note = f"setup_failed:{type(exc).__name__}:{exc}"
-    failure_run_config = build_failure_run_configuration(
-        branch_spec=branch_spec,
-        seed_base=seed_base,
-        agent_number=agent_number,
-        agent_number_index=agent_number_index,
-        run_index=run_index,
-        note=note,
-        dynamic_schedule_seed=(dynamic_state.schedule_seed if dynamic_state is not None else None),
-    )
-    run_configurations.append(failure_run_config.to_dict())
-    record = build_mapping_record(
-        run_configuration=failure_run_config,
-        mapping_name=mapping_name,
-        comparison_case=comparison_case,
-        runtime_limit_seconds=branch_spec.runtime_limit_seconds,
-        solver_result=None,
-        elapsed_seconds=0.0,
-        solver_status=note,
-        paired_run=paired_run,
-        dynamic=branch_spec.is_dynamic,
-    )
-    record_bucket.append(record)
-    run_records.append(record.to_dict())
-    log_mapping_record(logger, record)
-
-
-def _run_counted_classical_phase(
-    *,
-    branch_spec: BranchSpec,
+    branch_spec,
     dynamic_state: DynamicBranchState | None,
     agent_number: int,
     agent_number_index: int,
     seed_base: int,
     logger: ExperimentLogger,
-    run_configurations: list[dict[str, Any]],
-    run_records: list[dict[str, Any]],
-) -> tuple[list[MappingRunRecord], list[PreparedRunContext]]:
+) -> SamplingConditionResult:
     classical_records: list[MappingRunRecord] = []
-    counted_contexts: list[PreparedRunContext] = []
+    cyclic_records: list[MappingRunRecord] = []
+    run_configurations: list[dict[str, Any]] = []
+    run_records: list[dict[str, Any]] = []
 
     attempt_index = 0
+    retained_pairs = 0
+    total_paired_sampling_attempts = 0
+    consecutive_failed_paired_sampling_attempts = 0
+
     while (
-        len(counted_contexts) < branch_spec.counted_runs_required
+        retained_pairs < branch_spec.counted_runs_required
         and attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
     ):
         run_index = attempt_index
@@ -160,113 +134,170 @@ def _run_counted_classical_phase(
             )
         except Exception as exc:
             logger.log(
-                f"  Classical attempt {attempt_index + 1} | run_index={run_index} | "
+                f"  Warning: skipped run_index={run_index} during preparation | "
                 f"setup_failed={type(exc).__name__}: {exc}"
-            )
-            _record_setup_failure(
-                branch_spec=branch_spec,
-                dynamic_state=dynamic_state,
-                seed_base=seed_base,
-                agent_number=agent_number,
-                agent_number_index=agent_number_index,
-                run_index=run_index,
-                mapping_name="classical",
-                comparison_case="classical_counted_sampling",
-                run_configurations=run_configurations,
-                run_records=run_records,
-                record_bucket=classical_records,
-                logger=logger,
-                exc=exc,
-                paired_run=False,
             )
             attempt_index += 1
             continue
 
-        logger.log(
-            f"  Classical attempt {attempt_index + 1} | "
+        total_paired_sampling_attempts += 1
+        buffered_logger = BufferedExperimentLogger()
+        buffered_logger.log(
+            f"  Paired sampling attempt {attempt_index + 1} | "
             f"{prepared_context.run_configuration.run_config_id} | "
             f"map_id={prepared_context.run_configuration.map_identifier}"
         )
-        solver_result, elapsed_seconds, solver_status = _execute_mapping(
+
+        classical_solver_result, classical_elapsed_seconds, classical_solver_status = _execute_mapping(
             branch_spec=branch_spec,
             dynamic_state=dynamic_state,
             prepared_context=prepared_context,
             mapping_name="classical",
-            logger=logger,
+            logger=buffered_logger,
         )
-        record = build_mapping_record(
+        classical_record = build_mapping_record(
             run_configuration=prepared_context.run_configuration,
             mapping_name="classical",
-            comparison_case="classical_counted_sampling",
+            comparison_case="paired_jointly_viable_sampling",
             runtime_limit_seconds=branch_spec.runtime_limit_seconds,
-            solver_result=solver_result,
-            elapsed_seconds=elapsed_seconds,
-            solver_status=solver_status,
-            paired_run=False,
-            dynamic=branch_spec.is_dynamic,
-        )
-        classical_records.append(record)
-        if record.counted_run:
-            prepared_context.run_configuration.paired_source = True
-            counted_contexts.append(prepared_context)
-        run_configurations.append(prepared_context.run_configuration.to_dict())
-        run_records.append(record.to_dict())
-        log_mapping_record(logger, record)
-        if record.counted_run:
-            logger.log(
-                f"      Counted classical runs: {len(counted_contexts)}/{branch_spec.counted_runs_required}"
-            )
-        attempt_index += 1
-
-    if len(counted_contexts) < branch_spec.counted_runs_required:
-        logger.log(
-            "  Warning: classical sampling stopped at the internal safeguard before the "
-            f"counted-run quota was reached ({len(counted_contexts)}/{branch_spec.counted_runs_required})."
-        )
-
-    return classical_records, counted_contexts
-
-
-def _run_cyclic_paired_phase(
-    *,
-    branch_spec: BranchSpec,
-    dynamic_state: DynamicBranchState | None,
-    counted_contexts: list[PreparedRunContext],
-    run_records: list[dict[str, Any]],
-    logger: ExperimentLogger,
-) -> list[MappingRunRecord]:
-    cyclic_records: list[MappingRunRecord] = []
-    logger.log(
-        "  Replaying cyclic on the classical counted run configurations "
-        f"({len(counted_contexts)} total)."
-    )
-    for paired_index, prepared_context in enumerate(counted_contexts, start=1):
-        logger.log(
-            f"  Cyclic paired replay {paired_index}/{len(counted_contexts)} | "
-            f"{prepared_context.run_configuration.run_config_id}"
-        )
-        solver_result, elapsed_seconds, solver_status = _execute_mapping(
-            branch_spec=branch_spec,
-            dynamic_state=dynamic_state,
-            prepared_context=prepared_context,
-            mapping_name="cyclic",
-            logger=logger,
-        )
-        record = build_mapping_record(
-            run_configuration=prepared_context.run_configuration,
-            mapping_name="cyclic",
-            comparison_case="paired_counted_replay",
-            runtime_limit_seconds=branch_spec.runtime_limit_seconds,
-            solver_result=solver_result,
-            elapsed_seconds=elapsed_seconds,
-            solver_status=solver_status,
+            solver_result=classical_solver_result,
+            elapsed_seconds=classical_elapsed_seconds,
+            solver_status=classical_solver_status,
             paired_run=True,
             dynamic=branch_spec.is_dynamic,
         )
-        cyclic_records.append(record)
-        run_records.append(record.to_dict())
-        log_mapping_record(logger, record)
-    return cyclic_records
+
+        cyclic_solver_result, cyclic_elapsed_seconds, cyclic_solver_status = _execute_mapping(
+            branch_spec=branch_spec,
+            dynamic_state=dynamic_state,
+            prepared_context=prepared_context,
+            mapping_name="cyclic",
+            logger=buffered_logger,
+        )
+        cyclic_record = build_mapping_record(
+            run_configuration=prepared_context.run_configuration,
+            mapping_name="cyclic",
+            comparison_case="paired_jointly_viable_sampling",
+            runtime_limit_seconds=branch_spec.runtime_limit_seconds,
+            solver_result=cyclic_solver_result,
+            elapsed_seconds=cyclic_elapsed_seconds,
+            solver_status=cyclic_solver_status,
+            paired_run=True,
+            dynamic=branch_spec.is_dynamic,
+        )
+
+        both_counted = classical_record.counted_run and cyclic_record.counted_run
+        if both_counted:
+            prepared_context.run_configuration.paired_source = True
+            run_configurations.append(prepared_context.run_configuration.to_dict())
+            classical_records.append(classical_record)
+            cyclic_records.append(cyclic_record)
+            run_records.append(classical_record.to_dict())
+            run_records.append(cyclic_record.to_dict())
+            buffered_logger.flush_to(logger)
+            log_mapping_record(logger, classical_record)
+            log_mapping_record(logger, cyclic_record)
+            retained_pairs += 1
+            consecutive_failed_paired_sampling_attempts = 0
+            logger.log(
+                f"      Jointly viable counted pairs: {retained_pairs}/{branch_spec.counted_runs_required}"
+            )
+        else:
+            if (
+                classical_record.result_category == "unsolvable"
+                or cyclic_record.result_category == "unsolvable"
+            ):
+                consecutive_failed_paired_sampling_attempts += 1
+                logger.log(
+                    "      Discarded paired sampling attempt due to joint unsolvability screening | "
+                    f"classical={classical_record.result_category} | "
+                    f"cyclic={cyclic_record.result_category} | "
+                    "consecutive_failed_paired_sampling_attempts="
+                    f"{consecutive_failed_paired_sampling_attempts}/"
+                    f"{CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT}"
+                )
+            else:
+                logger.log(
+                    "      Discarded paired sampling attempt due to non-reportable setup outcome | "
+                    f"classical={classical_record.result_category} | "
+                    f"cyclic={cyclic_record.result_category}"
+                )
+
+            if (
+                consecutive_failed_paired_sampling_attempts
+                >= CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT
+            ):
+                stop_message = (
+                    "Stop rule triggered: encountered "
+                    f"{CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT} consecutive failed paired "
+                    f"sampling attempts at agent_number={agent_number}. "
+                    "The current condition is discarded and the branch stops before higher agent numbers."
+                )
+                logger.log(f"  {stop_message}")
+                return SamplingConditionResult(
+                    accepted_for_reporting=False,
+                    stop_branch=True,
+                    stop_reason="consecutive_failed_paired_sampling_attempts",
+                    stop_message=stop_message,
+                    retained_pairs=retained_pairs,
+                    total_paired_sampling_attempts=total_paired_sampling_attempts,
+                    consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+                )
+
+        attempt_index += 1
+
+    if retained_pairs < branch_spec.counted_runs_required:
+        stop_message = (
+            "Stop rule triggered by the internal attempt safeguard before the counted-pair quota was reached "
+            f"({retained_pairs}/{branch_spec.counted_runs_required}) at agent_number={agent_number}. "
+            "The current condition is discarded and the branch stops before higher agent numbers."
+        )
+        logger.log(f"  {stop_message}")
+        return SamplingConditionResult(
+            accepted_for_reporting=False,
+            stop_branch=True,
+            stop_reason="internal_attempt_safeguard",
+            stop_message=stop_message,
+            retained_pairs=retained_pairs,
+            total_paired_sampling_attempts=total_paired_sampling_attempts,
+            consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+        )
+
+    num_cyclic_successful_runs = sum(
+        record.result_category == "successful" for record in cyclic_records
+    )
+    num_cyclic_unfinished_runs = sum(
+        record.result_category == "unfinished" for record in cyclic_records
+    )
+    if num_cyclic_unfinished_runs > num_cyclic_successful_runs:
+        stop_message = (
+            "Stop rule triggered: cyclic unfinished runs exceeded cyclic successful runs within the "
+            f"retained counted pairs at agent_number={agent_number} "
+            f"({num_cyclic_unfinished_runs} unfinished > {num_cyclic_successful_runs} successful). "
+            "The current condition is discarded and the branch stops before higher agent numbers."
+        )
+        logger.log(f"  {stop_message}")
+        return SamplingConditionResult(
+            accepted_for_reporting=False,
+            stop_branch=True,
+            stop_reason="cyclic_unfinished_exceeded_successful",
+            stop_message=stop_message,
+            retained_pairs=retained_pairs,
+            total_paired_sampling_attempts=total_paired_sampling_attempts,
+            consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+        )
+
+    return SamplingConditionResult(
+        accepted_for_reporting=True,
+        stop_branch=False,
+        classical_records=classical_records,
+        cyclic_records=cyclic_records,
+        run_configurations=run_configurations,
+        run_records=run_records,
+        retained_pairs=retained_pairs,
+        total_paired_sampling_attempts=total_paired_sampling_attempts,
+        consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+    )
 
 
 def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> dict[str, Any]:
@@ -280,6 +311,14 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
     run_configurations: list[dict[str, Any]] = []
     run_records: list[dict[str, Any]] = []
     aggregates_payload: list[dict[str, Any]] = []
+    branch_stop_summary = {
+        "stop_triggered": False,
+        "stop_reason": None,
+        "stop_message": "",
+        "stopped_before_agent_number": None,
+        "reported_agent_numbers": [],
+        "planned_agent_numbers": branch_spec.agent_numbers,
+    }
 
     dynamic_state: DynamicBranchState | None = None
     if branch_spec.is_dynamic:
@@ -306,35 +345,44 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
         )
         logger.log("-" * 88)
 
-        classical_records, counted_contexts = _run_counted_classical_phase(
+        sampling_result = _run_jointly_viable_sampling(
             branch_spec=branch_spec,
             dynamic_state=dynamic_state,
             agent_number=agent_number,
             agent_number_index=agent_number_index,
             seed_base=resolved_seed_base,
             logger=logger,
-            run_configurations=run_configurations,
-            run_records=run_records,
         )
 
-        cyclic_records = _run_cyclic_paired_phase(
-            branch_spec=branch_spec,
-            dynamic_state=dynamic_state,
-            counted_contexts=counted_contexts,
-            run_records=run_records,
-            logger=logger,
-        )
+        if sampling_result.accepted_for_reporting:
+            run_configurations.extend(sampling_result.run_configurations)
+            run_records.extend(sampling_result.run_records)
+            aggregate = build_condition_aggregate(
+                branch_spec=branch_spec,
+                agent_number=agent_number,
+                agent_number_index=agent_number_index,
+                classical_records=sampling_result.classical_records,
+                cyclic_records=sampling_result.cyclic_records,
+                paired_run_configurations=min(
+                    len(sampling_result.classical_records),
+                    len(sampling_result.cyclic_records),
+                ),
+            )
+            aggregates_payload.append(aggregate.to_dict())
+            branch_stop_summary["reported_agent_numbers"].append(agent_number)
+            print_aggregate_block(logger, aggregate)
+            continue
 
-        aggregate = build_condition_aggregate(
-            branch_spec=branch_spec,
-            agent_number=agent_number,
-            agent_number_index=agent_number_index,
-            classical_records=classical_records,
-            cyclic_records=cyclic_records,
-            paired_run_configurations=len(counted_contexts),
-        )
-        aggregates_payload.append(aggregate.to_dict())
-        print_aggregate_block(logger, aggregate)
+        if sampling_result.stop_branch:
+            branch_stop_summary.update(
+                {
+                    "stop_triggered": True,
+                    "stop_reason": sampling_result.stop_reason,
+                    "stop_message": sampling_result.stop_message,
+                    "stopped_before_agent_number": agent_number,
+                }
+            )
+            break
 
     write_json(output_manager.records_dir / "run_configurations.json", run_configurations)
     write_json(output_manager.records_dir / "run_records.json", run_records)
@@ -342,6 +390,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
     write_csv(output_manager.records_dir / "run_configurations.csv", run_configurations)
     write_csv(output_manager.records_dir / "run_records.csv", run_records)
     write_csv(output_manager.aggregates_dir / "condition_summary.csv", aggregates_payload)
+    write_json(output_manager.metadata_dir / "branch_stop_summary.json", branch_stop_summary)
 
     aggregate_objects = [ConditionAggregate(**payload) for payload in aggregates_payload]
     graph_paths = generate_graphs(branch_spec, aggregate_objects, output_manager.graphs_dir)
@@ -350,6 +399,16 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
     logger.log("Final aggregate table:")
     for aggregate in aggregate_objects:
         print_aggregate_block(logger, aggregate)
+
+    if branch_stop_summary["stop_triggered"]:
+        logger.log("")
+        logger.log("Branch stopped early:")
+        logger.log(f"  Reason: {branch_stop_summary['stop_reason']}")
+        logger.log(f"  Details: {branch_stop_summary['stop_message']}")
+        logger.log(
+            "  Reported agent numbers: "
+            f"{branch_stop_summary['reported_agent_numbers']}"
+        )
 
     logger.log("")
     logger.log("Generated graph files:")
@@ -362,6 +421,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
         "run_configurations_path": str(output_manager.records_dir / "run_configurations.json"),
         "run_records_path": str(output_manager.records_dir / "run_records.json"),
         "condition_summary_path": str(output_manager.aggregates_dir / "condition_summary.json"),
+        "branch_stop_summary_path": str(output_manager.metadata_dir / "branch_stop_summary.json"),
         "graph_paths": [str(path) for path in graph_paths],
         "log_path": str(output_manager.logs_dir / "experiment.log"),
     }

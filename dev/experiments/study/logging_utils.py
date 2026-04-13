@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dev.experiments.branch_specs import BranchSpec
+from dev.experiments.study.constants import CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT
 from dev.experiments.study.io_utils import ExperimentLogger
 from dev.experiments.study.models import ConditionAggregate, DynamicBranchState, MappingRunRecord
 
@@ -22,9 +23,22 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Documented target type: {branch_spec.target_type_documented}")
     logger.log(f"Active target type: {branch_spec.target_type_active}")
     logger.log(f"Seed: {branch_spec.seed_base}")
-    logger.log(f"Counted runs required (n): {branch_spec.counted_runs_required}")
+    logger.log(f"Jointly viable counted pairs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
-    logger.log(f"Agent numbers: {branch_spec.agent_numbers}")
+    start_agent_number, step_size, max_agent_number = branch_spec.agent_number_range
+    logger.log(
+        "Agent number range: "
+        f"start={start_agent_number}, step={step_size}, max={max_agent_number}"
+    )
+    logger.log(f"Planned agent numbers before early stopping: {branch_spec.agent_numbers}")
+    logger.log(
+        "Early-stop rule 1: discard the current condition and stop when cyclic unfinished runs "
+        "exceed cyclic successful runs within the retained counted pairs."
+    )
+    logger.log(
+        "Early-stop rule 2: discard the current condition and stop after "
+        f"{CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT} consecutive failed paired sampling attempts."
+    )
     if branch_spec.notes:
         logger.log(f"Notes: {branch_spec.notes}")
     logger.log("=" * 88)
@@ -82,15 +96,12 @@ def print_aggregate_block(logger: ExperimentLogger, aggregate: ConditionAggregat
     logger.log(
         "    Condition aggregate | "
         f"{aggregate.condition_id} | agent_number={aggregate.agent_number} | "
-        f"classical_counted={aggregate.num_classical_counted_runs}/{aggregate.counted_runs_required} | "
-        f"cyclic_counted={aggregate.num_cyclic_counted_runs}/{aggregate.paired_run_configurations}"
+        f"retained_pairs={aggregate.paired_run_configurations}/{aggregate.counted_runs_required}"
     )
     logger.log(
         "      Classical | "
         f"successful={aggregate.num_classical_successful_runs} | "
         f"unfinished={aggregate.num_classical_unfinished_runs} | "
-        f"unsolvable={aggregate.num_classical_unsolvable_runs} | "
-        f"setup_failed={aggregate.num_classical_setup_failed_runs} | "
         f"avg_time_halted={format_metric(aggregate.classical_avg_time_computation_halted)} | "
         f"avg_conflicts_at_halt={format_metric(aggregate.classical_avg_conflicts_at_halt)} | "
         f"avg_path={format_metric(aggregate.classical_avg_path_length)}"
@@ -99,8 +110,6 @@ def print_aggregate_block(logger: ExperimentLogger, aggregate: ConditionAggregat
         "      Cyclic | "
         f"successful={aggregate.num_cyclic_successful_runs} | "
         f"unfinished={aggregate.num_cyclic_unfinished_runs} | "
-        f"unsolvable={aggregate.num_cyclic_unsolvable_runs} | "
-        f"setup_failed={aggregate.num_cyclic_setup_failed_runs} | "
         f"avg_time_halted={format_metric(aggregate.cyclic_avg_time_computation_halted)} | "
         f"avg_conflicts_at_halt={format_metric(aggregate.cyclic_avg_conflicts_at_halt)} | "
         f"avg_path={format_metric(aggregate.cyclic_avg_path_length)}"

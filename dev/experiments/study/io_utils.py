@@ -23,6 +23,18 @@ class ExperimentLogger:
             handle.write(message + "\n")
 
 
+class BufferedExperimentLogger:
+    def __init__(self):
+        self.messages: list[str] = []
+
+    def log(self, message: str = "") -> None:
+        self.messages.append(message)
+
+    def flush_to(self, logger: ExperimentLogger) -> None:
+        for message in self.messages:
+            logger.log(message)
+
+
 class BranchOutputManager:
     def __init__(self, branch_spec: BranchSpec):
         self.branch_root = OUTPUTS_ROOT / branch_spec.map_type

@@ -7,6 +7,9 @@ from typing import Any
 from dev.master_config import BRANCH_USER_CONFIGS
 
 
+AgentNumberRange = tuple[int, int, int]
+
+
 @dataclass(frozen=True)
 class BranchSpec:
     map_type: str
@@ -19,6 +22,7 @@ class BranchSpec:
     target_type_documented: str
     target_type_active: str
     seed_base: int
+    agent_number_range: AgentNumberRange
     agent_numbers: list[int]
     runtime_limit_seconds: float
     counted_runs_required: int
@@ -43,11 +47,27 @@ class BranchSpec:
         return payload
 
 
+def expand_agent_number_range(agent_number_range: AgentNumberRange) -> list[int]:
+    start, step, max_agent_number = agent_number_range
+    if start <= 0:
+        raise ValueError("agent_number_range start must be positive")
+    if step <= 0:
+        raise ValueError("agent_number_range step must be positive")
+    if max_agent_number < start:
+        raise ValueError("agent_number_range max must be greater than or equal to start")
+    return list(range(start, max_agent_number + 1, step))
+
+
 def _build_branch_specs() -> dict[str, BranchSpec]:
     static_cfg = BRANCH_USER_CONFIGS["static_artificial"]
     port_cfg = BRANCH_USER_CONFIGS["dynamic_port"]
     campus_1_cfg = BRANCH_USER_CONFIGS["dynamic_campus_area_1"]
     campus_2_cfg = BRANCH_USER_CONFIGS["dynamic_campus_area_2"]
+
+    static_range = tuple(static_cfg["agent_number_range"])
+    port_range = tuple(port_cfg["agent_number_range"])
+    campus_1_range = tuple(campus_1_cfg["agent_number_range"])
+    campus_2_range = tuple(campus_2_cfg["agent_number_range"])
 
     return {
         "static_artificial": BranchSpec(
@@ -61,7 +81,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             target_type_documented="scattered_targets",
             target_type_active="scattered_targets",
             seed_base=int(static_cfg["seed"]),
-            agent_numbers=list(static_cfg["agent_numbers"]),
+            agent_number_range=static_range,
+            agent_numbers=expand_agent_number_range(static_range),
             runtime_limit_seconds=float(static_cfg["time_limit_seconds"]),
             counted_runs_required=int(static_cfg["counted_runs_required"]),
             path_length_graph_enabled=True,
@@ -71,7 +92,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             static_obstacle_density=float(static_cfg["static_obstacle_density"]),
             notes=(
                 "Fresh artificial map per run configuration. Scattered targets are used. "
-                "Counted runs are the runs classified as successful or unfinished."
+                "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
+                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),
         "dynamic_port": BranchSpec(
@@ -85,7 +107,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             target_type_documented="scattered_targets",
             target_type_active="scattered_targets",
             seed_base=int(port_cfg["seed"]),
-            agent_numbers=list(port_cfg["agent_numbers"]),
+            agent_number_range=port_range,
+            agent_numbers=expand_agent_number_range(port_range),
             runtime_limit_seconds=float(port_cfg["time_limit_seconds"]),
             counted_runs_required=int(port_cfg["counted_runs_required"]),
             path_length_graph_enabled=False,
@@ -100,8 +123,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_loop_sequence_length=int(port_cfg["loop_sequence_length"]),
             dynamic_group_stay_durations=tuple(port_cfg["group_stay_durations"]),
             notes=(
-                "Image-based dynamic branch with scattered targets. Counted runs are the runs "
-                "classified as successful or unfinished."
+                "Image-based dynamic branch with scattered targets. Retained pairs are the run "
+                "configurations for which both mappings are classified as successful or unfinished. "
+                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),
         "dynamic_campus_area_1": BranchSpec(
@@ -115,7 +139,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             target_type_documented="single_cell_target",
             target_type_active="scattered_targets",
             seed_base=int(campus_1_cfg["seed"]),
-            agent_numbers=list(campus_1_cfg["agent_numbers"]),
+            agent_number_range=campus_1_range,
+            agent_numbers=expand_agent_number_range(campus_1_range),
             runtime_limit_seconds=float(campus_1_cfg["time_limit_seconds"]),
             counted_runs_required=int(campus_1_cfg["counted_runs_required"]),
             path_length_graph_enabled=False,
@@ -128,8 +153,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_group_stay_durations=tuple(campus_1_cfg["group_stay_durations"]),
             notes=(
                 "The documents describe the campus map as a single-cell target case, "
-                "but the active study currently uses scattered targets. Counted runs are the runs "
-                "classified as successful or unfinished."
+                "but the active study currently uses scattered targets. Retained pairs are the run "
+                "configurations for which both mappings are classified as successful or unfinished. "
+                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),
         "dynamic_campus_area_2": BranchSpec(
@@ -143,7 +169,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             target_type_documented="single_cell_target",
             target_type_active="scattered_targets",
             seed_base=int(campus_2_cfg["seed"]),
-            agent_numbers=list(campus_2_cfg["agent_numbers"]),
+            agent_number_range=campus_2_range,
+            agent_numbers=expand_agent_number_range(campus_2_range),
             runtime_limit_seconds=float(campus_2_cfg["time_limit_seconds"]),
             counted_runs_required=int(campus_2_cfg["counted_runs_required"]),
             path_length_graph_enabled=False,
@@ -156,8 +183,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_group_stay_durations=tuple(campus_2_cfg["group_stay_durations"]),
             notes=(
                 "The documents describe the campus map as a single-cell target case, "
-                "but the active study currently uses scattered targets. Counted runs are the runs "
-                "classified as successful or unfinished."
+                "but the active study currently uses scattered targets. Retained pairs are the run "
+                "configurations for which both mappings are classified as successful or unfinished. "
+                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),
     }

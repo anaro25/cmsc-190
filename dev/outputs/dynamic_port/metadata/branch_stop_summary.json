@@ -1,0 +1,23 @@
+{
+  "stop_triggered": true,
+  "stop_reason": "cyclic_unfinished_exceeded_successful",
+  "stop_message": "Stop rule triggered: cyclic unfinished runs exceeded cyclic successful runs within the retained counted pairs at agent_number=24 (3 unfinished > 2 successful). The current condition is discarded and the branch stops before higher agent numbers.",
+  "stopped_before_agent_number": 24,
+  "reported_agent_numbers": [
+    12,
+    16,
+    20
+  ],
+  "planned_agent_numbers": [
+    12,
+    16,
+    20,
+    24,
+    28,
+    32,
+    36,
+    40,
+    44,
+    48
+  ]
+}

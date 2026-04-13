@@ -1,0 +1,190 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{hyperref}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    pdftitle={Unofficial Experimental Design for Comparing Classical and Cyclic Mapping},
+    pdfauthor={}
+}
+
+\title{Unofficial Experimental Design for Comparing Classical and Cyclic Mapping}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Purpose}
+This document states the experimental design used to compare \textbf{classical mapping} and \textbf{cyclic mapping}. It focuses only on how the comparison is carried out: the experimental factors, the run protocol, the counted-run rule, the fairness rule, the stopping rules, the recorded outcomes, and the aggregation scheme.
+
+\section{Overall Design}
+The comparison is organized by branch and by agent-number condition. For every reported condition, classical and cyclic are evaluated on the same problem instances in the final dataset. The study is structured so that the comparison remains branch-aware, reproducible, and directly comparable across mappings.
+
+A central design choice is that the final dataset is formed only from \textbf{jointly viable} run configurations. A sampled configuration is retained only if it is \emph{not unsolvable} for either mapping. If it is unsolvable for classical or for cyclic, that configuration is discarded and a new one is generated.
+
+A second central design choice is that agent-number conditions are generated automatically and the branch stops early once the comparison becomes uninformative under the adopted stopping rules.
+
+\subsection{Experimental Branches}
+The study contains four branches:
+\begin{enumerate}[leftmargin=1.5em]
+    \item \textbf{Static artificial}
+    \item \textbf{Dynamic port}
+    \item \textbf{Dynamic campus\_area\_1}
+    \item \textbf{Dynamic campus\_area\_2}
+\end{enumerate}
+
+\subsection{Target-Type Grouping}
+The branches are further characterized by target layout:
+\begin{itemize}[leftmargin=1.5em]
+    \item \textbf{Scattered-target branches}: static artificial and dynamic port
+    \item \textbf{Single-cell-target branches}: dynamic campus\_area\_1 and dynamic campus\_area\_2
+\end{itemize}
+
+\subsection{Agent-Number Conditions}
+Instead of manually listing all tested agent numbers, each branch uses an automatic progression parameter
+\[
+\texttt{agent\_number\_range} = (a,b,c)
+\]
+where:
+\begin{itemize}[leftmargin=1.5em]
+    \item $a$ is the starting agent number,
+    \item $b$ is the increment, and
+    \item $c$ is the maximum allowed agent number.
+\end{itemize}
+
+The planned condition sequence is therefore
+\[
+a,\ a+b,\ a+2b,\ \dots
+\]
+up to and including $c$. The branch may stop earlier if one of the experimental stopping rules triggers.
+
+\section{Experimental Variables}
+\subsection{Independent Variable}
+The main independent variable is the \textbf{mapping type}, with two levels:
+\begin{itemize}[leftmargin=1.5em]
+    \item classical mapping
+    \item cyclic mapping
+\end{itemize}
+
+\subsection{Structured Experimental Factors}
+The comparison is stratified by the following experimental factors:
+\begin{itemize}[leftmargin=1.5em]
+    \item map obstacle type
+    \item map type
+    \item target type
+    \item agent number
+    \item run configuration
+\end{itemize}
+
+\subsection{Controlled Variables}
+The following are treated as controlled variables:
+\begin{itemize}[leftmargin=1.5em]
+    \item the MAPF solver and solver settings
+    \item the movement model
+    \item the success criterion
+    \item the runtime limit
+    \item the branch-specific map source or map-generation rule
+    \item the run-configuration generation logic
+    \item the fairness rule that both mappings are compared only on the same retained jointly viable configurations
+    \item the branch stopping rules
+\end{itemize}
+
+\subsection{Dependent Variables}
+The recorded outcome variables for retained paired configurations are:
+\begin{itemize}[leftmargin=1.5em]
+    \item run result category for each mapping
+    \item time\_computation\_halted
+    \item number of conflicts detected at the moment computation halted
+    \item average path length, where applicable
+\end{itemize}
+
+\section{Runtime Rule, Counted-Configuration Rule, and Stopping Rules}
+\subsection{Runtime Limit}
+Every run is executed with a fixed runtime limit defined by the branch configuration.
+
+\subsection{Run Result Categories}
+Each execution under a mapping is assigned exactly one of the following three result categories:
+\begin{enumerate}[leftmargin=1.5em]
+    \item \textbf{successful}: a valid solution is found within the runtime limit
+    \item \textbf{unfinished}: no solution is found within the runtime limit, but the instance is not treated as unsolvable
+    \item \textbf{unsolvable}: the instance is determined to be unsolvable
+\end{enumerate}
+
+\subsection{Counted Paired Configurations}
+The experiment uses
+\[
+n = 5
+\]
+counted paired configurations per reported condition.
+
+A sampled configuration is \textbf{retained and counted} if and only if both mappings yield a non-unsolvable outcome on that same configuration. Equivalently, the classical outcome must be either \textbf{successful} or \textbf{unfinished}, and the cyclic outcome must also be either \textbf{successful} or \textbf{unfinished}.
+
+If the configuration is \textbf{unsolvable} for either mapping, then the entire configuration is discarded and does \emph{not} count toward the required $n=5$ paired configurations.
+
+\subsection{Stopping Rule 1: Cyclic Majority-Unfinished Condition}
+After the current condition reaches its five counted paired configurations, the branch does not proceed to higher agent numbers if cyclic has more unfinished runs than successful runs within that retained set.
+
+For example, at $n=5$, the following trigger the stop rule:
+\begin{itemize}[leftmargin=1.5em]
+    \item $5$ unfinished and $0$ successful,
+    \item $4$ unfinished and $1$ successful,
+    \item $3$ unfinished and $2$ successful.
+\end{itemize}
+
+When this stop rule triggers, the entire current condition is discarded. The reported dataset therefore contains only the earlier accepted conditions.
+
+\subsection{Stopping Rule 2: Consecutive Failed Paired Sampling Attempts}
+While constructing the current condition, the branch does not proceed to higher agent numbers if it encounters five consecutive failed paired sampling attempts.
+
+A \textbf{failed paired sampling attempt} means that the sampled configuration is rejected by the joint viability screen because at least one mapping classifies it as \textbf{unsolvable}. Such a failed attempt does not count toward the required five paired configurations.
+
+When five consecutive failed paired sampling attempts occur, the entire current condition is discarded. The reported dataset therefore contains only the earlier accepted conditions.
+
+\subsection{Interpretation of the Maximum Agent Number}
+The value $c$ in \texttt{agent\_number\_range} is a hard upper bound on the planned progression. It is an implementation safeguard and not the primary scientific stopping criterion. In normal operation, the branch is expected to stop because of the two stopping rules above or because it reaches $c$ without triggering them.
+
+\section{Fairness Protocol for Comparing Classical and Cyclic}
+The main fairness rule of the study is:
+\begin{quote}
+For each reported condition, classical and cyclic are compared only on the same retained run configurations, and a configuration is retained only if it is jointly viable for both mappings.
+\end{quote}
+
+\subsection{Operational Procedure Per Condition}
+For each branch and each current agent-number condition, the procedure is:
+\begin{enumerate}[leftmargin=1.5em]
+    \item Generate a run configuration.
+    \item Execute \textbf{classical mapping} on that configuration.
+    \item Execute \textbf{cyclic mapping} on that same configuration.
+    \item Record the run result category and metrics for each mapping during evaluation.
+    \item If either mapping returns \textbf{unsolvable}, discard the entire configuration as one failed paired sampling attempt.
+    \item If both mappings return either \textbf{successful} or \textbf{unfinished}, keep that configuration as one counted paired configuration.
+    \item Continue until either exactly $n=5$ counted paired configurations have been accumulated or one of the stopping rules triggers.
+    \item If a stopping rule triggers at the current condition, discard that entire condition and report only the earlier accepted conditions.
+\end{enumerate}
+
+\section{Recorded Metrics and Aggregation}
+For each reported condition, the experiment records and aggregates:
+\begin{itemize}[leftmargin=1.5em]
+    \item average \texttt{time\_computation\_halted} over the retained counted pairs,
+    \item average number of conflicts detected at halt over the retained counted pairs,
+    \item average path length over successful runs only, where applicable.
+\end{itemize}
+
+If the retained set contains unfinished runs, those unfinished runs remain part of the averages for time-to-halt and conflicts-at-halt. Conditions discarded by a stopping rule are excluded from the reported aggregates.
+
+\section{Summary of the Design}
+The experiment is a branch-structured, condition-wise, paired comparison between classical and cyclic mapping. For each condition, run configurations are generated and evaluated under both mappings. A configuration is retained only if neither mapping classifies it as unsolvable; otherwise it is discarded and replaced by a newly generated configuration. Agent numbers are generated automatically from \texttt{agent\_number\_range} and the branch stops early when the retained cyclic outcomes become majority-unfinished or when five consecutive failed paired sampling attempts occur. When a stop rule triggers, the current condition is discarded and only the earlier accepted conditions remain in the reported dataset.
+
+\end{document}

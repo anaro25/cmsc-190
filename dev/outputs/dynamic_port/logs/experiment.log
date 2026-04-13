@@ -1,0 +1,255 @@
+========================================================================================
+Branch: Dynamic Port (dynamic_port)
+Map obstacle type: dynamic
+Documented target type: scattered_targets
+Active target type: scattered_targets
+Seed: 201
+Jointly viable counted pairs required (n): 5
+Runtime limit per run: 15.00s
+Agent number range: start=12, step=4, max=50
+Planned agent numbers before early stopping: [12, 16, 20, 24, 28, 32, 36, 40, 44, 48]
+Early-stop rule 1: discard the current condition and stop when cyclic unfinished runs exceed cyclic successful runs within the retained counted pairs.
+Early-stop rule 2: discard the current condition and stop after 5 consecutive failed paired sampling attempts.
+Notes: Image-based dynamic branch with scattered targets. Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger.
+========================================================================================
+Shared dynamic map prepared:
+  Image path: D:\projects\cmsc-190\dev\inputs\dynamic_port\port_map\port_map.png
+  Resized longest side: 40
+  Dimensions: 40x40
+  Raw static density: 0.30
+  Target static density: 0.15
+  Dynamic density target: 0.05
+  Static obstacle cells per frame: 240
+  Dynamic obstacle cells per frame: 80
+  Loop length: 20
+  Shared schedule seed: 57196
+  Dynamic generation mode: group_patch
+
+----------------------------------------------------------------------------------------
+Condition 1/10 | agent_number=12 | condition_id=agent_number[1.0.0]
+----------------------------------------------------------------------------------------
+  Paired sampling attempt 1 | run[1.0.0.0] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.0.0] progress: 0.00s
+    Classical run[1.0.0.0] progress: 5.00s
+    Classical run[1.0.0.0] progress: 10.00s
+    Classical run[1.0.0.0] progress: 15.00s
+    Cyclic run[1.0.0.0] progress: 0.00s
+      Classical | mapping[1.0.0.0.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=4488.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.0.0.1] | result=successful | solver_status=solved | counted=True | time_halted=0.43s | conflicts_at_halt=1.00 | avg_path=45.75 | paired=True
+      Jointly viable counted pairs: 1/5
+  Paired sampling attempt 2 | run[1.0.0.1] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.0.1] progress: 0.00s
+    Cyclic run[1.0.0.1] progress: 0.00s
+      Classical | mapping[1.0.0.1.0] | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=1.00 | avg_path=27.50 | paired=True
+      Cyclic | mapping[1.0.0.1.1] | result=successful | solver_status=solved | counted=True | time_halted=0.45s | conflicts_at_halt=3.00 | avg_path=46.42 | paired=True
+      Jointly viable counted pairs: 2/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=successful | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unsolvable | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=2/5
+  Paired sampling attempt 5 | run[1.0.0.4] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.0.4] progress: 0.00s
+    Classical run[1.0.0.4] progress: 5.00s
+    Classical run[1.0.0.4] progress: 10.00s
+    Classical run[1.0.0.4] progress: 15.00s
+    Cyclic run[1.0.0.4] progress: 0.00s
+      Classical | mapping[1.0.0.4.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=4785.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.0.4.1] | result=successful | solver_status=solved | counted=True | time_halted=0.31s | conflicts_at_halt=7.00 | avg_path=36.25 | paired=True
+      Jointly viable counted pairs: 3/5
+  Paired sampling attempt 6 | run[1.0.0.5] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.0.5] progress: 0.00s
+    Cyclic run[1.0.0.5] progress: 0.00s
+      Classical | mapping[1.0.0.5.0] | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=2.00 | avg_path=25.67 | paired=True
+      Cyclic | mapping[1.0.0.5.1] | result=successful | solver_status=solved | counted=True | time_halted=0.65s | conflicts_at_halt=2.00 | avg_path=40.42 | paired=True
+      Jointly viable counted pairs: 4/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=successful | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=successful | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=2/5
+  Paired sampling attempt 9 | run[1.0.0.8] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.0.8] progress: 0.00s
+    Cyclic run[1.0.0.8] progress: 0.00s
+      Classical | mapping[1.0.0.8.0] | result=successful | solver_status=solved | counted=True | time_halted=0.06s | conflicts_at_halt=1.00 | avg_path=27.08 | paired=True
+      Cyclic | mapping[1.0.0.8.1] | result=successful | solver_status=solved | counted=True | time_halted=0.11s | conflicts_at_halt=0.00 | avg_path=34.83 | paired=True
+      Jointly viable counted pairs: 5/5
+    Condition aggregate | agent_number[1.0.0] | agent_number=12 | retained_pairs=5/5
+      Classical | successful=3 | unfinished=2 | avg_time_halted=6.04 | avg_conflicts_at_halt=1855.40 | avg_path=26.75
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.39 | avg_conflicts_at_halt=2.60 | avg_path=40.73
+
+----------------------------------------------------------------------------------------
+Condition 2/10 | agent_number=16 | condition_id=agent_number[1.0.1]
+----------------------------------------------------------------------------------------
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unfinished | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+  Paired sampling attempt 2 | run[1.0.1.1] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.1.1] progress: 0.00s
+    Cyclic run[1.0.1.1] progress: 0.00s
+      Classical | mapping[1.0.1.1.0] | result=successful | solver_status=solved | counted=True | time_halted=0.06s | conflicts_at_halt=0.00 | avg_path=35.69 | paired=True
+      Cyclic | mapping[1.0.1.1.1] | result=successful | solver_status=solved | counted=True | time_halted=0.66s | conflicts_at_halt=7.00 | avg_path=50.75 | paired=True
+      Jointly viable counted pairs: 1/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=successful | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=successful | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=2/5
+  Paired sampling attempt 5 | run[1.0.1.4] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.1.4] progress: 0.00s
+    Classical run[1.0.1.4] progress: 5.00s
+    Classical run[1.0.1.4] progress: 10.00s
+    Classical run[1.0.1.4] progress: 15.00s
+    Cyclic run[1.0.1.4] progress: 0.00s
+      Classical | mapping[1.0.1.4.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=2257.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.1.4.1] | result=successful | solver_status=solved | counted=True | time_halted=0.41s | conflicts_at_halt=1.00 | avg_path=37.06 | paired=True
+      Jointly viable counted pairs: 2/5
+  Paired sampling attempt 6 | run[1.0.1.5] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.1.5] progress: 0.00s
+    Classical run[1.0.1.5] progress: 5.00s
+    Classical run[1.0.1.5] progress: 10.00s
+    Classical run[1.0.1.5] progress: 15.00s
+    Cyclic run[1.0.1.5] progress: 0.00s
+      Classical | mapping[1.0.1.5.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=2812.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.1.5.1] | result=successful | solver_status=solved | counted=True | time_halted=4.40s | conflicts_at_halt=44.00 | avg_path=40.88 | paired=True
+      Jointly viable counted pairs: 3/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unfinished | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+  Paired sampling attempt 8 | run[1.0.1.7] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.1.7] progress: 0.00s
+    Cyclic run[1.0.1.7] progress: 0.00s
+      Classical | mapping[1.0.1.7.0] | result=successful | solver_status=solved | counted=True | time_halted=0.06s | conflicts_at_halt=1.00 | avg_path=31.50 | paired=True
+      Cyclic | mapping[1.0.1.7.1] | result=successful | solver_status=solved | counted=True | time_halted=0.40s | conflicts_at_halt=2.00 | avg_path=43.75 | paired=True
+      Jointly viable counted pairs: 4/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unfinished | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+  Paired sampling attempt 10 | run[1.0.1.9] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.1.9] progress: 0.00s
+    Cyclic run[1.0.1.9] progress: 0.00s
+      Classical | mapping[1.0.1.9.0] | result=successful | solver_status=solved | counted=True | time_halted=0.09s | conflicts_at_halt=0.00 | avg_path=27.62 | paired=True
+      Cyclic | mapping[1.0.1.9.1] | result=successful | solver_status=solved | counted=True | time_halted=0.14s | conflicts_at_halt=1.00 | avg_path=34.50 | paired=True
+      Jointly viable counted pairs: 5/5
+    Condition aggregate | agent_number[1.0.1] | agent_number=16 | retained_pairs=5/5
+      Classical | successful=3 | unfinished=2 | avg_time_halted=6.04 | avg_conflicts_at_halt=1014.00 | avg_path=31.60
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=1.20 | avg_conflicts_at_halt=11.00 | avg_path=41.39
+
+----------------------------------------------------------------------------------------
+Condition 3/10 | agent_number=20 | condition_id=agent_number[1.0.2]
+----------------------------------------------------------------------------------------
+  Paired sampling attempt 1 | run[1.0.2.0] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.2.0] progress: 0.00s
+    Classical run[1.0.2.0] progress: 5.00s
+    Classical run[1.0.2.0] progress: 10.00s
+    Classical run[1.0.2.0] progress: 15.00s
+    Cyclic run[1.0.2.0] progress: 0.00s
+    Cyclic run[1.0.2.0] progress: 5.00s
+    Cyclic run[1.0.2.0] progress: 10.00s
+      Classical | mapping[1.0.2.0.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=4799.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.2.0.1] | result=successful | solver_status=solved | counted=True | time_halted=12.22s | conflicts_at_halt=167.00 | avg_path=42.85 | paired=True
+      Jointly viable counted pairs: 1/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unfinished | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unfinished | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=2/5
+  Paired sampling attempt 4 | run[1.0.2.3] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.2.3] progress: 0.00s
+    Classical run[1.0.2.3] progress: 5.00s
+    Classical run[1.0.2.3] progress: 10.00s
+    Classical run[1.0.2.3] progress: 15.00s
+    Cyclic run[1.0.2.3] progress: 0.00s
+      Classical | mapping[1.0.2.3.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=10834.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.2.3.1] | result=successful | solver_status=solved | counted=True | time_halted=0.63s | conflicts_at_halt=7.00 | avg_path=34.70 | paired=True
+      Jointly viable counted pairs: 2/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unsolvable | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=1/5
+      Discarded paired sampling attempt due to joint unsolvability screening | classical=unsolvable | cyclic=unsolvable | consecutive_failed_paired_sampling_attempts=2/5
+  Paired sampling attempt 7 | run[1.0.2.6] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.2.6] progress: 0.00s
+    Classical run[1.0.2.6] progress: 5.00s
+    Classical run[1.0.2.6] progress: 10.00s
+    Classical run[1.0.2.6] progress: 15.00s
+    Cyclic run[1.0.2.6] progress: 0.00s
+      Classical | mapping[1.0.2.6.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=6114.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.2.6.1] | result=successful | solver_status=solved | counted=True | time_halted=1.02s | conflicts_at_halt=6.00 | avg_path=41.85 | paired=True
+      Jointly viable counted pairs: 3/5
+  Paired sampling attempt 8 | run[1.0.2.7] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.2.7] progress: 0.00s
+    Classical run[1.0.2.7] progress: 5.00s
+    Classical run[1.0.2.7] progress: 10.00s
+    Classical run[1.0.2.7] progress: 15.00s
+    Cyclic run[1.0.2.7] progress: 0.00s
+      Classical | mapping[1.0.2.7.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=5108.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.2.7.1] | result=successful | solver_status=solved | counted=True | time_halted=1.14s | conflicts_at_halt=6.00 | avg_path=41.25 | paired=True
+      Jointly viable counted pairs: 4/5
+  Paired sampling attempt 9 | run[1.0.2.8] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.2.8] progress: 0.00s
+    Cyclic run[1.0.2.8] progress: 0.00s
+      Classical | mapping[1.0.2.8.0] | result=successful | solver_status=solved | counted=True | time_halted=0.14s | conflicts_at_halt=3.00 | avg_path=28.60 | paired=True
+      Cyclic | mapping[1.0.2.8.1] | result=successful | solver_status=solved | counted=True | time_halted=2.71s | conflicts_at_halt=13.00 | avg_path=49.55 | paired=True
+      Jointly viable counted pairs: 5/5
+    Condition aggregate | agent_number[1.0.2] | agent_number=20 | retained_pairs=5/5
+      Classical | successful=1 | unfinished=4 | avg_time_halted=12.03 | avg_conflicts_at_halt=5371.60 | avg_path=28.60
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=3.54 | avg_conflicts_at_halt=39.80 | avg_path=42.04
+
+----------------------------------------------------------------------------------------
+Condition 4/10 | agent_number=24 | condition_id=agent_number[1.0.3]
+----------------------------------------------------------------------------------------
+  Paired sampling attempt 1 | run[1.0.3.0] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.3.0] progress: 0.00s
+    Classical run[1.0.3.0] progress: 5.00s
+    Classical run[1.0.3.0] progress: 10.00s
+    Classical run[1.0.3.0] progress: 15.00s
+    Cyclic run[1.0.3.0] progress: 0.00s
+    Cyclic run[1.0.3.0] progress: 5.00s
+    Cyclic run[1.0.3.0] progress: 10.00s
+    Cyclic run[1.0.3.0] progress: 15.00s
+      Classical | mapping[1.0.3.0.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=3280.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.3.0.1] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=160.00 | avg_path=null | paired=True
+      Jointly viable counted pairs: 1/5
+  Paired sampling attempt 2 | run[1.0.3.1] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.3.1] progress: 0.00s
+    Classical run[1.0.3.1] progress: 5.00s
+    Classical run[1.0.3.1] progress: 10.00s
+    Classical run[1.0.3.1] progress: 15.00s
+    Cyclic run[1.0.3.1] progress: 0.00s
+    Cyclic run[1.0.3.1] progress: 5.00s
+    Cyclic run[1.0.3.1] progress: 10.00s
+    Cyclic run[1.0.3.1] progress: 15.00s
+      Classical | mapping[1.0.3.1.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=6084.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.3.1.1] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=170.00 | avg_path=null | paired=True
+      Jointly viable counted pairs: 2/5
+  Paired sampling attempt 3 | run[1.0.3.2] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.3.2] progress: 0.00s
+    Classical run[1.0.3.2] progress: 5.00s
+    Classical run[1.0.3.2] progress: 10.00s
+    Classical run[1.0.3.2] progress: 15.00s
+    Cyclic run[1.0.3.2] progress: 0.00s
+      Classical | mapping[1.0.3.2.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=3066.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.3.2.1] | result=successful | solver_status=solved | counted=True | time_halted=3.29s | conflicts_at_halt=57.00 | avg_path=45.46 | paired=True
+      Jointly viable counted pairs: 3/5
+  Paired sampling attempt 4 | run[1.0.3.3] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.3.3] progress: 0.00s
+    Classical run[1.0.3.3] progress: 5.00s
+    Classical run[1.0.3.3] progress: 10.00s
+    Classical run[1.0.3.3] progress: 15.00s
+    Cyclic run[1.0.3.3] progress: 0.00s
+      Classical | mapping[1.0.3.3.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=5016.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.3.3.1] | result=successful | solver_status=solved | counted=True | time_halted=2.74s | conflicts_at_halt=41.00 | avg_path=43.75 | paired=True
+      Jointly viable counted pairs: 4/5
+  Paired sampling attempt 5 | run[1.0.3.4] | map_id=dynamic_port_shared_map_seed_57196_group_patch
+    Classical run[1.0.3.4] progress: 0.00s
+    Classical run[1.0.3.4] progress: 5.00s
+    Classical run[1.0.3.4] progress: 10.00s
+    Classical run[1.0.3.4] progress: 15.00s
+    Cyclic run[1.0.3.4] progress: 0.00s
+    Cyclic run[1.0.3.4] progress: 5.00s
+    Cyclic run[1.0.3.4] progress: 10.00s
+    Cyclic run[1.0.3.4] progress: 15.00s
+      Classical | mapping[1.0.3.4.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=2906.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.0.3.4.1] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=15.00s | conflicts_at_halt=128.00 | avg_path=null | paired=True
+      Jointly viable counted pairs: 5/5
+  Stop rule triggered: cyclic unfinished runs exceeded cyclic successful runs within the retained counted pairs at agent_number=24 (3 unfinished > 2 successful). The current condition is discarded and the branch stops before higher agent numbers.
+
+Final aggregate table:
+    Condition aggregate | agent_number[1.0.0] | agent_number=12 | retained_pairs=5/5
+      Classical | successful=3 | unfinished=2 | avg_time_halted=6.04 | avg_conflicts_at_halt=1855.40 | avg_path=26.75
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.39 | avg_conflicts_at_halt=2.60 | avg_path=40.73
+    Condition aggregate | agent_number[1.0.1] | agent_number=16 | retained_pairs=5/5
+      Classical | successful=3 | unfinished=2 | avg_time_halted=6.04 | avg_conflicts_at_halt=1014.00 | avg_path=31.60
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=1.20 | avg_conflicts_at_halt=11.00 | avg_path=41.39
+    Condition aggregate | agent_number[1.0.2] | agent_number=20 | retained_pairs=5/5
+      Classical | successful=1 | unfinished=4 | avg_time_halted=12.03 | avg_conflicts_at_halt=5371.60 | avg_path=28.60
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=3.54 | avg_conflicts_at_halt=39.80 | avg_path=42.04
+
+Branch stopped early:
+  Reason: cyclic_unfinished_exceeded_successful
+  Details: Stop rule triggered: cyclic unfinished runs exceeded cyclic successful runs within the retained counted pairs at agent_number=24 (3 unfinished > 2 successful). The current condition is discarded and the branch stops before higher agent numbers.
+  Reported agent numbers: [12, 16, 20]
+
+Generated graph files:
+  - D:\projects\cmsc-190\dev\outputs\dynamic_port\graphs\dynamic_port_runtime.png
+  - D:\projects\cmsc-190\dev\outputs\dynamic_port\graphs\dynamic_port_conflicts.png
