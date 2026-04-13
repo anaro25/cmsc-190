@@ -2,11 +2,14 @@
 
 ## How to run
 
-Edit `dev/main.py` and leave exactly one `MAP_TYPE` uncommented, then run:
+Edit `dev/master_config.py` and leave exactly one `MAP_TYPE` uncommented, then run:
 
 ```bash
 python -m dev.main
 ```
+
+`master_config.py` is the single user-editable file for branch seeds, map size,
+agent lists, runtime limits, densities, thresholds, and loop settings.
 
 Results are written under `dev/outputs/<map_type>/`.
 
@@ -14,6 +17,7 @@ Results are written under `dev/outputs/<map_type>/`.
 
 The active experiment driver is the generalized study runner:
 
+- `dev/master_config.py`
 - `dev/main.py`
 - `dev/experiments/generalized_study.py` (thin compatibility wrapper)
 - `dev/experiments/study/`
@@ -33,7 +37,7 @@ The `study` package is split by responsibility:
 
 For each agent number in the selected branch:
 
-1. Classical mapping samples run configurations until it gathers `n = 5` counted runs.
+1. Classical mapping samples run configurations until it gathers `n` counted runs.
 2. A counted run is any run whose result category is either:
    - `successful`
    - `unfinished`
@@ -44,13 +48,13 @@ For each agent number in the selected branch:
    - `num_conflicts_detected_at_halt` over counted runs
    - `average_path_length` over successful runs only
 
-The runtime limit is `30.0` seconds for every run.
+The per-branch runtime limit and counted-run requirement both come from `master_config.py`.
 
 There is also an internal large safeguard on total classical attempts to prevent pathological infinite loops. It is only a protective implementation detail.
 
 ## Other important packages
 
-- `dev/experiments/branch_specs.py` — branch-level experiment definitions
+- `dev/experiments/branch_specs.py` — branch-level experiment definitions built from `master_config.py`
 - `dev/mapf/` — CBS solvers, metrics, and MAPF execution helpers
 - `dev/maps/` — map construction and mapping transforms
 - `dev/navigation/` — graph/navigation helpers over composite grids
@@ -62,4 +66,3 @@ There is also an internal large safeguard on total classical attempts to prevent
 - The study flow currently uses scattered targets for all branches.
 - Pillow-rendered run images are not part of the generalized study flow.
 - The dynamic branch sampler requires each sampled start-goal pair to be individually reachable on the shared assignment map, which avoids large numbers of trivial no-solution cases caused by unreachable goals.
-- `dev/main.py` now uses branch-specific seeds so each branch can be rerun deterministically on its own.

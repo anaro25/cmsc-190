@@ -2,13 +2,11 @@ import os
 import random
 
 from dev.experiments.dynamic_port.config import (
-    CONDITION_NAME,
-    DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
-    DEFAULT_NUM_OF_AGENTS,
-    DEFAULT_SELECTED_MAP_NAME,
+    DYNAMIC_PORT_CONDITION_NAME,
     GROUP_STAY_DURATIONS,
     LOOP_SEQUENCE_LENGTH,
     PORT_MAP_IMAGE_PATH,
+    PORT_MAP_NAME,
     PORT_MAP_THRESHOLD,
     TARGET_DYNAMIC_OBSTACLE_DENSITY,
     TARGET_STATIC_OBSTACLE_DENSITY,
@@ -84,11 +82,11 @@ def summarize_dynamic_loop(raw_obstacle_matrix, static_matrix, dynamic_loop_fram
 
 
 def run_dynamic_port_experiment(
-    selected_map_name=DEFAULT_SELECTED_MAP_NAME,
-    num_agents=DEFAULT_NUM_OF_AGENTS,
+    *,
+    num_agents,
+    max_solver_runtime_seconds,
     target_static_obstacle_density=TARGET_STATIC_OBSTACLE_DENSITY,
     target_dynamic_obstacle_density=TARGET_DYNAMIC_OBSTACLE_DENSITY,
-    max_solver_runtime_seconds=DEFAULT_MAX_SOLVER_RUNTIME_SECONDS,
     seed=None,
     loop_sequence_length=LOOP_SEQUENCE_LENGTH,
     group_stay_durations=GROUP_STAY_DURATIONS,
@@ -134,7 +132,7 @@ def run_dynamic_port_experiment(
     )
 
     cyclic_result = run_time_expanded_mapf_for_loop(
-        map_name=selected_map_name,
+        map_name=PORT_MAP_NAME,
         mapping_name="cyclic",
         mapped_loop=cyclic_loop,
         dynamic_matrix_loop=dynamic_loop_frames,
@@ -149,8 +147,8 @@ def run_dynamic_port_experiment(
         return {
             "status": "failed",
             "context": "dynamic_port",
-            "condition": CONDITION_NAME,
-            "selected_map_name": selected_map_name,
+            "condition": DYNAMIC_PORT_CONDITION_NAME,
+            "selected_map_name": PORT_MAP_NAME,
             "seed": seed,
             "agents": shared_agents,
             "results": {"cyclic": None, "classical": None},
@@ -158,7 +156,7 @@ def run_dynamic_port_experiment(
 
     print()
     classical_result = run_time_expanded_mapf_for_loop(
-        map_name=selected_map_name,
+        map_name=PORT_MAP_NAME,
         mapping_name="classical",
         mapped_loop=classical_loop,
         dynamic_matrix_loop=dynamic_loop_frames,
@@ -171,8 +169,8 @@ def run_dynamic_port_experiment(
     return {
         "status": "completed" if classical_result is not None else "failed",
         "context": "dynamic_port",
-        "condition": CONDITION_NAME,
-        "selected_map_name": selected_map_name,
+        "condition": DYNAMIC_PORT_CONDITION_NAME,
+        "selected_map_name": PORT_MAP_NAME,
         "seed": seed,
         "agents": shared_agents,
         "results": {"cyclic": cyclic_result, "classical": classical_result},

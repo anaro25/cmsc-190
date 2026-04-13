@@ -8,12 +8,13 @@
   "display_name": "Static Artificial",
   "target_type_documented": "scattered_targets",
   "target_type_active": "scattered_targets",
+  "seed_base": 101,
   "agent_numbers": [
     12,
     16,
     20
   ],
-  "runtime_limit_seconds": 30.0,
+  "runtime_limit_seconds": 15.0,
   "counted_runs_required": 5,
   "path_length_graph_enabled": true,
   "is_dynamic": false,
@@ -27,5 +28,5 @@
   "dynamic_target_dynamic_obstacle_density": null,
   "dynamic_loop_sequence_length": null,
   "dynamic_group_stay_durations": null,
-  "notes": "Fresh 25x25 artificial map per run configuration. Scattered targets are used. Counted runs are the runs classified as successful or unfinished."
+  "notes": "Fresh artificial map per run configuration. Scattered targets are used. Counted runs are the runs classified as successful or unfinished."
 }

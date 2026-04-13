@@ -21,6 +21,7 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Map obstacle type: {branch_spec.map_obstacle_type}")
     logger.log(f"Documented target type: {branch_spec.target_type_documented}")
     logger.log(f"Active target type: {branch_spec.target_type_active}")
+    logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Counted runs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
     logger.log(f"Agent numbers: {branch_spec.agent_numbers}")

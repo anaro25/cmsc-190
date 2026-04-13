@@ -4,10 +4,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-
-# STATIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-STATIC_AGENT_NUMBERS = [12, 16, 20]  # temporary
-DYNAMIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+from dev.master_config import BRANCH_USER_CONFIGS
 
 
 @dataclass(frozen=True)
@@ -21,6 +18,7 @@ class BranchSpec:
     display_name: str
     target_type_documented: str
     target_type_active: str
+    seed_base: int
     agent_numbers: list[int]
     runtime_limit_seconds: float
     counted_runs_required: int
@@ -45,123 +43,127 @@ class BranchSpec:
         return payload
 
 
-PACKAGE_ROOT = Path(__file__).resolve().parents[1]
-INPUTS_ROOT = PACKAGE_ROOT / "inputs"
+def _build_branch_specs() -> dict[str, BranchSpec]:
+    static_cfg = BRANCH_USER_CONFIGS["static_artificial"]
+    port_cfg = BRANCH_USER_CONFIGS["dynamic_port"]
+    campus_1_cfg = BRANCH_USER_CONFIGS["dynamic_campus_area_1"]
+    campus_2_cfg = BRANCH_USER_CONFIGS["dynamic_campus_area_2"]
+
+    return {
+        "static_artificial": BranchSpec(
+            map_type="static_artificial",
+            branch_id="static_artificial",
+            branch_decimal="0.0",
+            map_obstacle_type="static",
+            map_obstacle_index=0,
+            map_type_index=0,
+            display_name="Static Artificial",
+            target_type_documented="scattered_targets",
+            target_type_active="scattered_targets",
+            seed_base=int(static_cfg["seed"]),
+            agent_numbers=list(static_cfg["agent_numbers"]),
+            runtime_limit_seconds=float(static_cfg["time_limit_seconds"]),
+            counted_runs_required=int(static_cfg["counted_runs_required"]),
+            path_length_graph_enabled=True,
+            is_dynamic=False,
+            base_rows=int(static_cfg["map_size"][0]),
+            base_cols=int(static_cfg["map_size"][1]),
+            static_obstacle_density=float(static_cfg["static_obstacle_density"]),
+            notes=(
+                "Fresh artificial map per run configuration. Scattered targets are used. "
+                "Counted runs are the runs classified as successful or unfinished."
+            ),
+        ),
+        "dynamic_port": BranchSpec(
+            map_type="dynamic_port",
+            branch_id="dynamic_port",
+            branch_decimal="1.0",
+            map_obstacle_type="dynamic",
+            map_obstacle_index=1,
+            map_type_index=0,
+            display_name="Dynamic Port",
+            target_type_documented="scattered_targets",
+            target_type_active="scattered_targets",
+            seed_base=int(port_cfg["seed"]),
+            agent_numbers=list(port_cfg["agent_numbers"]),
+            runtime_limit_seconds=float(port_cfg["time_limit_seconds"]),
+            counted_runs_required=int(port_cfg["counted_runs_required"]),
+            path_length_graph_enabled=False,
+            is_dynamic=True,
+            image_path=str(port_cfg["image_path"]),
+            image_threshold=int(port_cfg["image_threshold"]),
+            image_resize_longest_side=(
+                None if port_cfg.get("image_resize_longest_side") is None else int(port_cfg["image_resize_longest_side"])
+            ),
+            dynamic_target_static_obstacle_density=float(port_cfg["target_static_obstacle_density"]),
+            dynamic_target_dynamic_obstacle_density=float(port_cfg["target_dynamic_obstacle_density"]),
+            dynamic_loop_sequence_length=int(port_cfg["loop_sequence_length"]),
+            dynamic_group_stay_durations=tuple(port_cfg["group_stay_durations"]),
+            notes=(
+                "Image-based dynamic branch with scattered targets. Counted runs are the runs "
+                "classified as successful or unfinished."
+            ),
+        ),
+        "dynamic_campus_area_1": BranchSpec(
+            map_type="dynamic_campus_area_1",
+            branch_id="dynamic_campus_area_1",
+            branch_decimal="1.1",
+            map_obstacle_type="dynamic",
+            map_obstacle_index=1,
+            map_type_index=1,
+            display_name="Dynamic Campus Area 1",
+            target_type_documented="single_cell_target",
+            target_type_active="scattered_targets",
+            seed_base=int(campus_1_cfg["seed"]),
+            agent_numbers=list(campus_1_cfg["agent_numbers"]),
+            runtime_limit_seconds=float(campus_1_cfg["time_limit_seconds"]),
+            counted_runs_required=int(campus_1_cfg["counted_runs_required"]),
+            path_length_graph_enabled=False,
+            is_dynamic=True,
+            image_path=str(campus_1_cfg["image_path"]),
+            image_threshold=int(campus_1_cfg["image_threshold"]),
+            dynamic_target_static_obstacle_density=float(campus_1_cfg["target_static_obstacle_density"]),
+            dynamic_target_dynamic_obstacle_density=float(campus_1_cfg["target_dynamic_obstacle_density"]),
+            dynamic_loop_sequence_length=int(campus_1_cfg["loop_sequence_length"]),
+            dynamic_group_stay_durations=tuple(campus_1_cfg["group_stay_durations"]),
+            notes=(
+                "The documents describe the campus map as a single-cell target case, "
+                "but the active study currently uses scattered targets. Counted runs are the runs "
+                "classified as successful or unfinished."
+            ),
+        ),
+        "dynamic_campus_area_2": BranchSpec(
+            map_type="dynamic_campus_area_2",
+            branch_id="dynamic_campus_area_2",
+            branch_decimal="1.2",
+            map_obstacle_type="dynamic",
+            map_obstacle_index=1,
+            map_type_index=2,
+            display_name="Dynamic Campus Area 2",
+            target_type_documented="single_cell_target",
+            target_type_active="scattered_targets",
+            seed_base=int(campus_2_cfg["seed"]),
+            agent_numbers=list(campus_2_cfg["agent_numbers"]),
+            runtime_limit_seconds=float(campus_2_cfg["time_limit_seconds"]),
+            counted_runs_required=int(campus_2_cfg["counted_runs_required"]),
+            path_length_graph_enabled=False,
+            is_dynamic=True,
+            image_path=str(campus_2_cfg["image_path"]),
+            image_threshold=int(campus_2_cfg["image_threshold"]),
+            dynamic_target_static_obstacle_density=float(campus_2_cfg["target_static_obstacle_density"]),
+            dynamic_target_dynamic_obstacle_density=float(campus_2_cfg["target_dynamic_obstacle_density"]),
+            dynamic_loop_sequence_length=int(campus_2_cfg["loop_sequence_length"]),
+            dynamic_group_stay_durations=tuple(campus_2_cfg["group_stay_durations"]),
+            notes=(
+                "The documents describe the campus map as a single-cell target case, "
+                "but the active study currently uses scattered targets. Counted runs are the runs "
+                "classified as successful or unfinished."
+            ),
+        ),
+    }
 
 
-BRANCH_SPECS: dict[str, BranchSpec] = {
-    "static_artificial": BranchSpec(
-        map_type="static_artificial",
-        branch_id="static_artificial",
-        branch_decimal="0.0",
-        map_obstacle_type="static",
-        map_obstacle_index=0,
-        map_type_index=0,
-        display_name="Static Artificial",
-        target_type_documented="scattered_targets",
-        target_type_active="scattered_targets",
-        agent_numbers=STATIC_AGENT_NUMBERS,
-        runtime_limit_seconds=30.0,
-        counted_runs_required=5,
-        path_length_graph_enabled=True,
-        is_dynamic=False,
-        base_rows=25,
-        base_cols=25,
-        static_obstacle_density=0.40,
-        notes=(
-            "Fresh 25x25 artificial map per run configuration. "
-            "Scattered targets are used. Counted runs are the runs classified as "
-            "successful or unfinished."
-        ),
-    ),
-    "dynamic_port": BranchSpec(
-        map_type="dynamic_port",
-        branch_id="dynamic_port",
-        branch_decimal="1.0",
-        map_obstacle_type="dynamic",
-        map_obstacle_index=1,
-        map_type_index=0,
-        display_name="Dynamic Port",
-        target_type_documented="scattered_targets",
-        target_type_active="scattered_targets",
-        agent_numbers=DYNAMIC_AGENT_NUMBERS,
-        runtime_limit_seconds=30.0,
-        counted_runs_required=5,
-        path_length_graph_enabled=False,
-        is_dynamic=True,
-        image_path=str(INPUTS_ROOT / "dynamic_port" / "port_map" / "port_map.png"),
-        image_threshold=127,
-        image_resize_longest_side=40,
-        dynamic_target_static_obstacle_density=None,
-        dynamic_target_dynamic_obstacle_density=0.005,
-        dynamic_loop_sequence_length=30,
-        dynamic_group_stay_durations=(3, 4, 5),
-        notes=(
-            "Image-based dynamic branch. The implementation preserves the source-map "
-            "static density, downsizes the large port image to longest-side 40 for "
-            "practical runtime, and uses a conservative dynamic density (0.005). "
-            "Counted runs are the runs classified as successful or unfinished."
-        ),
-    ),
-    "dynamic_campus_area_1": BranchSpec(
-        map_type="dynamic_campus_area_1",
-        branch_id="dynamic_campus_area_1",
-        branch_decimal="1.1",
-        map_obstacle_type="dynamic",
-        map_obstacle_index=1,
-        map_type_index=1,
-        display_name="Dynamic Campus Area 1",
-        target_type_documented="single_cell_target",
-        target_type_active="scattered_targets",
-        agent_numbers=DYNAMIC_AGENT_NUMBERS,
-        runtime_limit_seconds=30.0,
-        counted_runs_required=5,
-        path_length_graph_enabled=False,
-        is_dynamic=True,
-        image_path=str(INPUTS_ROOT / "dynamic_campus_area_1" / "campus_area_1_x80.png"),
-        image_threshold=127,
-        dynamic_target_static_obstacle_density=None,
-        dynamic_target_dynamic_obstacle_density=0.005,
-        dynamic_loop_sequence_length=30,
-        dynamic_group_stay_durations=(3, 4, 5),
-        notes=(
-            "The experimental design documents campus maps as single-cell target cases, "
-            "but the current implementation deliberately uses scattered targets. The "
-            "source-map static density is preserved and a light dynamic density (0.005) "
-            "is used by default. Counted runs are the runs classified as successful or "
-            "unfinished."
-        ),
-    ),
-    "dynamic_campus_area_2": BranchSpec(
-        map_type="dynamic_campus_area_2",
-        branch_id="dynamic_campus_area_2",
-        branch_decimal="1.2",
-        map_obstacle_type="dynamic",
-        map_obstacle_index=1,
-        map_type_index=2,
-        display_name="Dynamic Campus Area 2",
-        target_type_documented="single_cell_target",
-        target_type_active="scattered_targets",
-        agent_numbers=DYNAMIC_AGENT_NUMBERS,
-        runtime_limit_seconds=30.0,
-        counted_runs_required=5,
-        path_length_graph_enabled=False,
-        is_dynamic=True,
-        image_path=str(INPUTS_ROOT / "dynamic_campus_area_2" / "campus_area_2_x80.png"),
-        image_threshold=127,
-        dynamic_target_static_obstacle_density=None,
-        dynamic_target_dynamic_obstacle_density=0.005,
-        dynamic_loop_sequence_length=30,
-        dynamic_group_stay_durations=(3, 4, 5),
-        notes=(
-            "The experimental design documents campus maps as single-cell target cases, "
-            "but the current implementation deliberately uses scattered targets. The "
-            "source-map static density is preserved and a light dynamic density (0.005) "
-            "is used by default. Counted runs are the runs classified as successful or "
-            "unfinished."
-        ),
-    ),
-}
+BRANCH_SPECS = _build_branch_specs()
 
 
 def get_branch_spec(map_type: str) -> BranchSpec:

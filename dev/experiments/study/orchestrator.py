@@ -269,8 +269,9 @@ def _run_cyclic_paired_phase(
     return cyclic_records
 
 
-def run_selected_experiment(map_type: str, *, seed_base: int = 1) -> dict[str, Any]:
+def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> dict[str, Any]:
     branch_spec = get_branch_spec(map_type)
+    resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
     output_manager = BranchOutputManager(branch_spec)
     logger = ExperimentLogger(output_manager.logs_dir / "experiment.log")
     log_branch_header(logger, branch_spec)
@@ -282,7 +283,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int = 1) -> dict[str, A
 
     dynamic_state: DynamicBranchState | None = None
     if branch_spec.is_dynamic:
-        dynamic_state = prepare_dynamic_branch_state(branch_spec, seed_base=seed_base)
+        dynamic_state = prepare_dynamic_branch_state(branch_spec, seed_base=resolved_seed_base)
         log_dynamic_state(logger, branch_spec, dynamic_state)
         write_json(
             output_manager.metadata_dir / "shared_dynamic_state.json",
@@ -310,7 +311,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int = 1) -> dict[str, A
             dynamic_state=dynamic_state,
             agent_number=agent_number,
             agent_number_index=agent_number_index,
-            seed_base=seed_base,
+            seed_base=resolved_seed_base,
             logger=logger,
             run_configurations=run_configurations,
             run_records=run_records,
