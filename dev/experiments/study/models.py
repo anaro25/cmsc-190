@@ -44,11 +44,12 @@ class MappingRunRecord:
     mapping_record_id: str
     comparison_case: str
     paired_run: bool
-    success: bool
-    status: str
-    failure_reason: str | None
-    computation_time_seconds: float
-    num_conflicts_detected: int | None
+    solver_status: str
+    result_category: str
+    counted_run: bool
+    solved_run: bool
+    time_computation_halted_seconds: float
+    num_conflicts_detected_at_halt: int | None
     average_path_length: float | None
     num_high_level_nodes_expanded: int | None
     runtime_limit_seconds: float
@@ -76,22 +77,27 @@ class ConditionAggregate:
     agent_number: int
     agent_number_index: int
     condition_id: str
-    required_successes: int
-    max_classical_attempts: int
-    classical_condition_success: bool
-    classical_null_data_point: bool
-    cyclic_condition_success: bool
-    paired_comparison: bool
-    cyclic_recovery_non_paired: bool
+    counted_runs_required: int
+    paired_run_configurations: int
+    classical_reached_counted_quota: bool
+    cyclic_replayed_all_paired_configs: bool
     num_classical_attempts: int
-    num_classical_successes: int
+    num_classical_counted_runs: int
+    num_classical_successful_runs: int
+    num_classical_unfinished_runs: int
+    num_classical_unsolvable_runs: int
+    num_classical_setup_failed_runs: int
     num_cyclic_attempts: int
-    num_cyclic_successes: int
-    classical_avg_computation_time: float | None
-    classical_avg_conflicts: float | None
+    num_cyclic_counted_runs: int
+    num_cyclic_successful_runs: int
+    num_cyclic_unfinished_runs: int
+    num_cyclic_unsolvable_runs: int
+    num_cyclic_setup_failed_runs: int
+    classical_avg_time_computation_halted: float | None
+    classical_avg_conflicts_at_halt: float | None
     classical_avg_path_length: float | None
-    cyclic_avg_computation_time: float | None
-    cyclic_avg_conflicts: float | None
+    cyclic_avg_time_computation_halted: float | None
+    cyclic_avg_conflicts_at_halt: float | None
     cyclic_avg_path_length: float | None
     notes: str = ""
 

@@ -27,7 +27,26 @@ The `study` package is split by responsibility:
 - `plotting.py` — PNG graph generation
 - `io_utils.py` — structured output writing and experiment logging
 - `logging_utils.py` — console/file log formatting
-- `orchestrator.py` — the fairness protocol and branch execution flow
+- `orchestrator.py` — counted-run protocol and branch execution flow
+
+## Current counted-run protocol
+
+For each agent number in the selected branch:
+
+1. Classical mapping samples run configurations until it gathers `n = 5` counted runs.
+2. A counted run is any run whose result category is either:
+   - `successful`
+   - `unfinished`
+3. A run classified as `unsolvable` is recorded, but it does not count toward `n`.
+4. Cyclic mapping replays the exact counted classical run configurations.
+5. Aggregates use:
+   - `time_computation_halted_seconds` over counted runs
+   - `num_conflicts_detected_at_halt` over counted runs
+   - `average_path_length` over successful runs only
+
+The runtime limit is `30.0` seconds for every run.
+
+There is also an internal large safeguard on total classical attempts to prevent pathological infinite loops. It is only a protective implementation detail.
 
 ## Other important packages
 
@@ -42,4 +61,5 @@ The `study` package is split by responsibility:
 
 - The study flow currently uses scattered targets for all branches.
 - Pillow-rendered run images are not part of the generalized study flow.
-- The dynamic branch sampler now requires each sampled start-goal pair to be individually reachable on the shared assignment map, which avoids large numbers of trivial no-solution cases caused by unreachable goals.
+- The dynamic branch sampler requires each sampled start-goal pair to be individually reachable on the shared assignment map, which avoids large numbers of trivial no-solution cases caused by unreachable goals.
+- `dev/main.py` now uses branch-specific seeds so each branch can be rerun deterministically on its own.

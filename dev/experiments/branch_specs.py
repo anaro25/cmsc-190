@@ -6,10 +6,9 @@ from typing import Any
 
 
 # STATIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40]
-
-STATIC_AGENT_NUMBERS = [8, 12, 16, 20] # temporary
-
+STATIC_AGENT_NUMBERS = [12, 16, 20]  # temporary
 DYNAMIC_AGENT_NUMBERS = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+
 
 @dataclass(frozen=True)
 class BranchSpec:
@@ -24,8 +23,7 @@ class BranchSpec:
     target_type_active: str
     agent_numbers: list[int]
     runtime_limit_seconds: float
-    required_successes: int
-    max_classical_attempts: int
+    counted_runs_required: int
     path_length_graph_enabled: bool
     is_dynamic: bool
     base_rows: int | None = None
@@ -64,8 +62,7 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         target_type_active="scattered_targets",
         agent_numbers=STATIC_AGENT_NUMBERS,
         runtime_limit_seconds=30.0,
-        required_successes=3,
-        max_classical_attempts=10,
+        counted_runs_required=5,
         path_length_graph_enabled=True,
         is_dynamic=False,
         base_rows=25,
@@ -73,7 +70,8 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         static_obstacle_density=0.40,
         notes=(
             "Fresh 25x25 artificial map per run configuration. "
-            "Scattered targets are used."
+            "Scattered targets are used. Counted runs are the runs classified as "
+            "successful or unfinished."
         ),
     ),
     "dynamic_port": BranchSpec(
@@ -88,8 +86,7 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         target_type_active="scattered_targets",
         agent_numbers=DYNAMIC_AGENT_NUMBERS,
         runtime_limit_seconds=30.0,
-        required_successes=3,
-        max_classical_attempts=10,
+        counted_runs_required=5,
         path_length_graph_enabled=False,
         is_dynamic=True,
         image_path=str(INPUTS_ROOT / "dynamic_port" / "port_map" / "port_map.png"),
@@ -100,10 +97,10 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         dynamic_loop_sequence_length=30,
         dynamic_group_stay_durations=(3, 4, 5),
         notes=(
-            "Image-based dynamic branch. The experimental documents do not pin down "
-            "dynamic densities, so the implementation preserves the source-map static "
-            "density, downsizes the large port image to longest-side 40 for practical "
-            "runtime, and uses a conservative dynamic density (0.005)."
+            "Image-based dynamic branch. The implementation preserves the source-map "
+            "static density, downsizes the large port image to longest-side 40 for "
+            "practical runtime, and uses a conservative dynamic density (0.005). "
+            "Counted runs are the runs classified as successful or unfinished."
         ),
     ),
     "dynamic_campus_area_1": BranchSpec(
@@ -118,8 +115,7 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         target_type_active="scattered_targets",
         agent_numbers=DYNAMIC_AGENT_NUMBERS,
         runtime_limit_seconds=30.0,
-        required_successes=3,
-        max_classical_attempts=10,
+        counted_runs_required=5,
         path_length_graph_enabled=False,
         is_dynamic=True,
         image_path=str(INPUTS_ROOT / "dynamic_campus_area_1" / "campus_area_1_x80.png"),
@@ -130,9 +126,10 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         dynamic_group_stay_durations=(3, 4, 5),
         notes=(
             "The experimental design documents campus maps as single-cell target cases, "
-            "but the current requested implementation deliberately uses scattered targets "
-            "for now. The source-map static density is preserved and a light dynamic "
-            "density (0.005) is used by default."
+            "but the current implementation deliberately uses scattered targets. The "
+            "source-map static density is preserved and a light dynamic density (0.005) "
+            "is used by default. Counted runs are the runs classified as successful or "
+            "unfinished."
         ),
     ),
     "dynamic_campus_area_2": BranchSpec(
@@ -147,8 +144,7 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         target_type_active="scattered_targets",
         agent_numbers=DYNAMIC_AGENT_NUMBERS,
         runtime_limit_seconds=30.0,
-        required_successes=3,
-        max_classical_attempts=10,
+        counted_runs_required=5,
         path_length_graph_enabled=False,
         is_dynamic=True,
         image_path=str(INPUTS_ROOT / "dynamic_campus_area_2" / "campus_area_2_x80.png"),
@@ -159,9 +155,10 @@ BRANCH_SPECS: dict[str, BranchSpec] = {
         dynamic_group_stay_durations=(3, 4, 5),
         notes=(
             "The experimental design documents campus maps as single-cell target cases, "
-            "but the current requested implementation deliberately uses scattered targets "
-            "for now. The source-map static density is preserved and a light dynamic "
-            "density (0.005) is used by default."
+            "but the current implementation deliberately uses scattered targets. The "
+            "source-map static density is preserved and a light dynamic density (0.005) "
+            "is used by default. Counted runs are the runs classified as successful or "
+            "unfinished."
         ),
     ),
 }

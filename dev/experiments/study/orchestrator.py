@@ -4,7 +4,7 @@ from typing import Any
 
 from dev.experiments.branch_specs import BranchSpec, get_branch_spec
 from dev.experiments.study.aggregation import build_condition_aggregate
-from dev.experiments.study.constants import MAX_CYCLIC_RECOVERY_ATTEMPTS
+from dev.experiments.study.constants import INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
 from dev.experiments.study.io_utils import BranchOutputManager, ExperimentLogger, write_csv, write_json
 from dev.experiments.study.logging_utils import (
     log_branch_header,
@@ -59,7 +59,7 @@ def _execute_mapping(
     prepared_context: PreparedRunContext,
     mapping_name: str,
     logger: ExperimentLogger,
-) -> tuple[bool, dict[str, Any] | None, float, str | None]:
+) -> tuple[dict[str, Any] | None, float, str]:
     label = f"{mapping_name.title()} {prepared_context.run_configuration.run_config_id}"
     if branch_spec.is_dynamic:
         if dynamic_state is None:
@@ -100,6 +100,7 @@ def _record_setup_failure(
     record_bucket: list[MappingRunRecord],
     logger: ExperimentLogger,
     exc: Exception,
+    paired_run: bool,
 ) -> None:
     note = f"setup_failed:{type(exc).__name__}:{exc}"
     failure_run_config = build_failure_run_configuration(
@@ -119,9 +120,8 @@ def _record_setup_failure(
         runtime_limit_seconds=branch_spec.runtime_limit_seconds,
         solver_result=None,
         elapsed_seconds=0.0,
-        paired_run=False,
-        success=False,
-        failure_reason=note,
+        solver_status=note,
+        paired_run=paired_run,
         dynamic=branch_spec.is_dynamic,
     )
     record_bucket.append(record)
@@ -129,7 +129,7 @@ def _record_setup_failure(
     log_mapping_record(logger, record)
 
 
-def _run_classical_phase(
+def _run_counted_classical_phase(
     *,
     branch_spec: BranchSpec,
     dynamic_state: DynamicBranchState | None,
@@ -141,10 +141,14 @@ def _run_classical_phase(
     run_records: list[dict[str, Any]],
 ) -> tuple[list[MappingRunRecord], list[PreparedRunContext]]:
     classical_records: list[MappingRunRecord] = []
-    saved_success_contexts: list[PreparedRunContext] = []
+    counted_contexts: list[PreparedRunContext] = []
 
-    for classical_attempt_index in range(branch_spec.max_classical_attempts):
-        run_index = classical_attempt_index
+    attempt_index = 0
+    while (
+        len(counted_contexts) < branch_spec.counted_runs_required
+        and attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
+    ):
+        run_index = attempt_index
         try:
             prepared_context = _prepare_run_context(
                 branch_spec=branch_spec,
@@ -156,8 +160,8 @@ def _run_classical_phase(
             )
         except Exception as exc:
             logger.log(
-                f"  Classical attempt {classical_attempt_index + 1}/{branch_spec.max_classical_attempts} | "
-                f"run_index={run_index} | setup_failed={type(exc).__name__}: {exc}"
+                f"  Classical attempt {attempt_index + 1} | run_index={run_index} | "
+                f"setup_failed={type(exc).__name__}: {exc}"
             )
             _record_setup_failure(
                 branch_spec=branch_spec,
@@ -167,22 +171,23 @@ def _run_classical_phase(
                 agent_number_index=agent_number_index,
                 run_index=run_index,
                 mapping_name="classical",
-                comparison_case="classical_attempt",
+                comparison_case="classical_counted_sampling",
                 run_configurations=run_configurations,
                 run_records=run_records,
                 record_bucket=classical_records,
                 logger=logger,
                 exc=exc,
+                paired_run=False,
             )
+            attempt_index += 1
             continue
 
-        run_configurations.append(prepared_context.run_configuration.to_dict())
         logger.log(
-            f"  Classical attempt {classical_attempt_index + 1}/{branch_spec.max_classical_attempts} | "
+            f"  Classical attempt {attempt_index + 1} | "
             f"{prepared_context.run_configuration.run_config_id} | "
             f"map_id={prepared_context.run_configuration.map_identifier}"
         )
-        success, solver_result, elapsed_seconds, failure_reason = _execute_mapping(
+        solver_result, elapsed_seconds, solver_status = _execute_mapping(
             branch_spec=branch_spec,
             dynamic_state=dynamic_state,
             prepared_context=prepared_context,
@@ -192,131 +197,55 @@ def _run_classical_phase(
         record = build_mapping_record(
             run_configuration=prepared_context.run_configuration,
             mapping_name="classical",
-            comparison_case="classical_attempt",
+            comparison_case="classical_counted_sampling",
             runtime_limit_seconds=branch_spec.runtime_limit_seconds,
             solver_result=solver_result,
             elapsed_seconds=elapsed_seconds,
+            solver_status=solver_status,
             paired_run=False,
-            success=success,
-            failure_reason=failure_reason,
             dynamic=branch_spec.is_dynamic,
         )
         classical_records.append(record)
+        if record.counted_run:
+            prepared_context.run_configuration.paired_source = True
+            counted_contexts.append(prepared_context)
+        run_configurations.append(prepared_context.run_configuration.to_dict())
         run_records.append(record.to_dict())
         log_mapping_record(logger, record)
-        if success:
-            prepared_context.run_configuration.paired_source = True
-            saved_success_contexts.append(prepared_context)
-            if len(saved_success_contexts) >= branch_spec.required_successes:
-                logger.log(f"  Classical reached required successes ({branch_spec.required_successes}).")
-                break
+        if record.counted_run:
+            logger.log(
+                f"      Counted classical runs: {len(counted_contexts)}/{branch_spec.counted_runs_required}"
+            )
+        attempt_index += 1
 
-    return classical_records, saved_success_contexts
+    if len(counted_contexts) < branch_spec.counted_runs_required:
+        logger.log(
+            "  Warning: classical sampling stopped at the internal safeguard before the "
+            f"counted-run quota was reached ({len(counted_contexts)}/{branch_spec.counted_runs_required})."
+        )
+
+    return classical_records, counted_contexts
 
 
 def _run_cyclic_paired_phase(
     *,
     branch_spec: BranchSpec,
     dynamic_state: DynamicBranchState | None,
-    saved_success_contexts: list[PreparedRunContext],
-    logger: ExperimentLogger,
+    counted_contexts: list[PreparedRunContext],
     run_records: list[dict[str, Any]],
+    logger: ExperimentLogger,
 ) -> list[MappingRunRecord]:
     cyclic_records: list[MappingRunRecord] = []
-    logger.log("  Replaying cyclic on saved successful classical run configurations.")
-    for paired_index, prepared_context in enumerate(saved_success_contexts, start=1):
-        logger.log(
-            f"  Cyclic paired replay {paired_index}/{len(saved_success_contexts)} | "
-            f"{prepared_context.run_configuration.run_config_id}"
-        )
-        success, solver_result, elapsed_seconds, failure_reason = _execute_mapping(
-            branch_spec=branch_spec,
-            dynamic_state=dynamic_state,
-            prepared_context=prepared_context,
-            mapping_name="cyclic",
-            logger=logger,
-        )
-        record = build_mapping_record(
-            run_configuration=prepared_context.run_configuration,
-            mapping_name="cyclic",
-            comparison_case="paired_replay",
-            runtime_limit_seconds=branch_spec.runtime_limit_seconds,
-            solver_result=solver_result,
-            elapsed_seconds=elapsed_seconds,
-            paired_run=True,
-            success=success,
-            failure_reason=failure_reason,
-            dynamic=branch_spec.is_dynamic,
-        )
-        cyclic_records.append(record)
-        run_records.append(record.to_dict())
-        log_mapping_record(logger, record)
-    return cyclic_records
-
-
-def _run_cyclic_recovery_phase(
-    *,
-    branch_spec: BranchSpec,
-    dynamic_state: DynamicBranchState | None,
-    agent_number: int,
-    agent_number_index: int,
-    seed_base: int,
-    logger: ExperimentLogger,
-    run_configurations: list[dict[str, Any]],
-    run_records: list[dict[str, Any]],
-) -> list[MappingRunRecord]:
-    cyclic_records: list[MappingRunRecord] = []
-    cyclic_success_count = 0
-    recovery_attempt_index = 0
-
     logger.log(
-        "  Classical did not reach required successes. "
-        "Classical receives a null condition-level data point; cyclic enters recovery mode."
+        "  Replaying cyclic on the classical counted run configurations "
+        f"({len(counted_contexts)} total)."
     )
-
-    while (
-        cyclic_success_count < branch_spec.required_successes
-        and recovery_attempt_index < MAX_CYCLIC_RECOVERY_ATTEMPTS
-    ):
-        run_index = branch_spec.max_classical_attempts + recovery_attempt_index
-        try:
-            prepared_context = _prepare_run_context(
-                branch_spec=branch_spec,
-                dynamic_state=dynamic_state,
-                agent_number=agent_number,
-                agent_number_index=agent_number_index,
-                run_index=run_index,
-                seed_base=seed_base,
-            )
-        except Exception as exc:
-            logger.log(
-                f"  Cyclic recovery attempt {recovery_attempt_index + 1}/{MAX_CYCLIC_RECOVERY_ATTEMPTS} | "
-                f"run_index={run_index} | setup_failed={type(exc).__name__}: {exc}"
-            )
-            _record_setup_failure(
-                branch_spec=branch_spec,
-                dynamic_state=dynamic_state,
-                seed_base=seed_base,
-                agent_number=agent_number,
-                agent_number_index=agent_number_index,
-                run_index=run_index,
-                mapping_name="cyclic",
-                comparison_case="cyclic_recovery",
-                run_configurations=run_configurations,
-                run_records=run_records,
-                record_bucket=cyclic_records,
-                logger=logger,
-                exc=exc,
-            )
-            recovery_attempt_index += 1
-            continue
-
-        run_configurations.append(prepared_context.run_configuration.to_dict())
+    for paired_index, prepared_context in enumerate(counted_contexts, start=1):
         logger.log(
-            f"  Cyclic recovery attempt {recovery_attempt_index + 1}/{MAX_CYCLIC_RECOVERY_ATTEMPTS} | "
+            f"  Cyclic paired replay {paired_index}/{len(counted_contexts)} | "
             f"{prepared_context.run_configuration.run_config_id}"
         )
-        success, solver_result, elapsed_seconds, failure_reason = _execute_mapping(
+        solver_result, elapsed_seconds, solver_status = _execute_mapping(
             branch_spec=branch_spec,
             dynamic_state=dynamic_state,
             prepared_context=prepared_context,
@@ -326,27 +255,17 @@ def _run_cyclic_recovery_phase(
         record = build_mapping_record(
             run_configuration=prepared_context.run_configuration,
             mapping_name="cyclic",
-            comparison_case="cyclic_recovery",
+            comparison_case="paired_counted_replay",
             runtime_limit_seconds=branch_spec.runtime_limit_seconds,
             solver_result=solver_result,
             elapsed_seconds=elapsed_seconds,
-            paired_run=False,
-            success=success,
-            failure_reason=failure_reason,
+            solver_status=solver_status,
+            paired_run=True,
             dynamic=branch_spec.is_dynamic,
         )
         cyclic_records.append(record)
         run_records.append(record.to_dict())
         log_mapping_record(logger, record)
-        if success:
-            cyclic_success_count += 1
-        recovery_attempt_index += 1
-
-    if cyclic_success_count < branch_spec.required_successes:
-        logger.log(
-            f"  Cyclic recovery stopped at safeguard limit ({MAX_CYCLIC_RECOVERY_ATTEMPTS} attempts) "
-            f"with {cyclic_success_count} successes."
-        )
     return cyclic_records
 
 
@@ -386,7 +305,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int = 1) -> dict[str, A
         )
         logger.log("-" * 88)
 
-        classical_records, saved_success_contexts = _run_classical_phase(
+        classical_records, counted_contexts = _run_counted_classical_phase(
             branch_spec=branch_spec,
             dynamic_state=dynamic_state,
             agent_number=agent_number,
@@ -396,27 +315,14 @@ def run_selected_experiment(map_type: str, *, seed_base: int = 1) -> dict[str, A
             run_configurations=run_configurations,
             run_records=run_records,
         )
-        classical_success = len(saved_success_contexts) >= branch_spec.required_successes
 
-        if classical_success:
-            cyclic_records = _run_cyclic_paired_phase(
-                branch_spec=branch_spec,
-                dynamic_state=dynamic_state,
-                saved_success_contexts=saved_success_contexts,
-                logger=logger,
-                run_records=run_records,
-            )
-        else:
-            cyclic_records = _run_cyclic_recovery_phase(
-                branch_spec=branch_spec,
-                dynamic_state=dynamic_state,
-                agent_number=agent_number,
-                agent_number_index=agent_number_index,
-                seed_base=seed_base,
-                logger=logger,
-                run_configurations=run_configurations,
-                run_records=run_records,
-            )
+        cyclic_records = _run_cyclic_paired_phase(
+            branch_spec=branch_spec,
+            dynamic_state=dynamic_state,
+            counted_contexts=counted_contexts,
+            run_records=run_records,
+            logger=logger,
+        )
 
         aggregate = build_condition_aggregate(
             branch_spec=branch_spec,
@@ -424,6 +330,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int = 1) -> dict[str, A
             agent_number_index=agent_number_index,
             classical_records=classical_records,
             cyclic_records=cyclic_records,
+            paired_run_configurations=len(counted_contexts),
         )
         aggregates_payload.append(aggregate.to_dict())
         print_aggregate_block(logger, aggregate)

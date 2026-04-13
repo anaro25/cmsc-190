@@ -3,257 +3,211 @@ Branch: Static Artificial (static_artificial)
 Map obstacle type: static
 Documented target type: scattered_targets
 Active target type: scattered_targets
-Required successes (n): 3
-Maximum classical attempts (m): 10
-Runtime limit per run: 30.0s
-Agent numbers: [8, 12, 16, 20]
-Notes: Fresh 25x25 artificial map per run configuration. Scattered targets are used.
+Counted runs required (n): 5
+Runtime limit per run: 30.00s
+Agent numbers: [12, 16, 20]
+Notes: Fresh 25x25 artificial map per run configuration. Scattered targets are used. Counted runs are the runs classified as successful or unfinished.
 ========================================================================================
 
 ----------------------------------------------------------------------------------------
-Condition 1/4 | agent_number=8 | condition_id=agent_number[0.0.0]
+Condition 1/3 | agent_number=12 | condition_id=agent_number[0.0.0]
 ----------------------------------------------------------------------------------------
-  Classical attempt 1/10 | run[0.0.0.0] | map_id=artificial_25x25_seed_37479
-    Classical run[0.0.0.0] progress: 0s
-      Classical | mapping[0.0.0.0.0] | status=success | time=0.0103s | conflicts=1 | avg_path=15.6250 | paired=False
-  Classical attempt 2/10 | run[0.0.0.1] | map_id=artificial_25x25_seed_37506
-    Classical run[0.0.0.1] progress: 0s
-      Classical | mapping[0.0.0.1.0] | status=success | time=0.0073s | conflicts=0 | avg_path=13.6250 | paired=False
-  Classical attempt 3/10 | run[0.0.0.2] | map_id=artificial_25x25_seed_37533
-    Classical run[0.0.0.2] progress: 0s
-    Classical run[0.0.0.2] progress: 5s
-    Classical run[0.0.0.2] progress: 10s
-    Classical run[0.0.0.2] progress: 15s
-    Classical run[0.0.0.2] progress: 20s
-    Classical run[0.0.0.2] progress: 25s
-    Classical run[0.0.0.2] progress: 30s
-      Classical | mapping[0.0.0.2.0] | status=bad_setup_timeout | time=30.0147s | conflicts=6180 | avg_path=null | paired=False
-  Classical attempt 4/10 | run[0.0.0.3] | map_id=artificial_25x25_seed_37560
-    Classical run[0.0.0.3] progress: 0s
-    Classical run[0.0.0.3] progress: 5s
-    Classical run[0.0.0.3] progress: 10s
-    Classical run[0.0.0.3] progress: 15s
-    Classical run[0.0.0.3] progress: 20s
-    Classical run[0.0.0.3] progress: 25s
-    Classical run[0.0.0.3] progress: 30s
-      Classical | mapping[0.0.0.3.0] | status=bad_setup_timeout | time=30.0375s | conflicts=12144 | avg_path=null | paired=False
-  Classical attempt 5/10 | run[0.0.0.4] | map_id=artificial_25x25_seed_37587
-    Classical run[0.0.0.4] progress: 0s
-      Classical | mapping[0.0.0.4.0] | status=success | time=0.0104s | conflicts=1 | avg_path=14.7500 | paired=False
-  Classical reached required successes (3).
-  Replaying cyclic on saved successful classical run configurations.
-  Cyclic paired replay 1/3 | run[0.0.0.0]
-    Cyclic run[0.0.0.0] progress: 0s
-      Cyclic | mapping[0.0.0.0.1] | status=success | time=0.0113s | conflicts=1 | avg_path=17.6250 | paired=True
-  Cyclic paired replay 2/3 | run[0.0.0.1]
-    Cyclic run[0.0.0.1] progress: 0s
-      Cyclic | mapping[0.0.0.1.1] | status=success | time=0.0084s | conflicts=0 | avg_path=15.6250 | paired=True
-  Cyclic paired replay 3/3 | run[0.0.0.4]
-    Cyclic run[0.0.0.4] progress: 0s
-      Cyclic | mapping[0.0.0.4.1] | status=success | time=0.0099s | conflicts=0 | avg_path=16.2500 | paired=True
-    Condition aggregate | agent_number[0.0.0] | agent_number=8 | classical_successes=3/5 | cyclic_successes=3/3 | paired=True
-      Averages | classical_time=0.0093 | cyclic_time=0.0099 | classical_conflicts=0.6667 | cyclic_conflicts=0.3333 | classical_path=14.6667 | cyclic_path=16.5000
+  Classical attempt 1 | run[0.0.0.0] | map_id=artificial_25x25_seed_42439
+    Classical run[0.0.0.0] progress: 0.00s
+      Classical | mapping[0.0.0.0.0] | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=1.00 | avg_path=12.33 | paired=False
+      Counted classical runs: 1/5
+  Classical attempt 2 | run[0.0.0.1] | map_id=artificial_25x25_seed_42469
+    Classical run[0.0.0.1] progress: 0.00s
+    Classical run[0.0.0.1] progress: 5.00s
+    Classical run[0.0.0.1] progress: 10.00s
+    Classical run[0.0.0.1] progress: 15.00s
+    Classical run[0.0.0.1] progress: 20.00s
+    Classical run[0.0.0.1] progress: 25.00s
+    Classical run[0.0.0.1] progress: 30.00s
+      Classical | mapping[0.0.0.1.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=13499.00 | avg_path=null | paired=False
+      Counted classical runs: 2/5
+  Classical attempt 3 | run[0.0.0.2] | map_id=artificial_25x25_seed_42499
+    Classical run[0.0.0.2] progress: 0.00s
+      Classical | mapping[0.0.0.2.0] | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=1.00 | avg_path=13.58 | paired=False
+      Counted classical runs: 3/5
+  Classical attempt 4 | run[0.0.0.3] | map_id=artificial_25x25_seed_42529
+    Classical run[0.0.0.3] progress: 0.00s
+      Classical | mapping[0.0.0.3.0] | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=14.58 | paired=False
+      Counted classical runs: 4/5
+  Classical attempt 5 | run[0.0.0.4] | map_id=artificial_25x25_seed_42559
+    Classical run[0.0.0.4] progress: 0.00s
+    Classical run[0.0.0.4] progress: 5.00s
+    Classical run[0.0.0.4] progress: 10.00s
+    Classical run[0.0.0.4] progress: 15.00s
+    Classical run[0.0.0.4] progress: 20.00s
+    Classical run[0.0.0.4] progress: 25.00s
+    Classical run[0.0.0.4] progress: 30.00s
+      Classical | mapping[0.0.0.4.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=6954.00 | avg_path=null | paired=False
+      Counted classical runs: 5/5
+  Replaying cyclic on the classical counted run configurations (5 total).
+  Cyclic paired replay 1/5 | run[0.0.0.0]
+    Cyclic run[0.0.0.0] progress: 0.00s
+      Cyclic | mapping[0.0.0.0.1] | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=1.00 | avg_path=13.17 | paired=True
+  Cyclic paired replay 2/5 | run[0.0.0.1]
+    Cyclic run[0.0.0.1] progress: 0.00s
+      Cyclic | mapping[0.0.0.1.1] | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=1.00 | avg_path=17.42 | paired=True
+  Cyclic paired replay 3/5 | run[0.0.0.2]
+    Cyclic run[0.0.0.2] progress: 0.00s
+      Cyclic | mapping[0.0.0.2.1] | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=2.00 | avg_path=14.92 | paired=True
+  Cyclic paired replay 4/5 | run[0.0.0.3]
+    Cyclic run[0.0.0.3] progress: 0.00s
+      Cyclic | mapping[0.0.0.3.1] | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=16.08 | paired=True
+  Cyclic paired replay 5/5 | run[0.0.0.4]
+    Cyclic run[0.0.0.4] progress: 0.00s
+      Cyclic | mapping[0.0.0.4.1] | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=3.00 | avg_path=15.83 | paired=True
+    Condition aggregate | agent_number[0.0.0] | agent_number=12 | classical_counted=5/5 | cyclic_counted=5/5
+      Classical | successful=3 | unfinished=2 | unsolvable=0 | setup_failed=0 | avg_time_halted=12.01 | avg_conflicts_at_halt=4091.00 | avg_path=13.50
+      Cyclic | successful=5 | unfinished=0 | unsolvable=0 | setup_failed=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=1.40 | avg_path=15.48
 
 ----------------------------------------------------------------------------------------
-Condition 2/4 | agent_number=12 | condition_id=agent_number[0.0.1]
+Condition 2/3 | agent_number=16 | condition_id=agent_number[0.0.1]
 ----------------------------------------------------------------------------------------
-  Classical attempt 1/10 | run[0.0.1.0] | map_id=artificial_25x25_seed_38776
-    Classical run[0.0.1.0] progress: 0s
-    Classical run[0.0.1.0] progress: 5s
-    Classical run[0.0.1.0] progress: 10s
-    Classical run[0.0.1.0] progress: 15s
-    Classical run[0.0.1.0] progress: 20s
-    Classical run[0.0.1.0] progress: 25s
-    Classical run[0.0.1.0] progress: 30s
-      Classical | mapping[0.0.1.0.0] | status=bad_setup_timeout | time=30.0180s | conflicts=7212 | avg_path=null | paired=False
-  Classical attempt 2/10 | run[0.0.1.1] | map_id=artificial_25x25_seed_38804
-    Classical run[0.0.1.1] progress: 0s
-      Classical | mapping[0.0.1.1.0] | status=success | time=0.0118s | conflicts=1 | avg_path=14.5000 | paired=False
-  Classical attempt 3/10 | run[0.0.1.2] | map_id=artificial_25x25_seed_38832
-    Classical run[0.0.1.2] progress: 0s
-    Classical run[0.0.1.2] progress: 5s
-    Classical run[0.0.1.2] progress: 10s
-    Classical run[0.0.1.2] progress: 15s
-    Classical run[0.0.1.2] progress: 20s
-    Classical run[0.0.1.2] progress: 25s
-    Classical run[0.0.1.2] progress: 30s
-      Classical | mapping[0.0.1.2.0] | status=bad_setup_timeout | time=30.0330s | conflicts=10130 | avg_path=null | paired=False
-  Classical attempt 4/10 | run[0.0.1.3] | map_id=artificial_25x25_seed_38860
-    Classical run[0.0.1.3] progress: 0s
-      Classical | mapping[0.0.1.3.0] | status=success | time=0.1652s | conflicts=55 | avg_path=15.7500 | paired=False
-  Classical attempt 5/10 | run[0.0.1.4] | map_id=artificial_25x25_seed_38888
-    Classical run[0.0.1.4] progress: 0s
-    Classical run[0.0.1.4] progress: 5s
-    Classical run[0.0.1.4] progress: 10s
-    Classical run[0.0.1.4] progress: 15s
-    Classical run[0.0.1.4] progress: 20s
-    Classical run[0.0.1.4] progress: 25s
-    Classical run[0.0.1.4] progress: 30s
-      Classical | mapping[0.0.1.4.0] | status=bad_setup_timeout | time=30.0192s | conflicts=6540 | avg_path=null | paired=False
-  Classical attempt 6/10 | run[0.0.1.5] | map_id=artificial_25x25_seed_38916
-    Classical run[0.0.1.5] progress: 0s
-    Classical run[0.0.1.5] progress: 5s
-    Classical run[0.0.1.5] progress: 10s
-    Classical run[0.0.1.5] progress: 15s
-    Classical run[0.0.1.5] progress: 20s
-    Classical run[0.0.1.5] progress: 25s
-    Classical run[0.0.1.5] progress: 30s
-      Classical | mapping[0.0.1.5.0] | status=bad_setup_timeout | time=30.0530s | conflicts=13227 | avg_path=null | paired=False
-  Classical attempt 7/10 | run[0.0.1.6] | map_id=artificial_25x25_seed_38944
-    Classical run[0.0.1.6] progress: 0s
-      Classical | mapping[0.0.1.6.0] | status=success | time=0.0189s | conflicts=4 | avg_path=14.2500 | paired=False
-  Classical reached required successes (3).
-  Replaying cyclic on saved successful classical run configurations.
-  Cyclic paired replay 1/3 | run[0.0.1.1]
-    Cyclic run[0.0.1.1] progress: 0s
-      Cyclic | mapping[0.0.1.1.1] | status=success | time=0.0166s | conflicts=3 | avg_path=17.1667 | paired=True
-  Cyclic paired replay 2/3 | run[0.0.1.3]
-    Cyclic run[0.0.1.3] progress: 0s
-      Cyclic | mapping[0.0.1.3.1] | status=success | time=0.2004s | conflicts=55 | avg_path=18.6667 | paired=True
-  Cyclic paired replay 3/3 | run[0.0.1.6]
-    Cyclic run[0.0.1.6] progress: 0s
-      Cyclic | mapping[0.0.1.6.1] | status=success | time=0.0152s | conflicts=0 | avg_path=14.7500 | paired=True
-    Condition aggregate | agent_number[0.0.1] | agent_number=12 | classical_successes=3/7 | cyclic_successes=3/3 | paired=True
-      Averages | classical_time=0.0653 | cyclic_time=0.0774 | classical_conflicts=20.0000 | cyclic_conflicts=19.3333 | classical_path=14.8333 | cyclic_path=16.8611
+  Classical attempt 1 | run[0.0.1.0] | map_id=artificial_25x25_seed_42551
+    Classical run[0.0.1.0] progress: 0.00s
+    Classical run[0.0.1.0] progress: 5.00s
+    Classical run[0.0.1.0] progress: 10.00s
+    Classical run[0.0.1.0] progress: 15.00s
+    Classical run[0.0.1.0] progress: 20.00s
+    Classical run[0.0.1.0] progress: 25.00s
+    Classical run[0.0.1.0] progress: 30.00s
+      Classical | mapping[0.0.1.0.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=3279.00 | avg_path=null | paired=False
+      Counted classical runs: 1/5
+  Classical attempt 2 | run[0.0.1.1] | map_id=artificial_25x25_seed_42581
+    Classical run[0.0.1.1] progress: 0.00s
+    Classical run[0.0.1.1] progress: 5.00s
+    Classical run[0.0.1.1] progress: 10.00s
+    Classical run[0.0.1.1] progress: 15.00s
+    Classical run[0.0.1.1] progress: 20.00s
+    Classical run[0.0.1.1] progress: 25.00s
+    Classical run[0.0.1.1] progress: 30.00s
+      Classical | mapping[0.0.1.1.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=8624.00 | avg_path=null | paired=False
+      Counted classical runs: 2/5
+  Classical attempt 3 | run[0.0.1.2] | map_id=artificial_25x25_seed_42611
+    Classical run[0.0.1.2] progress: 0.00s
+    Classical run[0.0.1.2] progress: 5.00s
+    Classical run[0.0.1.2] progress: 10.00s
+    Classical run[0.0.1.2] progress: 15.00s
+    Classical run[0.0.1.2] progress: 20.00s
+    Classical run[0.0.1.2] progress: 25.00s
+    Classical run[0.0.1.2] progress: 30.00s
+      Classical | mapping[0.0.1.2.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=5627.00 | avg_path=null | paired=False
+      Counted classical runs: 3/5
+  Classical attempt 4 | run[0.0.1.3] | map_id=artificial_25x25_seed_42641
+    Classical run[0.0.1.3] progress: 0.00s
+      Classical | mapping[0.0.1.3.0] | result=successful | solver_status=solved | counted=True | time_halted=0.63s | conflicts_at_halt=305.00 | avg_path=11.88 | paired=False
+      Counted classical runs: 4/5
+  Classical attempt 5 | run[0.0.1.4] | map_id=artificial_25x25_seed_42671
+    Classical run[0.0.1.4] progress: 0.00s
+    Classical run[0.0.1.4] progress: 5.00s
+    Classical run[0.0.1.4] progress: 10.00s
+    Classical run[0.0.1.4] progress: 15.00s
+    Classical run[0.0.1.4] progress: 20.00s
+    Classical run[0.0.1.4] progress: 25.00s
+    Classical run[0.0.1.4] progress: 30.00s
+      Classical | mapping[0.0.1.4.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=10383.00 | avg_path=null | paired=False
+      Counted classical runs: 5/5
+  Replaying cyclic on the classical counted run configurations (5 total).
+  Cyclic paired replay 1/5 | run[0.0.1.0]
+    Cyclic run[0.0.1.0] progress: 0.00s
+      Cyclic | mapping[0.0.1.0.1] | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=1.00 | avg_path=21.00 | paired=True
+  Cyclic paired replay 2/5 | run[0.0.1.1]
+    Cyclic run[0.0.1.1] progress: 0.00s
+      Cyclic | mapping[0.0.1.1.1] | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=5.00 | avg_path=12.44 | paired=True
+  Cyclic paired replay 3/5 | run[0.0.1.2]
+    Cyclic run[0.0.1.2] progress: 0.00s
+      Cyclic | mapping[0.0.1.2.1] | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=3.00 | avg_path=15.81 | paired=True
+  Cyclic paired replay 4/5 | run[0.0.1.3]
+    Cyclic run[0.0.1.3] progress: 0.00s
+      Cyclic | mapping[0.0.1.3.1] | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=23.00 | avg_path=13.50 | paired=True
+  Cyclic paired replay 5/5 | run[0.0.1.4]
+    Cyclic run[0.0.1.4] progress: 0.00s
+      Cyclic | mapping[0.0.1.4.1] | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=0.00 | avg_path=16.94 | paired=True
+    Condition aggregate | agent_number[0.0.1] | agent_number=16 | classical_counted=5/5 | cyclic_counted=5/5
+      Classical | successful=1 | unfinished=4 | unsolvable=0 | setup_failed=0 | avg_time_halted=24.13 | avg_conflicts_at_halt=5643.60 | avg_path=11.88
+      Cyclic | successful=5 | unfinished=0 | unsolvable=0 | setup_failed=0 | avg_time_halted=0.03 | avg_conflicts_at_halt=6.40 | avg_path=15.94
 
 ----------------------------------------------------------------------------------------
-Condition 3/4 | agent_number=16 | condition_id=agent_number[0.0.2]
+Condition 3/3 | agent_number=20 | condition_id=agent_number[0.0.2]
 ----------------------------------------------------------------------------------------
-  Classical attempt 1/10 | run[0.0.2.0] | map_id=artificial_25x25_seed_38880
-    Classical run[0.0.2.0] progress: 0s
-      Classical | mapping[0.0.2.0.0] | status=success | time=0.0316s | conflicts=7 | avg_path=13.6250 | paired=False
-  Classical attempt 2/10 | run[0.0.2.1] | map_id=artificial_25x25_seed_38908
-    Classical run[0.0.2.1] progress: 0s
-    Classical run[0.0.2.1] progress: 5s
-    Classical run[0.0.2.1] progress: 10s
-    Classical run[0.0.2.1] progress: 15s
-    Classical run[0.0.2.1] progress: 20s
-    Classical run[0.0.2.1] progress: 25s
-    Classical run[0.0.2.1] progress: 30s
-      Classical | mapping[0.0.2.1.0] | status=bad_setup_timeout | time=30.0455s | conflicts=11387 | avg_path=null | paired=False
-  Classical attempt 3/10 | run[0.0.2.2] | map_id=artificial_25x25_seed_38936
-    Classical run[0.0.2.2] progress: 0s
-      Classical | mapping[0.0.2.2.0] | status=success | time=0.0176s | conflicts=2 | avg_path=12.3750 | paired=False
-  Classical attempt 4/10 | run[0.0.2.3] | map_id=artificial_25x25_seed_38964
-    Classical run[0.0.2.3] progress: 0s
-      Classical | mapping[0.0.2.3.0] | status=success | time=0.0200s | conflicts=2 | avg_path=11.4375 | paired=False
-  Classical reached required successes (3).
-  Replaying cyclic on saved successful classical run configurations.
-  Cyclic paired replay 1/3 | run[0.0.2.0]
-    Cyclic run[0.0.2.0] progress: 0s
-      Cyclic | mapping[0.0.2.0.1] | status=success | time=0.0165s | conflicts=0 | avg_path=15.3750 | paired=True
-  Cyclic paired replay 2/3 | run[0.0.2.2]
-    Cyclic run[0.0.2.2] progress: 0s
-      Cyclic | mapping[0.0.2.2.1] | status=success | time=0.0263s | conflicts=8 | avg_path=13.8750 | paired=True
-  Cyclic paired replay 3/3 | run[0.0.2.3]
-    Cyclic run[0.0.2.3] progress: 0s
-      Cyclic | mapping[0.0.2.3.1] | status=success | time=0.0430s | conflicts=7 | avg_path=15.3125 | paired=True
-    Condition aggregate | agent_number[0.0.2] | agent_number=16 | classical_successes=3/4 | cyclic_successes=3/3 | paired=True
-      Averages | classical_time=0.0230 | cyclic_time=0.0286 | classical_conflicts=3.6667 | cyclic_conflicts=5.0000 | classical_path=12.4792 | cyclic_path=14.8542
-
-----------------------------------------------------------------------------------------
-Condition 4/4 | agent_number=20 | condition_id=agent_number[0.0.3]
-----------------------------------------------------------------------------------------
-  Classical attempt 1/10 | run[0.0.3.0] | map_id=artificial_25x25_seed_38749
-    Classical run[0.0.3.0] progress: 0s
-      Classical | mapping[0.0.3.0.0] | status=success | time=0.7445s | conflicts=316 | avg_path=12.9500 | paired=False
-  Classical attempt 2/10 | run[0.0.3.1] | map_id=artificial_25x25_seed_38777
-    Classical run[0.0.3.1] progress: 0s
-    Classical run[0.0.3.1] progress: 5s
-    Classical run[0.0.3.1] progress: 10s
-    Classical run[0.0.3.1] progress: 15s
-    Classical run[0.0.3.1] progress: 20s
-    Classical run[0.0.3.1] progress: 25s
-    Classical run[0.0.3.1] progress: 30s
-      Classical | mapping[0.0.3.1.0] | status=bad_setup_timeout | time=30.0312s | conflicts=8704 | avg_path=null | paired=False
-  Classical attempt 3/10 | run[0.0.3.2] | map_id=artificial_25x25_seed_38805
-    Classical run[0.0.3.2] progress: 0s
-      Classical | mapping[0.0.3.2.0] | status=success | time=0.1840s | conflicts=69 | avg_path=15.9000 | paired=False
-  Classical attempt 4/10 | run[0.0.3.3] | map_id=artificial_25x25_seed_38833
-    Classical run[0.0.3.3] progress: 0s
-    Classical run[0.0.3.3] progress: 5s
-    Classical run[0.0.3.3] progress: 10s
-    Classical run[0.0.3.3] progress: 15s
-    Classical run[0.0.3.3] progress: 20s
-    Classical run[0.0.3.3] progress: 25s
-    Classical run[0.0.3.3] progress: 30s
-      Classical | mapping[0.0.3.3.0] | status=bad_setup_timeout | time=30.0155s | conflicts=6484 | avg_path=null | paired=False
-  Classical attempt 5/10 | run[0.0.3.4] | map_id=artificial_25x25_seed_38861
-    Classical run[0.0.3.4] progress: 0s
-    Classical run[0.0.3.4] progress: 5s
-    Classical run[0.0.3.4] progress: 10s
-    Classical run[0.0.3.4] progress: 15s
-    Classical run[0.0.3.4] progress: 20s
-    Classical run[0.0.3.4] progress: 25s
-    Classical run[0.0.3.4] progress: 30s
-      Classical | mapping[0.0.3.4.0] | status=bad_setup_timeout | time=30.0221s | conflicts=7580 | avg_path=null | paired=False
-  Classical attempt 6/10 | run[0.0.3.5] | map_id=artificial_25x25_seed_38889
-    Classical run[0.0.3.5] progress: 0s
-    Classical run[0.0.3.5] progress: 5s
-    Classical run[0.0.3.5] progress: 10s
-    Classical run[0.0.3.5] progress: 15s
-    Classical run[0.0.3.5] progress: 20s
-    Classical run[0.0.3.5] progress: 25s
-    Classical run[0.0.3.5] progress: 30s
-      Classical | mapping[0.0.3.5.0] | status=bad_setup_timeout | time=30.0310s | conflicts=10045 | avg_path=null | paired=False
-  Classical attempt 7/10 | run[0.0.3.6] | map_id=artificial_25x25_seed_38917
-    Classical run[0.0.3.6] progress: 0s
-    Classical run[0.0.3.6] progress: 5s
-    Classical run[0.0.3.6] progress: 10s
-    Classical run[0.0.3.6] progress: 15s
-    Classical run[0.0.3.6] progress: 20s
-    Classical run[0.0.3.6] progress: 25s
-    Classical run[0.0.3.6] progress: 30s
-      Classical | mapping[0.0.3.6.0] | status=bad_setup_timeout | time=30.0439s | conflicts=15434 | avg_path=null | paired=False
-  Classical attempt 8/10 | run[0.0.3.7] | map_id=artificial_25x25_seed_38945
-    Classical run[0.0.3.7] progress: 0s
-    Classical run[0.0.3.7] progress: 5s
-    Classical run[0.0.3.7] progress: 10s
-    Classical run[0.0.3.7] progress: 15s
-    Classical run[0.0.3.7] progress: 20s
-    Classical run[0.0.3.7] progress: 25s
-    Classical run[0.0.3.7] progress: 30s
-      Classical | mapping[0.0.3.7.0] | status=bad_setup_timeout | time=30.0229s | conflicts=11054 | avg_path=null | paired=False
-  Classical attempt 9/10 | run[0.0.3.8] | map_id=artificial_25x25_seed_38973
-    Classical run[0.0.3.8] progress: 0s
-    Classical run[0.0.3.8] progress: 5s
-    Classical run[0.0.3.8] progress: 10s
-    Classical run[0.0.3.8] progress: 15s
-    Classical run[0.0.3.8] progress: 20s
-    Classical run[0.0.3.8] progress: 25s
-    Classical run[0.0.3.8] progress: 30s
-      Classical | mapping[0.0.3.8.0] | status=bad_setup_timeout | time=30.0690s | conflicts=13317 | avg_path=null | paired=False
-  Classical attempt 10/10 | run[0.0.3.9] | map_id=artificial_25x25_seed_39001
-    Classical run[0.0.3.9] progress: 0s
-    Classical run[0.0.3.9] progress: 5s
-    Classical run[0.0.3.9] progress: 10s
-    Classical run[0.0.3.9] progress: 15s
-    Classical run[0.0.3.9] progress: 20s
-    Classical run[0.0.3.9] progress: 25s
-    Classical run[0.0.3.9] progress: 30s
-      Classical | mapping[0.0.3.9.0] | status=bad_setup_timeout | time=30.0270s | conflicts=6647 | avg_path=null | paired=False
-  Classical did not reach required successes. Classical receives a null condition-level data point; cyclic enters recovery mode.
-  Cyclic recovery attempt 1/30 | run[0.0.3.10]
-    Cyclic run[0.0.3.10] progress: 0s
-      Cyclic | mapping[0.0.3.10.1] | status=success | time=0.1074s | conflicts=21 | avg_path=18.8000 | paired=False
-  Cyclic recovery attempt 2/30 | run[0.0.3.11]
-    Cyclic run[0.0.3.11] progress: 0s
-      Cyclic | mapping[0.0.3.11.1] | status=success | time=0.1064s | conflicts=15 | avg_path=16.4500 | paired=False
-  Cyclic recovery attempt 3/30 | run[0.0.3.12]
-    Cyclic run[0.0.3.12] progress: 0s
-      Cyclic | mapping[0.0.3.12.1] | status=success | time=0.0603s | conflicts=8 | avg_path=17.0000 | paired=False
-    Condition aggregate | agent_number[0.0.3] | agent_number=20 | classical_successes=2/10 | cyclic_successes=3/3 | paired=False
-      Averages | classical_time=0.4642 | cyclic_time=0.0914 | classical_conflicts=192.5000 | cyclic_conflicts=14.6667 | classical_path=14.4250 | cyclic_path=17.4167
+  Classical attempt 1 | run[0.0.2.0] | map_id=artificial_25x25_seed_42410
+    Classical run[0.0.2.0] progress: 0.00s
+    Classical run[0.0.2.0] progress: 5.00s
+    Classical run[0.0.2.0] progress: 10.00s
+    Classical run[0.0.2.0] progress: 15.00s
+    Classical run[0.0.2.0] progress: 20.00s
+    Classical run[0.0.2.0] progress: 25.00s
+    Classical run[0.0.2.0] progress: 30.00s
+      Classical | mapping[0.0.2.0.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=13901.00 | avg_path=null | paired=False
+      Counted classical runs: 1/5
+  Classical attempt 2 | run[0.0.2.1] | map_id=artificial_25x25_seed_42440
+    Classical run[0.0.2.1] progress: 0.00s
+    Classical run[0.0.2.1] progress: 5.00s
+    Classical run[0.0.2.1] progress: 10.00s
+    Classical run[0.0.2.1] progress: 15.00s
+    Classical run[0.0.2.1] progress: 20.00s
+    Classical run[0.0.2.1] progress: 25.00s
+    Classical run[0.0.2.1] progress: 30.00s
+      Classical | mapping[0.0.2.1.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7569.00 | avg_path=null | paired=False
+      Counted classical runs: 2/5
+  Classical attempt 3 | run[0.0.2.2] | map_id=artificial_25x25_seed_42470
+    Classical run[0.0.2.2] progress: 0.00s
+    Classical run[0.0.2.2] progress: 5.00s
+    Classical run[0.0.2.2] progress: 10.00s
+    Classical run[0.0.2.2] progress: 15.00s
+    Classical run[0.0.2.2] progress: 20.00s
+    Classical run[0.0.2.2] progress: 25.00s
+    Classical run[0.0.2.2] progress: 30.00s
+      Classical | mapping[0.0.2.2.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=5727.00 | avg_path=null | paired=False
+      Counted classical runs: 3/5
+  Classical attempt 4 | run[0.0.2.3] | map_id=artificial_25x25_seed_42500
+    Classical run[0.0.2.3] progress: 0.00s
+    Classical run[0.0.2.3] progress: 5.00s
+    Classical run[0.0.2.3] progress: 10.00s
+    Classical run[0.0.2.3] progress: 15.00s
+    Classical run[0.0.2.3] progress: 20.00s
+    Classical run[0.0.2.3] progress: 25.00s
+    Classical run[0.0.2.3] progress: 30.00s
+      Classical | mapping[0.0.2.3.0] | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=8130.00 | avg_path=null | paired=False
+      Counted classical runs: 4/5
+  Classical attempt 5 | run[0.0.2.4] | map_id=artificial_25x25_seed_42530
+    Classical run[0.0.2.4] progress: 0.00s
+      Classical | mapping[0.0.2.4.0] | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=4.00 | avg_path=10.85 | paired=False
+      Counted classical runs: 5/5
+  Replaying cyclic on the classical counted run configurations (5 total).
+  Cyclic paired replay 1/5 | run[0.0.2.0]
+    Cyclic run[0.0.2.0] progress: 0.00s
+      Cyclic | mapping[0.0.2.0.1] | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=0.00 | avg_path=18.90 | paired=True
+  Cyclic paired replay 2/5 | run[0.0.2.1]
+    Cyclic run[0.0.2.1] progress: 0.00s
+      Cyclic | mapping[0.0.2.1.1] | result=successful | solver_status=solved | counted=True | time_halted=0.18s | conflicts_at_halt=41.00 | avg_path=16.60 | paired=True
+  Cyclic paired replay 3/5 | run[0.0.2.2]
+    Cyclic run[0.0.2.2] progress: 0.00s
+      Cyclic | mapping[0.0.2.2.1] | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=7.00 | avg_path=16.75 | paired=True
+  Cyclic paired replay 4/5 | run[0.0.2.3]
+    Cyclic run[0.0.2.3] progress: 0.00s
+      Cyclic | mapping[0.0.2.3.1] | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=2.00 | avg_path=12.25 | paired=True
+  Cyclic paired replay 5/5 | run[0.0.2.4]
+    Cyclic run[0.0.2.4] progress: 0.00s
+      Cyclic | mapping[0.0.2.4.1] | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=1.00 | avg_path=12.25 | paired=True
+    Condition aggregate | agent_number[0.0.2] | agent_number=20 | classical_counted=5/5 | cyclic_counted=5/5
+      Classical | successful=1 | unfinished=4 | unsolvable=0 | setup_failed=0 | avg_time_halted=24.01 | avg_conflicts_at_halt=7066.20 | avg_path=10.85
+      Cyclic | successful=5 | unfinished=0 | unsolvable=0 | setup_failed=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=10.20 | avg_path=15.35
 
 Final aggregate table:
-    Condition aggregate | agent_number[0.0.0] | agent_number=8 | classical_successes=3/5 | cyclic_successes=3/3 | paired=True
-      Averages | classical_time=0.0093 | cyclic_time=0.0099 | classical_conflicts=0.6667 | cyclic_conflicts=0.3333 | classical_path=14.6667 | cyclic_path=16.5000
-    Condition aggregate | agent_number[0.0.1] | agent_number=12 | classical_successes=3/7 | cyclic_successes=3/3 | paired=True
-      Averages | classical_time=0.0653 | cyclic_time=0.0774 | classical_conflicts=20.0000 | cyclic_conflicts=19.3333 | classical_path=14.8333 | cyclic_path=16.8611
-    Condition aggregate | agent_number[0.0.2] | agent_number=16 | classical_successes=3/4 | cyclic_successes=3/3 | paired=True
-      Averages | classical_time=0.0230 | cyclic_time=0.0286 | classical_conflicts=3.6667 | cyclic_conflicts=5.0000 | classical_path=12.4792 | cyclic_path=14.8542
-    Condition aggregate | agent_number[0.0.3] | agent_number=20 | classical_successes=2/10 | cyclic_successes=3/3 | paired=False
-      Averages | classical_time=0.4642 | cyclic_time=0.0914 | classical_conflicts=192.5000 | cyclic_conflicts=14.6667 | classical_path=14.4250 | cyclic_path=17.4167
+    Condition aggregate | agent_number[0.0.0] | agent_number=12 | classical_counted=5/5 | cyclic_counted=5/5
+      Classical | successful=3 | unfinished=2 | unsolvable=0 | setup_failed=0 | avg_time_halted=12.01 | avg_conflicts_at_halt=4091.00 | avg_path=13.50
+      Cyclic | successful=5 | unfinished=0 | unsolvable=0 | setup_failed=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=1.40 | avg_path=15.48
+    Condition aggregate | agent_number[0.0.1] | agent_number=16 | classical_counted=5/5 | cyclic_counted=5/5
+      Classical | successful=1 | unfinished=4 | unsolvable=0 | setup_failed=0 | avg_time_halted=24.13 | avg_conflicts_at_halt=5643.60 | avg_path=11.88
+      Cyclic | successful=5 | unfinished=0 | unsolvable=0 | setup_failed=0 | avg_time_halted=0.03 | avg_conflicts_at_halt=6.40 | avg_path=15.94
+    Condition aggregate | agent_number[0.0.2] | agent_number=20 | classical_counted=5/5 | cyclic_counted=5/5
+      Classical | successful=1 | unfinished=4 | unsolvable=0 | setup_failed=0 | avg_time_halted=24.01 | avg_conflicts_at_halt=7066.20 | avg_path=10.85
+      Cyclic | successful=5 | unfinished=0 | unsolvable=0 | setup_failed=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=10.20 | avg_path=15.35
 
 Generated graph files:
   - D:\projects\cmsc-190\dev\outputs\static_artificial\graphs\static_artificial_runtime.png

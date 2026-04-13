@@ -11,9 +11,12 @@ from dev.mapf.time_expanded_cbs import compute_solution_cost as compute_dynamic_
 from dev.mapf.time_expanded_cbs import solve_time_expanded_mapf_with_cbs
 
 
+COUNTED_RESULT_CATEGORIES = {"successful", "unfinished"}
+
+
 def build_progress_callback(logger: ExperimentLogger, label: str) -> Callable[[int], None]:
     def callback(elapsed_seconds: int) -> None:
-        logger.log(f"    {label} progress: {max(0, elapsed_seconds)}s")
+        logger.log(f"    {label} progress: {max(0, elapsed_seconds):.2f}s")
 
     return callback
 
@@ -39,6 +42,20 @@ def seed_for(*parts: Any) -> int:
     return total or 1
 
 
+def categorize_solver_status(solver_status: str | None) -> tuple[str, bool, bool]:
+    if solver_status == "solved":
+        return "successful", True, True
+    if solver_status == "bad_setup_timeout":
+        return "unfinished", True, False
+    if solver_status == "no_solution":
+        return "unsolvable", False, False
+    if solver_status and solver_status.startswith("setup_failed"):
+        return "setup_failed", False, False
+    if solver_status and solver_status.startswith("exception"):
+        return "setup_failed", False, False
+    return "setup_failed", False, False
+
+
 def build_mapping_record(
     *,
     run_configuration: RunConfiguration,
@@ -47,25 +64,30 @@ def build_mapping_record(
     runtime_limit_seconds: float,
     solver_result: dict[str, Any] | None,
     elapsed_seconds: float,
+    solver_status: str | None,
     paired_run: bool,
-    success: bool,
-    failure_reason: str | None,
     dynamic: bool,
 ) -> MappingRunRecord:
     average_path_length = None
-    num_conflicts_detected = None
-    num_high_level_nodes_expanded = None
-    status = failure_reason or "unknown_failure"
+    num_conflicts_detected_at_halt = None
+    resolved_solver_status = solver_status or "unknown_failure"
 
     if solver_result is not None:
-        status = solver_result.get("status", status)
-        num_conflicts_detected = solver_result.get("num_conflicts_detected")
-        num_high_level_nodes_expanded = solver_result.get("num_high_level_nodes_expanded")
+        resolved_solver_status = solver_result.get("status", resolved_solver_status)
+        num_conflicts_detected_at_halt = solver_result.get("num_conflicts_detected")
+        if num_conflicts_detected_at_halt is None:
+            num_conflicts_detected_at_halt = solver_result.get("num_conflicts_detected_at_halt")
         if solver_result.get("paths_by_agent"):
             average_path_length = compute_average_path_length(
                 solver_result["paths_by_agent"],
                 dynamic=dynamic,
             )
+        num_high_level_nodes_expanded = solver_result.get("num_high_level_nodes_expanded")
+    else:
+        num_high_level_nodes_expanded = None
+
+    result_category, counted_run, solved_run = categorize_solver_status(resolved_solver_status)
+    halted_time = runtime_limit_seconds if result_category == "unfinished" else elapsed_seconds
 
     mapping_index = 0 if mapping_name == "classical" else 1
     return MappingRunRecord(
@@ -86,11 +108,12 @@ def build_mapping_record(
         ),
         comparison_case=comparison_case,
         paired_run=paired_run,
-        success=success,
-        status=status,
-        failure_reason=None if success else failure_reason,
-        computation_time_seconds=elapsed_seconds,
-        num_conflicts_detected=num_conflicts_detected,
+        solver_status=resolved_solver_status,
+        result_category=result_category,
+        counted_run=counted_run,
+        solved_run=solved_run,
+        time_computation_halted_seconds=halted_time,
+        num_conflicts_detected_at_halt=num_conflicts_detected_at_halt,
         average_path_length=average_path_length,
         num_high_level_nodes_expanded=num_high_level_nodes_expanded,
         runtime_limit_seconds=runtime_limit_seconds,
@@ -109,7 +132,7 @@ def run_static_mapping(
     runtime_limit_seconds: float,
     logger: ExperimentLogger,
     label: str,
-) -> tuple[bool, dict[str, Any] | None, float, str | None]:
+) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
         solver_result = solve_mapf_with_cbs(
@@ -119,12 +142,10 @@ def run_static_mapping(
             progress_callback=build_progress_callback(logger, label),
         )
         elapsed_seconds = time.perf_counter() - start
-        if solver_result.get("status") == "solved":
-            return True, solver_result, elapsed_seconds, None
-        return False, solver_result, elapsed_seconds, solver_result.get("status")
+        return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")
     except Exception as exc:  # pragma: no cover
         elapsed_seconds = time.perf_counter() - start
-        return False, None, elapsed_seconds, f"exception:{type(exc).__name__}:{exc}"
+        return None, elapsed_seconds, f"exception:{type(exc).__name__}:{exc}"
 
 
 def run_dynamic_mapping(
@@ -134,7 +155,7 @@ def run_dynamic_mapping(
     runtime_limit_seconds: float,
     logger: ExperimentLogger,
     label: str,
-) -> tuple[bool, dict[str, Any] | None, float, str | None]:
+) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
         solver_result = solve_time_expanded_mapf_with_cbs(
@@ -144,9 +165,7 @@ def run_dynamic_mapping(
             progress_callback=build_progress_callback(logger, label),
         )
         elapsed_seconds = time.perf_counter() - start
-        if solver_result.get("status") == "solved":
-            return True, solver_result, elapsed_seconds, None
-        return False, solver_result, elapsed_seconds, solver_result.get("status")
+        return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")
     except Exception as exc:  # pragma: no cover
         elapsed_seconds = time.perf_counter() - start
-        return False, None, elapsed_seconds, f"exception:{type(exc).__name__}:{exc}"
+        return None, elapsed_seconds, f"exception:{type(exc).__name__}:{exc}"
