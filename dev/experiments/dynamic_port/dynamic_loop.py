@@ -1,6 +1,6 @@
-
 import random
 from collections import deque
+from collections.abc import Callable
 
 from dev.experiments.dynamic_port.preprocessing import get_neighbors, is_free_space_connected
 
@@ -103,14 +103,27 @@ def _candidate_centers(base_matrix, rng):
     return candidates
 
 
-def _build_patch_bank(base_matrix, group_sizes, seed, patches_per_group=90):
+def _emit_progress(progress_callback: Callable[[str], None] | None, message: str) -> None:
+    if progress_callback is not None:
+        progress_callback(message)
+
+
+def _build_patch_bank(base_matrix, group_sizes, seed, patches_per_group=90, progress_callback: Callable[[str], None] | None = None):
     rng = random.Random(seed)
     centers = _candidate_centers(base_matrix, rng)
+    _emit_progress(
+        progress_callback,
+        f'Dynamic patch-bank center candidates prepared: {len(centers)} usable centers.',
+    )
     patch_bank = []
     for group_index, target_size in enumerate(group_sizes):
         group_rng = random.Random(seed + 1000 + group_index * 997)
         entries = []
         attempts = 0
+        _emit_progress(
+            progress_callback,
+            f'Building dynamic patch bank for group {group_index + 1}/{len(group_sizes)} | target_patch_size={target_size} | required_entries={patches_per_group}',
+        )
         while len(entries) < patches_per_group and attempts < patches_per_group * 8:
             attempts += 1
             center = centers[group_rng.randrange(len(centers))]
@@ -122,13 +135,27 @@ def _build_patch_bank(base_matrix, group_sizes, seed, patches_per_group=90):
                 rng=random.Random(seed + 5000 + group_index * 10000 + attempts),
             )
             if len(patch) != target_size:
+                if attempts == 1 or attempts % 10 == 0:
+                    _emit_progress(
+                        progress_callback,
+                        f'  Patch bank group {group_index + 1}/{len(group_sizes)} progress | entries={len(entries)}/{patches_per_group} | center_attempts={attempts} | last_patch_size={len(patch)}/{target_size}',
+                    )
                 continue
             entries.append({
                 'center': center,
                 'cells': tuple(sorted(patch)),
             })
+            if len(entries) == 1 or len(entries) % 10 == 0 or len(entries) == patches_per_group:
+                _emit_progress(
+                    progress_callback,
+                    f'  Patch bank group {group_index + 1}/{len(group_sizes)} progress | entries={len(entries)}/{patches_per_group} | center_attempts={attempts}',
+                )
         if not entries:
             raise RuntimeError('Unable to build dynamic obstacle patch bank.')
+        _emit_progress(
+            progress_callback,
+            f'Completed dynamic patch bank for group {group_index + 1}/{len(group_sizes)} | entries={len(entries)}/{patches_per_group} | center_attempts={attempts}',
+        )
         patch_bank.append(entries)
     return patch_bank
 
@@ -192,12 +219,19 @@ def build_dynamic_loop(
     loop_length,
     group_stay_durations=(3, 4, 5),
     seed=42,
+    progress_callback: Callable[[str], None] | None = None,
 ):
     total_cells = len(base_matrix) * len(base_matrix[0])
     target_dynamic_cells = int(round(dynamic_density * total_cells))
     loop_length = max(1, loop_length)
 
+    _emit_progress(
+        progress_callback,
+        f'Dynamic loop generation started | grid={len(base_matrix)}x{len(base_matrix[0]) if base_matrix else 0} | dynamic_density={dynamic_density:.2f} | target_dynamic_cells={target_dynamic_cells} | loop_length={loop_length}',
+    )
+
     if target_dynamic_cells <= 0:
+        _emit_progress(progress_callback, 'Dynamic loop generation resolved immediately because target_dynamic_cells=0.')
         return [apply_dynamic_cells(base_matrix, set()) for _ in range(loop_length)]
 
     if not group_stay_durations:
@@ -208,13 +242,18 @@ def build_dynamic_loop(
     for index in range(target_dynamic_cells % group_count):
         group_sizes[index] += 1
 
+    _emit_progress(
+        progress_callback,
+        f'Dynamic loop group split | group_count={group_count} | group_sizes={group_sizes} | stay_durations={tuple(group_stay_durations)}',
+    )
+
     patch_bank = _build_patch_bank(
         base_matrix=base_matrix,
         group_sizes=group_sizes,
         seed=seed,
+        progress_callback=progress_callback,
     )
 
-    schedule_rng = random.Random(seed + 20000)
     current_patches = [None for _ in range(group_count)]
     frames = []
 
@@ -242,4 +281,11 @@ def build_dynamic_loop(
             )
         frames.append(apply_dynamic_cells(base_matrix, dynamic_cells))
 
+        if time_step == 0 or (time_step + 1) % 5 == 0 or time_step + 1 == loop_length:
+            _emit_progress(
+                progress_callback,
+                f'Dynamic loop frame progress | frame={time_step + 1}/{loop_length} | dynamic_cells={len(dynamic_cells)}',
+            )
+
+    _emit_progress(progress_callback, 'Dynamic loop generation completed successfully.')
     return frames

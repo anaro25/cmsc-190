@@ -16,32 +16,34 @@ CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
 
 # Uncomment exactly one MAP_TYPE.
 # MAP_TYPE = "static_artificial"
-MAP_TYPE = "dynamic_port"
+# MAP_TYPE = "dynamic_port"
 # MAP_TYPE = "dynamic_campus_area_1"
-# MAP_TYPE = "dynamic_campus_area_2"
+MAP_TYPE = "dynamic_campus_area_2"
 
 
 # All user-defined experiment values live in this file.
 # Edit the branch dictionaries below when you want to change seeds, agent-number
 # ranges, time limits, densities, image thresholds, or other branch-specific settings.
 #
-# agent_number_range = (start_agent_number, step_size, max_agent_number)
-# Example: (8, 4, 40) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
+# agent_number_range = (start_agent_number, max_agent_number, step_size)
+# Example: (8, 40, 4) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
 
 STATIC_ARTIFICIAL_CONFIG = {
+    "time_limit_seconds": 15.0,
+    "agent_number_range": (8, 100, 4),
+
     "seed": 101,
     "map_size": (25, 25),
     "static_obstacle_density": 0.40,
-    "time_limit_seconds": 15.0,
     "counted_runs_required": 5,
-    "agent_number_range": (8, 4, 100),
 }
 
 DYNAMIC_PORT_CONFIG = {
-    "seed": 201,
     "time_limit_seconds": 15.0,
+    "agent_number_range": (8, 100, 2),
+
+    "seed": 201,
     "counted_runs_required": 5,
-    "agent_number_range": (8, 2, 100),
     "target_static_obstacle_density": 0.15,
     "target_dynamic_obstacle_density": 0.05,
     "loop_sequence_length": 20,
@@ -52,13 +54,14 @@ DYNAMIC_PORT_CONFIG = {
 }
 
 DYNAMIC_CAMPUS_AREA_1_CONFIG = {
-    "seed": 301,
     "time_limit_seconds": 15.0,
+    "agent_number_range": (4, 100, 2),
+    "target_dynamic_obstacle_density": 0.02,
+
+    "seed": 301,
     "counted_runs_required": 5,
-    "agent_number_range": (2, 2, 100),
     # Campus Area 1 preserves the source-image static layout; this value is intentionally not applied.
     "target_static_obstacle_density": None,
-    "target_dynamic_obstacle_density": 0.10,
     "loop_sequence_length": 20,
     "group_stay_durations": (3, 4, 5),
     "image_threshold": 127,
@@ -67,13 +70,14 @@ DYNAMIC_CAMPUS_AREA_1_CONFIG = {
 }
 
 DYNAMIC_CAMPUS_AREA_2_CONFIG = {
-    "seed": 401,
     "time_limit_seconds": 15.0,
+    "agent_number_range": (4, 100, 4),
+    "target_dynamic_obstacle_density": 0.01,
+
+    "seed": 401,
     "counted_runs_required": 5,
-    "agent_number_range": (2, 2, 100),
     # Campus Area 2 preserves the source-image static layout; this value is intentionally not applied.
     "target_static_obstacle_density": None,
-    "target_dynamic_obstacle_density": 0.10,
     "loop_sequence_length": 20,
     "group_stay_durations": (3, 4, 5),
     "image_threshold": 127,

@@ -49,7 +49,7 @@ class BranchSpec:
 
 
 def expand_agent_number_range(agent_number_range: AgentNumberRange) -> list[int]:
-    start, step, max_agent_number = agent_number_range
+    start, max_agent_number, step = agent_number_range
     if start <= 0:
         raise ValueError("agent_number_range start must be positive")
     if step <= 0:

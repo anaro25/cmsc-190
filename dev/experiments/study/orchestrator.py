@@ -123,6 +123,10 @@ def _run_jointly_viable_sampling(
         and attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
     ):
         run_index = attempt_index
+        logger.log(
+            f"  Preparing paired sampling attempt {attempt_index + 1}... | "
+            f"agent_number={agent_number} | run_index={run_index}"
+        )
         try:
             prepared_context = _prepare_run_context(
                 branch_spec=branch_spec,
@@ -322,7 +326,12 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
 
     dynamic_state: DynamicBranchState | None = None
     if branch_spec.is_dynamic:
-        dynamic_state = prepare_dynamic_branch_state(branch_spec, seed_base=resolved_seed_base)
+        logger.log("Preparing shared dynamic map state before iterating agent-number conditions...")
+        dynamic_state = prepare_dynamic_branch_state(
+            branch_spec,
+            seed_base=resolved_seed_base,
+            logger=logger,
+        )
         log_dynamic_state(logger, branch_spec, dynamic_state)
         write_json(
             output_manager.metadata_dir / "shared_dynamic_state.json",

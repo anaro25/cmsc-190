@@ -39,13 +39,13 @@ The `study` package is split by responsibility:
 Each branch now uses:
 
 ```python
-agent_number_range = (start_agent_number, step_size, max_agent_number)
+agent_number_range = (start_agent_number, max_agent_number, step_size)
 ```
 
 Example:
 
 ```python
-(8, 4, 40) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
+(8, 40, 4) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
 ```
 
 The generated list is the planned progression only. A branch may stop earlier if one
@@ -55,6 +55,7 @@ of the stopping rules triggers.
 
 During paired sampling, the terminal now prints progress lines such as
 `Paired sampling attempt 4 ongoing...` so long jointly viable searches are visible while they run.
+Startup progress is also logged during shared dynamic-map preparation, including image loading, static preprocessing, dynamic patch-bank generation, mapped-loop construction, and any fallback activation.
 
 
 For each planned agent number in the selected branch:

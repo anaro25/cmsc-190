@@ -10,6 +10,7 @@ from dev.experiments.dynamic_port.pipeline import (
     get_shared_assignment_map,
 )
 from dev.experiments.dynamic_port.preprocessing import preprocess_static_obstacle_density
+from dev.experiments.study.io_utils import ExperimentLogger
 from dev.experiments.study.models import DynamicBranchState, PreparedRunContext, RunConfiguration
 from dev.experiments.study.runtime import seed_for
 from dev.inputs.dynamic_port.loader import load_port_obstacle_matrix, load_spawnable_white_mask
@@ -17,6 +18,11 @@ from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.maps.base_map_factory import create_base_map
 from dev.maps.classical_mapper import apply_classical_mapping
 from dev.maps.cyclic_mapper import apply_cyclic_mapping
+
+
+def _log(logger: ExperimentLogger | None, message: str) -> None:
+    if logger is not None:
+        logger.log(message)
 
 
 def _spawn_mask_to_composite_positions(spawn_mask: list[list[bool]]) -> set[tuple[int, int]]:
@@ -158,23 +164,42 @@ def prepare_dynamic_branch_state(
     branch_spec: BranchSpec,
     *,
     seed_base: int,
+    logger: ExperimentLogger | None = None,
 ) -> DynamicBranchState:
     schedule_seed = seed_for(branch_spec.map_type, seed_base, "dynamic_schedule")
+    _log(
+        logger,
+        f"Preparing shared dynamic branch state | schedule_seed={schedule_seed} | image_path={branch_spec.image_path}",
+    )
+    _log(
+        logger,
+        f"  Loading obstacle matrix | threshold={branch_spec.image_threshold} | resize_longest_side={branch_spec.image_resize_longest_side}",
+    )
     raw_obstacle_matrix = load_port_obstacle_matrix(
         image_path=branch_spec.image_path,
         threshold=branch_spec.image_threshold,
         resize_longest_side=branch_spec.image_resize_longest_side,
     )
+    raw_rows = len(raw_obstacle_matrix)
+    raw_cols = len(raw_obstacle_matrix[0]) if raw_rows else 0
+    _log(logger, f"  Obstacle matrix loaded | dimensions={raw_rows}x{raw_cols}")
     if branch_spec.dynamic_target_static_obstacle_density is None:
+        _log(logger, "  Preserving source-image static obstacle layout (no static-density preprocessing).")
         static_matrix = [row[:] for row in raw_obstacle_matrix]
     else:
+        _log(
+            logger,
+            f"  Preprocessing static obstacle density toward target={branch_spec.dynamic_target_static_obstacle_density:.2f}",
+        )
         static_matrix = preprocess_static_obstacle_density(
             obstacle_matrix=raw_obstacle_matrix,
             target_density=branch_spec.dynamic_target_static_obstacle_density,
             seed=schedule_seed,
         )
+        _log(logger, "  Static obstacle density preprocessing completed.")
 
     generation_mode = "group_patch"
+    _log(logger, "  Building shared dynamic loop with grouped obstacle patches...")
     try:
         dynamic_loop_frames = build_dynamic_loop(
             base_matrix=static_matrix,
@@ -182,25 +207,41 @@ def prepare_dynamic_branch_state(
             loop_length=branch_spec.dynamic_loop_sequence_length or 30,
             group_stay_durations=branch_spec.dynamic_group_stay_durations or (3, 4, 5),
             seed=schedule_seed,
+            progress_callback=(logger.log if logger is not None else None),
         )
-    except RuntimeError:
+    except RuntimeError as exc:
         generation_mode = "scattered_fallback"
+        _log(
+            logger,
+            f"  Grouped dynamic loop generation failed ({type(exc).__name__}: {exc}). Switching to scattered fallback generator.",
+        )
         dynamic_loop_frames = fallback_build_dynamic_loop(
             base_matrix=static_matrix,
             dynamic_density=branch_spec.dynamic_target_dynamic_obstacle_density or 0.10,
             loop_length=branch_spec.dynamic_loop_sequence_length or 30,
             seed=schedule_seed,
         )
+        _log(logger, "  Scattered fallback dynamic loop generation completed.")
 
+    _log(logger, "  Building mapped loop representations for classical and cyclic mappings...")
     classical_loop, cyclic_loop = build_mapped_loop(dynamic_loop_frames)
+    _log(logger, "  Shared mapped loop representations completed.")
+    _log(logger, "  Building shared assignment map from the classical loop...")
     assignment_map = get_shared_assignment_map(classical_loop)
+    _log(logger, "  Shared assignment map ready.")
     allowed_spawn_vertices = None
     if branch_spec.spawnable_cell_mode == "pure_white_only":
+        _log(logger, "  Loading pure-white spawn mask to restrict spawnable cells...")
         spawn_mask = load_spawnable_white_mask(
             image_path=branch_spec.image_path,
             resize_longest_side=branch_spec.image_resize_longest_side,
         )
         allowed_spawn_vertices = _spawn_mask_to_composite_positions(spawn_mask)
+        _log(
+            logger,
+            f"  Pure-white spawn mask loaded | allowed_spawn_vertices={len(allowed_spawn_vertices)}",
+        )
+    _log(logger, "Shared dynamic branch state preparation completed.")
     return DynamicBranchState(
         raw_obstacle_matrix=raw_obstacle_matrix,
         static_matrix=static_matrix,
@@ -250,4 +291,10 @@ def prepare_dynamic_run_context(
         starts_and_goals=_serialize_agents(agents),
         notes="Shared dynamic map source; unique initial conditions for this run.",
     )
-    return PreparedRunContext(run_configuration=run_config, agents=agents)
+    return PreparedRunContext(
+        run_configuration=run_config,
+        agents=agents,
+        base_map=None,
+        classical_map=None,
+        cyclic_map=None,
+    )

@@ -25,10 +25,10 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Jointly viable counted pairs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
-    start_agent_number, step_size, max_agent_number = branch_spec.agent_number_range
+    start_agent_number, max_agent_number, step_size = branch_spec.agent_number_range
     logger.log(
         "Agent number range: "
-        f"start={start_agent_number}, step={step_size}, max={max_agent_number}"
+        f"start={start_agent_number}, end={max_agent_number}, step={step_size}"
     )
     logger.log(f"Planned agent numbers before early stopping: {branch_spec.agent_numbers}")
     logger.log(
