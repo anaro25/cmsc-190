@@ -14,6 +14,16 @@ def _binarize_pixel(value, threshold=127):
     raise TypeError(f"Unsupported pixel value: {value!r}")
 
 
+def _is_pure_white_pixel(value):
+    if isinstance(value, int):
+        return value == 255
+
+    if isinstance(value, tuple):
+        return all(channel == 255 for channel in value[:3])
+
+    raise TypeError(f"Unsupported pixel value: {value!r}")
+
+
 def build_fallback_port_matrix(rows=25, cols=25):
     """
     1 = obstacle, 0 = free space.
@@ -58,13 +68,14 @@ def build_fallback_port_matrix(rows=25, cols=25):
     return grid
 
 
-def load_port_obstacle_matrix(image_path, threshold=127, resize_longest_side=None):
+def _load_resized_images(image_path, resize_longest_side=None):
     image_path = Path(image_path)
 
     if not image_path.exists():
-        return build_fallback_port_matrix()
+        return None, None
 
     with Image.open(image_path) as image:
+        rgb_image = image.convert("RGB")
         grayscale_image = image.convert("L")
         if resize_longest_side is not None and resize_longest_side > 0:
             width, height = grayscale_image.size
@@ -73,15 +84,50 @@ def load_port_obstacle_matrix(image_path, threshold=127, resize_longest_side=Non
                 scale = resize_longest_side / float(longest_side)
                 resized_width = max(1, int(round(width * scale)))
                 resized_height = max(1, int(round(height * scale)))
-                grayscale_image = grayscale_image.resize((resized_width, resized_height), Image.NEAREST)
-        width, height = grayscale_image.size
-        pixels = grayscale_image.load()
+                resize_size = (resized_width, resized_height)
+                rgb_image = rgb_image.resize(resize_size, Image.NEAREST)
+                grayscale_image = grayscale_image.resize(resize_size, Image.NEAREST)
+        return rgb_image, grayscale_image
 
-        matrix = []
-        for y in range(height):
-            row = []
-            for x in range(width):
-                row.append(_binarize_pixel(pixels[x, y], threshold=threshold))
-            matrix.append(row)
+
+def load_port_obstacle_matrix(image_path, threshold=127, resize_longest_side=None):
+    _, grayscale_image = _load_resized_images(
+        image_path=image_path,
+        resize_longest_side=resize_longest_side,
+    )
+    if grayscale_image is None:
+        return build_fallback_port_matrix()
+
+    width, height = grayscale_image.size
+    pixels = grayscale_image.load()
+
+    matrix = []
+    for y in range(height):
+        row = []
+        for x in range(width):
+            row.append(_binarize_pixel(pixels[x, y], threshold=threshold))
+        matrix.append(row)
 
     return matrix
+
+
+def load_spawnable_white_mask(image_path, resize_longest_side=None):
+    rgb_image, _ = _load_resized_images(
+        image_path=image_path,
+        resize_longest_side=resize_longest_side,
+    )
+    if rgb_image is None:
+        fallback = build_fallback_port_matrix()
+        return [[cell == 0 for cell in row] for row in fallback]
+
+    width, height = rgb_image.size
+    pixels = rgb_image.load()
+
+    mask = []
+    for y in range(height):
+        row = []
+        for x in range(width):
+            row.append(_is_pure_white_pixel(pixels[x, y]))
+        mask.append(row)
+
+    return mask

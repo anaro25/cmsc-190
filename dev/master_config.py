@@ -7,6 +7,13 @@ PACKAGE_ROOT = Path(__file__).resolve().parent
 INPUTS_ROOT = PACKAGE_ROOT / "inputs"
 
 
+# One user-defined limit applies to all branches.
+# If the current agent-number condition reaches this many consecutive jointly
+# non-viable paired sampling attempts, that entire condition is discarded and
+# the branch stops before higher agent numbers.
+CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
+
+
 # Uncomment exactly one MAP_TYPE.
 # MAP_TYPE = "static_artificial"
 MAP_TYPE = "dynamic_port"
@@ -27,14 +34,14 @@ STATIC_ARTIFICIAL_CONFIG = {
     "static_obstacle_density": 0.40,
     "time_limit_seconds": 15.0,
     "counted_runs_required": 5,
-    "agent_number_range": (8, 4, 40),
+    "agent_number_range": (8, 4, 100),
 }
 
 DYNAMIC_PORT_CONFIG = {
     "seed": 201,
     "time_limit_seconds": 15.0,
     "counted_runs_required": 5,
-    "agent_number_range": (12, 4, 50),
+    "agent_number_range": (8, 2, 100),
     "target_static_obstacle_density": 0.15,
     "target_dynamic_obstacle_density": 0.05,
     "loop_sequence_length": 20,
@@ -48,26 +55,31 @@ DYNAMIC_CAMPUS_AREA_1_CONFIG = {
     "seed": 301,
     "time_limit_seconds": 15.0,
     "counted_runs_required": 5,
-    "agent_number_range": (2, 2, 20),
-    "target_static_obstacle_density": 0.20,
+    "agent_number_range": (2, 2, 100),
+    # Campus Area 1 preserves the source-image static layout; this value is intentionally not applied.
+    "target_static_obstacle_density": None,
     "target_dynamic_obstacle_density": 0.10,
     "loop_sequence_length": 20,
     "group_stay_durations": (3, 4, 5),
     "image_threshold": 127,
     "image_path": str(INPUTS_ROOT / "dynamic_campus_area_1" / "campus_area_1_x80.png"),
+    "spawnable_cell_mode": "all_free",
 }
 
 DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     "seed": 401,
     "time_limit_seconds": 15.0,
     "counted_runs_required": 5,
-    "agent_number_range": (2, 2, 20),
-    "target_static_obstacle_density": 0.20,
+    "agent_number_range": (2, 2, 100),
+    # Campus Area 2 preserves the source-image static layout; this value is intentionally not applied.
+    "target_static_obstacle_density": None,
     "target_dynamic_obstacle_density": 0.10,
     "loop_sequence_length": 20,
     "group_stay_durations": (3, 4, 5),
     "image_threshold": 127,
     "image_path": str(INPUTS_ROOT / "dynamic_campus_area_2" / "campus_area_2_x80.png"),
+    # Only pure-white raster cells may be used as start/goal spawn cells.
+    "spawnable_cell_mode": "pure_white_only",
 }
 
 

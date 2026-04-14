@@ -12,11 +12,20 @@ from dev.experiments.dynamic_port.pipeline import (
 from dev.experiments.dynamic_port.preprocessing import preprocess_static_obstacle_density
 from dev.experiments.study.models import DynamicBranchState, PreparedRunContext, RunConfiguration
 from dev.experiments.study.runtime import seed_for
-from dev.inputs.dynamic_port.loader import load_port_obstacle_matrix
+from dev.inputs.dynamic_port.loader import load_port_obstacle_matrix, load_spawnable_white_mask
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.maps.base_map_factory import create_base_map
 from dev.maps.classical_mapper import apply_classical_mapping
 from dev.maps.cyclic_mapper import apply_cyclic_mapping
+
+
+def _spawn_mask_to_composite_positions(spawn_mask: list[list[bool]]) -> set[tuple[int, int]]:
+    positions: set[tuple[int, int]] = set()
+    for row_index, row in enumerate(spawn_mask):
+        for column_index, is_spawnable in enumerate(row):
+            if is_spawnable:
+                positions.add((2 * row_index, 2 * column_index))
+    return positions
 
 
 def _serialize_agents(agents: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -185,6 +194,13 @@ def prepare_dynamic_branch_state(
 
     classical_loop, cyclic_loop = build_mapped_loop(dynamic_loop_frames)
     assignment_map = get_shared_assignment_map(classical_loop)
+    allowed_spawn_vertices = None
+    if branch_spec.spawnable_cell_mode == "pure_white_only":
+        spawn_mask = load_spawnable_white_mask(
+            image_path=branch_spec.image_path,
+            resize_longest_side=branch_spec.image_resize_longest_side,
+        )
+        allowed_spawn_vertices = _spawn_mask_to_composite_positions(spawn_mask)
     return DynamicBranchState(
         raw_obstacle_matrix=raw_obstacle_matrix,
         static_matrix=static_matrix,
@@ -195,6 +211,7 @@ def prepare_dynamic_branch_state(
         map_identifier=f"{branch_spec.map_type}_shared_map_seed_{schedule_seed}_{generation_mode}",
         schedule_seed=schedule_seed,
         generation_mode=generation_mode,
+        allowed_spawn_vertices=allowed_spawn_vertices,
     )
 
 
@@ -213,6 +230,7 @@ def prepare_dynamic_run_context(
         num_agents=agent_number,
         rng=random.Random(assignment_seed),
         require_individual_reachability=True,
+        allowed_spawn_vertices=dynamic_state.allowed_spawn_vertices,
     )
     run_config = RunConfiguration(
         branch_id=branch_spec.branch_id,

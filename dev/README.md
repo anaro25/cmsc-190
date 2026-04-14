@@ -9,7 +9,8 @@ python -m dev.main
 ```
 
 `master_config.py` is the single user-editable file for branch seeds, map size,
-agent-number ranges, runtime limits, densities, thresholds, and loop settings.
+agent-number ranges, runtime limits, densities, thresholds, loop settings, and the
+global consecutive failed paired sampling limit.
 
 Results are written under `dev/outputs/<map_type>/`.
 
@@ -52,6 +53,10 @@ of the stopping rules triggers.
 
 ## Current counted-run protocol
 
+During paired sampling, the terminal now prints progress lines such as
+`Paired sampling attempt 4 ongoing...` so long jointly viable searches are visible while they run.
+
+
 For each planned agent number in the selected branch:
 
 1. The study generates one run configuration at a time.
@@ -66,7 +71,7 @@ For each planned agent number in the selected branch:
 6. Aggregates use:
    - `time_computation_halted_seconds` over retained counted pairs
    - `num_conflicts_detected_at_halt` over retained counted pairs
-   - `average_path_length` over successful runs only
+   - `average_path_length` over successful runs only for all branches, including the dynamic branches
 
 The per-branch runtime limit and counted-run requirement both come from `master_config.py`.
 
@@ -79,9 +84,11 @@ condition:
    pairs for that condition.
    - Example trigger patterns at `n = 5`: `5 > 0`, `4 > 1`, `3 > 2`
    - The entire current condition is discarded.
-2. **Five consecutive failed paired sampling attempts** occur while trying to build the
+2. **A user-defined number of consecutive failed paired sampling attempts** occur while trying to build the
    current condition.
-   - In this project, that means five consecutive sampled configurations were rejected by
+   - The shared limit is configured by
+     `CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT` in `dev/master_config.py`.
+   - In this project, that means consecutive sampled configurations were rejected by
      the joint viability screen because at least one mapping classified the configuration as
      `unsolvable`.
    - The entire current condition is discarded.
@@ -103,6 +110,8 @@ pathological infinite loops. It remains only a protective implementation detail.
 
 ## Notes
 
-- The study flow currently uses scattered targets for all branches.
+- The study flow currently uses scattered targets for all branches, including the campus branches for now.
+- The campus branches preserve their source-image static layout; static-density control is applied only to `static_artificial` and `dynamic_port`.
+- `dynamic_campus_area_2` samples starts/goals only from pure-white source-image cells. Other non-black colors still render as ordinary free space, but they are excluded from spawning.
 - Pillow-rendered run images are not part of the generalized study flow.
 - The dynamic branch sampler requires each sampled start-goal pair to be individually reachable on the shared assignment map, which avoids large numbers of trivial no-solution cases caused by unreachable goals.

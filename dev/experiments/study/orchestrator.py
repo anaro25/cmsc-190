@@ -141,12 +141,12 @@ def _run_jointly_viable_sampling(
             continue
 
         total_paired_sampling_attempts += 1
-        buffered_logger = BufferedExperimentLogger()
-        buffered_logger.log(
-            f"  Paired sampling attempt {attempt_index + 1} | "
+        logger.log(
+            f"  Paired sampling attempt {attempt_index + 1} ongoing... | "
             f"{prepared_context.run_configuration.run_config_id} | "
             f"map_id={prepared_context.run_configuration.map_identifier}"
         )
+        buffered_logger = BufferedExperimentLogger()
 
         classical_solver_result, classical_elapsed_seconds, classical_solver_status = _execute_mapping(
             branch_spec=branch_spec,

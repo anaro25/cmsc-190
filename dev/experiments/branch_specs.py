@@ -38,6 +38,7 @@ class BranchSpec:
     dynamic_target_dynamic_obstacle_density: float | None = None
     dynamic_loop_sequence_length: int | None = None
     dynamic_group_stay_durations: tuple[int, ...] | None = None
+    spawnable_cell_mode: str = "all_free"
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -111,7 +112,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(port_range),
             runtime_limit_seconds=float(port_cfg["time_limit_seconds"]),
             counted_runs_required=int(port_cfg["counted_runs_required"]),
-            path_length_graph_enabled=False,
+            path_length_graph_enabled=True,
             is_dynamic=True,
             image_path=str(port_cfg["image_path"]),
             image_threshold=int(port_cfg["image_threshold"]),
@@ -122,6 +123,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_target_dynamic_obstacle_density=float(port_cfg["target_dynamic_obstacle_density"]),
             dynamic_loop_sequence_length=int(port_cfg["loop_sequence_length"]),
             dynamic_group_stay_durations=tuple(port_cfg["group_stay_durations"]),
+            spawnable_cell_mode=str(port_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
                 "Image-based dynamic branch with scattered targets. Retained pairs are the run "
                 "configurations for which both mappings are classified as successful or unfinished. "
@@ -143,18 +145,21 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(campus_1_range),
             runtime_limit_seconds=float(campus_1_cfg["time_limit_seconds"]),
             counted_runs_required=int(campus_1_cfg["counted_runs_required"]),
-            path_length_graph_enabled=False,
+            path_length_graph_enabled=True,
             is_dynamic=True,
             image_path=str(campus_1_cfg["image_path"]),
             image_threshold=int(campus_1_cfg["image_threshold"]),
-            dynamic_target_static_obstacle_density=float(campus_1_cfg["target_static_obstacle_density"]),
+            dynamic_target_static_obstacle_density=(
+                None if campus_1_cfg.get("target_static_obstacle_density") is None else float(campus_1_cfg["target_static_obstacle_density"])
+            ),
             dynamic_target_dynamic_obstacle_density=float(campus_1_cfg["target_dynamic_obstacle_density"]),
             dynamic_loop_sequence_length=int(campus_1_cfg["loop_sequence_length"]),
             dynamic_group_stay_durations=tuple(campus_1_cfg["group_stay_durations"]),
+            spawnable_cell_mode=str(campus_1_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
                 "The documents describe the campus map as a single-cell target case, "
-                "but the active study currently uses scattered targets. Retained pairs are the run "
-                "configurations for which both mappings are classified as successful or unfinished. "
+                "but the active study currently uses scattered targets. The base static layout is preserved from the source image. "
+                "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
                 "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),
@@ -173,18 +178,22 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(campus_2_range),
             runtime_limit_seconds=float(campus_2_cfg["time_limit_seconds"]),
             counted_runs_required=int(campus_2_cfg["counted_runs_required"]),
-            path_length_graph_enabled=False,
+            path_length_graph_enabled=True,
             is_dynamic=True,
             image_path=str(campus_2_cfg["image_path"]),
             image_threshold=int(campus_2_cfg["image_threshold"]),
-            dynamic_target_static_obstacle_density=float(campus_2_cfg["target_static_obstacle_density"]),
+            dynamic_target_static_obstacle_density=(
+                None if campus_2_cfg.get("target_static_obstacle_density") is None else float(campus_2_cfg["target_static_obstacle_density"])
+            ),
             dynamic_target_dynamic_obstacle_density=float(campus_2_cfg["target_dynamic_obstacle_density"]),
             dynamic_loop_sequence_length=int(campus_2_cfg["loop_sequence_length"]),
             dynamic_group_stay_durations=tuple(campus_2_cfg["group_stay_durations"]),
+            spawnable_cell_mode=str(campus_2_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
                 "The documents describe the campus map as a single-cell target case, "
-                "but the active study currently uses scattered targets. Retained pairs are the run "
-                "configurations for which both mappings are classified as successful or unfinished. "
+                "but the active study currently uses scattered targets. The base static layout is preserved from the source image, "
+                "and starts/goals are sampled only from pure-white source-image cells so the sampled assignments stay in the main contiguous area. "
+                "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
                 "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),

@@ -1,8 +1,0 @@
-{
-  "map_identifier": "dynamic_port_shared_map_seed_57196_group_patch",
-  "schedule_seed": 57196,
-  "generation_mode": "group_patch",
-  "static_rows": 40,
-  "static_cols": 40,
-  "dynamic_loop_length": 20
-}

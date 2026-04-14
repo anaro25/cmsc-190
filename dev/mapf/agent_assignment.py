@@ -57,6 +57,7 @@ def sample_agent_start_goal_pairs(
     num_agents=8,
     rng=None,
     require_individual_reachability=False,
+    allowed_spawn_vertices=None,
 ):
     """
     Randomly assigns start and goal vertices for each agent.
@@ -73,6 +74,9 @@ def sample_agent_start_goal_pairs(
         rng = random
 
     free_vertices = collect_free_vertices(composite_map)
+    if allowed_spawn_vertices is not None:
+        allowed_spawn_vertices = set(allowed_spawn_vertices)
+        free_vertices = [vertex for vertex in free_vertices if vertex in allowed_spawn_vertices]
 
     if len(free_vertices) < num_agents * 2:
         raise ValueError(
@@ -126,7 +130,11 @@ def sample_agent_start_goal_pairs(
         for start in starts:
             reachable_vertices = _collect_reachable_vertices(composite_map, start)
             candidate_goals = [
-                vertex for vertex in reachable_vertices if vertex not in used_goals and vertex != start
+                vertex
+                for vertex in reachable_vertices
+                if vertex not in used_goals
+                and vertex != start
+                and (allowed_spawn_vertices is None or vertex in allowed_spawn_vertices)
             ]
             if not candidate_goals:
                 valid = False

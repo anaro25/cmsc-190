@@ -125,6 +125,7 @@ class DynamicBranchState:
     map_identifier: str
     schedule_seed: int
     generation_mode: str
+    allowed_spawn_vertices: set[tuple[int, int]] | None = None
 
 
 @dataclass
