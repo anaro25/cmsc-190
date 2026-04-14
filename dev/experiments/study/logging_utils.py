@@ -78,6 +78,7 @@ def log_dynamic_state(
     logger.log(f"  Loop length: {len(dynamic_state.dynamic_loop_frames)}")
     logger.log(f"  Shared schedule seed: {dynamic_state.schedule_seed}")
     logger.log(f"  Dynamic generation mode: {dynamic_state.generation_mode}")
+    logger.log(f"  Dynamic generation cell mode: {branch_spec.dynamic_generation_cell_mode}")
     logger.log(f"  Spawnable cell mode: {branch_spec.spawnable_cell_mode}")
     if dynamic_state.allowed_spawn_vertices is not None:
         logger.log(f"  Allowed spawn vertices on assignment map: {len(dynamic_state.allowed_spawn_vertices)}")

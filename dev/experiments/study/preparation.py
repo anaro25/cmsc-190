@@ -9,7 +9,7 @@ from dev.experiments.dynamic_port.pipeline import (
     build_mapped_loop,
     get_shared_assignment_map,
 )
-from dev.experiments.dynamic_port.preprocessing import preprocess_static_obstacle_density
+from dev.experiments.dynamic_port.preprocessing import iter_free_cells, preprocess_static_obstacle_density
 from dev.experiments.study.io_utils import ExperimentLogger
 from dev.experiments.study.models import DynamicBranchState, PreparedRunContext, RunConfiguration
 from dev.experiments.study.runtime import seed_for
@@ -32,6 +32,41 @@ def _spawn_mask_to_composite_positions(spawn_mask: list[list[bool]]) -> set[tupl
             if is_spawnable:
                 positions.add((2 * row_index, 2 * column_index))
     return positions
+
+
+def _binary_matrix_from_spawn_mask(spawn_mask: list[list[bool]]) -> list[list[int]]:
+    return [[0 if is_spawnable else 1 for is_spawnable in row] for row in spawn_mask]
+
+
+def _count_free_components(matrix: list[list[int]]) -> int:
+    free_cells = list(iter_free_cells(matrix))
+    if not free_cells:
+        return 0
+
+    rows = len(matrix)
+    cols = len(matrix[0]) if rows else 0
+    visited: set[tuple[int, int]] = set()
+    component_count = 0
+
+    for start in free_cells:
+        if start in visited:
+            continue
+        component_count += 1
+        stack = [start]
+        visited.add(start)
+        while stack:
+            row, col = stack.pop()
+            for next_row, next_col in ((row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)):
+                if next_row < 0 or next_row >= rows or next_col < 0 or next_col >= cols:
+                    continue
+                if matrix[next_row][next_col] != 0:
+                    continue
+                neighbor = (next_row, next_col)
+                if neighbor in visited:
+                    continue
+                visited.add(neighbor)
+                stack.append(neighbor)
+    return component_count
 
 
 def _serialize_agents(agents: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -183,16 +218,44 @@ def prepare_dynamic_branch_state(
     raw_rows = len(raw_obstacle_matrix)
     raw_cols = len(raw_obstacle_matrix[0]) if raw_rows else 0
     _log(logger, f"  Obstacle matrix loaded | dimensions={raw_rows}x{raw_cols}")
+
+    spawn_mask: list[list[bool]] | None = None
+    generation_source_matrix = raw_obstacle_matrix
+    raw_free_components = _count_free_components(raw_obstacle_matrix)
+    _log(
+        logger,
+        f"  Thresholded traversable-space diagnostic | free_cells={sum(cell == 0 for row in raw_obstacle_matrix for cell in row)} | connected_components={raw_free_components}",
+    )
+
+    if branch_spec.dynamic_generation_cell_mode == "pure_white_only":
+        _log(logger, "  Loading pure-white traversable mask for grouped dynamic-obstacle generation...")
+        spawn_mask = load_spawnable_white_mask(
+            image_path=branch_spec.image_path,
+            resize_longest_side=branch_spec.image_resize_longest_side,
+        )
+        generation_source_matrix = _binary_matrix_from_spawn_mask(spawn_mask)
+        generation_free_components = _count_free_components(generation_source_matrix)
+        _log(
+            logger,
+            f"  Pure-white traversable-space diagnostic | free_cells={sum(cell == 0 for row in generation_source_matrix for cell in row)} | connected_components={generation_free_components}",
+        )
+        _log(
+            logger,
+            "  Using pure-white-only traversable cells for grouped dynamic-obstacle generation and connectivity checks.",
+        )
+    else:
+        _log(logger, "  Using all thresholded non-black cells for grouped dynamic-obstacle generation and connectivity checks.")
+
     if branch_spec.dynamic_target_static_obstacle_density is None:
         _log(logger, "  Preserving source-image static obstacle layout (no static-density preprocessing).")
-        static_matrix = [row[:] for row in raw_obstacle_matrix]
+        static_matrix = [row[:] for row in generation_source_matrix]
     else:
         _log(
             logger,
             f"  Preprocessing static obstacle density toward target={branch_spec.dynamic_target_static_obstacle_density:.2f}",
         )
         static_matrix = preprocess_static_obstacle_density(
-            obstacle_matrix=raw_obstacle_matrix,
+            obstacle_matrix=generation_source_matrix,
             target_density=branch_spec.dynamic_target_static_obstacle_density,
             seed=schedule_seed,
         )
@@ -231,15 +294,18 @@ def prepare_dynamic_branch_state(
     _log(logger, "  Shared assignment map ready.")
     allowed_spawn_vertices = None
     if branch_spec.spawnable_cell_mode == "pure_white_only":
-        _log(logger, "  Loading pure-white spawn mask to restrict spawnable cells...")
-        spawn_mask = load_spawnable_white_mask(
-            image_path=branch_spec.image_path,
-            resize_longest_side=branch_spec.image_resize_longest_side,
-        )
+        if spawn_mask is None:
+            _log(logger, "  Loading pure-white spawn mask to restrict spawnable cells...")
+            spawn_mask = load_spawnable_white_mask(
+                image_path=branch_spec.image_path,
+                resize_longest_side=branch_spec.image_resize_longest_side,
+            )
+        else:
+            _log(logger, "  Reusing previously loaded pure-white mask to restrict spawnable cells...")
         allowed_spawn_vertices = _spawn_mask_to_composite_positions(spawn_mask)
         _log(
             logger,
-            f"  Pure-white spawn mask loaded | allowed_spawn_vertices={len(allowed_spawn_vertices)}",
+            f"  Pure-white spawn mask ready | allowed_spawn_vertices={len(allowed_spawn_vertices)}",
         )
     _log(logger, "Shared dynamic branch state preparation completed.")
     return DynamicBranchState(

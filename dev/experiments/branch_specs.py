@@ -38,6 +38,7 @@ class BranchSpec:
     dynamic_target_dynamic_obstacle_density: float | None = None
     dynamic_loop_sequence_length: int | None = None
     dynamic_group_stay_durations: tuple[int, ...] | None = None
+    dynamic_generation_cell_mode: str = "all_free"
     spawnable_cell_mode: str = "all_free"
     notes: str = ""
 
@@ -123,6 +124,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_target_dynamic_obstacle_density=float(port_cfg["target_dynamic_obstacle_density"]),
             dynamic_loop_sequence_length=int(port_cfg["loop_sequence_length"]),
             dynamic_group_stay_durations=tuple(port_cfg["group_stay_durations"]),
+            dynamic_generation_cell_mode=str(port_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(port_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
                 "Image-based dynamic branch with scattered targets. Retained pairs are the run "
@@ -155,6 +157,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_target_dynamic_obstacle_density=float(campus_1_cfg["target_dynamic_obstacle_density"]),
             dynamic_loop_sequence_length=int(campus_1_cfg["loop_sequence_length"]),
             dynamic_group_stay_durations=tuple(campus_1_cfg["group_stay_durations"]),
+            dynamic_generation_cell_mode=str(campus_1_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(campus_1_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
                 "The documents describe the campus map as a single-cell target case, "
@@ -188,11 +191,12 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_target_dynamic_obstacle_density=float(campus_2_cfg["target_dynamic_obstacle_density"]),
             dynamic_loop_sequence_length=int(campus_2_cfg["loop_sequence_length"]),
             dynamic_group_stay_durations=tuple(campus_2_cfg["group_stay_durations"]),
+            dynamic_generation_cell_mode=str(campus_2_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(campus_2_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
                 "The documents describe the campus map as a single-cell target case, "
                 "but the active study currently uses scattered targets. The base static layout is preserved from the source image, "
-                "and starts/goals are sampled only from pure-white source-image cells so the sampled assignments stay in the main contiguous area. "
+                "and grouped dynamic-obstacle generation as well as start/goal sampling are both restricted to pure-white source-image cells so the study stays in the main contiguous area. "
                 "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
                 "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),

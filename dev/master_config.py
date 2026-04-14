@@ -25,6 +25,11 @@ MAP_TYPE = "dynamic_campus_area_2"
 # Edit the branch dictionaries below when you want to change seeds, agent-number
 # ranges, time limits, densities, image thresholds, or other branch-specific settings.
 #
+# dynamic_generation_cell_mode controls which raster cells participate in dynamic
+# obstacle generation and free-space connectivity checks:
+# - "all_free": every non-black source-image cell is traversable
+# - "pure_white_only": only pure-white source-image cells are traversable
+#
 # agent_number_range = (start_agent_number, max_agent_number, step_size)
 # Example: (8, 40, 4) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
 
@@ -51,6 +56,7 @@ DYNAMIC_PORT_CONFIG = {
     "image_threshold": 127,
     "image_path": str(INPUTS_ROOT / "dynamic_port" / "port_map" / "port_map.png"),
     "image_resize_longest_side": 40,
+    "dynamic_generation_cell_mode": "all_free",
 }
 
 DYNAMIC_CAMPUS_AREA_1_CONFIG = {
@@ -66,6 +72,7 @@ DYNAMIC_CAMPUS_AREA_1_CONFIG = {
     "group_stay_durations": (3, 4, 5),
     "image_threshold": 127,
     "image_path": str(INPUTS_ROOT / "dynamic_campus_area_1" / "campus_area_1_x80.png"),
+    "dynamic_generation_cell_mode": "all_free",
     "spawnable_cell_mode": "all_free",
 }
 
@@ -82,6 +89,10 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     "group_stay_durations": (3, 4, 5),
     "image_threshold": 127,
     "image_path": str(INPUTS_ROOT / "dynamic_campus_area_2" / "campus_area_2_x80.png"),
+    # Campus Area 2 contains extra non-black but non-white raster regions.
+    # To keep grouped dynamic-obstacle generation on the main contiguous playable area,
+    # use only pure-white cells for dynamic generation, connectivity checks, and spawning.
+    "dynamic_generation_cell_mode": "pure_white_only",
     # Only pure-white raster cells may be used as start/goal spawn cells.
     "spawnable_cell_mode": "pure_white_only",
 }

@@ -113,6 +113,6 @@ pathological infinite loops. It remains only a protective implementation detail.
 
 - The study flow currently uses scattered targets for all branches, including the campus branches for now.
 - The campus branches preserve their source-image static layout; static-density control is applied only to `static_artificial` and `dynamic_port`.
-- `dynamic_campus_area_2` samples starts/goals only from pure-white source-image cells. Other non-black colors still render as ordinary free space, but they are excluded from spawning.
+- `dynamic_campus_area_2` now uses only pure-white source-image cells for grouped dynamic-obstacle generation, connectivity checking, and start/goal sampling. This keeps the study on the main contiguous playable area even when the raster contains extra non-black colors.
 - Pillow-rendered run images are not part of the generalized study flow.
 - The dynamic branch sampler requires each sampled start-goal pair to be individually reachable on the shared assignment map, which avoids large numbers of trivial no-solution cases caused by unreachable goals.
