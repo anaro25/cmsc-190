@@ -129,6 +129,16 @@ class DynamicBranchState:
 
 
 @dataclass
+class VisualizationCandidate:
+    run_configuration: RunConfiguration
+    agents: list[dict[str, Any]]
+    classical_solver_result: dict[str, Any]
+    cyclic_solver_result: dict[str, Any]
+    classical_map: list[list[Any]] | None = None
+    cyclic_map: list[list[Any]] | None = None
+
+
+@dataclass
 class SamplingConditionResult:
     accepted_for_reporting: bool
     stop_branch: bool
@@ -138,6 +148,7 @@ class SamplingConditionResult:
     cyclic_records: list[MappingRunRecord] = field(default_factory=list)
     run_configurations: list[dict[str, Any]] = field(default_factory=list)
     run_records: list[dict[str, Any]] = field(default_factory=list)
+    visualization_candidates: list[VisualizationCandidate] = field(default_factory=list)
     retained_pairs: int = 0
     total_paired_sampling_attempts: int = 0
     consecutive_failed_paired_sampling_attempts: int = 0

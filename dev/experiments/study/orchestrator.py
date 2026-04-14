@@ -27,6 +27,7 @@ from dev.experiments.study.models import (
     MappingRunRecord,
     PreparedRunContext,
     SamplingConditionResult,
+    VisualizationCandidate,
 )
 from dev.experiments.study.plotting import generate_graphs
 from dev.experiments.study.preparation import (
@@ -35,6 +36,7 @@ from dev.experiments.study.preparation import (
     prepare_static_run_context,
 )
 from dev.experiments.study.runtime import build_mapping_record, run_dynamic_mapping, run_static_mapping
+from dev.experiments.study.visualization import render_selected_visualizations
 
 
 def _prepare_run_context(
@@ -112,6 +114,7 @@ def _run_jointly_viable_sampling(
     cyclic_records: list[MappingRunRecord] = []
     run_configurations: list[dict[str, Any]] = []
     run_records: list[dict[str, Any]] = []
+    visualization_candidates: list[VisualizationCandidate] = []
 
     attempt_index = 0
     retained_pairs = 0
@@ -198,6 +201,17 @@ def _run_jointly_viable_sampling(
             cyclic_records.append(cyclic_record)
             run_records.append(classical_record.to_dict())
             run_records.append(cyclic_record.to_dict())
+            if classical_record.solved_run and cyclic_record.solved_run:
+                visualization_candidates.append(
+                    VisualizationCandidate(
+                        run_configuration=prepared_context.run_configuration,
+                        agents=prepared_context.agents,
+                        classical_solver_result=classical_solver_result,
+                        cyclic_solver_result=cyclic_solver_result,
+                        classical_map=prepared_context.classical_map,
+                        cyclic_map=prepared_context.cyclic_map,
+                    )
+                )
             buffered_logger.flush_to(logger)
             log_mapping_record(logger, classical_record)
             log_mapping_record(logger, cyclic_record)
@@ -298,6 +312,7 @@ def _run_jointly_viable_sampling(
         cyclic_records=cyclic_records,
         run_configurations=run_configurations,
         run_records=run_records,
+        visualization_candidates=visualization_candidates,
         retained_pairs=retained_pairs,
         total_paired_sampling_attempts=total_paired_sampling_attempts,
         consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
@@ -323,6 +338,8 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
         "reported_agent_numbers": [],
         "planned_agent_numbers": branch_spec.agent_numbers,
     }
+    selected_visualization_candidates: list[VisualizationCandidate] = []
+    all_visualization_candidates: list[VisualizationCandidate] = []
 
     dynamic_state: DynamicBranchState | None = None
     if branch_spec.is_dynamic:
@@ -366,6 +383,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
         if sampling_result.accepted_for_reporting:
             run_configurations.extend(sampling_result.run_configurations)
             run_records.extend(sampling_result.run_records)
+            all_visualization_candidates.extend(sampling_result.visualization_candidates)
             aggregate = build_condition_aggregate(
                 branch_spec=branch_spec,
                 agent_number=agent_number,
@@ -401,8 +419,20 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
     write_csv(output_manager.aggregates_dir / "condition_summary.csv", aggregates_payload)
     write_json(output_manager.metadata_dir / "branch_stop_summary.json", branch_stop_summary)
 
+    if branch_spec.num_last_runs_to_visualize > 0:
+        selected_visualization_candidates = all_visualization_candidates[
+            -branch_spec.num_last_runs_to_visualize :
+        ]
+
     aggregate_objects = [ConditionAggregate(**payload) for payload in aggregates_payload]
     graph_paths = generate_graphs(branch_spec, aggregate_objects, output_manager.graphs_dir)
+    visualization_summary = render_selected_visualizations(
+        branch_spec=branch_spec,
+        output_manager=output_manager,
+        dynamic_state=dynamic_state,
+        selected_candidates=selected_visualization_candidates,
+        logger=logger,
+    )
 
     logger.log("")
     logger.log("Final aggregate table:")
@@ -432,5 +462,8 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
         "condition_summary_path": str(output_manager.aggregates_dir / "condition_summary.json"),
         "branch_stop_summary_path": str(output_manager.metadata_dir / "branch_stop_summary.json"),
         "graph_paths": [str(path) for path in graph_paths],
+        "visualizations_root": str(output_manager.visualizations_dir),
+        "visualization_summary_path": str(output_manager.metadata_dir / "visualization_selection_summary.json"),
+        "num_visualized_run_configurations": len(visualization_summary["selected_run_configurations"]),
         "log_path": str(output_manager.logs_dir / "experiment.log"),
     }

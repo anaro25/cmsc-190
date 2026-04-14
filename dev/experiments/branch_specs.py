@@ -26,6 +26,7 @@ class BranchSpec:
     agent_numbers: list[int]
     runtime_limit_seconds: float
     counted_runs_required: int
+    num_last_runs_to_visualize: int
     path_length_graph_enabled: bool
     is_dynamic: bool
     base_rows: int | None = None
@@ -87,6 +88,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(static_range),
             runtime_limit_seconds=float(static_cfg["time_limit_seconds"]),
             counted_runs_required=int(static_cfg["counted_runs_required"]),
+            num_last_runs_to_visualize=int(static_cfg.get("num_last_runs_to_visualize", 0)),
             path_length_graph_enabled=True,
             is_dynamic=False,
             base_rows=int(static_cfg["map_size"][0]),
@@ -113,6 +115,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(port_range),
             runtime_limit_seconds=float(port_cfg["time_limit_seconds"]),
             counted_runs_required=int(port_cfg["counted_runs_required"]),
+            num_last_runs_to_visualize=int(port_cfg.get("num_last_runs_to_visualize", 0)),
             path_length_graph_enabled=True,
             is_dynamic=True,
             image_path=str(port_cfg["image_path"]),
@@ -147,6 +150,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(campus_1_range),
             runtime_limit_seconds=float(campus_1_cfg["time_limit_seconds"]),
             counted_runs_required=int(campus_1_cfg["counted_runs_required"]),
+            num_last_runs_to_visualize=int(campus_1_cfg.get("num_last_runs_to_visualize", 0)),
             path_length_graph_enabled=True,
             is_dynamic=True,
             image_path=str(campus_1_cfg["image_path"]),
@@ -181,6 +185,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(campus_2_range),
             runtime_limit_seconds=float(campus_2_cfg["time_limit_seconds"]),
             counted_runs_required=int(campus_2_cfg["counted_runs_required"]),
+            num_last_runs_to_visualize=int(campus_2_cfg.get("num_last_runs_to_visualize", 0)),
             path_length_graph_enabled=True,
             is_dynamic=True,
             image_path=str(campus_2_cfg["image_path"]),
@@ -196,7 +201,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             notes=(
                 "The documents describe the campus map as a single-cell target case, "
                 "but the active study currently uses scattered targets. The base static layout is preserved from the source image, "
-                "and grouped dynamic-obstacle generation as well as start/goal sampling are both restricted to pure-white source-image cells so the study stays in the main contiguous area. "
+                "and grouped dynamic-obstacle generation uses only the pure-white traversable region. "
                 "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
                 "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
@@ -208,9 +213,7 @@ BRANCH_SPECS = _build_branch_specs()
 
 
 def get_branch_spec(map_type: str) -> BranchSpec:
-    try:
-        return BRANCH_SPECS[map_type]
-    except KeyError as exc:
-        raise ValueError(
-            "MAP_TYPE must be one of: " + ", ".join(sorted(BRANCH_SPECS))
-        ) from exc
+    if map_type not in BRANCH_SPECS:
+        available = ", ".join(sorted(BRANCH_SPECS))
+        raise ValueError(f"Unknown map_type '{map_type}'. Available map types: {available}")
+    return BRANCH_SPECS[map_type]

@@ -46,12 +46,14 @@ class BranchOutputManager:
         self.aggregates_dir = self.branch_root / "aggregates"
         self.graphs_dir = self.branch_root / "graphs"
         self.logs_dir = self.branch_root / "logs"
+        self.visualizations_dir = self.branch_root / "visualizations"
         for directory in (
             self.metadata_dir,
             self.records_dir,
             self.aggregates_dir,
             self.graphs_dir,
             self.logs_dir,
+            self.visualizations_dir,
         ):
             directory.mkdir(parents=True, exist_ok=True)
 
