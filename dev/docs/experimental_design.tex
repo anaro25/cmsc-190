@@ -46,7 +46,7 @@ The study contains four branches:
 \end{enumerate}
 
 \subsection{Target-Type Grouping}
-The current study run uses scattered one-to-one targets in all four branches. The campus branches are still documented as future single-cell-target cases, but that planned change is not active yet.
+The campus branches now support two target modes. When `single_cell_target=false`, they use the traditional scattered one-to-one target setup. When `single_cell_target=true`, they use a many-to-one shared single-cell target setup in which all agents share one goal cell and must spawn outside the target zone.
 
 \subsection{Agent-Number Conditions}
 Instead of manually listing all tested agent numbers, each branch uses an automatic progression parameter
@@ -114,7 +114,7 @@ The static-artificial branch continues to use user-controlled static obstacle de
 The dynamic-port branch continues to apply the user-controlled target static obstacle density before building the dynamic loop.
 
 \subsection{Dynamic Campus Area 1 and 2}
-For both campus branches, the source-image static layout is preserved as-is. The user-controlled target static obstacle density is not applied to the campus base maps, although dynamic obstacle density remains user-controlled.
+For both campus branches, the source-image static layout is preserved as-is. The user-controlled target static obstacle density is not applied to the campus base maps, although dynamic obstacle density remains user-controlled. Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, gray regions are non-traversable, and dynamic obstacles are generated only within the zone colors.
 
 For \texttt{dynamic\_campus\_area\_2}, starts and goals are sampled only from source-image cells that are pure white. Any other non-black raster colors are still visualized as ordinary free space, but they are excluded from start/goal spawning so sampled assignments remain in the intended contiguous area.
 

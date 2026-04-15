@@ -111,8 +111,8 @@ pathological infinite loops. It remains only a protective implementation detail.
 
 ## Notes
 
-- The study flow currently uses scattered targets for all branches, including the campus branches for now.
+- The campus branches now have a `single_cell_target` toggle in `master_config.py`. When enabled, all agents share one target cell and must spawn outside the target zone; when disabled, the campus branches keep the traditional scattered one-to-one target setup.
 - The campus branches preserve their source-image static layout; static-density control is applied only to `static_artificial` and `dynamic_port`.
-- `dynamic_campus_area_2` now uses only pure-white source-image cells for grouped dynamic-obstacle generation, connectivity checking, and start/goal sampling. This keeps the study on the main contiguous playable area even when the raster contains extra non-black colors.
-- Pillow-rendered run images are generated selectively in the generalized study flow: only the final successful paired run configurations from the highest reported agent-number condition are rendered, limited by each branch's `num_last_runs_to_visualize` setting in `master_config.py`.
+- For the campus branches, zone colors are traversable and spawnable, white walkways are traversable but not spawnable, gray regions are non-traversable, and dynamic obstacles are generated only inside the zone colors.
+- Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize` and `require_jointly_successful_mappings` in `master_config.py`, so you can choose either the last jointly successful classical-cyclic pairs or the last successful runs of each mapping independently.
 - The dynamic branch sampler requires each sampled start-goal pair to be individually reachable on the shared assignment map, which avoids large numbers of trivial no-solution cases caused by unreachable goals.

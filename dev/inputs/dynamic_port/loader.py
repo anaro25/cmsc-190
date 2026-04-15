@@ -3,6 +3,16 @@ from pathlib import Path
 from PIL import Image
 
 
+CAMPUS_ZONE_RGBS = (
+    (182, 218, 249),  # blue
+    (175, 252, 198),  # green
+    (245, 196, 198),  # light red
+)
+CAMPUS_GRAY_RGB = (208, 208, 208)
+CAMPUS_WHITE_RGB = (255, 255, 255)
+CAMPUS_BLACK_RGB = (0, 0, 0)
+
+
 def _binarize_pixel(value, threshold=127):
     if isinstance(value, int):
         return 1 if value <= threshold else 0
@@ -131,3 +141,112 @@ def load_spawnable_white_mask(image_path, resize_longest_side=None):
         mask.append(row)
 
     return mask
+
+
+def _rgb_tuple(value):
+    if isinstance(value, int):
+        return (value, value, value)
+
+    if isinstance(value, tuple):
+        return tuple(int(channel) for channel in value[:3])
+
+    raise TypeError(f"Unsupported pixel value: {value!r}")
+
+
+def _is_rgb_close(value, target_rgb, tolerance=8):
+    rgb = _rgb_tuple(value)
+    return all(abs(channel - target) <= tolerance for channel, target in zip(rgb, target_rgb))
+
+
+def _classify_campus_pixel(value, tolerance=8):
+    if _is_rgb_close(value, CAMPUS_BLACK_RGB, tolerance=tolerance):
+        return ("obstacle", None)
+    if _is_rgb_close(value, CAMPUS_GRAY_RGB, tolerance=tolerance):
+        return ("gray", None)
+    if _is_rgb_close(value, CAMPUS_WHITE_RGB, tolerance=tolerance):
+        return ("walkway", None)
+
+    for zone_id, zone_rgb in enumerate(CAMPUS_ZONE_RGBS, start=1):
+        if _is_rgb_close(value, zone_rgb, tolerance=tolerance):
+            return ("zone", zone_id)
+
+    rgb = _rgb_tuple(value)
+    raise ValueError(
+        "Unsupported campus-map pixel color encountered. "
+        f"Expected black, white, gray, or one of the zone colors, but found {rgb}."
+    )
+
+
+def load_campus_semantic_masks(image_path, resize_longest_side=None, color_tolerance=8):
+    rgb_image, _ = _load_resized_images(
+        image_path=image_path,
+        resize_longest_side=resize_longest_side,
+    )
+    if rgb_image is None:
+        fallback = build_fallback_port_matrix()
+        zone_id_matrix = []
+        traversable_matrix = []
+        zone_spawn_mask = []
+        walkway_mask = []
+        gray_mask = []
+        for row in fallback:
+            traversable_row = []
+            zone_row = []
+            walkway_row = []
+            gray_row = []
+            zone_id_row = []
+            for cell in row:
+                is_free = cell == 0
+                traversable_row.append(0 if is_free else 1)
+                zone_row.append(is_free)
+                walkway_row.append(False)
+                gray_row.append(False)
+                zone_id_row.append(1 if is_free else None)
+            traversable_matrix.append(traversable_row)
+            zone_spawn_mask.append(zone_row)
+            walkway_mask.append(walkway_row)
+            gray_mask.append(gray_row)
+            zone_id_matrix.append(zone_id_row)
+        return {
+            "traversable_matrix": traversable_matrix,
+            "zone_spawn_mask": zone_spawn_mask,
+            "walkway_mask": walkway_mask,
+            "gray_mask": gray_mask,
+            "zone_id_matrix": zone_id_matrix,
+        }
+
+    width, height = rgb_image.size
+    pixels = rgb_image.load()
+
+    traversable_matrix = []
+    zone_spawn_mask = []
+    walkway_mask = []
+    gray_mask = []
+    zone_id_matrix = []
+
+    for y in range(height):
+        traversable_row = []
+        zone_row = []
+        walkway_row = []
+        gray_row = []
+        zone_id_row = []
+        for x in range(width):
+            pixel_type, zone_id = _classify_campus_pixel(pixels[x, y], tolerance=color_tolerance)
+            traversable_row.append(0 if pixel_type in {"zone", "walkway"} else 1)
+            zone_row.append(pixel_type == "zone")
+            walkway_row.append(pixel_type == "walkway")
+            gray_row.append(pixel_type == "gray")
+            zone_id_row.append(zone_id)
+        traversable_matrix.append(traversable_row)
+        zone_spawn_mask.append(zone_row)
+        walkway_mask.append(walkway_row)
+        gray_mask.append(gray_row)
+        zone_id_matrix.append(zone_id_row)
+
+    return {
+        "traversable_matrix": traversable_matrix,
+        "zone_spawn_mask": zone_spawn_mask,
+        "walkway_mask": walkway_mask,
+        "gray_mask": gray_mask,
+        "zone_id_matrix": zone_id_matrix,
+    }

@@ -13,6 +13,32 @@ from dev.experiments.branch_specs import BranchSpec
 from dev.experiments.study.models import ConditionAggregate
 
 
+MARKER_SIZE = 8
+CLASSICAL_LABEL_OFFSET = (6, 6)
+CYCLIC_LABEL_OFFSET = (6, -10)
+
+
+def _annotate_series(
+    axes: plt.Axes,
+    x_values: list[int],
+    y_values: list[float],
+    *,
+    offset: tuple[int, int],
+) -> None:
+    for x_value, y_value in zip(x_values, y_values):
+        if math.isnan(y_value):
+            continue
+        axes.annotate(
+            f"{y_value:.2f}",
+            xy=(x_value, y_value),
+            xytext=offset,
+            textcoords="offset points",
+            ha="left",
+            va="center",
+            fontsize=8,
+        )
+
+
 def plot_metric_graph(
     *,
     branch_spec: BranchSpec,
@@ -35,12 +61,27 @@ def plot_metric_graph(
 
     figure = plt.figure(figsize=(10, 6))
     axes = figure.add_subplot(111)
-    axes.plot(x_values, classical_values, marker="o", label="Classical")
-    axes.plot(x_values, cyclic_values, marker="o", label="Cyclic")
+    axes.plot(
+        x_values,
+        classical_values,
+        marker="s",
+        markersize=MARKER_SIZE,
+        label="Classical",
+    )
+    axes.plot(
+        x_values,
+        cyclic_values,
+        marker="o",
+        markersize=MARKER_SIZE,
+        label="Cyclic",
+    )
+    _annotate_series(axes, x_values, classical_values, offset=CLASSICAL_LABEL_OFFSET)
+    _annotate_series(axes, x_values, cyclic_values, offset=CYCLIC_LABEL_OFFSET)
     axes.set_xlabel("Agent number")
     axes.set_ylabel(y_label)
     axes.set_title(title)
     axes.grid(True, alpha=0.3)
+    axes.margins(x=0.05, y=0.12)
     axes.legend()
     figure.tight_layout()
     figure.savefig(output_path, dpi=150)

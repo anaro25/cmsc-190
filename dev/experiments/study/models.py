@@ -126,16 +126,17 @@ class DynamicBranchState:
     schedule_seed: int
     generation_mode: str
     allowed_spawn_vertices: set[tuple[int, int]] | None = None
+    zone_vertices_by_id: dict[int, set[tuple[int, int]]] = field(default_factory=dict)
+    visually_free_vertices: set[tuple[int, int]] = field(default_factory=set)
 
 
 @dataclass
 class VisualizationCandidate:
+    mapping_name: str
     run_configuration: RunConfiguration
     agents: list[dict[str, Any]]
-    classical_solver_result: dict[str, Any]
-    cyclic_solver_result: dict[str, Any]
-    classical_map: list[list[Any]] | None = None
-    cyclic_map: list[list[Any]] | None = None
+    solver_result: dict[str, Any]
+    composite_map: list[list[Any]] | None = None
 
 
 @dataclass

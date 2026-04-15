@@ -23,6 +23,7 @@ DEFAULT_ARROW_COLOR = (228, 228, 228)
 ACTIVE_ARROW_COLOR = (0, 0, 0)
 SHOWCASE_ARROW_COLOR = (90, 90, 90)
 FREE_SPACE_DOT_COLOR = (210, 210, 210)
+SHARED_TARGET_COLOR = (60, 60, 60)
 
 
 class PillowMapfRenderer:
@@ -39,7 +40,7 @@ class PillowMapfRenderer:
             transition_scale=transition_scale,
         )
 
-    def render_all_frames(self, composite_map, agents, paths_by_agent, output_dir):
+    def render_all_frames(self, composite_map, agents, paths_by_agent, output_dir, visually_free_vertex_positions=None):
         output_dir = Path(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -57,12 +58,13 @@ class PillowMapfRenderer:
                 time_step=time_step,
                 output_path=output_path,
                 agent_colors=agent_colors,
+                visually_free_vertex_positions=visually_free_vertex_positions,
             )
             rendered_paths.append(output_path)
 
         return rendered_paths
 
-    def render_obstacle_only_frame(self, composite_map, output_path, dynamic_vertex_positions=None):
+    def render_obstacle_only_frame(self, composite_map, output_path, dynamic_vertex_positions=None, visually_free_vertex_positions=None):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
 
@@ -73,11 +75,12 @@ class PillowMapfRenderer:
             transition_mode="hidden",
             draw_free_space_dots=False,
             dynamic_vertex_positions=dynamic_vertex_positions,
+            visually_free_vertex_positions=visually_free_vertex_positions,
         )
 
         image.save(output_path)
 
-    def render_showcase_frame(self, composite_map, output_path, dynamic_vertex_positions=None):
+    def render_showcase_frame(self, composite_map, output_path, dynamic_vertex_positions=None, visually_free_vertex_positions=None):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
 
@@ -88,6 +91,7 @@ class PillowMapfRenderer:
             transition_mode="showcase",
             draw_free_space_dots=False,
             dynamic_vertex_positions=dynamic_vertex_positions,
+            visually_free_vertex_positions=visually_free_vertex_positions,
         )
 
         image.save(output_path)
@@ -99,6 +103,7 @@ class PillowMapfRenderer:
         output_path,
         agent_colors,
         dynamic_vertex_positions=None,
+        visually_free_vertex_positions=None,
     ):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
@@ -110,6 +115,7 @@ class PillowMapfRenderer:
             transition_mode="normal",
             draw_free_space_dots=False,
             dynamic_vertex_positions=dynamic_vertex_positions,
+            visually_free_vertex_positions=visually_free_vertex_positions,
         )
         self._draw_targets(
             draw=draw,
@@ -135,6 +141,7 @@ class PillowMapfRenderer:
         output_path,
         agent_colors,
         dynamic_vertex_positions=None,
+        visually_free_vertex_positions=None,
     ):
         image = self._create_base_image(composite_map)
         draw = ImageDraw.Draw(image)
@@ -153,6 +160,7 @@ class PillowMapfRenderer:
             transition_mode="normal",
             draw_free_space_dots=False,
             dynamic_vertex_positions=dynamic_vertex_positions,
+            visually_free_vertex_positions=visually_free_vertex_positions,
         )
         self._draw_targets(
             draw=draw,
@@ -197,6 +205,7 @@ class PillowMapfRenderer:
         transition_mode="normal",
         draw_free_space_dots=False,
         dynamic_vertex_positions=None,
+        visually_free_vertex_positions=None,
     ):
         for row_index, row in enumerate(composite_map):
             for column_index, cell_value in enumerate(row):
@@ -209,6 +218,7 @@ class PillowMapfRenderer:
                     bounds=bounds,
                     cell_value=cell_value,
                     dynamic_vertex_positions=dynamic_vertex_positions or set(),
+                    visually_free_vertex_positions=visually_free_vertex_positions or set(),
                 )
                 self._draw_transition_symbol(
                     draw=draw,
@@ -234,14 +244,21 @@ class PillowMapfRenderer:
         bounds,
         cell_value,
         dynamic_vertex_positions,
+        visually_free_vertex_positions,
     ):
         fill_color = FREE_SPACE_COLOR
-        if cell_value == Vertex.OBSTACLE:
+        cell_position = (row_index, column_index)
+        if cell_value == Vertex.OBSTACLE and cell_position not in visually_free_vertex_positions:
             fill_color = OBSTACLE_COLOR
             draw.rectangle(bounds, fill=fill_color)
             return fill_color
 
-        if self._should_fill_obstacle_gap(composite_map, row_index, column_index):
+        if self._should_fill_obstacle_gap(
+            composite_map,
+            row_index,
+            column_index,
+            visually_free_vertex_positions=visually_free_vertex_positions,
+        ):
             fill_color = OBSTACLE_FILLER_COLOR
             draw.rectangle(bounds, fill=fill_color)
             return fill_color
@@ -255,22 +272,23 @@ class PillowMapfRenderer:
             bounds=bounds,
             cell_value=cell_value,
             dynamic_vertex_positions=dynamic_vertex_positions,
+            visually_free_vertex_positions=visually_free_vertex_positions,
         )
         return fill_color
 
-    def _should_fill_obstacle_gap(self, composite_map, row_index, column_index):
+    def _should_fill_obstacle_gap(self, composite_map, row_index, column_index, visually_free_vertex_positions=None):
         if row_index % 2 == 0 and column_index % 2 == 0:
             return False
 
         if row_index % 2 == 0 and column_index % 2 == 1:
             left_cell = (row_index, column_index - 1)
             right_cell = (row_index, column_index + 1)
-            return self._all_are_obstacles(composite_map, [left_cell, right_cell])
+            return self._all_are_obstacles(composite_map, [left_cell, right_cell], visually_free_vertex_positions=visually_free_vertex_positions)
 
         if row_index % 2 == 1 and column_index % 2 == 0:
             upper_cell = (row_index - 1, column_index)
             lower_cell = (row_index + 1, column_index)
-            return self._all_are_obstacles(composite_map, [upper_cell, lower_cell])
+            return self._all_are_obstacles(composite_map, [upper_cell, lower_cell], visually_free_vertex_positions=visually_free_vertex_positions)
 
         surrounding_cells = [
             (row_index - 1, column_index - 1),
@@ -278,13 +296,15 @@ class PillowMapfRenderer:
             (row_index + 1, column_index - 1),
             (row_index + 1, column_index + 1),
         ]
-        return self._all_are_obstacles(composite_map, surrounding_cells)
+        return self._all_are_obstacles(composite_map, surrounding_cells, visually_free_vertex_positions=visually_free_vertex_positions)
 
-    def _all_are_obstacles(self, composite_map, positions):
+    def _all_are_obstacles(self, composite_map, positions, visually_free_vertex_positions=None):
         for row_index, column_index in positions:
             if not self._cell_is_in_bounds(composite_map, row_index, column_index):
                 return False
             if composite_map[row_index][column_index] != Vertex.OBSTACLE:
+                return False
+            if visually_free_vertex_positions is not None and (row_index, column_index) in visually_free_vertex_positions:
                 return False
         return True
 
@@ -297,14 +317,15 @@ class PillowMapfRenderer:
         bounds,
         cell_value,
         dynamic_vertex_positions,
+        visually_free_vertex_positions,
     ):
         left, top, right, bottom = bounds
         midpoint_x = (left + right) / 2
         midpoint_y = (top + bottom) / 2
 
         if row_index % 2 == 0 and column_index % 2 == 1:
-            left_is_obstacle = self._vertex_is_obstacle(composite_map, row_index, column_index - 1)
-            right_is_obstacle = self._vertex_is_obstacle(composite_map, row_index, column_index + 1)
+            left_is_obstacle = self._vertex_is_obstacle(composite_map, row_index, column_index - 1, visually_free_vertex_positions=visually_free_vertex_positions)
+            right_is_obstacle = self._vertex_is_obstacle(composite_map, row_index, column_index + 1, visually_free_vertex_positions=visually_free_vertex_positions)
             if left_is_obstacle ^ right_is_obstacle:
                 if left_is_obstacle:
                     fill_bounds = (left, top, midpoint_x, bottom)
@@ -314,8 +335,8 @@ class PillowMapfRenderer:
             return
 
         if row_index % 2 == 1 and column_index % 2 == 0:
-            upper_is_obstacle = self._vertex_is_obstacle(composite_map, row_index - 1, column_index)
-            lower_is_obstacle = self._vertex_is_obstacle(composite_map, row_index + 1, column_index)
+            upper_is_obstacle = self._vertex_is_obstacle(composite_map, row_index - 1, column_index, visually_free_vertex_positions=visually_free_vertex_positions)
+            lower_is_obstacle = self._vertex_is_obstacle(composite_map, row_index + 1, column_index, visually_free_vertex_positions=visually_free_vertex_positions)
             if upper_is_obstacle ^ lower_is_obstacle:
                 if upper_is_obstacle:
                     fill_bounds = (left, top, right, midpoint_y)
@@ -326,20 +347,24 @@ class PillowMapfRenderer:
 
         if row_index % 2 == 1 and column_index % 2 == 1:
             diagonal_quadrants = [
-                (self._vertex_is_obstacle(composite_map, row_index - 1, column_index - 1), (left, top, midpoint_x, midpoint_y)),
-                (self._vertex_is_obstacle(composite_map, row_index - 1, column_index + 1), (midpoint_x, top, right, midpoint_y)),
-                (self._vertex_is_obstacle(composite_map, row_index + 1, column_index - 1), (left, midpoint_y, midpoint_x, bottom)),
-                (self._vertex_is_obstacle(composite_map, row_index + 1, column_index + 1), (midpoint_x, midpoint_y, right, bottom)),
+                (self._vertex_is_obstacle(composite_map, row_index - 1, column_index - 1, visually_free_vertex_positions=visually_free_vertex_positions), (left, top, midpoint_x, midpoint_y)),
+                (self._vertex_is_obstacle(composite_map, row_index - 1, column_index + 1, visually_free_vertex_positions=visually_free_vertex_positions), (midpoint_x, top, right, midpoint_y)),
+                (self._vertex_is_obstacle(composite_map, row_index + 1, column_index - 1, visually_free_vertex_positions=visually_free_vertex_positions), (left, midpoint_y, midpoint_x, bottom)),
+                (self._vertex_is_obstacle(composite_map, row_index + 1, column_index + 1, visually_free_vertex_positions=visually_free_vertex_positions), (midpoint_x, midpoint_y, right, bottom)),
             ]
             for has_obstacle, fill_bounds in diagonal_quadrants:
                 if has_obstacle:
                     draw.rectangle(fill_bounds, fill=OBSTACLE_FILLER_COLOR)
             return
 
-    def _vertex_is_obstacle(self, composite_map, row_index, column_index):
+    def _vertex_is_obstacle(self, composite_map, row_index, column_index, visually_free_vertex_positions=None):
         if not self._cell_is_in_bounds(composite_map, row_index, column_index):
             return False
-        return composite_map[row_index][column_index] == Vertex.OBSTACLE
+        if composite_map[row_index][column_index] != Vertex.OBSTACLE:
+            return False
+        if visually_free_vertex_positions is not None and (row_index, column_index) in visually_free_vertex_positions:
+            return False
+        return True
 
     def _draw_transition_symbol(
         self,
@@ -425,6 +450,29 @@ class PillowMapfRenderer:
         return DEFAULT_ARROW_COLOR
 
     def _draw_targets(self, draw, agents, agent_colors, paths_by_agent, time_step):
+        shared_goal_positions = {agent["goal"] for agent in agents}
+        if len(shared_goal_positions) == 1 and agents:
+            shared_goal = next(iter(shared_goal_positions))
+            row_index, column_index = shared_goal
+            bounds = self._get_cell_bounds(row_index, column_index)
+            reached_goal = False
+            if paths_by_agent is not None and time_step is not None:
+                reached_goal = all(
+                    self._agent_has_reached_goal(
+                        path=paths_by_agent[agent["id"]],
+                        goal_position=shared_goal,
+                        time_step=time_step,
+                    )
+                    for agent in agents
+                )
+            self._draw_target_triangle(
+                draw,
+                bounds,
+                fill=SHARED_TARGET_COLOR,
+                inverted=reached_goal,
+            )
+            return
+
         for agent in agents:
             row_index, column_index = agent["goal"]
             bounds = self._get_cell_bounds(row_index, column_index)

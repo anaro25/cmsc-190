@@ -22,6 +22,8 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Map obstacle type: {branch_spec.map_obstacle_type}")
     logger.log(f"Documented target type: {branch_spec.target_type_documented}")
     logger.log(f"Active target type: {branch_spec.target_type_active}")
+    if branch_spec.is_dynamic and branch_spec.map_type.startswith("dynamic_campus_area"):
+        logger.log(f"Campus single_cell_target mode: {branch_spec.single_cell_target}")
     logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Jointly viable counted pairs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
@@ -82,6 +84,9 @@ def log_dynamic_state(
     logger.log(f"  Spawnable cell mode: {branch_spec.spawnable_cell_mode}")
     if dynamic_state.allowed_spawn_vertices is not None:
         logger.log(f"  Allowed spawn vertices on assignment map: {len(dynamic_state.allowed_spawn_vertices)}")
+    if dynamic_state.zone_vertices_by_id:
+        zone_counts = {zone_id: len(vertices) for zone_id, vertices in sorted(dynamic_state.zone_vertices_by_id.items())}
+        logger.log(f"  Campus zone vertices on assignment map: {zone_counts}")
 
 
 def log_mapping_record(logger: ExperimentLogger, record: MappingRunRecord) -> None:

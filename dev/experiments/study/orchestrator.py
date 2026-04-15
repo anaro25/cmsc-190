@@ -201,15 +201,24 @@ def _run_jointly_viable_sampling(
             cyclic_records.append(cyclic_record)
             run_records.append(classical_record.to_dict())
             run_records.append(cyclic_record.to_dict())
-            if classical_record.solved_run and cyclic_record.solved_run:
+            if classical_record.solved_run and classical_solver_result is not None:
                 visualization_candidates.append(
                     VisualizationCandidate(
+                        mapping_name="classical",
                         run_configuration=prepared_context.run_configuration,
                         agents=prepared_context.agents,
-                        classical_solver_result=classical_solver_result,
-                        cyclic_solver_result=cyclic_solver_result,
-                        classical_map=prepared_context.classical_map,
-                        cyclic_map=prepared_context.cyclic_map,
+                        solver_result=classical_solver_result,
+                        composite_map=prepared_context.classical_map,
+                    )
+                )
+            if cyclic_record.solved_run and cyclic_solver_result is not None:
+                visualization_candidates.append(
+                    VisualizationCandidate(
+                        mapping_name="cyclic",
+                        run_configuration=prepared_context.run_configuration,
+                        agents=prepared_context.agents,
+                        solver_result=cyclic_solver_result,
+                        composite_map=prepared_context.cyclic_map,
                     )
                 )
             buffered_logger.flush_to(logger)
@@ -319,12 +328,21 @@ def _run_jointly_viable_sampling(
     )
 
 
-def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> dict[str, Any]:
+def run_selected_experiment(
+    map_type: str,
+    *,
+    seed_base: int | None = None,
+    program_start_time: float | None = None,
+) -> dict[str, Any]:
     branch_spec = get_branch_spec(map_type)
     resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
     output_manager = BranchOutputManager(branch_spec)
-    logger = ExperimentLogger(output_manager.logs_dir / "experiment.log")
+    logger = ExperimentLogger(
+        output_manager.logs_dir / "experiment.log",
+        start_time=program_start_time,
+    )
     log_branch_header(logger, branch_spec)
+    logger.log_elapsed("Program stopwatch started.")
     write_json(output_manager.metadata_dir / "branch_spec.json", branch_spec.to_dict())
 
     run_configurations: list[dict[str, Any]] = []
@@ -338,7 +356,6 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
         "reported_agent_numbers": [],
         "planned_agent_numbers": branch_spec.agent_numbers,
     }
-    selected_visualization_candidates: list[VisualizationCandidate] = []
     all_visualization_candidates: list[VisualizationCandidate] = []
 
     dynamic_state: DynamicBranchState | None = None
@@ -350,6 +367,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
             logger=logger,
         )
         log_dynamic_state(logger, branch_spec, dynamic_state)
+        logger.log_elapsed("Shared dynamic map preparation completed.")
         write_json(
             output_manager.metadata_dir / "shared_dynamic_state.json",
             {
@@ -398,6 +416,10 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
             aggregates_payload.append(aggregate.to_dict())
             branch_stop_summary["reported_agent_numbers"].append(agent_number)
             print_aggregate_block(logger, aggregate)
+            logger.log_elapsed(
+                f"Condition {agent_number_index + 1}/{len(branch_spec.agent_numbers)} completed "
+                f"(agent_number={agent_number})."
+            )
             continue
 
         if sampling_result.stop_branch:
@@ -409,6 +431,10 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
                     "stopped_before_agent_number": agent_number,
                 }
             )
+            logger.log_elapsed(
+                f"Condition {agent_number_index + 1}/{len(branch_spec.agent_numbers)} stopped the branch "
+                f"(agent_number={agent_number})."
+            )
             break
 
     write_json(output_manager.records_dir / "run_configurations.json", run_configurations)
@@ -418,11 +444,7 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
     write_csv(output_manager.records_dir / "run_records.csv", run_records)
     write_csv(output_manager.aggregates_dir / "condition_summary.csv", aggregates_payload)
     write_json(output_manager.metadata_dir / "branch_stop_summary.json", branch_stop_summary)
-
-    if branch_spec.num_last_runs_to_visualize > 0:
-        selected_visualization_candidates = all_visualization_candidates[
-            -branch_spec.num_last_runs_to_visualize :
-        ]
+    logger.log_elapsed("Structured records and summaries written to disk.")
 
     aggregate_objects = [ConditionAggregate(**payload) for payload in aggregates_payload]
     graph_paths = generate_graphs(branch_spec, aggregate_objects, output_manager.graphs_dir)
@@ -430,9 +452,10 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
         branch_spec=branch_spec,
         output_manager=output_manager,
         dynamic_state=dynamic_state,
-        selected_candidates=selected_visualization_candidates,
+        all_candidates=all_visualization_candidates,
         logger=logger,
     )
+    logger.log_elapsed("Graphs and visualization exports completed.")
 
     logger.log("")
     logger.log("Final aggregate table:")
@@ -449,6 +472,8 @@ def run_selected_experiment(map_type: str, *, seed_base: int | None = None) -> d
             f"{branch_stop_summary['reported_agent_numbers']}"
         )
 
+    logger.log("")
+    logger.log_elapsed("Experiment finished.")
     logger.log("")
     logger.log("Generated graph files:")
     for graph_path in graph_paths:

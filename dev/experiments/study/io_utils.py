@@ -4,6 +4,7 @@ import csv
 import json
 import math
 import shutil
+import time
 from pathlib import Path
 from typing import Any
 
@@ -11,9 +12,16 @@ from dev.experiments.branch_specs import BranchSpec
 from dev.paths import OUTPUTS_ROOT
 
 
+def format_elapsed_mmss(elapsed_seconds: float) -> str:
+    total_seconds = max(0, int(round(elapsed_seconds)))
+    minutes, seconds = divmod(total_seconds, 60)
+    return f"{minutes:02d}m {seconds:02d}s"
+
+
 class ExperimentLogger:
-    def __init__(self, output_path: Path):
+    def __init__(self, output_path: Path, *, start_time: float | None = None):
         self.output_path = output_path
+        self.start_time = time.perf_counter() if start_time is None else start_time
         self.output_path.parent.mkdir(parents=True, exist_ok=True)
         self.output_path.write_text("", encoding="utf-8")
 
@@ -21,6 +29,13 @@ class ExperimentLogger:
         print(message)
         with self.output_path.open("a", encoding="utf-8") as handle:
             handle.write(message + "\n")
+
+    def elapsed_seconds(self) -> float:
+        return time.perf_counter() - self.start_time
+
+    def log_elapsed(self, milestone: str) -> None:
+        elapsed = self.elapsed_seconds()
+        self.log(f"[Elapsed: {format_elapsed_mmss(elapsed)}] {milestone}")
 
 
 class BufferedExperimentLogger:
