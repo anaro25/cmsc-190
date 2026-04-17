@@ -1,0 +1,89 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Static Branches}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Purpose}
+
+The static side of the project now has two complementary branches:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{static\_artificial}, a clean synthetic baseline,
+    \item \texttt{static\_campus\_area\_2}, a semantic image-based campus branch.
+\end{itemize}
+
+Both remain static in the strict sense that there are no time-varying obstacle schedules.
+
+\section{\texttt{static\_artificial}}
+
+This branch is still the cleanest place to compare the two mappings without image semantics. For each sampled run configuration, the code:
+\begin{enumerate}[leftmargin=2em]
+    \item creates a fresh artificial composite grid,
+    \item places static obstacles according to the configured density,
+    \item builds classical and cyclic mapped versions,
+    \item samples dispersed one-to-one starts and dispersed one-to-one goals.
+\end{enumerate}
+
+Because the branch is synthetic, it is best read as the lowest-assumption baseline for the whole study.
+
+\section{\texttt{static\_campus\_area\_2}}
+
+This new branch uses the campus-area-2 image as a \emph{static} semantic map rather than a dynamic branch source. The campus loader keeps the meaning of the image colors:
+\begin{itemize}[leftmargin=2em]
+    \item zone colors are traversable and spawnable,
+    \item white walkways are traversable but non-spawnable,
+    \item gray regions are non-traversable.
+\end{itemize}
+
+The branch then samples:
+\begin{itemize}[leftmargin=2em]
+    \item a dispersed start set from one campus zone,
+    \item a clustered goal set from the other campus zone,
+    \item a one-to-one assignment between those sets.
+\end{itemize}
+
+Because the two groups must occupy different zones, the branch keeps the intended pressure toward cross-zone travel and bottleneck usage even though the environment itself is static.
+
+\section{Reachability and Fairness}
+
+The semantic campus static branch uses individual reachability checks during assignment, while the artificial static branch keeps its older unrestricted dispersed assignment behavior. This difference is deliberate: the campus branch is meant to study zone-separated spatial structure, not to waste most samples on trivially disconnected start-goal pairs.
+
+\section{Why Both Static Branches Matter}
+
+Taken together, the two static branches answer different questions:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{static\_artificial}: what the mapping difference looks like in a controlled synthetic setting,
+    \item \texttt{static\_campus\_area\_2}: what the mapping difference looks like on a semantically meaningful real image while still avoiding time variation.
+\end{itemize}
+
+\end{document}

@@ -1,0 +1,147 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Experiment Protocol and Paired Sampling Rules}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Condition Structure}
+
+Each branch is evaluated over an agent-number progression generated from:
+\[
+\texttt{agent\_number\_range}=(a,b,c)
+\]
+in the current code meaning
+\[
+(a,\text{ max agent number},\text{ step size}).
+\]
+
+So the planned sequence is:
+\[
+a,\ a+c,\ a+2c,\ \dots
+\]
+up to the maximum agent number \(b\).
+
+\section{Run Configuration Identity}
+
+The experiment uses explicit identifiers such as:
+\[
+\texttt{run[branch.agent\_number\_index.run\_index]}.
+\]
+The project also uses branch decimal labels such as:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{0.0} for \texttt{static\_artificial},
+    \item \texttt{0.1} for \texttt{static\_campus\_area\_2},
+    \item \texttt{1.0} for \texttt{dynamic\_port},
+    \item \texttt{1.1} for \texttt{dynamic\_campus\_area\_1}.
+\end{itemize}
+
+\section{Paired Jointly Viable Sampling}
+
+For each current agent number, the orchestrator keeps sampling candidate run configurations until it either:
+\begin{itemize}[leftmargin=2em]
+    \item reaches the counted-pair quota, or
+    \item triggers a branch stop rule.
+\end{itemize}
+
+The operational loop is:
+\begin{enumerate}[leftmargin=2em]
+    \item prepare one run configuration,
+    \item solve it under classical mapping,
+    \item solve the same configuration under cyclic mapping,
+    \item retain the configuration only if both results are counted categories.
+\end{enumerate}
+
+The counted categories are:
+\[
+\{\texttt{successful},\ \texttt{unfinished}\}.
+\]
+
+If either mapping returns \texttt{unsolvable}, the configuration is discarded and does \emph{not} count toward the quota.
+
+\section{Static vs.\ Dynamic Sharing Rule}
+
+The branches do not all share maps in the same way:
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{static branches}: a fresh static run context is prepared per run configuration. For \texttt{static\_artificial} this means a fresh artificial map; for \texttt{static\_campus\_area\_2} it means reloading the same semantic campus image and resampling new starts/goals.
+    \item \textbf{dynamic branches}: one shared dynamic branch state is prepared once, then reused across all agent-number conditions and run indices for that branch execution.
+\end{itemize}
+
+This difference is intentional and should not be treated as an accident.
+
+\section{Sampling Rules That Now Matter Scientifically}
+
+The current project varies run configurations along three sampling axes.
+
+\subsection{Start Distribution Mode}
+A branch can request \texttt{dispersed} or \texttt{clustered} starts.
+
+\subsection{Goal Distribution Mode}
+A branch can request \texttt{dispersed} or \texttt{clustered} goals.
+
+\subsection{Zone Relationship Mode}
+Campus branches can require starts and goals to come from \emph{different} semantic zones. This is what forces transitions through bottlenecks and connectors rather than allowing both groups to occupy the same campus region.
+
+\subsection{Eight-Neighbor Clearance}
+Within any one sampled run configuration:
+\begin{itemize}[leftmargin=2em]
+    \item no two starts may be adjacent by edge or vertex,
+    \item no two goals may be adjacent by edge or vertex,
+    \item start-goal adjacency is allowed as long as the cells are not identical.
+\end{itemize}
+
+\section{Stopping Rules}
+
+The current branch execution stops before moving to higher agent numbers when either of the following happens.
+
+\subsection{Cyclic Majority-Unfinished Rule}
+
+After the counted quota is reached for the current condition, the condition is discarded and the branch stops if cyclic has more unfinished runs than successful runs within the retained set.
+
+\subsection{Consecutive Failed Paired Sampling Rule}
+
+If too many consecutive paired attempts are rejected because at least one mapping returned \texttt{unsolvable}, the current condition is discarded and the branch stops. The user-configurable global limit currently comes from:
+\[
+\texttt{CONSECUTIVE\_FAILED\_PAIRED\_SAMPLING\_ATTEMPTS\_LIMIT}.
+\]
+
+\section{Internal Safeguard}
+
+There is also an internal large attempt safeguard to prevent pathological infinite loops. It is an implementation safety net, not the main scientific stopping rule.
+
+\section{Seed Discipline}
+
+The project derives deterministic seeds using a helper function \texttt{seed\_for(*parts)}. The branch name, role, agent number, and run index are folded into a stable integer seed.
+
+This means reproducibility is not based on one giant global random stream. Different parts of the experiment derive role-specific seeds from semantic labels such as \texttt{"map"}, \texttt{"assign"}, and \texttt{"dynamic\_schedule"}.
+
+\end{document}

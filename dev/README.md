@@ -9,8 +9,8 @@ python -m dev.main
 ```
 
 `master_config.py` is the single user-editable file for branch seeds, map size,
-agent-number ranges, runtime limits, densities, thresholds, loop settings, and the
-global consecutive failed paired sampling limit.
+agent-number ranges, runtime limits, densities, thresholds, loop settings, start/goal
+positioning modes, and the global consecutive failed paired sampling limit.
 
 Results are written under `dev/outputs/<map_type>/`.
 
@@ -34,6 +34,15 @@ The `study` package is split by responsibility:
 - `logging_utils.py` — console/file log formatting
 - `orchestrator.py` — jointly viable paired sampling, early stopping, and branch execution flow
 
+## Current branches
+
+The configured branch set is now:
+
+- `static_artificial`
+- `static_campus_area_2`
+- `dynamic_port`
+- `dynamic_campus_area_1`
+
 ## Agent-number progression
 
 Each branch now uses:
@@ -56,7 +65,6 @@ of the stopping rules triggers.
 During paired sampling, the terminal now prints progress lines such as
 `Paired sampling attempt 4 ongoing...` so long jointly viable searches are visible while they run.
 Startup progress is also logged during shared dynamic-map preparation, including image loading, static preprocessing, dynamic patch-bank generation, mapped-loop construction, and any fallback activation.
-
 
 For each planned agent number in the selected branch:
 
@@ -106,13 +114,16 @@ pathological infinite loops. It remains only a protective implementation detail.
 - `dev/mapf/` — CBS solvers, metrics, and MAPF execution helpers
 - `dev/maps/` — map construction and mapping transforms
 - `dev/navigation/` — graph/navigation helpers over composite grids
-- `dev/inputs/` — image-based inputs for dynamic branches
+- `dev/inputs/` — image-based inputs for dynamic and static campus/image branches
 - `dev/core/` — composite-grid primitives
 
 ## Notes
 
-- The campus branches now have a `single_cell_target` toggle in `master_config.py`. When enabled, all agents share one target cell and must spawn outside the target zone; when disabled, the campus branches keep the traditional scattered one-to-one target setup.
-- The campus branches preserve their source-image static layout; static-density control is applied only to `static_artificial` and `dynamic_port`.
-- For the campus branches, zone colors are traversable and spawnable, white walkways are traversable but not spawnable, gray regions are non-traversable, and dynamic obstacles are generated only inside the zone colors.
+- The project now uses explicit `start_distribution_mode` and `goal_distribution_mode` settings instead of the older shared-goal campus toggle.
+- All current branches remain one-to-one MAPF setups. The experiment varies spatial placement, not assignment cardinality.
+- The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, gray regions are non-traversable.
+- `static_campus_area_2` uses campus area 2 as a static branch with dispersed starts in one zone and clustered goals in the other zone.
+- `dynamic_port` now uses clustered starts and dispersed goals.
+- `dynamic_campus_area_1` now uses clustered starts and clustered goals, with the two clusters forced into different campus zones.
+- The assignment sampler now enforces 8-neighbor clearance within starts and within goals.
 - Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize` and `require_jointly_successful_mappings` in `master_config.py`, so you can choose either the last jointly successful classical-cyclic pairs or the last successful runs of each mapping independently.
-- The dynamic branch sampler requires each sampled start-goal pair to be individually reachable on the shared assignment map, which avoids large numbers of trivial no-solution cases caused by unreachable goals.

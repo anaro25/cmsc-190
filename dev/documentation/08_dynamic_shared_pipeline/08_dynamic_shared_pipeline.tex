@@ -1,0 +1,92 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Dynamic Shared Pipeline}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{What Is Shared}
+
+The dynamic pipeline still prepares one shared branch state and reuses it across all conditions of a dynamic branch execution. That shared state includes:
+\begin{itemize}[leftmargin=2em]
+    \item the raw traversability matrix,
+    \item the static matrix after any preprocessing,
+    \item the dynamic loop frames,
+    \item the classical and cyclic mapped loops,
+    \item one assignment map used for start-goal sampling,
+    \item optional spawn masks and campus zone metadata.
+\end{itemize}
+
+This is a core scientific contract of the project: dynamic branches compare mappings on the same evolving environment, not on freshly regenerated loops every run.
+
+\section{Preparation Steps}
+
+The current dynamic preparation sequence is:
+\begin{enumerate}[leftmargin=2em]
+    \item load the source image,
+    \item optionally reinterpret the image using campus semantic colors,
+    \item optionally preprocess the static obstacle density,
+    \item generate the shared dynamic loop,
+    \item map that loop into classical and cyclic composite representations,
+    \item extract one shared assignment map from the classical loop,
+    \item filter allowed spawn vertices and semantic zone vertices on that assignment map.
+\end{enumerate}
+
+\section{Cell-Eligibility Modes}
+
+The dynamic pipeline still supports the same high-level eligibility controls:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{all\_free}: every thresholded non-black cell is eligible,
+    \item \texttt{pure\_white\_only}: only pure-white cells are eligible,
+    \item \texttt{zone\_colors\_only}: only designated campus zone cells are eligible.
+\end{itemize}
+
+For campus images, white walkways remain traversable but non-spawnable, and gray regions remain non-traversable.
+
+\section{What Changed in the Assignment Layer}
+
+The most important recent change is that the dynamic pipeline no longer supports a many-to-one shared campus goal. Instead, the assignment layer now exposes:
+\begin{itemize}[leftmargin=2em]
+    \item start distribution mode,
+    \item goal distribution mode,
+    \item optional distinct-zone campus sampling,
+    \item 8-neighbor clearance within starts and within goals,
+    \item one-to-one matching with optional individual reachability.
+\end{itemize}
+
+That means the dynamic pipeline still shares \emph{maps}, but each run configuration can now differ in a richer and more explicit way than the old \texttt{single\_cell\_target} toggle allowed.
+
+\section{Renderer-Only Visual Semantics}
+
+Dynamic campus branches also store \texttt{visually\_free\_vertices}. These are used only by the renderer. A cell can therefore be drawn like an open region even when it is not traversable for pathfinding. This distinction is mainly relevant for campus gray regions.
+
+\end{document}

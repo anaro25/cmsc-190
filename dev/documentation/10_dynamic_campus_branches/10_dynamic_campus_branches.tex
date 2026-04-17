@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Campus Image Branches}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Semantic Color Contract}
+
+The campus maps are not ordinary thresholded images. Their pixel colors encode semantics that affect:
+\begin{itemize}[leftmargin=2em]
+    \item traversability,
+    \item spawn eligibility,
+    \item zone membership,
+    \item dynamic-obstacle eligibility for the dynamic campus branch.
+\end{itemize}
+
+The current campus loader recognizes:
+\begin{itemize}[leftmargin=2em]
+    \item colored zones as traversable and spawnable,
+    \item white walkways as traversable but non-spawnable,
+    \item gray regions as non-traversable.
+\end{itemize}
+
+\section{Current Campus Branch Split}
+
+The project now uses the two campus source images in different ways:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{static\_campus\_area\_2}: static image branch,
+    \item \texttt{dynamic\_campus\_area\_1}: dynamic image branch.
+\end{itemize}
+
+This is an intentional redesign. Campus area 2 is no longer a dynamic branch.
+
+\section{\texttt{static\_campus\_area\_2}}
+
+Campus area 2 has two semantic zones. The static branch samples:
+\begin{itemize}[leftmargin=2em]
+    \item a dispersed start group from one zone,
+    \item a clustered goal group from the other zone,
+    \item then assigns those starts and goals one-to-one.
+\end{itemize}
+
+The start zone and goal zone can swap across runs, but they must remain different.
+
+\section{\texttt{dynamic\_campus\_area\_1}}
+
+Campus area 1 has three semantic zones. The dynamic branch samples:
+\begin{itemize}[leftmargin=2em]
+    \item a clustered start group from one zone,
+    \item a clustered goal group from exactly one \emph{different} zone,
+    \item then assigns those starts and goals one-to-one.
+\end{itemize}
+
+So if starts are in zone A, goals must be entirely in zone B or entirely in zone C, not split across both.
+
+\section{Dynamic Generation Policy}
+
+For \texttt{dynamic\_campus\_area\_1}, dynamic obstacle generation still uses:
+\[
+\texttt{dynamic\_generation\_cell\_mode=zone\_colors\_only}.
+\]
+That means dynamic obstacles are generated only inside the designated zone colors. The static image layout itself is preserved.
+
+\section{Sampling Policy}
+
+The current campus assignment logic now follows these rules:
+\begin{itemize}[leftmargin=2em]
+    \item one goal per agent,
+    \item starts and goals are unique,
+    \item starts and goals each obey 8-neighbor clearance internally,
+    \item starts and goals may be adjacent to one another,
+    \item when campus distinct-zone mode is active, the start zone and goal zone must differ,
+    \item optional individual reachability is checked before accepting a sample.
+\end{itemize}
+
+\section{Renderer Note}
+
+The campus preparation code stores gray-region vertices as \texttt{visually\_free\_vertices}. In practice, this means a gray campus region can be drawn like an open area in some Pillow outputs even though it remains non-traversable for the actual solver.
+
+\section{Practical Warning}
+
+If a campus run logs something like \texttt{zone\_cells=0} or otherwise behaves as though no campus zones exist, the first thing to check is the source image itself. The campus branch assumes the image was actually recolored with the intended zone colors. If the image colors are wrong, the semantic loader cannot recover the intended zones.
+
+\end{document}

@@ -1,0 +1,69 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Troubleshooting Notes}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Campus Zones Not Detected}
+
+If a campus run reports something that implies zero usable zones, such as a log with \texttt{zone\_cells=0}, check the source image before changing the code. The current campus loader expects the designated zone colors to be present in the actual image asset.
+
+\section{Clustered Sampling Keeps Failing}
+
+If a branch repeatedly fails during assignment preparation, inspect the interaction among:
+\begin{itemize}[leftmargin=2em]
+    \item requested agent count,
+    \item 8-neighbor clearance,
+    \item cluster mode,
+    \item zone restriction,
+    \item reachability filtering.
+\end{itemize}
+
+A cluster request is intentionally loose, but it can still fail if one zone is too narrow or too fragmented for the requested count under the clearance rule.
+
+\section{Distinct-Zone Campus Sampling Fails}
+
+In campus \texttt{distinct\_campus\_zones} mode, the code must find:
+\begin{itemize}[leftmargin=2em]
+    \item enough valid start vertices in one zone,
+    \item enough valid goal vertices in a different zone,
+    \item a one-to-one reachable matching between those two sets when reachability is required.
+\end{itemize}
+
+If any of those three conditions fails, the run configuration is rejected and a new one is sampled.
+
+\section{Campus Visualization Looks Open but Solver Treats It as Blocked}
+
+Gray campus regions may be recorded as \texttt{visually\_free\_vertices} for rendering purposes. That does not make them solver-traversable. If a visualization looks more open than the solver behavior suggests, check whether the region is semantically gray rather than truly traversable.
+
+\end{document}

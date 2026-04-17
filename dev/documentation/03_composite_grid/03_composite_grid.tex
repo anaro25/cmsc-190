@@ -1,0 +1,108 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Composite Grid Representation}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Why the Project Uses a Composite Grid}
+
+A normal grid MAPF implementation often stores only vertices and infers movement from adjacency. This project instead stores both:
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{vertex slots}, and
+    \item \textbf{transition slots}.
+\end{itemize}
+
+That choice matters because the project wants movement structure itself to be editable. The distinction between classical and cyclic mapping is not just a hidden rule in the solver. It is encoded directly in the map.
+
+\section{Dimension Formula}
+
+If the underlying base grid has dimensions
+\[
+R \times C,
+\]
+then the composite grid has dimensions
+\[
+(2R-1)\times(2C-1).
+\]
+
+\section{Slot Meaning}
+
+The slot type is determined entirely by parity:
+\begin{itemize}[leftmargin=2em]
+    \item even row, even column: a real vertex,
+    \item even row, odd column: a horizontal transition slot,
+    \item odd row, even column: a vertical transition slot,
+    \item odd row, odd column: a placeholder corner slot.
+\end{itemize}
+
+So a base-grid cell \((r,c)\) corresponds to composite-grid vertex position
+\[
+(2r,\,2c).
+\]
+
+\section{Stored Element Types}
+
+The core enums live in \texttt{dev/core/composite\_elements.py}. The important conceptual categories are:
+\begin{itemize}[leftmargin=2em]
+    \item vertex values: free space or obstacle,
+    \item horizontal transition values: left, right, bidirectional, or no transition,
+    \item vertical transition values: up, down, bidirectional, or no transition,
+    \item placeholder corner slots.
+\end{itemize}
+
+\section{Practical Consequences}
+
+\subsection{Assignments and Semantic Masks}
+
+When the code loads a binary obstacle matrix or a semantic campus mask, those values initially live in ordinary image/grid coordinates. Whenever the project needs to restrict spawning or identify zone membership inside the composite map, it converts raster coordinates to composite coordinates by doubling row and column indices.
+
+\subsection{Mapping Becomes Explicit Data}
+
+Because transitions are first-class cells, a cyclic map is not just a free-space grid with an orientation rule applied on the fly. It is a concrete composite grid in which each transition slot stores the allowed direction.
+
+\subsection{Visualization Is Also Composite-Grid-Aware}
+
+The renderer does not merely draw occupancy. It draws:
+\begin{itemize}[leftmargin=2em]
+    \item vertex cells,
+    \item transition symbols,
+    \item obstacle-adjacent side fills,
+    \item placeholder-corner fills.
+\end{itemize}
+This is why the visualization logic is tightly coupled to the composite representation.
+
+\section{Mental Model for Reading the Code}
+
+When reading the repository, it is helpful to think of a composite map as a \emph{movement diagram} rather than a plain obstacle raster. The obstacles define which vertices are blocked, but the transition cells define what kinds of motion remain available between the free vertices.
+
+\end{document}

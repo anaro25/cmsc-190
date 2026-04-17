@@ -1,0 +1,108 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Mapping System: Classical vs.\ Cyclic}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Classical Mapping}
+
+Classical mapping is intentionally simple. For every transition slot whose two endpoint vertices are both free, the slot is made bidirectional:
+\begin{itemize}[leftmargin=2em]
+    \item horizontal slots become left-and-right,
+    \item vertical slots become up-and-down.
+\end{itemize}
+
+Conceptually, this is the ordinary undirected-grid interpretation expressed in explicit composite-grid form.
+
+\section{Cyclic Mapping as a Pipeline}
+
+Cyclic mapping is not just a raw directed overlay. The current implementation is a three-stage pipeline:
+\begin{enumerate}[leftmargin=2em]
+    \item overlay a deterministic cyclic direction pattern,
+    \item clean up transitions that are invalid because of obstacle contact,
+    \item postprocess the result to reduce unnecessary bidirectionals and restore connectivity where needed.
+\end{enumerate}
+
+\section{Raw Cyclic Overlay}
+
+The raw cyclic pattern is encoded in \texttt{dev/maps/cycle\_pattern\_mapper.py}. It uses index parity and modulus classes such as \(i \bmod 4\) and \(j \bmod 4\) to orient transition slots. The effect is a repeating local circulation pattern over the composite grid.
+
+The important point is not the exact modulus arithmetic but the design intent:
+\begin{itemize}[leftmargin=2em]
+    \item many transitions become one-way,
+    \item local motion is given a preferred circulation direction,
+    \item the resulting map is more structured than the classical fully bidirectional case.
+\end{itemize}
+
+\section{Obstacle-Aware Cyclic Cleanup}
+
+The raw overlay alone is not safe enough. A directed transition can point into or out of an obstacle-adjacent area in a way that breaks the intended local cycle.
+
+The cleanup stage therefore does two things:
+\begin{enumerate}[leftmargin=2em]
+    \item mark one-way cyclic transitions that touch obstacles,
+    \item repair the surrounding local cycle by converting surviving related transitions into bidirectional transitions when needed.
+\end{enumerate}
+
+This repair step matters because the project does not want the raw cyclic stencil to create nonsense movement around blocked cells.
+
+\section{Connectivity Postprocessing}
+
+After obstacle cleanup, the cyclic map is passed through a second postprocessor:
+\begin{itemize}[leftmargin=2em]
+    \item first remove redundant bidirectional transitions if their endpoints remain mutually reachable through another route,
+    \item then add bidirectional transitions back at empty slots if they are necessary to restore mutual reachability between adjacent free vertices.
+\end{itemize}
+
+The effect is a compromise:
+\begin{itemize}[leftmargin=2em]
+    \item keep the cyclic character where possible,
+    \item but do not let the map fragment unnecessarily.
+\end{itemize}
+
+\section{Important Interpretation}
+
+The current cyclic mapping is \textbf{not} a purely one-way map. After cleanup and connectivity restoration, some local edges may become bidirectional. This is deliberate. The project is comparing a strongly direction-biased map structure against the classical fully bidirectional structure, not forcing one-way motion at all costs.
+
+\section{Why This Matters for Future Updates}
+
+Any change to cyclic mapping should preserve the distinction between:
+\begin{enumerate}[leftmargin=2em]
+    \item the raw directed pattern,
+    \item obstacle-aware repair,
+    \item global connectivity repair.
+\end{enumerate}
+
+Collapsing these stages into one opaque step would make the project harder to reason about and would remove one of the clearest conceptual separations in the repository.
+
+\end{document}

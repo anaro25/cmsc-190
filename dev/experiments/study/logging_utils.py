@@ -22,8 +22,10 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Map obstacle type: {branch_spec.map_obstacle_type}")
     logger.log(f"Documented target type: {branch_spec.target_type_documented}")
     logger.log(f"Active target type: {branch_spec.target_type_active}")
-    if branch_spec.is_dynamic and branch_spec.map_type.startswith("dynamic_campus_area"):
-        logger.log(f"Campus single_cell_target mode: {branch_spec.single_cell_target}")
+    logger.log(f"Start distribution mode: {branch_spec.start_distribution_mode}")
+    logger.log(f"Goal distribution mode: {branch_spec.goal_distribution_mode}")
+    logger.log(f"Require individual reachability: {branch_spec.require_individual_reachability}")
+    logger.log(f"Zone relationship mode: {branch_spec.zone_relationship_mode}")
     logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Jointly viable counted pairs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")

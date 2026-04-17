@@ -19,6 +19,7 @@ from dev.inputs.dynamic_port.loader import (
     load_port_obstacle_matrix,
     load_spawnable_white_mask,
 )
+from dev.inputs.dynamic_port.map_builder import obstacle_matrix_to_composite_base_map
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.maps.base_map_factory import create_base_map
 from dev.maps.classical_mapper import apply_classical_mapping
@@ -135,6 +136,68 @@ def _serialize_agents(agents: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
+def _ordered_distinct_zone_pairs(zone_vertices_by_id: dict[int, set[tuple[int, int]]], rng: random.Random) -> list[tuple[int, int]]:
+    zone_ids = list(zone_vertices_by_id.keys())
+    ordered_pairs = [(start_zone_id, goal_zone_id) for start_zone_id in zone_ids for goal_zone_id in zone_ids if start_zone_id != goal_zone_id]
+    rng.shuffle(ordered_pairs)
+    return ordered_pairs
+
+
+def _sample_agents_for_branch(
+    *,
+    branch_spec: BranchSpec,
+    composite_map: list[list[Any]],
+    num_agents: int,
+    rng: random.Random,
+    allowed_spawn_vertices: set[tuple[int, int]] | None = None,
+    zone_vertices_by_id: dict[int, set[tuple[int, int]]] | None = None,
+) -> tuple[list[dict[str, Any]], str]:
+    zone_vertices_by_id = zone_vertices_by_id or {}
+
+    if branch_spec.zone_relationship_mode == "distinct_campus_zones":
+        if not zone_vertices_by_id:
+            raise ValueError("distinct_campus_zones mode requires campus zone vertices on the assignment map.")
+
+        last_error: Exception | None = None
+        for start_zone_id, goal_zone_id in _ordered_distinct_zone_pairs(zone_vertices_by_id, rng):
+            try:
+                agents = sample_agent_start_goal_pairs(
+                    composite_map=composite_map,
+                    num_agents=num_agents,
+                    rng=rng,
+                    require_individual_reachability=branch_spec.require_individual_reachability,
+                    allowed_start_vertices=zone_vertices_by_id[start_zone_id],
+                    allowed_goal_vertices=zone_vertices_by_id[goal_zone_id],
+                    start_distribution_mode=branch_spec.start_distribution_mode,
+                    goal_distribution_mode=branch_spec.goal_distribution_mode,
+                )
+                return (
+                    agents,
+                    f"start_zone={start_zone_id} | goal_zone={goal_zone_id} | start_distribution={branch_spec.start_distribution_mode} | goal_distribution={branch_spec.goal_distribution_mode}",
+                )
+            except ValueError as exc:
+                last_error = exc
+                continue
+
+        if last_error is not None:
+            raise last_error
+        raise ValueError("Could not sample a valid distinct-zone campus run configuration.")
+
+    agents = sample_agent_start_goal_pairs(
+        composite_map=composite_map,
+        num_agents=num_agents,
+        rng=rng,
+        require_individual_reachability=branch_spec.require_individual_reachability,
+        allowed_spawn_vertices=allowed_spawn_vertices,
+        start_distribution_mode=branch_spec.start_distribution_mode,
+        goal_distribution_mode=branch_spec.goal_distribution_mode,
+    )
+    return (
+        agents,
+        f"start_distribution={branch_spec.start_distribution_mode} | goal_distribution={branch_spec.goal_distribution_mode}",
+    )
+
+
 def fallback_build_dynamic_loop(
     base_matrix: list[list[int]],
     dynamic_density: float,
@@ -221,18 +284,55 @@ def prepare_static_run_context(
     map_seed = seed_for(branch_spec.map_type, seed_base, "map", agent_number, run_index)
     assignment_seed = seed_for(branch_spec.map_type, seed_base, "assign", agent_number, run_index)
 
-    base_map = create_base_map(
-        base_rows=branch_spec.base_rows or 25,
-        base_cols=branch_spec.base_cols or 25,
-        obstacle_ratio=branch_spec.static_obstacle_density or 0.40,
-        rng=random.Random(map_seed),
-    )
+    if branch_spec.image_path is None:
+        base_map = create_base_map(
+            base_rows=branch_spec.base_rows or 25,
+            base_cols=branch_spec.base_cols or 25,
+            obstacle_ratio=branch_spec.static_obstacle_density or 0.40,
+            rng=random.Random(map_seed),
+        )
+        allowed_spawn_vertices = None
+        zone_vertices_by_id: dict[int, set[tuple[int, int]]] = {}
+        map_identifier = f"artificial_{branch_spec.base_rows}x{branch_spec.base_cols}_seed_{map_seed}"
+        map_note = "Fresh artificial map for this run configuration."
+    else:
+        if branch_spec.spawnable_cell_mode == "zone_colors_only":
+            campus_semantics = load_campus_semantic_masks(
+                image_path=branch_spec.image_path,
+                resize_longest_side=branch_spec.image_resize_longest_side,
+            )
+            obstacle_matrix = campus_semantics["traversable_matrix"]
+            base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix)
+            allowed_spawn_vertices = _filter_free_vertex_positions(
+                base_map,
+                _spawn_mask_to_composite_positions(campus_semantics["zone_spawn_mask"]),
+            )
+            zone_vertices_by_id = _filter_zone_vertices_by_assignment_map(
+                base_map,
+                _zone_id_matrix_to_composite_positions(campus_semantics["zone_id_matrix"]),
+            )
+            map_note = "Static image-based campus map loaded with semantic zone masks."
+        else:
+            obstacle_matrix = load_port_obstacle_matrix(
+                image_path=branch_spec.image_path,
+                threshold=branch_spec.image_threshold,
+                resize_longest_side=branch_spec.image_resize_longest_side,
+            )
+            base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix)
+            allowed_spawn_vertices = None
+            zone_vertices_by_id = {}
+            map_note = "Static image-based thresholded map loaded for this run configuration."
+        map_identifier = f"{branch_spec.map_type}_static_image_seed_{map_seed}"
+
     classical_map = apply_classical_mapping({"map": base_map})["map"]
     cyclic_map = apply_cyclic_mapping({"map": base_map})["map"]
-    agents = sample_agent_start_goal_pairs(
-        composite_map=base_map,
+    agents, assignment_note = _sample_agents_for_branch(
+        branch_spec=branch_spec,
+        composite_map=classical_map,
         num_agents=agent_number,
         rng=random.Random(assignment_seed),
+        allowed_spawn_vertices=allowed_spawn_vertices,
+        zone_vertices_by_id=zone_vertices_by_id,
     )
     run_config = RunConfiguration(
         branch_id=branch_spec.branch_id,
@@ -244,13 +344,13 @@ def prepare_static_run_context(
         agent_number_index=agent_number_index,
         run_index=run_index,
         run_config_id=f"run[{branch_spec.branch_decimal}.{agent_number_index}.{run_index}]",
-        map_identifier=f"artificial_{branch_spec.base_rows}x{branch_spec.base_cols}_seed_{map_seed}",
+        map_identifier=map_identifier,
         map_seed=map_seed,
         assignment_seed=assignment_seed,
         dynamic_schedule_seed=None,
         paired_source=False,
         starts_and_goals=_serialize_agents(agents),
-        notes="Fresh artificial map for this run configuration.",
+        notes=f"{map_note} {assignment_note}",
     )
     return PreparedRunContext(
         run_configuration=run_config,
@@ -453,64 +553,15 @@ def prepare_dynamic_run_context(
 ) -> PreparedRunContext:
     assignment_seed = seed_for(branch_spec.map_type, seed_base, "assign", agent_number, run_index)
     assignment_rng = random.Random(assignment_seed)
-    run_note = "Shared dynamic map source; unique initial conditions for this run."
-
-    if branch_spec.single_cell_target:
-        if not dynamic_state.zone_vertices_by_id:
-            raise ValueError("single_cell_target mode requires campus zone vertices on the assignment map.")
-
-        zone_ids = list(dynamic_state.zone_vertices_by_id.keys())
-        assignment_rng.shuffle(zone_ids)
-        agents = None
-        selected_zone_id = None
-        last_error: Exception | None = None
-
-        for target_zone_id in zone_ids:
-            allowed_goal_vertices = dynamic_state.zone_vertices_by_id[target_zone_id]
-            allowed_start_vertices: set[tuple[int, int]] = set()
-            for other_zone_id, other_zone_vertices in dynamic_state.zone_vertices_by_id.items():
-                if other_zone_id == target_zone_id:
-                    continue
-                allowed_start_vertices.update(other_zone_vertices)
-
-            if len(allowed_start_vertices) < agent_number:
-                continue
-
-            try:
-                agents = sample_agent_start_goal_pairs(
-                    composite_map=dynamic_state.assignment_map,
-                    num_agents=agent_number,
-                    rng=assignment_rng,
-                    require_individual_reachability=True,
-                    allowed_start_vertices=allowed_start_vertices,
-                    allowed_goal_vertices=allowed_goal_vertices,
-                    shared_goal=True,
-                )
-                selected_zone_id = target_zone_id
-                break
-            except ValueError as exc:
-                last_error = exc
-                continue
-
-        if agents is None:
-            if last_error is not None:
-                raise last_error
-            raise ValueError(
-                "Could not sample a valid single-cell-target campus run configuration with starts outside the target zone."
-            )
-
-        run_note = (
-            "Shared dynamic map source; unique initial conditions for this run. "
-            f"Campus single-cell-target mode active | target_zone={selected_zone_id}."
-        )
-    else:
-        agents = sample_agent_start_goal_pairs(
-            composite_map=dynamic_state.assignment_map,
-            num_agents=agent_number,
-            rng=assignment_rng,
-            require_individual_reachability=True,
-            allowed_spawn_vertices=dynamic_state.allowed_spawn_vertices,
-        )
+    agents, assignment_note = _sample_agents_for_branch(
+        branch_spec=branch_spec,
+        composite_map=dynamic_state.assignment_map,
+        num_agents=agent_number,
+        rng=assignment_rng,
+        allowed_spawn_vertices=dynamic_state.allowed_spawn_vertices,
+        zone_vertices_by_id=dynamic_state.zone_vertices_by_id,
+    )
+    run_note = f"Shared dynamic map source; unique initial conditions for this run. {assignment_note}"
 
     run_config = RunConfiguration(
         branch_id=branch_spec.branch_id,

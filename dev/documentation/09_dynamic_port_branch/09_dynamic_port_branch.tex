@@ -1,0 +1,67 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Dynamic Port Branch}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Purpose}
+
+The \texttt{dynamic\_port} branch is the generic image-based dynamic branch without campus-specific semantic colors. It remains the main time-varying benchmark between the clean static branches and the more semantically structured campus branch.
+
+\section{Current Spatial Design}
+
+The branch now samples:
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{clustered starts},
+    \item \textbf{dispersed one-to-one goals}.
+\end{itemize}
+
+So the branch no longer acts like a fully scattered dynamic baseline. It now studies what happens when one agent group begins from a local concentration and must spread toward dispersed destinations while the environment changes over time.
+
+\section{Map Preparation}
+
+This branch uses ordinary thresholded image loading rather than campus semantic colors. It also still applies static-density preprocessing before dynamic loop generation. In that sense, it remains the most generic dynamic image branch in the repository.
+
+\section{Why This Branch Still Matters}
+
+The port branch is now useful for isolating the interaction between:
+\begin{itemize}[leftmargin=2em]
+    \item clustered initial congestion,
+    \item dispersed destination pressure,
+    \item time-varying obstacle schedules,
+    \item classical vs.\ cyclic movement topology.
+\end{itemize}
+
+It therefore sits between the synthetic static baseline and the zone-constrained campus experiments.
+
+\end{document}

@@ -1,0 +1,116 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Solver Behavior and Result Semantics}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Static Solver}
+
+Static runs use standard Conflict-Based Search (CBS) with a low-level A* search. The implementation lives primarily in:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{dev/mapf/cbs\_solver.py},
+    \item \texttt{dev/mapf/mapf\_low\_level\_astar.py}.
+\end{itemize}
+
+The low-level search operates on the composite grid, so legality of motion depends on transition cells, not just free-space adjacency.
+
+\section{Dynamic Solver}
+
+Dynamic runs use separate time-expanded solvers:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{dev/mapf/time\_expanded\_cbs.py},
+    \item \texttt{dev/mapf/time\_expanded\_astar.py}.
+\end{itemize}
+
+The search state is:
+\[
+(\text{position},\text{time}).
+\]
+At time \(t\), the active movement graph is read from
+\[
+\texttt{mapped\_loop}[t \bmod L],
+\]
+where \(L\) is the loop length.
+
+\section{Conflict Model}
+
+Both static and dynamic CBS implementations detect:
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{vertex conflicts}: two agents occupying the same vertex at the same time,
+    \item \textbf{edge conflicts}: two agents swapping across the same connection at the same time.
+\end{itemize}
+
+\section{Disappearing-Agent Model}
+
+Once an agent reaches its final path position, it is no longer considered present for later conflict checks. This makes the system behave like a disappearing-agent MAPF model rather than a stay-at-goal blocking model.
+
+This assumption still matters in the current clustered-target branches because agents reaching a compact goal region disappear instead of continuing to block that region for everyone behind them.
+
+\section{Runtime and Progress Reporting}
+
+The solver callbacks report elapsed time in roughly five-second increments. This is mainly for visibility during long runs. The relevant constant is currently defined in \texttt{experiments/study/constants.py}.
+
+\section{Solver Status vs.\ Experimental Category}
+
+The low-level solver status is \emph{not} the same thing as the experimental reporting category. The current mapping is:
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+solver status & experimental category \\
+\midrule
+\texttt{solved} & \texttt{successful} \\
+\texttt{bad\_setup\_timeout} & \texttt{unfinished} \\
+\texttt{no\_solution} & \texttt{unsolvable} \\
+exception/setup failure & \texttt{setup\_failed} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Why \texttt{bad\_setup\_timeout} Becomes \texttt{unfinished}}
+
+The project interprets a runtime cap as ``solver halted before completing useful search'' rather than as a proof that the instance is unsolvable. Therefore, timeout-style failures are retained as \texttt{unfinished} and can still count toward the paired quota.
+
+\section{Recorded Per-Run Metrics}
+
+When available, a mapping record stores:
+\begin{itemize}[leftmargin=2em]
+    \item halted computation time,
+    \item number of detected conflicts at halt,
+    \item average path length,
+    \item number of high-level CBS nodes expanded,
+    \item run identifiers and seed metadata.
+\end{itemize}
+
+Average path length is computed only when solution paths exist. It is derived from total solution cost divided by the number of agents.
+
+\end{document}

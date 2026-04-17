@@ -1,0 +1,124 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Repository Map and Active Code Paths}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Current Entry Path}
+
+The intended way to run the project is:
+\begin{lstlisting}
+python -m dev.main
+\end{lstlisting}
+
+The active call chain is:
+\begin{lstlisting}
+dev/main.py
+-> dev/experiments/generalized_study.py
+-> dev/experiments/study/
+\end{lstlisting}
+
+\texttt{generalized\_study.py} is only a thin compatibility wrapper. The real orchestration lives in the \texttt{study} package.
+
+\section{Where the Important Logic Lives}
+
+\subsection{\texttt{dev/master\_config.py}}
+
+This is the single user-editable configuration file. It defines:
+\begin{itemize}[leftmargin=2em]
+    \item which branch is active via \texttt{MAP\_TYPE},
+    \item the global limit on consecutive failed paired sampling attempts,
+    \item all branch-specific numeric parameters and toggles.
+\end{itemize}
+
+\subsection{\texttt{dev/experiments/branch\_specs.py}}
+
+This file converts user config dictionaries into normalized branch specifications. In practice, many parts of the runner depend on the \texttt{BranchSpec} dataclass rather than directly reading raw config dictionaries.
+
+\subsection{\texttt{dev/experiments/study/}}
+
+This is the active experiment engine. Its submodules are separated by responsibility:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{models.py}: dataclasses for run configurations, run records, aggregates, and dynamic state,
+    \item \texttt{preparation.py}: branch-aware setup logic,
+    \item \texttt{runtime.py}: solver execution and result-category conversion,
+    \item \texttt{aggregation.py}: condition-level summaries,
+    \item \texttt{plotting.py}: metric graphs,
+    \item \texttt{io\_utils.py}: output folder management and JSON/CSV writing,
+    \item \texttt{logging\_utils.py}: console/log formatting,
+    \item \texttt{visualization.py}: selection and rendering of final Pillow exports,
+    \item \texttt{orchestrator.py}: the main control flow.
+\end{itemize}
+
+\subsection{\texttt{dev/mapf/}}
+
+This folder contains the actual planning code:
+\begin{itemize}[leftmargin=2em]
+    \item static CBS and low-level A*,
+    \item time-expanded CBS and low-level A*,
+    \item conflict metrics,
+    \item frame builders and image loggers.
+\end{itemize}
+
+\subsection{\texttt{dev/maps/} and \texttt{dev/navigation/}}
+
+These modules implement the map representation, mapping overlays, cyclic cleanup, connectivity restoration, and neighbor-generation semantics over composite grids.
+
+\subsection{\texttt{dev/inputs/}}
+
+Image-based branches depend on this folder. The current dynamic input logic supports both ordinary thresholded port loading and campus semantic-color loading.
+
+\section{Legacy vs.\ Active Code}
+
+The project still contains older branch-specific pipeline modules such as:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{dev/experiments/static\_artificial/pipeline.py},
+    \item \texttt{dev/experiments/dynamic\_port/pipeline.py}.
+\end{itemize}
+
+These are useful references for branch intent, but the current top-level execution path does \emph{not} go through them. When updating the project, changes that affect current behavior should usually be made under:
+\[
+\texttt{master\_config.py},\quad
+\texttt{experiments/branch\_specs.py},\quad
+\texttt{experiments/study/}.
+\]
+
+\section{Output Contract}
+
+All active experiment outputs are written under:
+\[
+\texttt{dev/outputs/<map\_type>/}
+\]
+with subfolders for metadata, records, aggregates, graphs, logs, and visualizations. This output shape is now part of the practical contract of the project.
+
+\end{document}

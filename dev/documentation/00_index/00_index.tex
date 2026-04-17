@@ -1,0 +1,79 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Project Documentation Index for \texttt{dev}}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Purpose of this Folder}
+
+This folder is a compact but human-readable description of the current \texttt{dev} codebase. It is meant to help a reader, or an LLM that is about to modify the repository, understand the project at the level of design intent, invariants, execution flow, and branch-specific semantics.
+
+It is \emph{not} a full thesis-style documentation set. It deliberately focuses on the parts that are easy to miss when reading source code line by line:
+\begin{itemize}[leftmargin=2em]
+    \item what the project is trying to compare,
+    \item why the code is organized the way it is,
+    \item what assumptions the experiment runner enforces,
+    \item which branch semantics are special,
+    \item and which project contracts should be preserved when updating the code.
+\end{itemize}
+
+\section{Important Reading Notes}
+
+This folder describes the \textbf{latest current version} of the project only. It does not try to preserve older superseded behavior.
+
+A few global facts are worth knowing before reading the rest:
+\begin{itemize}[leftmargin=2em]
+    \item The current top-level entry point is \texttt{python -m dev.main}.
+    \item The active experiment driver is the generalized study runner under \texttt{dev/experiments/study/}.
+    \item \texttt{dev/master\_config.py} is the single intended user-editable configuration file.
+    \item Dynamic branches prepare one shared dynamic map state for the whole branch execution.
+    \item The experiment compares \textbf{classical mapping} and \textbf{cyclic mapping}, not two different planning algorithms.
+\end{itemize}
+
+\section{Recommended Reading Order}
+
+\begin{enumerate}[leftmargin=2em]
+    \item \texttt{01\_overview} for the big picture.
+    \item \texttt{02\_repository\_map} for where the active code lives.
+    \item \texttt{03\_composite\_grid} and \texttt{04\_mapping\_system} for the core representation.
+    \item \texttt{05\_solver\_behavior} and \texttt{06\_experiment\_protocol} for execution semantics.
+    \item \texttt{07\_static\_artificial\_branch}, \texttt{08\_dynamic\_shared\_pipeline}, \texttt{09\_dynamic\_port\_branch}, and \texttt{10\_dynamic\_campus\_branches} for branch-specific details.
+    \item \texttt{11\_outputs\_and\_visualization} and \texttt{12\_current\_configuration} for current output and config contracts.
+    \item \texttt{13\_update\_guidelines} and \texttt{14\_troubleshooting} before making changes.
+\end{enumerate}
+
+\section{Scope Boundary}
+
+These documents assume the reader can still inspect the code. Therefore, they do not duplicate every implementation detail. The aim is to expose the \emph{shape} of the system, the \emph{meaning} of its branches and metrics, and the \emph{assumptions that should survive future updates}.
+
+\end{document}

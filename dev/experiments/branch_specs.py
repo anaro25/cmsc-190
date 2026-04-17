@@ -30,7 +30,10 @@ class BranchSpec:
     require_jointly_successful_mappings: bool
     path_length_graph_enabled: bool
     is_dynamic: bool
-    single_cell_target: bool = False
+    start_distribution_mode: str = "dispersed"
+    goal_distribution_mode: str = "dispersed"
+    require_individual_reachability: bool = False
+    zone_relationship_mode: str = "none"
     base_rows: int | None = None
     base_cols: int | None = None
     static_obstacle_density: float | None = None
@@ -63,22 +66,21 @@ def expand_agent_number_range(agent_number_range: AgentNumberRange) -> list[int]
     return list(range(start, max_agent_number + 1, step))
 
 
-def _campus_target_type(config: dict[str, Any]) -> str:
-    return "single_cell_target" if bool(config.get("single_cell_target", False)) else "scattered_targets"
+def _goal_type(config: dict[str, Any]) -> str:
+    goal_distribution_mode = str(config.get("goal_distribution_mode", "dispersed"))
+    return "clustered_targets" if goal_distribution_mode == "clustered" else "dispersed_targets"
 
 
 def _build_branch_specs() -> dict[str, BranchSpec]:
     static_cfg = BRANCH_USER_CONFIGS["static_artificial"]
+    static_campus_2_cfg = BRANCH_USER_CONFIGS["static_campus_area_2"]
     port_cfg = BRANCH_USER_CONFIGS["dynamic_port"]
     campus_1_cfg = BRANCH_USER_CONFIGS["dynamic_campus_area_1"]
-    campus_2_cfg = BRANCH_USER_CONFIGS["dynamic_campus_area_2"]
 
     static_range = tuple(static_cfg["agent_number_range"])
+    static_campus_2_range = tuple(static_campus_2_cfg["agent_number_range"])
     port_range = tuple(port_cfg["agent_number_range"])
     campus_1_range = tuple(campus_1_cfg["agent_number_range"])
-    campus_2_range = tuple(campus_2_cfg["agent_number_range"])
-    campus_1_target_type = _campus_target_type(campus_1_cfg)
-    campus_2_target_type = _campus_target_type(campus_2_cfg)
 
     return {
         "static_artificial": BranchSpec(
@@ -89,8 +91,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             map_obstacle_index=0,
             map_type_index=0,
             display_name="Static Artificial",
-            target_type_documented="scattered_targets",
-            target_type_active="scattered_targets",
+            target_type_documented=_goal_type(static_cfg),
+            target_type_active=_goal_type(static_cfg),
             seed_base=int(static_cfg["seed"]),
             agent_number_range=static_range,
             agent_numbers=expand_agent_number_range(static_range),
@@ -100,13 +102,50 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(static_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=False,
+            start_distribution_mode=str(static_cfg.get("start_distribution_mode", "dispersed")),
+            goal_distribution_mode=str(static_cfg.get("goal_distribution_mode", "dispersed")),
+            require_individual_reachability=bool(static_cfg.get("require_individual_reachability", False)),
+            zone_relationship_mode=str(static_cfg.get("zone_relationship_mode", "none")),
             base_rows=int(static_cfg["map_size"][0]),
             base_cols=int(static_cfg["map_size"][1]),
             static_obstacle_density=float(static_cfg["static_obstacle_density"]),
             notes=(
-                "Fresh artificial map per run configuration. Scattered targets are used. "
+                "Fresh artificial map per run configuration. Starts and goals are both dispersed one-to-one sets. "
                 "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
                 "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
+            ),
+        ),
+        "static_campus_area_2": BranchSpec(
+            map_type="static_campus_area_2",
+            branch_id="static_campus_area_2",
+            branch_decimal="0.1",
+            map_obstacle_type="static",
+            map_obstacle_index=0,
+            map_type_index=1,
+            display_name="Static Campus Area 2",
+            target_type_documented=_goal_type(static_campus_2_cfg),
+            target_type_active=_goal_type(static_campus_2_cfg),
+            seed_base=int(static_campus_2_cfg["seed"]),
+            agent_number_range=static_campus_2_range,
+            agent_numbers=expand_agent_number_range(static_campus_2_range),
+            runtime_limit_seconds=float(static_campus_2_cfg["time_limit_seconds"]),
+            counted_runs_required=int(static_campus_2_cfg["counted_runs_required"]),
+            num_last_runs_to_visualize=int(static_campus_2_cfg.get("num_last_runs_to_visualize", 0)),
+            require_jointly_successful_mappings=bool(static_campus_2_cfg.get("require_jointly_successful_mappings", True)),
+            path_length_graph_enabled=True,
+            is_dynamic=False,
+            start_distribution_mode=str(static_campus_2_cfg.get("start_distribution_mode", "dispersed")),
+            goal_distribution_mode=str(static_campus_2_cfg.get("goal_distribution_mode", "dispersed")),
+            require_individual_reachability=bool(static_campus_2_cfg.get("require_individual_reachability", False)),
+            zone_relationship_mode=str(static_campus_2_cfg.get("zone_relationship_mode", "none")),
+            image_path=str(static_campus_2_cfg["image_path"]),
+            image_threshold=int(static_campus_2_cfg["image_threshold"]),
+            dynamic_generation_cell_mode=str(static_campus_2_cfg.get("dynamic_generation_cell_mode", "zone_colors_only")),
+            spawnable_cell_mode=str(static_campus_2_cfg.get("spawnable_cell_mode", "zone_colors_only")),
+            notes=(
+                "Static image-based campus branch with explicit zone-color semantics. Starts are dispersed in one zone, "
+                "targets are clustered in a different zone, and assignments remain one-to-one. Zone colors are traversable "
+                "and spawnable, white walkways are traversable but non-spawnable, and gray is non-traversable."
             ),
         ),
         "dynamic_port": BranchSpec(
@@ -117,8 +156,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             map_obstacle_index=1,
             map_type_index=0,
             display_name="Dynamic Port",
-            target_type_documented="scattered_targets",
-            target_type_active="scattered_targets",
+            target_type_documented=_goal_type(port_cfg),
+            target_type_active=_goal_type(port_cfg),
             seed_base=int(port_cfg["seed"]),
             agent_number_range=port_range,
             agent_numbers=expand_agent_number_range(port_range),
@@ -128,6 +167,10 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(port_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=True,
+            start_distribution_mode=str(port_cfg.get("start_distribution_mode", "dispersed")),
+            goal_distribution_mode=str(port_cfg.get("goal_distribution_mode", "dispersed")),
+            require_individual_reachability=bool(port_cfg.get("require_individual_reachability", True)),
+            zone_relationship_mode=str(port_cfg.get("zone_relationship_mode", "none")),
             image_path=str(port_cfg["image_path"]),
             image_threshold=int(port_cfg["image_threshold"]),
             image_resize_longest_side=(
@@ -140,9 +183,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_generation_cell_mode=str(port_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(port_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
-                "Image-based dynamic branch with scattered targets. Retained pairs are the run "
-                "configurations for which both mappings are classified as successful or unfinished. "
-                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
+                "Image-based dynamic branch with clustered starts and dispersed one-to-one targets. Retained pairs are the run "
+                "configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated "
+                "from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),
         "dynamic_campus_area_1": BranchSpec(
@@ -151,10 +194,10 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             branch_decimal="1.1",
             map_obstacle_type="dynamic",
             map_obstacle_index=1,
-            map_type_index=1,
+            map_type_index=2,
             display_name="Dynamic Campus Area 1",
-            target_type_documented=campus_1_target_type,
-            target_type_active=campus_1_target_type,
+            target_type_documented=_goal_type(campus_1_cfg),
+            target_type_active=_goal_type(campus_1_cfg),
             seed_base=int(campus_1_cfg["seed"]),
             agent_number_range=campus_1_range,
             agent_numbers=expand_agent_number_range(campus_1_range),
@@ -164,7 +207,10 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(campus_1_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=True,
-            single_cell_target=bool(campus_1_cfg.get("single_cell_target", False)),
+            start_distribution_mode=str(campus_1_cfg.get("start_distribution_mode", "dispersed")),
+            goal_distribution_mode=str(campus_1_cfg.get("goal_distribution_mode", "dispersed")),
+            require_individual_reachability=bool(campus_1_cfg.get("require_individual_reachability", True)),
+            zone_relationship_mode=str(campus_1_cfg.get("zone_relationship_mode", "none")),
             image_path=str(campus_1_cfg["image_path"]),
             image_threshold=int(campus_1_cfg["image_threshold"]),
             dynamic_target_static_obstacle_density=(
@@ -176,45 +222,10 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_generation_cell_mode=str(campus_1_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(campus_1_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
-                "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, "
-                "white walkways are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles "
-                "are generated only inside the zone colors. The target mode is controlled by single_cell_target."
-            ),
-        ),
-        "dynamic_campus_area_2": BranchSpec(
-            map_type="dynamic_campus_area_2",
-            branch_id="dynamic_campus_area_2",
-            branch_decimal="1.2",
-            map_obstacle_type="dynamic",
-            map_obstacle_index=1,
-            map_type_index=2,
-            display_name="Dynamic Campus Area 2",
-            target_type_documented=campus_2_target_type,
-            target_type_active=campus_2_target_type,
-            seed_base=int(campus_2_cfg["seed"]),
-            agent_number_range=campus_2_range,
-            agent_numbers=expand_agent_number_range(campus_2_range),
-            runtime_limit_seconds=float(campus_2_cfg["time_limit_seconds"]),
-            counted_runs_required=int(campus_2_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize=int(campus_2_cfg.get("num_last_runs_to_visualize", 0)),
-            require_jointly_successful_mappings=bool(campus_2_cfg.get("require_jointly_successful_mappings", True)),
-            path_length_graph_enabled=True,
-            is_dynamic=True,
-            single_cell_target=bool(campus_2_cfg.get("single_cell_target", False)),
-            image_path=str(campus_2_cfg["image_path"]),
-            image_threshold=int(campus_2_cfg["image_threshold"]),
-            dynamic_target_static_obstacle_density=(
-                None if campus_2_cfg.get("target_static_obstacle_density") is None else float(campus_2_cfg["target_static_obstacle_density"])
-            ),
-            dynamic_target_dynamic_obstacle_density=float(campus_2_cfg["target_dynamic_obstacle_density"]),
-            dynamic_loop_sequence_length=int(campus_2_cfg["loop_sequence_length"]),
-            dynamic_group_stay_durations=tuple(campus_2_cfg["group_stay_durations"]),
-            dynamic_generation_cell_mode=str(campus_2_cfg.get("dynamic_generation_cell_mode", "all_free")),
-            spawnable_cell_mode=str(campus_2_cfg.get("spawnable_cell_mode", "all_free")),
-            notes=(
-                "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, "
-                "white walkways are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles "
-                "are generated only inside the zone colors. The target mode is controlled by single_cell_target."
+                "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways "
+                "are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles are generated only inside the "
+                "zone colors. Starts and targets are both clustered, assignments stay one-to-one, and the two clusters must come "
+                "from different campus zones."
             ),
         ),
     }

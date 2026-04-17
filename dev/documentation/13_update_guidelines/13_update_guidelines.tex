@@ -1,0 +1,110 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue
+}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Guidelines for Updating the Project Safely}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Where to Make Changes First}
+
+When modifying current behavior, the safest order of inspection is:
+\begin{enumerate}[leftmargin=2em]
+    \item \texttt{master\_config.py},
+    \item \texttt{experiments/branch\_specs.py},
+    \item \texttt{experiments/study/preparation.py},
+    \item \texttt{mapf/agent\_assignment.py},
+    \item \texttt{experiments/study/orchestrator.py},
+    \item the relevant solver or mapping modules,
+    \item \texttt{experiments/study/aggregation.py}, \texttt{plotting.py}, and \texttt{visualization.py} if outputs also change.
+\end{enumerate}
+
+\section{Invariants Worth Preserving}
+
+\subsection{Paired Fairness Contract}
+Do not accidentally compare classical and cyclic on different retained configurations for a reported condition. The current project deliberately discards jointly non-viable samples instead.
+
+\subsection{Dynamic Shared-State Contract}
+Dynamic branches are meant to share one prepared dynamic environment across the whole branch execution. If that is changed, the meaning of the experiment changes.
+
+\subsection{Status-to-Category Contract}
+The runner currently treats:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{solved} as successful,
+    \item \texttt{bad\_setup\_timeout} as unfinished,
+    \item \texttt{no\_solution} as unsolvable.
+\end{itemize}
+Changing this mapping would change reported metrics and stopping behavior.
+
+\subsection{Campus Semantic Contract}
+The campus branches depend on semantic colors, not just thresholding. Any update to campus input processing should preserve the meanings of zone colors, white walkways, and gray regions unless the experiment design itself is intentionally changed.
+
+\subsection{One-to-One Assignment Contract}
+All current branches are one-to-one MAPF branches. Do not silently reintroduce many-to-one or one-to-many assignment semantics under a misleading flag name.
+
+\subsection{Output Contract}
+Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change.
+
+\section{When Adding a New Branch}
+
+A new branch usually requires coordinated updates in at least:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{master\_config.py},
+    \item \texttt{experiments/branch\_specs.py},
+    \item \texttt{experiments/study/preparation.py},
+    \item possibly \texttt{visualization.py},
+    \item and potentially loader logic under \texttt{inputs/}.
+\end{itemize}
+
+\section{When Changing Sampling Rules}
+
+Sampling logic is branch-sensitive. Before changing it, check:
+\begin{itemize}[leftmargin=2em]
+    \item whether starts and goals must remain unique,
+    \item whether the branch requires individual reachability,
+    \item whether the branch expects \texttt{dispersed} or \texttt{clustered} start placement,
+    \item whether the branch expects \texttt{dispersed} or \texttt{clustered} goal placement,
+    \item whether the branch requires starts and goals to occupy different campus zones,
+    \item whether the allowed start and goal vertices come from an image-semantic mask,
+    \item whether the 8-neighbor clearance rule is still being enforced.
+\end{itemize}
+
+\section{A Good Mental Rule}
+
+A safe update usually preserves the separation:
+\[
+\text{configuration} \rightarrow \text{normalized branch spec} \rightarrow
+\text{preparation} \rightarrow \text{solver execution} \rightarrow
+\text{aggregation/output}.
+\]
+If a change smears all of those layers together, the project becomes much harder to maintain.
+
+\end{document}
