@@ -43,13 +43,13 @@ If a campus run reports something that implies zero usable zones, such as a log 
 If a branch repeatedly fails during assignment preparation, inspect the interaction among:
 \begin{itemize}[leftmargin=2em]
     \item requested agent count,
-    \item 8-neighbor clearance,
+    \item whether the branch is using dispersed separation or directly adjacent cluster mode,
     \item cluster mode,
     \item zone restriction,
     \item reachability filtering.
 \end{itemize}
 
-A cluster request is intentionally loose, but it can still fail if one zone is too narrow or too fragmented for the requested count under the clearance rule.
+A cluster request is intentionally loose, but it can still fail if one zone is too narrow or too fragmented to fit the requested count as one directly adjacent component.
 
 \section{Distinct-Zone Campus Sampling Fails}
 

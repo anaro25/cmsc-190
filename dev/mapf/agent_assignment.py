@@ -56,12 +56,41 @@ def _vertices_conflict_under_clearance(vertex_a, vertex_b):
     return row_delta <= VERTEX_ADJACENCY_CLEARANCE and col_delta <= VERTEX_ADJACENCY_CLEARANCE
 
 
+def _vertices_are_direct_neighbors(vertex_a, vertex_b):
+    row_delta = abs(vertex_a[0] - vertex_b[0])
+    col_delta = abs(vertex_a[1] - vertex_b[1])
+    return (row_delta != 0 or col_delta != 0) and row_delta <= 2 and col_delta <= 2
+
+
 def _subset_respects_clearance(vertices):
     for index, vertex in enumerate(vertices):
         for other in vertices[index + 1 :]:
             if _vertices_conflict_under_clearance(vertex, other):
                 return False
     return True
+
+
+def _subset_is_connected_cluster(vertices):
+    if not vertices:
+        return False
+    if len(vertices) == 1:
+        return True
+
+    remaining = set(vertices)
+    stack = [remaining.pop()]
+    visited = {stack[0]}
+    while stack:
+        current = stack.pop()
+        newly_reached = {
+            other
+            for other in tuple(remaining)
+            if _vertices_are_direct_neighbors(current, other)
+        }
+        if newly_reached:
+            remaining -= newly_reached
+            visited |= newly_reached
+            stack.extend(newly_reached)
+    return len(visited) == len(vertices)
 
 
 def _greedy_clearance_subset(candidates, num_vertices):
@@ -90,22 +119,40 @@ def _sample_clustered_vertices(vertices, num_vertices, rng):
     if not vertices:
         raise ValueError("No candidate vertices are available for clustered sampling.")
 
+    if num_vertices == 1:
+        return [rng.choice(vertices)]
+
+    vertex_set = set(vertices)
     centers = vertices[:]
     rng.shuffle(centers)
     for center in centers[: min(len(centers), MAX_ASSIGNMENT_ATTEMPTS)]:
-        ordered_candidates = sorted(
-            vertices,
-            key=lambda vertex: (
-                (vertex[0] - center[0]) ** 2 + (vertex[1] - center[1]) ** 2,
-                rng.random(),
-            ),
-        )
-        chosen = _greedy_clearance_subset(ordered_candidates, num_vertices)
-        if chosen is not None:
+        chosen = [center]
+        chosen_set = {center}
+
+        while len(chosen) < num_vertices:
+            frontier = []
+            for candidate in vertex_set - chosen_set:
+                touching_vertices = sum(
+                    1 for existing in chosen if _vertices_are_direct_neighbors(candidate, existing)
+                )
+                if touching_vertices == 0:
+                    continue
+                distance_sq = (candidate[0] - center[0]) ** 2 + (candidate[1] - center[1]) ** 2
+                frontier.append((distance_sq, -touching_vertices, rng.random(), candidate))
+
+            if not frontier:
+                break
+
+            frontier.sort()
+            next_vertex = frontier[0][3]
+            chosen.append(next_vertex)
+            chosen_set.add(next_vertex)
+
+        if len(chosen) == num_vertices and _subset_is_connected_cluster(chosen):
             return chosen
 
     raise ValueError(
-        f"Could not sample {num_vertices} clustered vertices with 8-neighbor clearance."
+        f"Could not sample {num_vertices} clustered vertices as one directly adjacent component."
     )
 
 
@@ -200,8 +247,8 @@ def sample_agent_start_goal_pairs(
         * starts and goals remain unique one-to-one positions when shared_goal=False
         * start != goal for each agent
         * when require_individual_reachability=True, each assigned start-goal pair must be reachable
-        * starts respect 8-neighbor clearance among themselves
-        * goals respect 8-neighbor clearance among themselves
+        * dispersed sets respect 8-neighbor clearance internally
+        * clustered sets form one directly adjacent 8-neighbor component internally
         * clustered/dispersed controls only how each set is positioned, not assignment cardinality
     """
     if rng is None:
@@ -226,7 +273,9 @@ def sample_agent_start_goal_pairs(
 
     for _ in range(MAX_ASSIGNMENT_ATTEMPTS):
         starts = _sample_vertex_subset(start_vertices, num_agents, rng, start_distribution_mode)
-        if not _subset_respects_clearance(starts):
+        if start_distribution_mode == "dispersed" and not _subset_respects_clearance(starts):
+            continue
+        if start_distribution_mode == "clustered" and not _subset_is_connected_cluster(starts):
             continue
 
         remaining_goal_vertices = [vertex for vertex in goal_vertices if vertex not in set(starts)]
@@ -234,7 +283,9 @@ def sample_agent_start_goal_pairs(
             continue
 
         goals = _sample_vertex_subset(remaining_goal_vertices, num_agents, rng, goal_distribution_mode)
-        if not _subset_respects_clearance(goals):
+        if goal_distribution_mode == "dispersed" and not _subset_respects_clearance(goals):
+            continue
+        if goal_distribution_mode == "clustered" and not _subset_is_connected_cluster(goals):
             continue
 
         paired_goals = _pair_starts_and_goals(

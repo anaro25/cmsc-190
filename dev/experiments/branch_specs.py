@@ -144,7 +144,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             spawnable_cell_mode=str(static_campus_2_cfg.get("spawnable_cell_mode", "zone_colors_only")),
             notes=(
                 "Static image-based campus branch with explicit zone-color semantics. Starts are dispersed in one zone, "
-                "targets are clustered in a different zone, and assignments remain one-to-one. Zone colors are traversable "
+                "targets are sampled as one directly adjacent cluster in a different zone, and assignments remain one-to-one. Zone colors are traversable "
                 "and spawnable, white walkways are traversable but non-spawnable, and gray is non-traversable."
             ),
         ),
@@ -183,7 +183,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_generation_cell_mode=str(port_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(port_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
-                "Image-based dynamic branch with clustered starts and dispersed one-to-one targets. Retained pairs are the run "
+                "Image-based dynamic branch with clustered starts sampled as one directly adjacent group and dispersed one-to-one targets. Retained pairs are the run "
                 "configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated "
                 "from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
@@ -224,7 +224,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             notes=(
                 "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways "
                 "are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles are generated only inside the "
-                "zone colors. Starts and targets are both clustered, assignments stay one-to-one, and the two clusters must come "
+                "zone colors. Starts and targets are both sampled as directly adjacent clusters, assignments stay one-to-one, and the two clusters must come "
                 "from different campus zones."
             ),
         ),

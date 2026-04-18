@@ -125,5 +125,5 @@ pathological infinite loops. It remains only a protective implementation detail.
 - `static_campus_area_2` uses campus area 2 as a static branch with dispersed starts in one zone and clustered goals in the other zone.
 - `dynamic_port` now uses clustered starts and dispersed goals.
 - `dynamic_campus_area_1` now uses clustered starts and clustered goals, with the two clusters forced into different campus zones.
-- The assignment sampler now enforces 8-neighbor clearance within starts and within goals.
+- The assignment sampler now treats dispersed sets and clustered sets differently: dispersed sets keep 8-neighbor separation within the set, while clustered sets are sampled as directly adjacent 8-neighbor-connected groups.
 - Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize` and `require_jointly_successful_mappings` in `master_config.py`, so you can choose either the last jointly successful classical-cyclic pairs or the last successful runs of each mapping independently.

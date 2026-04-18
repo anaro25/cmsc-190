@@ -21,7 +21,7 @@ INPUTS_ROOT = PACKAGE_ROOT / "inputs"
 #
 # start_distribution_mode / goal_distribution_mode:
 # - "dispersed": unique one-to-one positions sampled across the allowed set
-# - "clustered": unique one-to-one positions concentrated in one general area
+# - "clustered": unique one-to-one positions sampled as one directly adjacent 8-neighbor-connected group
 #
 # zone_relationship_mode:
 # - "none": starts and goals may be sampled from the same allowed pool
@@ -78,7 +78,7 @@ STATIC_ARTIFICIAL_CONFIG = {
 
 STATIC_CAMPUS_AREA_2_CONFIG = {
     # common frequently edited constant
-    "agent_number_range": (8, 100, 2),
+    "agent_number_range": (10, 10, 2),
     "time_limit_seconds": 5.0,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,

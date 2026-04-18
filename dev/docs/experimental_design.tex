@@ -44,8 +44,8 @@ All branches now use one-to-one MAPF assignments. The experiment does not curren
 
 For the campus branches, zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, gray regions are non-traversable, and the dynamic campus branch generates dynamic obstacles only inside the zone colors.
 
-\section{Spacing Rule}
+\section{Placement Rule}
 
-Within a sampled run configuration, starts must be separated from other starts by at least one cell in all 8 directions, and goals must satisfy the same rule among themselves. Start-goal adjacency is allowed.
+Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally, while \texttt{clustered} sets are sampled as directly adjacent 8-neighbor-connected groups. Start-goal adjacency is allowed.
 
 \end{document}

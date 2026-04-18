@@ -111,11 +111,13 @@ A branch can request \texttt{dispersed} or \texttt{clustered} goals.
 \subsection{Zone Relationship Mode}
 Campus branches can require starts and goals to come from \emph{different} semantic zones. This is what forces transitions through bottlenecks and connectors rather than allowing both groups to occupy the same campus region.
 
-\subsection{Eight-Neighbor Clearance}
+\subsection{Mode-Dependent Internal Spacing}
 Within any one sampled run configuration:
 \begin{itemize}[leftmargin=2em]
-    \item no two starts may be adjacent by edge or vertex,
-    \item no two goals may be adjacent by edge or vertex,
+    \item \texttt{dispersed} starts avoid edge and vertex adjacency to other starts,
+    \item \texttt{dispersed} goals avoid edge and vertex adjacency to other goals,
+    \item \texttt{clustered} starts form one directly adjacent 8-neighbor-connected component,
+    \item \texttt{clustered} goals form one directly adjacent 8-neighbor-connected component,
     \item start-goal adjacency is allowed as long as the cells are not identical.
 \end{itemize}
 
