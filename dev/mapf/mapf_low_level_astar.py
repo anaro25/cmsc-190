@@ -60,9 +60,9 @@ def reconstruct_path(came_from, end_state):
     return path
 
 
-def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
+def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints, heuristic_weight=1.0):
     """
-    Low-level A* for CBS.
+    Low-level A* for CBS / ECBS.
 
     State:
         (vertex_position, time_step)
@@ -82,6 +82,7 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
         horizon to a conservative finite value based on map size plus the
         latest relevant constraint time.
     """
+    heuristic_weight = max(1.0, float(heuristic_weight))
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
     if violates_vertex_constraint(agent_constraints, start, 0):
@@ -101,12 +102,16 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
     came_from = {start_state: None}
     best_g = {start_state: 0}
 
-    start_f = manhattan_vertex_distance(start, goal)
+    start_h = manhattan_vertex_distance(start, goal)
+    start_f = start_h * heuristic_weight
     heapq.heappush(open_heap, (start_f, 0, next(counter), start_state))
 
     while open_heap:
         _, current_g, _, current_state = heapq.heappop(open_heap)
         current_position, current_time = current_state
+
+        if current_g != best_g.get(current_state):
+            continue
 
         if current_position == goal and current_time >= latest_constraint_time:
             return reconstruct_path(came_from, current_state)
@@ -141,7 +146,7 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints):
             came_from[next_state] = current_state
 
             h_value = manhattan_vertex_distance(next_position, goal)
-            f_value = tentative_g + h_value
+            f_value = tentative_g + (heuristic_weight * h_value)
 
             heapq.heappush(
                 open_heap,

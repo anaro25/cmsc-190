@@ -5,6 +5,7 @@ from typing import Any, Callable
 
 from dev.experiments.study.io_utils import ExperimentLogger
 from dev.experiments.study.models import MappingRunRecord, RunConfiguration
+from dev.master_config import enhanced_CBS
 from dev.mapf.cbs_solver import compute_solution_cost as compute_static_solution_cost
 from dev.mapf.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.time_expanded_cbs import compute_solution_cost as compute_dynamic_solution_cost
@@ -62,6 +63,9 @@ def build_mapping_record(
     mapping_name: str,
     comparison_case: str,
     runtime_limit_seconds: float,
+    solver_name: str,
+    enhanced_cbs_enabled: bool,
+    solver_suboptimality_factor: float | None,
     solver_result: dict[str, Any] | None,
     elapsed_seconds: float,
     solver_status: str | None,
@@ -107,6 +111,9 @@ def build_mapping_record(
             f"{run_configuration.agent_number_index}.{run_configuration.run_index}.{mapping_index}]"
         ),
         comparison_case=comparison_case,
+        solver_name=solver_name,
+        enhanced_cbs_enabled=enhanced_cbs_enabled,
+        solver_suboptimality_factor=solver_suboptimality_factor,
         paired_run=paired_run,
         solver_status=resolved_solver_status,
         result_category=result_category,
@@ -140,6 +147,7 @@ def run_static_mapping(
             agents=agents,
             max_runtime_seconds=runtime_limit_seconds,
             progress_callback=build_progress_callback(logger, label),
+            use_ecbs=bool(enhanced_CBS),
         )
         elapsed_seconds = time.perf_counter() - start
         return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")
@@ -163,6 +171,7 @@ def run_dynamic_mapping(
             agents=agents,
             max_runtime_seconds=runtime_limit_seconds,
             progress_callback=build_progress_callback(logger, label),
+            use_ecbs=bool(enhanced_CBS),
         )
         elapsed_seconds = time.perf_counter() - start
         return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")

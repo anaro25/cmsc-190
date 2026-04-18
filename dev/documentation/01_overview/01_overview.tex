@@ -42,16 +42,16 @@ The project is a Python package for experimenting with \textbf{multi-agent pathf
     \item \textbf{cyclic mapping}: local movement is biased by a directed cyclic pattern and then postprocessed so that obstacle contact and connectivity remain manageable.
 \end{itemize}
 
-The project is therefore not mainly about inventing a new high-level MAPF solver. Instead, it studies what happens when the \emph{same underlying planning problem family} is presented through two different movement topologies.
+The project is therefore not mainly about inventing a new high-level MAPF solver. Instead, it studies what happens when the \emph{same underlying planning problem family} is presented through two different movement topologies. The current code now keeps that mapping comparison while allowing one global switch between vanilla CBS and ECBS for the whole experiment.
 
 \section{What Is Being Compared}
 
 The comparison is organized across four branches:
 \begin{enumerate}[leftmargin=2em]
     \item \texttt{static\_artificial},
-    \item \texttt{static\_campus\_area\_2},
+    \item \texttt{static\_campus\_area\_1},
     \item \texttt{dynamic\_port},
-    \item \texttt{dynamic\_campus\_area\_1}.
+    \item \texttt{dynamic\_campus\_area\_2}.
 \end{enumerate}
 
 The branches differ in how maps are generated or loaded, how starts and goals are positioned, and whether the environment is static or time-varying. The common comparison axis is always:
@@ -95,7 +95,7 @@ At present, the code is best understood as a generalized branch runner with spec
     \item resolve a branch specification from \texttt{master\_config.py},
     \item prepare either a fresh static run context or a shared dynamic branch state,
     \item sample run configurations condition by condition,
-    \item solve each retained configuration under both mappings,
+    \item solve each retained configuration under both mappings using the currently selected global solver family,
     \item aggregate the retained paired results,
     \item write structured records, graphs, and selected Pillow visualizations.
 \end{enumerate}

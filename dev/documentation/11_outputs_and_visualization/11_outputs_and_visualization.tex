@@ -63,6 +63,17 @@ The most important structured outputs are:
     \item \texttt{aggregates/condition\_summary.json} and \texttt{.csv}.
 \end{itemize}
 
+The solver update makes two of those files more informative:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{branch\_spec.json} now records the effective solver family metadata for the whole branch run,
+    \item \texttt{run\_records.json}/\texttt{.csv} now record per-run solver metadata such as CBS vs.\ ECBS and the active suboptimality factor when ECBS is enabled.
+\end{itemize}
+
+
+\section{Logging Behavior}
+
+The experiment logger writes each line both to the branch log file and to stdout immediately. In practical terms, the periodic solver progress lines such as the 5-second classical/cyclic progress reports should now appear live during long runs instead of being buffered and dumped all at once later.
+
 \section{Graphs}
 
 Each accepted condition can contribute to up to three graphs:

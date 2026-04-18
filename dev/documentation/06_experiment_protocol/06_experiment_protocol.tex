@@ -60,9 +60,9 @@ The experiment uses explicit identifiers such as:
 The project also uses branch decimal labels such as:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{0.0} for \texttt{static\_artificial},
-    \item \texttt{0.1} for \texttt{static\_campus\_area\_2},
+    \item \texttt{0.1} for \texttt{static\_campus\_area\_1},
     \item \texttt{1.0} for \texttt{dynamic\_port},
-    \item \texttt{1.1} for \texttt{dynamic\_campus\_area\_1}.
+    \item \texttt{1.1} for \texttt{dynamic\_campus\_area\_2}.
 \end{itemize}
 
 \section{Paired Jointly Viable Sampling}
@@ -92,7 +92,7 @@ If either mapping returns \texttt{unsolvable}, the configuration is discarded an
 
 The branches do not all share maps in the same way:
 \begin{itemize}[leftmargin=2em]
-    \item \textbf{static branches}: a fresh static run context is prepared per run configuration. For \texttt{static\_artificial} this means a fresh artificial map; for \texttt{static\_campus\_area\_2} it means reloading the same semantic campus image and resampling new starts/goals.
+    \item \textbf{static branches}: a fresh static run context is prepared per run configuration. For \texttt{static\_artificial} this means a fresh artificial map; for \texttt{static\_campus\_area\_1} it means reloading the same semantic campus image and resampling new starts/goals.
     \item \textbf{dynamic branches}: one shared dynamic branch state is prepared once, then reused across all agent-number conditions and run indices for that branch execution.
 \end{itemize}
 

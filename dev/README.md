@@ -10,7 +10,8 @@ python -m dev.main
 
 `master_config.py` is the single user-editable file for branch seeds, map size,
 agent-number ranges, runtime limits, densities, thresholds, loop settings, start/goal
-positioning modes, and the global consecutive failed paired sampling limit.
+positioning modes, the global consecutive failed paired sampling limit, and the
+project-wide `enhanced_CBS` solver toggle.
 
 Results are written under `dev/outputs/<map_type>/`.
 
@@ -27,7 +28,7 @@ The `study` package is split by responsibility:
 
 - `models.py` — run/config/result dataclasses
 - `preparation.py` — build static and dynamic run contexts
-- `runtime.py` — solver execution, seeds, and run record construction
+- `runtime.py` — solver execution, CBS/ECBS dispatch, seeds, and run record construction
 - `aggregation.py` — condition-level summaries
 - `plotting.py` — PNG graph generation
 - `io_utils.py` — structured output writing and experiment logging
@@ -39,9 +40,9 @@ The `study` package is split by responsibility:
 The configured branch set is now:
 
 - `static_artificial`
-- `static_campus_area_2`
+- `static_campus_area_1`
 - `dynamic_port`
-- `dynamic_campus_area_1`
+- `dynamic_campus_area_2`
 
 ## Agent-number progression
 
@@ -59,6 +60,19 @@ Example:
 
 The generated list is the planned progression only. A branch may stop earlier if one
 of the stopping rules triggers.
+
+## Global solver toggle
+
+`master_config.py` now contains one project-wide boolean:
+
+```python
+enhanced_CBS = True
+```
+
+- `False` uses vanilla CBS
+- `True` uses ECBS
+
+This is intentionally global rather than branch-specific, so the whole run uses one solver family consistently. The current ECBS implementation uses a fixed suboptimality factor of `1.5`.
 
 ## Current counted-run protocol
 
@@ -111,7 +125,7 @@ pathological infinite loops. It remains only a protective implementation detail.
 ## Other important packages
 
 - `dev/experiments/branch_specs.py` — branch-level experiment definitions built from `master_config.py`
-- `dev/mapf/` — CBS solvers, metrics, and MAPF execution helpers
+- `dev/mapf/` — CBS/ECBS solvers, metrics, and MAPF execution helpers
 - `dev/maps/` — map construction and mapping transforms
 - `dev/navigation/` — graph/navigation helpers over composite grids
 - `dev/inputs/` — image-based inputs for dynamic and static campus/image branches
@@ -122,8 +136,9 @@ pathological infinite loops. It remains only a protective implementation detail.
 - The project now uses explicit `start_distribution_mode` and `goal_distribution_mode` settings instead of the older shared-goal campus toggle.
 - All current branches remain one-to-one MAPF setups. The experiment varies spatial placement, not assignment cardinality.
 - The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, gray regions are non-traversable.
-- `static_campus_area_2` uses campus area 2 as a static branch with dispersed starts in one zone and clustered goals in the other zone.
+- `static_campus_area_1` now uses campus area 1 as the static branch, with dispersed starts in one zone and clustered goals in the other zone.
 - `dynamic_port` now uses clustered starts and dispersed goals.
-- `dynamic_campus_area_1` now uses clustered starts and clustered goals, with the two clusters forced into different campus zones.
+- `dynamic_campus_area_2` now uses campus area 2 as the dynamic campus branch, with clustered starts and clustered goals forced into different campus zones.
 - The assignment sampler now treats dispersed sets and clustered sets differently: dispersed sets keep 8-neighbor separation within the set, while clustered sets are sampled as directly adjacent 8-neighbor-connected groups.
 - Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize` and `require_jointly_successful_mappings` in `master_config.py`, so you can choose either the last jointly successful classical-cyclic pairs or the last successful runs of each mapping independently.
+- Branch metadata and per-run records now also capture the active solver family (`CBS` or `ECBS`) so output files remain interpretable after solver-toggle changes.

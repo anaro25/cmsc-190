@@ -36,7 +36,7 @@
 
 \section{Campus Zones Not Detected}
 
-If a campus run reports something that implies zero usable zones, such as a log with \texttt{zone\_cells=0}, check the source image before changing the code. The current campus loader expects the designated zone colors to be present in the actual image asset. Also confirm that the configured filenames still match the renamed campus assets: \texttt{campus\_area\_1\_x64\_colored.png} and \texttt{campus\_area\_2\_x64\_colored.png}.
+If a campus run reports something that implies zero usable zones, such as a log with \texttt{zone\_cells=0}, check the source image before changing the code. The current campus loader expects the designated zone colors to be present in the actual image asset. After the campus-area name swap, also confirm that the branch/image pairing in \texttt{master\_config.py} is still the intended one: \texttt{static\_campus\_area\_1} should point to \texttt{campus\_area\_1\_x64\_colored.png} and \texttt{dynamic\_campus\_area\_2} should point to \texttt{campus\_area\_2\_x64\_colored.png}.
 
 \section{Clustered Sampling Keeps Failing}
 
@@ -65,5 +65,9 @@ If any of those three conditions fails, the run configuration is rejected and a 
 \section{Campus Visualization Looks Open but Solver Treats It as Blocked}
 
 Gray campus regions may be recorded as \texttt{visually\_free\_vertices} for rendering purposes. That does not make them solver-traversable. If a visualization looks more open than the solver behavior suggests, check whether the region is semantically gray rather than truly traversable.
+
+\section{Progress Lines Appear in a Burst}
+
+If the solver seems silent for a long time and then prints many progress lines at once, the most likely cause was stdout buffering. The current logger now flushes each line immediately. If this symptom returns, inspect any new logging path that bypasses \texttt{ExperimentLogger.log()} or writes through a buffered wrapper without flushing.
 
 \end{document}

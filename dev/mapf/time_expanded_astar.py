@@ -59,7 +59,8 @@ def get_neighbors_at_time(mapped_loop, position, time_step):
     return get_outgoing_neighbors(frame, position)
 
 
-def find_time_expanded_path_for_agent(mapped_loop, agent_id, start, goal, constraints):
+def find_time_expanded_path_for_agent(mapped_loop, agent_id, start, goal, constraints, heuristic_weight=1.0):
+    heuristic_weight = max(1.0, float(heuristic_weight))
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
     if violates_vertex_constraint(agent_constraints, start, 0):
@@ -74,13 +75,16 @@ def find_time_expanded_path_for_agent(mapped_loop, agent_id, start, goal, constr
     start_state = (start, 0)
     open_heap = []
     counter = itertools.count()
-    heapq.heappush(open_heap, (manhattan_vertex_distance(start, goal), next(counter), start_state))
+    heapq.heappush(open_heap, (manhattan_vertex_distance(start, goal) * heuristic_weight, 0, next(counter), start_state))
     came_from = {start_state: None}
     g_score = {start_state: 0}
 
     while open_heap:
-        _, _, current_state = heapq.heappop(open_heap)
+        _, current_g, _, current_state = heapq.heappop(open_heap)
         current_position, current_time = current_state
+
+        if current_g != g_score.get(current_state):
+            continue
 
         if current_position == goal and current_time >= latest_constraint_time:
             return reconstruct_path(came_from, current_state)
@@ -101,13 +105,13 @@ def find_time_expanded_path_for_agent(mapped_loop, agent_id, start, goal, constr
                 continue
 
             next_state = (next_position, next_time)
-            tentative_g = g_score[current_state] + 1
+            tentative_g = current_g + 1
             if tentative_g >= g_score.get(next_state, float('inf')):
                 continue
 
             came_from[next_state] = current_state
             g_score[next_state] = tentative_g
-            f_score = tentative_g + manhattan_vertex_distance(next_position, goal)
-            heapq.heappush(open_heap, (f_score, next(counter), next_state))
+            f_score = tentative_g + (heuristic_weight * manhattan_vertex_distance(next_position, goal))
+            heapq.heappush(open_heap, (f_score, tentative_g, next(counter), next_state))
 
     return None

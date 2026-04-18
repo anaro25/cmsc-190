@@ -26,6 +26,10 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Goal distribution mode: {branch_spec.goal_distribution_mode}")
     logger.log(f"Require individual reachability: {branch_spec.require_individual_reachability}")
     logger.log(f"Zone relationship mode: {branch_spec.zone_relationship_mode}")
+    logger.log(f"Solver: {branch_spec.solver_name}")
+    logger.log(f"Enhanced CBS enabled: {branch_spec.enhanced_cbs_enabled}")
+    if branch_spec.solver_suboptimality_factor is not None:
+        logger.log(f"Solver suboptimality factor: {branch_spec.solver_suboptimality_factor:.2f}")
     logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Jointly viable counted pairs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
@@ -95,7 +99,7 @@ def log_mapping_record(logger: ExperimentLogger, record: MappingRunRecord) -> No
     logger.log(
         "      "
         f"{mapping_label(record.mapping_name)} | {record.mapping_record_id} | "
-        f"result={record.result_category} | solver_status={record.solver_status} | "
+        f"solver={record.solver_name} | result={record.result_category} | solver_status={record.solver_status} | "
         f"counted={record.counted_run} | time_halted={record.time_computation_halted_seconds:.2f}s | "
         f"conflicts_at_halt={format_metric(record.num_conflicts_detected_at_halt)} | "
         f"avg_path={format_metric(record.average_path_length)} | "

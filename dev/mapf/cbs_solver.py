@@ -1,8 +1,12 @@
 import heapq
 import itertools
 import time
+from typing import Any
 
 from dev.mapf.mapf_low_level_astar import find_path_for_agent
+
+
+ECBS_SUBOPTIMALITY_FACTOR = 1.5
 
 
 def get_path_position(path, time_step):
@@ -88,6 +92,45 @@ def detect_first_conflict(paths_by_agent):
     return None
 
 
+def count_all_conflicts(paths_by_agent):
+    if not paths_by_agent:
+        return 0
+
+    agent_ids = sorted(paths_by_agent.keys())
+    max_time = max(len(path) for path in paths_by_agent.values())
+    total_conflicts = 0
+
+    for time_step in range(max_time):
+        occupied_positions = {}
+        for agent_id in agent_ids:
+            position = get_path_position(paths_by_agent[agent_id], time_step)
+            if position is None:
+                continue
+            occupied_positions.setdefault(position, []).append(agent_id)
+
+        for occupants in occupied_positions.values():
+            if len(occupants) >= 2:
+                total_conflicts += len(occupants) - 1
+
+        if time_step == 0:
+            continue
+
+        transitions = {}
+        for agent_id in agent_ids:
+            prev_position = get_path_position(paths_by_agent[agent_id], time_step - 1)
+            current_position = get_path_position(paths_by_agent[agent_id], time_step)
+            if prev_position is None or current_position is None:
+                continue
+
+            edge = (prev_position, current_position)
+            reverse_edge = (current_position, prev_position)
+            if reverse_edge in transitions and prev_position != current_position:
+                total_conflicts += 1
+            transitions[edge] = agent_id
+
+    return total_conflicts
+
+
 def split_conflict_into_constraints(conflict):
     agent_a, agent_b = conflict["agents"]
 
@@ -160,15 +203,18 @@ def make_cbs_node(constraints, paths_by_agent):
         "constraints": constraints,
         "paths": paths_by_agent,
         "cost": compute_solution_cost(paths_by_agent),
+        "secondary_key": count_all_conflicts(paths_by_agent),
     }
 
 
-def build_cbs_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded):
+def build_cbs_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name):
     return {
         "status": reason,
         "paths_by_agent": None,
         "num_conflicts_detected": num_conflicts_detected,
         "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
+        "solver_name": solver_name,
+        "solver_suboptimality_factor": None if solver_name == "CBS" else ECBS_SUBOPTIMALITY_FACTOR,
     }
 
 
@@ -185,23 +231,43 @@ def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback
     return next_report_seconds
 
 
-def solve_mapf_with_cbs(
+def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name):
+    return {
+        "status": "solved",
+        "paths_by_agent": paths_by_agent,
+        "num_conflicts_detected": num_conflicts_detected,
+        "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
+        "solver_name": solver_name,
+        "solver_suboptimality_factor": None if solver_name == "CBS" else ECBS_SUBOPTIMALITY_FACTOR,
+    }
+
+
+def _agent_lookup(agents):
+    return {agent["id"]: agent for agent in agents}
+
+
+def _replan_static_agent(composite_map, agent, constraints, *, heuristic_weight):
+    return find_path_for_agent(
+        cyclic_map=composite_map,
+        agent_id=agent["id"],
+        start=agent["start"],
+        goal=agent["goal"],
+        constraints=constraints,
+        heuristic_weight=heuristic_weight,
+    )
+
+
+def _solve_mapf_with_vanilla_cbs(
     composite_map,
     agents,
     max_runtime_seconds=10.0,
     progress_callback=None,
 ):
-    """
-    Vanilla CBS for disappearing agents, with practical bad-setup detection.
-
-    A setup is treated as bad when CBS keeps expanding for too long without
-    finishing. In that case, return a non-solved status so the caller can skip
-    the setup and resample a new assignment.
-    """
     start_time = time.perf_counter()
     next_report_seconds = 5
     root_constraints = []
     root_paths = {}
+    agents_by_id = _agent_lookup(agents)
 
     if progress_callback is not None:
         progress_callback(0)
@@ -218,14 +284,14 @@ def solve_mapf_with_cbs(
                 reason="bad_setup_timeout",
                 num_conflicts_detected=0,
                 num_high_level_nodes_expanded=0,
+                solver_name="CBS",
             )
 
-        path = find_path_for_agent(
-            cyclic_map=composite_map,
-            agent_id=agent["id"],
-            start=agent["start"],
-            goal=agent["goal"],
-            constraints=root_constraints,
+        path = _replan_static_agent(
+            composite_map,
+            agent,
+            root_constraints,
+            heuristic_weight=1.0,
         )
 
         if path is None:
@@ -233,6 +299,7 @@ def solve_mapf_with_cbs(
                 reason="no_solution",
                 num_conflicts_detected=0,
                 num_high_level_nodes_expanded=0,
+                solver_name="CBS",
             )
 
         root_paths[agent["id"]] = path
@@ -259,6 +326,7 @@ def solve_mapf_with_cbs(
                 reason="bad_setup_timeout",
                 num_conflicts_detected=num_conflicts_detected,
                 num_high_level_nodes_expanded=num_high_level_nodes_expanded,
+                solver_name="CBS",
             )
 
         _, _, current_node = heapq.heappop(open_heap)
@@ -267,12 +335,12 @@ def solve_mapf_with_cbs(
         conflict = detect_first_conflict(current_node["paths"])
 
         if conflict is None:
-            return {
-                "status": "solved",
-                "paths_by_agent": current_node["paths"],
-                "num_conflicts_detected": num_conflicts_detected,
-                "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
-            }
+            return _build_solver_success(
+                current_node["paths"],
+                num_conflicts_detected,
+                num_high_level_nodes_expanded,
+                solver_name="CBS",
+            )
 
         num_conflicts_detected += 1
 
@@ -290,6 +358,7 @@ def solve_mapf_with_cbs(
                     reason="bad_setup_timeout",
                     num_conflicts_detected=num_conflicts_detected,
                     num_high_level_nodes_expanded=num_high_level_nodes_expanded,
+                    solver_name="CBS",
                 )
 
             child_constraints = list(current_node["constraints"])
@@ -297,15 +366,13 @@ def solve_mapf_with_cbs(
 
             child_paths = dict(current_node["paths"])
             constrained_agent_id = added_constraint["agent"]
+            agent = agents_by_id[constrained_agent_id]
 
-            agent = next(agent for agent in agents if agent["id"] == constrained_agent_id)
-
-            new_path = find_path_for_agent(
-                cyclic_map=composite_map,
-                agent_id=agent["id"],
-                start=agent["start"],
-                goal=agent["goal"],
-                constraints=child_constraints,
+            new_path = _replan_static_agent(
+                composite_map,
+                agent,
+                child_constraints,
+                heuristic_weight=1.0,
             )
 
             if new_path is None:
@@ -328,4 +395,194 @@ def solve_mapf_with_cbs(
         reason="no_solution",
         num_conflicts_detected=num_conflicts_detected,
         num_high_level_nodes_expanded=num_high_level_nodes_expanded,
+        solver_name="CBS",
+    )
+
+
+def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float):
+    cost_bound = ECBS_SUBOPTIMALITY_FACTOR * best_cost
+    eligible = [
+        (node["secondary_key"], node["cost"], node_id, node)
+        for node_id, node in active_nodes.items()
+        if node["cost"] <= cost_bound
+    ]
+    if not eligible:
+        return None, None
+    _, _, node_id, node = min(eligible)
+    return node_id, node
+
+
+def _clean_open_heap(open_heap, active_nodes):
+    while open_heap and open_heap[0][2] not in active_nodes:
+        heapq.heappop(open_heap)
+
+
+def _solve_mapf_with_ecbs(
+    composite_map,
+    agents,
+    max_runtime_seconds=10.0,
+    progress_callback=None,
+):
+    start_time = time.perf_counter()
+    next_report_seconds = 5
+    root_constraints = []
+    root_paths = {}
+    agents_by_id = _agent_lookup(agents)
+
+    if progress_callback is not None:
+        progress_callback(0)
+
+    for agent in agents:
+        next_report_seconds = maybe_report_elapsed_time(
+            start_time=start_time,
+            next_report_seconds=next_report_seconds,
+            progress_callback=progress_callback,
+        )
+
+        if time.perf_counter() - start_time > max_runtime_seconds:
+            return build_cbs_failure(
+                reason="bad_setup_timeout",
+                num_conflicts_detected=0,
+                num_high_level_nodes_expanded=0,
+                solver_name="ECBS",
+            )
+
+        path = _replan_static_agent(
+            composite_map,
+            agent,
+            root_constraints,
+            heuristic_weight=ECBS_SUBOPTIMALITY_FACTOR,
+        )
+        if path is None:
+            return build_cbs_failure(
+                reason="no_solution",
+                num_conflicts_detected=0,
+                num_high_level_nodes_expanded=0,
+                solver_name="ECBS",
+            )
+        root_paths[agent["id"]] = path
+
+    root_node = make_cbs_node(root_constraints, root_paths)
+    num_conflicts_detected = 0
+    num_high_level_nodes_expanded = 0
+
+    open_heap = []
+    active_nodes = {}
+    node_id_counter = itertools.count()
+    visited_constraint_sets = {make_constraint_signature(root_constraints)}
+
+    root_node_id = next(node_id_counter)
+    active_nodes[root_node_id] = root_node
+    heapq.heappush(open_heap, (root_node["cost"], root_node["secondary_key"], root_node_id))
+
+    while active_nodes:
+        next_report_seconds = maybe_report_elapsed_time(
+            start_time=start_time,
+            next_report_seconds=next_report_seconds,
+            progress_callback=progress_callback,
+        )
+
+        if time.perf_counter() - start_time > max_runtime_seconds:
+            return build_cbs_failure(
+                reason="bad_setup_timeout",
+                num_conflicts_detected=num_conflicts_detected,
+                num_high_level_nodes_expanded=num_high_level_nodes_expanded,
+                solver_name="ECBS",
+            )
+
+        _clean_open_heap(open_heap, active_nodes)
+        if not open_heap:
+            break
+
+        best_cost = open_heap[0][0]
+        selected_node_id, current_node = _select_focal_node(active_nodes, best_cost)
+        if current_node is None:
+            break
+
+        del active_nodes[selected_node_id]
+        num_high_level_nodes_expanded += 1
+
+        conflict = detect_first_conflict(current_node["paths"])
+        if conflict is None:
+            return _build_solver_success(
+                current_node["paths"],
+                num_conflicts_detected,
+                num_high_level_nodes_expanded,
+                solver_name="ECBS",
+            )
+
+        num_conflicts_detected += 1
+
+        for added_constraint in split_conflict_into_constraints(conflict):
+            next_report_seconds = maybe_report_elapsed_time(
+                start_time=start_time,
+                next_report_seconds=next_report_seconds,
+                progress_callback=progress_callback,
+            )
+            if time.perf_counter() - start_time > max_runtime_seconds:
+                return build_cbs_failure(
+                    reason="bad_setup_timeout",
+                    num_conflicts_detected=num_conflicts_detected,
+                    num_high_level_nodes_expanded=num_high_level_nodes_expanded,
+                    solver_name="ECBS",
+                )
+
+            child_constraints = list(current_node["constraints"]) + [added_constraint]
+            child_signature = make_constraint_signature(child_constraints)
+            if child_signature in visited_constraint_sets:
+                continue
+
+            child_paths = dict(current_node["paths"])
+            constrained_agent_id = added_constraint["agent"]
+            agent = agents_by_id[constrained_agent_id]
+            new_path = _replan_static_agent(
+                composite_map,
+                agent,
+                child_constraints,
+                heuristic_weight=ECBS_SUBOPTIMALITY_FACTOR,
+            )
+            if new_path is None:
+                continue
+
+            visited_constraint_sets.add(child_signature)
+            child_paths[constrained_agent_id] = new_path
+            child_node = make_cbs_node(child_constraints, child_paths)
+            child_node_id = next(node_id_counter)
+            active_nodes[child_node_id] = child_node
+            heapq.heappush(open_heap, (child_node["cost"], child_node["secondary_key"], child_node_id))
+
+    return build_cbs_failure(
+        reason="no_solution",
+        num_conflicts_detected=num_conflicts_detected,
+        num_high_level_nodes_expanded=num_high_level_nodes_expanded,
+        solver_name="ECBS",
+    )
+
+
+def solve_mapf_with_cbs(
+    composite_map,
+    agents,
+    max_runtime_seconds=10.0,
+    progress_callback=None,
+    use_ecbs=False,
+):
+    """
+    Global static MAPF entry point.
+
+    When use_ecbs=False, run vanilla CBS.
+    When use_ecbs=True, run Enhanced CBS (ECBS) with a fixed suboptimality
+    factor and focal-node selection biased toward lower-conflict solutions.
+    """
+    if use_ecbs:
+        return _solve_mapf_with_ecbs(
+            composite_map=composite_map,
+            agents=agents,
+            max_runtime_seconds=max_runtime_seconds,
+            progress_callback=progress_callback,
+        )
+    return _solve_mapf_with_vanilla_cbs(
+        composite_map=composite_map,
+        agents=agents,
+        max_runtime_seconds=max_runtime_seconds,
+        progress_callback=progress_callback,
     )

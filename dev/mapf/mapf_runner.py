@@ -2,6 +2,7 @@ import random
 import shutil
 from pathlib import Path
 
+from dev.master_config import enhanced_CBS
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.mapf.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.mapf_logger import (
@@ -71,6 +72,7 @@ def solve_single_mapf_instance(
         agents=agents,
         max_runtime_seconds=max_solver_runtime_seconds,
         progress_callback=progress_callback,
+        use_ecbs=bool(enhanced_CBS),
     )
 
 
@@ -162,6 +164,7 @@ def run_single_mapf_for_map(
         agents=agents,
         max_solver_runtime_seconds=max_solver_runtime_seconds,
         progress_callback=build_elapsed_time_reporter(),
+        use_ecbs=bool(enhanced_CBS),
     )
 
     if result["status"] != "solved":

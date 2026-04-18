@@ -26,7 +26,7 @@ class ExperimentLogger:
         self.output_path.write_text("", encoding="utf-8")
 
     def log(self, message: str = "") -> None:
-        print(message)
+        print(message, flush=True)
         with self.output_path.open("a", encoding="utf-8") as handle:
             handle.write(message + "\n")
 

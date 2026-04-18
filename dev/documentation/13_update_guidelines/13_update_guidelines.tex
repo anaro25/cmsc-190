@@ -41,9 +41,10 @@ When modifying current behavior, the safest order of inspection is:
     \item \texttt{master\_config.py},
     \item \texttt{experiments/branch\_specs.py},
     \item \texttt{experiments/study/preparation.py},
+    \item \texttt{experiments/study/runtime.py},
     \item \texttt{mapf/agent\_assignment.py},
+    \item the relevant solver modules under \texttt{mapf/},
     \item \texttt{experiments/study/orchestrator.py},
-    \item the relevant solver or mapping modules,
     \item \texttt{experiments/study/aggregation.py}, \texttt{plotting.py}, and \texttt{visualization.py} if outputs also change.
 \end{enumerate}
 
@@ -70,8 +71,11 @@ The campus branches depend on semantic colors, not just thresholding. Any update
 \subsection{One-to-One Assignment Contract}
 All current branches are one-to-one MAPF branches. Do not silently reintroduce many-to-one or one-to-many assignment semantics under a misleading flag name.
 
+\subsection{Global Solver Toggle Contract}
+The new \texttt{enhanced\_CBS} switch is global. Do not quietly make solver choice branch-specific unless that experiment-design change is intentional and documented. The current design uses one solver family for the whole run so solver behavior remains comparable across branches.
+
 \subsection{Output Contract}
-Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change.
+Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the new solver metadata fields written into branch specs and run records.
 
 \section{When Adding a New Branch}
 
@@ -82,6 +86,17 @@ A new branch usually requires coordinated updates in at least:
     \item \texttt{experiments/study/preparation.py},
     \item possibly \texttt{visualization.py},
     \item and potentially loader logic under \texttt{inputs/}.
+\end{itemize}
+
+\section{When Changing Solver Behavior}
+
+Solver updates now touch more than just the planner implementation. Before changing CBS or ECBS behavior, check whether you also need to update:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{master\_config.py} if the user-facing toggle changes,
+    \item \texttt{experiments/branch\_specs.py} if metadata recorded for the run changes,
+    \item \texttt{experiments/study/runtime.py} if dispatch or result metadata changes,
+    \item \texttt{experiments/study/models.py} if run-record fields change,
+    \item documentation under \texttt{documentation/05\_solver\_behavior}, \texttt{11\_outputs\_and\_visualization}, and \texttt{12\_current\_configuration}.
 \end{itemize}
 
 \section{When Changing Sampling Rules}

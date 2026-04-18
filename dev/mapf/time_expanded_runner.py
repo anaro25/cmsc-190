@@ -1,6 +1,7 @@
 import shutil
 from pathlib import Path
 
+from dev.master_config import enhanced_CBS
 from dev.mapf.mapf_logger_dynamic import (
     write_dynamic_mapf_frames,
     write_dynamic_setup_frame,
@@ -98,6 +99,7 @@ def run_time_expanded_mapf_for_loop(
         agents=agents,
         max_runtime_seconds=max_solver_runtime_seconds,
         progress_callback=build_elapsed_time_reporter(),
+        use_ecbs=bool(enhanced_CBS),
     )
 
     if result["status"] != "solved":

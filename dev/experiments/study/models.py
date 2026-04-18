@@ -43,6 +43,9 @@ class MappingRunRecord:
     mapping_index: int
     mapping_record_id: str
     comparison_case: str
+    solver_name: str
+    enhanced_cbs_enabled: bool
+    solver_suboptimality_factor: float | None
     paired_run: bool
     solver_status: str
     result_category: str

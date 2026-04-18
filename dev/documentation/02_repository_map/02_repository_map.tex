@@ -58,12 +58,13 @@ This is the single user-editable configuration file. It defines:
 \begin{itemize}[leftmargin=2em]
     \item which branch is active via \texttt{MAP\_TYPE},
     \item the global limit on consecutive failed paired sampling attempts,
+    \item the global \texttt{enhanced\_CBS} toggle,
     \item all branch-specific numeric parameters and toggles.
 \end{itemize}
 
 \subsection{\texttt{dev/experiments/branch\_specs.py}}
 
-This file converts user config dictionaries into normalized branch specifications. In practice, many parts of the runner depend on the \texttt{BranchSpec} dataclass rather than directly reading raw config dictionaries.
+This file converts user config dictionaries into normalized branch specifications. In practice, many parts of the runner depend on the \texttt{BranchSpec} dataclass rather than directly reading raw config dictionaries. The branch spec now also records the effective solver family metadata so the output directory keeps track of whether the run used vanilla CBS or ECBS.
 
 \subsection{\texttt{dev/experiments/study/}}
 
@@ -71,10 +72,10 @@ This is the active experiment engine. Its submodules are separated by responsibi
 \begin{itemize}[leftmargin=2em]
     \item \texttt{models.py}: dataclasses for run configurations, run records, aggregates, and dynamic state,
     \item \texttt{preparation.py}: branch-aware setup logic,
-    \item \texttt{runtime.py}: solver execution and result-category conversion,
+    \item \texttt{runtime.py}: solver execution, solver-mode dispatch, and result-category conversion,
     \item \texttt{aggregation.py}: condition-level summaries,
     \item \texttt{plotting.py}: metric graphs,
-    \item \texttt{io\_utils.py}: output folder management and JSON/CSV writing,
+    \item \texttt{io\_utils.py}: output folder management, JSON/CSV writing, and immediate console/log flushing,
     \item \texttt{logging\_utils.py}: console/log formatting,
     \item \texttt{visualization.py}: selection and rendering of final Pillow exports,
     \item \texttt{orchestrator.py}: the main control flow.
@@ -84,8 +85,8 @@ This is the active experiment engine. Its submodules are separated by responsibi
 
 This folder contains the actual planning code:
 \begin{itemize}[leftmargin=2em]
-    \item static CBS and low-level A*,
-    \item time-expanded CBS and low-level A*,
+    \item static CBS/ECBS and low-level A*,
+    \item time-expanded CBS/ECBS and low-level A*,
     \item conflict metrics,
     \item frame builders and image loggers.
 \end{itemize}
@@ -110,7 +111,8 @@ These are useful references for branch intent, but the current top-level executi
 \[
 \texttt{master\_config.py},\quad
 \texttt{experiments/branch\_specs.py},\quad
-\texttt{experiments/study/}.
+\texttt{experiments/study/},\quad
+\texttt{mapf/}.
 \]
 
 \section{Output Contract}

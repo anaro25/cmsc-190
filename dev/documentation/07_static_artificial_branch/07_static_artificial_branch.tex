@@ -39,7 +39,7 @@
 The static side of the project now has two complementary branches:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{static\_artificial}, a clean synthetic baseline,
-    \item \texttt{static\_campus\_area\_2}, a semantic image-based campus branch.
+    \item \texttt{static\_campus\_area\_1}, a semantic image-based campus branch.
 \end{itemize}
 
 Both remain static in the strict sense that there are no time-varying obstacle schedules.
@@ -56,9 +56,9 @@ This branch is still the cleanest place to compare the two mappings without imag
 
 Because the branch is synthetic, it is best read as the lowest-assumption baseline for the whole study.
 
-\section{\texttt{static\_campus\_area\_2}}
+\section{\texttt{static\_campus\_area\_1}}
 
-This new branch uses the campus-area-2 image as a \emph{static} semantic map rather than a dynamic branch source. The campus loader keeps the meaning of the image colors:
+This branch now uses the campus-area-1 image as a \emph{static} semantic map rather than a dynamic branch source. The campus loader keeps the meaning of the image colors:
 \begin{itemize}[leftmargin=2em]
     \item zone colors are traversable and spawnable,
     \item white walkways are traversable but non-spawnable,
@@ -83,7 +83,7 @@ The semantic campus static branch uses individual reachability checks during ass
 Taken together, the two static branches answer different questions:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{static\_artificial}: what the mapping difference looks like in a controlled synthetic setting,
-    \item \texttt{static\_campus\_area\_2}: what the mapping difference looks like on a semantically meaningful real image while still avoiding time variation.
+    \item \texttt{static\_campus\_area\_1}: what the mapping difference looks like on a semantically meaningful real image while still avoiding time variation.
 \end{itemize}
 
 \end{document}

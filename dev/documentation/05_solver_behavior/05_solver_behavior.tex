@@ -34,19 +34,42 @@
 \begin{document}
 \maketitle
 
-\section{Static Solver}
+\section{Global Solver Toggle}
 
-Static runs use standard Conflict-Based Search (CBS) with a low-level A* search. The implementation lives primarily in:
+The project now has one global solver switch in \texttt{master\_config.py}:
+\begin{lstlisting}
+enhanced_CBS = True  # or False
+\end{lstlisting}
+
+That toggle applies to the \emph{entire} project rather than to individual branches:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{False} selects vanilla CBS,
+    \item \texttt{True} selects Enhanced CBS (ECBS).
+\end{itemize}
+
+So the current experiment still compares \textbf{classical mapping vs.\ cyclic mapping} on matched run configurations, but both sides now use the same selected high-level solver family.
+
+\section{Static Solver Path}
+
+Static runs go through:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{dev/mapf/cbs\_solver.py},
     \item \texttt{dev/mapf/mapf\_low\_level\_astar.py}.
 \end{itemize}
 
-The low-level search operates on the composite grid, so legality of motion depends on transition cells, not just free-space adjacency.
+When \texttt{enhanced\_CBS=False}, the static branch uses standard CBS with admissible low-level A*.
+When \texttt{enhanced\_CBS=True}, the same entry point switches to an ECBS-style search that uses:
+\begin{itemize}[leftmargin=2em]
+    \item a high-level focal-style selection rule,
+    \item conflict count as the secondary node preference inside the focal set,
+    \item weighted low-level A* replanning.
+\end{itemize}
 
-\section{Dynamic Solver}
+The current ECBS implementation uses a fixed suboptimality factor of \(1.5\).
 
-Dynamic runs use separate time-expanded solvers:
+\section{Dynamic Solver Path}
+
+Dynamic runs go through:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{dev/mapf/time\_expanded\_cbs.py},
     \item \texttt{dev/mapf/time\_expanded\_astar.py}.
@@ -62,9 +85,11 @@ At time \(t\), the active movement graph is read from
 \]
 where \(L\) is the loop length.
 
+The same global toggle is respected here as well, so dynamic branches now also switch together between vanilla CBS and ECBS rather than maintaining a separate branch-specific solver choice.
+
 \section{Conflict Model}
 
-Both static and dynamic CBS implementations detect:
+Both the static and dynamic solver families detect:
 \begin{itemize}[leftmargin=2em]
     \item \textbf{vertex conflicts}: two agents occupying the same vertex at the same time,
     \item \textbf{edge conflicts}: two agents swapping across the same connection at the same time.
@@ -74,7 +99,11 @@ Both static and dynamic CBS implementations detect:
 
 Once an agent reaches its final path position, it is no longer considered present for later conflict checks. This makes the system behave like a disappearing-agent MAPF model rather than a stay-at-goal blocking model.
 
-This assumption still matters in the current clustered-target branches because agents reaching a compact goal region disappear instead of continuing to block that region for everyone behind them.
+This assumption still matters in the clustered-target branches because agents reaching a compact goal region disappear instead of continuing to block that region for everyone behind them.
+
+\section{Why ECBS Was Added}
+
+The motivation of the change is practical rather than cosmetic. The repository was already able to run higher-density cases more comfortably on \texttt{static\_artificial}, but several of the other branches were hitting computational difficulty at much lower agent counts. The new global ECBS toggle preserves the old vanilla baseline while making it possible to test whether a bounded-suboptimal solver can push those branches to higher agent numbers before the runtime cap dominates.
 
 \section{Runtime and Progress Reporting}
 
@@ -104,10 +133,11 @@ The project interprets a runtime cap as ``solver halted before completing useful
 
 When available, a mapping record stores:
 \begin{itemize}[leftmargin=2em]
+    \item solver family metadata (CBS vs.\ ECBS and the current suboptimality factor when relevant),
     \item halted computation time,
     \item number of detected conflicts at halt,
     \item average path length,
-    \item number of high-level CBS nodes expanded,
+    \item number of high-level nodes expanded,
     \item run identifiers and seed metadata.
 \end{itemize}
 
