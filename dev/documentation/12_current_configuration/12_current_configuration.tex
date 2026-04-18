@@ -38,7 +38,7 @@
 
 The current \texttt{master\_config.py} defines:
 \begin{itemize}[leftmargin=2em]
-    \item active \texttt{MAP\_TYPE}: \texttt{dynamic\_port},
+    \item active \texttt{MAP\_TYPE}: \texttt{static\_campus\_area\_2},
     \item global consecutive failed paired sampling stop limit: \(15\).
 \end{itemize}
 
@@ -54,34 +54,36 @@ branch & current important values \\
 \texttt{num\_last\_runs\_to\_visualize=3};
 \texttt{require\_jointly\_successful\_mappings=True};
 \texttt{time\_limit\_seconds=15.0};
-\texttt{agent\_number\_range=(2,100,2)} so the planned sequence is \(2,4,6,\dots,100\);
+\texttt{agent\_number\_range=(10,14,2)} so the planned sequence is \(10,12,14\);
 \texttt{seed=101};
 \texttt{map\_size=(25,25)};
 \texttt{static\_obstacle\_density=0.40};
 \texttt{counted\_runs\_required=5};
 \texttt{start\_distribution\_mode=dispersed};
-\texttt{goal\_distribution\_mode=dispersed}. \\
+\texttt{goal\_distribution\_mode=dispersed};
+\texttt{require\_individual\_reachability=False}. \\
 
 \texttt{static\_campus\_area\_2} &
-\texttt{num\_last\_runs\_to\_visualize=2};
+\texttt{num\_last\_runs\_to\_visualize=1};
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=15.0};
-\texttt{agent\_number\_range=(10,10,4)} so the current planned sequence is only \([10]\);
-\texttt{seed=401};
+\texttt{agent\_number\_range=(6,8,2)} so the current planned sequence is \([6,8]\);
+\texttt{seed=201};
 \texttt{counted\_runs\_required=5};
 \texttt{start\_distribution\_mode=dispersed};
 \texttt{goal\_distribution\_mode=clustered};
 \texttt{require\_individual\_reachability=True};
 \texttt{zone\_relationship\_mode=distinct\_campus\_zones};
 \texttt{dynamic\_generation\_cell\_mode=zone\_colors\_only};
-\texttt{spawnable\_cell\_mode=zone\_colors\_only}. \\
+\texttt{spawnable\_cell\_mode=zone\_colors\_only};
+\texttt{image\_path=dynamic\_campus\_area\_2/campus\_area\_2\_x64\_colored.png}. \\
 
 \texttt{dynamic\_port} &
 \texttt{num\_last\_runs\_to\_visualize=3};
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=15.0};
 \texttt{agent\_number\_range=(2,100,1)} so the planned sequence is \(2,3,4,\dots,100\);
-\texttt{seed=201};
+\texttt{seed=301};
 \texttt{counted\_runs\_required=5};
 \texttt{target\_static\_obstacle\_density=0.15};
 \texttt{target\_dynamic\_obstacle\_density=0.05};
@@ -99,24 +101,26 @@ branch & current important values \\
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=15.0};
 \texttt{agent\_number\_range=(6,100,2)} so the planned sequence is \(6,8,10,\dots,100\);
-\texttt{seed=301};
+\texttt{seed=401};
 \texttt{counted\_runs\_required=5};
 \texttt{target\_static\_obstacle\_density=None} meaning the source-image static layout is preserved;
 \texttt{target\_dynamic\_obstacle\_density=0.015};
 \texttt{loop\_sequence\_length=20};
 \texttt{group\_stay\_durations=(3,4,5)};
+\texttt{image\_threshold=127};
 \texttt{start\_distribution\_mode=clustered};
 \texttt{goal\_distribution\_mode=clustered};
 \texttt{require\_individual\_reachability=True};
 \texttt{zone\_relationship\_mode=distinct\_campus\_zones};
 \texttt{dynamic\_generation\_cell\_mode=zone\_colors\_only};
-\texttt{spawnable\_cell\_mode=zone\_colors\_only}. \\
+\texttt{spawnable\_cell\_mode=zone\_colors\_only};
+\texttt{image\_path=dynamic\_campus\_area\_1/campus\_area\_1\_x64\_colored.png}. \\
 
 \bottomrule
 \end{longtable}
 
 \section{Interpretation Advice}
 
-This file is a snapshot, not a substitute for \texttt{master\_config.py}. If a future change updates the project but this documentation is not refreshed, the code should win. Still, the values listed here are useful because they explain the current experimental shape: two static branches, two dynamic branches, and a fully one-to-one assignment policy whose main variation now comes from dispersed vs. clustered positioning and campus zone separation.
+This file is a snapshot, not a substitute for \texttt{master\_config.py}. If a future change updates the project but this documentation is not refreshed, the code should win. Still, the values listed here are useful because they explain the current experimental shape: two static branches, two dynamic branches, and a fully one-to-one assignment policy whose main variation now comes from dispersed vs. clustered positioning, campus zone separation, and the exact image assets referenced by the campus branches.
 
 \end{document}

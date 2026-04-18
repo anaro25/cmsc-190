@@ -38,6 +38,10 @@ INPUTS_ROOT = PACKAGE_ROOT / "inputs"
 # require_jointly_successful_mappings = False
 #   Select the last n successful classical runs and the last n successful cyclic
 #   runs independently, even when they come from different paired instances.
+# require_individual_reachbility
+#   Set this to "True" for branches whose maps are not manually generated. This 
+#   verifies if the placement of each element satisfies "individual reachability".
+#   That is, all targets can be reached by their respective agents.
 
 
 # One user-defined limit applies to all branches.
@@ -47,57 +51,69 @@ INPUTS_ROOT = PACKAGE_ROOT / "inputs"
 CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
 
 # Uncomment exactly one MAP_TYPE.
-MAP_TYPE = "static_artificial"
-# MAP_TYPE = "static_campus_area_2"
+# MAP_TYPE = "static_artificial"
+MAP_TYPE = "static_campus_area_2"
 # MAP_TYPE = "dynamic_port"
 # MAP_TYPE = "dynamic_campus_area_1"
 
 STATIC_ARTIFICIAL_CONFIG = {
+    # common frequently edited constants
+    "agent_number_range": (10, 14, 2), # (2, 100, 2)
+    "time_limit_seconds": 15.0,
     "num_last_runs_to_visualize": 3,
     "require_jointly_successful_mappings": True,
-    "time_limit_seconds": 15.0,
-    "agent_number_range": (10, 14, 2), # (2, 100, 2)
+    "seed": 101,
+    
+    # common permanent constants
+    "counted_runs_required": 5,
     "start_distribution_mode": "dispersed",
     "goal_distribution_mode": "dispersed",
     "require_individual_reachability": False,
     "zone_relationship_mode": "none",
-
-    "seed": 101,
+    
+    # branch-specific constants
     "map_size": (25, 25),
     "static_obstacle_density": 0.40,
-    "counted_runs_required": 5,
 }
 
 STATIC_CAMPUS_AREA_2_CONFIG = {
-    "num_last_runs_to_visualize": 2,
+    # common frequently edited constant
+    "agent_number_range": (8, 100, 2),
+    "time_limit_seconds": 5.0,
+    "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,
-    "time_limit_seconds": 15.0,
-    "agent_number_range": (10, 10, 4),
+    "seed": 201,
+
+    # common permanent constants
+    "counted_runs_required": 5,
     "start_distribution_mode": "dispersed",
     "goal_distribution_mode": "clustered",
     "require_individual_reachability": True,
     "zone_relationship_mode": "distinct_campus_zones",
-
-    "seed": 401,
-    "counted_runs_required": 5,
-    "image_threshold": 127,
-    "image_path": str(INPUTS_ROOT / "dynamic_campus_area_2" / "campus_area_2_x80.png"),
-    "dynamic_generation_cell_mode": "zone_colors_only",
+    
+    # branch-specific constants
     "spawnable_cell_mode": "zone_colors_only",
+    "image_threshold": 127,
+    "image_path": str(INPUTS_ROOT / "dynamic_campus_area_2" / "campus_area_2_x64_colored.png"),
+    "dynamic_generation_cell_mode": "zone_colors_only",
 }
 
 DYNAMIC_PORT_CONFIG = {
+    # common frequently edited constants
+    "agent_number_range": (2, 100, 1),
+    "time_limit_seconds": 15.0,
     "num_last_runs_to_visualize": 3,
     "require_jointly_successful_mappings": False,
-    "time_limit_seconds": 15.0,
-    "agent_number_range": (2, 100, 1),
+    "seed": 301,    
+
+    # common permanent constants
+    "counted_runs_required": 5,
     "start_distribution_mode": "clustered",
     "goal_distribution_mode": "dispersed",
     "require_individual_reachability": True,
     "zone_relationship_mode": "none",
 
-    "seed": 201,
-    "counted_runs_required": 5,
+    # branch-exclusive constants
     "target_static_obstacle_density": 0.15,
     "target_dynamic_obstacle_density": 0.05,
     "loop_sequence_length": 20,
@@ -109,24 +125,28 @@ DYNAMIC_PORT_CONFIG = {
 }
 
 DYNAMIC_CAMPUS_AREA_1_CONFIG = {
+    # common frequently edited constants
+    "agent_number_range": (6, 100, 2),
+    "time_limit_seconds": 15.0,
     "num_last_runs_to_visualize": 2,
     "require_jointly_successful_mappings": False,
-    "time_limit_seconds": 15.0,
-    "agent_number_range": (6, 100, 2),
+    "seed": 401,
+    
+    # common permanent constants
+    "counted_runs_required": 5,
     "start_distribution_mode": "clustered",
     "goal_distribution_mode": "clustered",
     "require_individual_reachability": True,
     "zone_relationship_mode": "distinct_campus_zones",
-    "target_dynamic_obstacle_density": 0.015,
-
-    "seed": 301,
-    "counted_runs_required": 5,
-    # Campus Area 1 preserves the source-image static layout; this value is intentionally not applied.
+        
+    # branch-exclusive constants
+    #   Campus Area 1 preserves the source-image static layout; this value is intentionally not applied.
     "target_static_obstacle_density": None,
+    "target_dynamic_obstacle_density": 0.015,
     "loop_sequence_length": 20,
     "group_stay_durations": (3, 4, 5),
     "image_threshold": 127,
-    "image_path": str(INPUTS_ROOT / "dynamic_campus_area_1" / "campus_area_1_x80.png"),
+    "image_path": str(INPUTS_ROOT / "dynamic_campus_area_1" / "campus_area_1_x64_colored.png"),
     "dynamic_generation_cell_mode": "zone_colors_only",
     "spawnable_cell_mode": "zone_colors_only",
 }

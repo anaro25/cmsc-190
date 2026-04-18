@@ -61,6 +61,12 @@ The project now uses the two campus source images in different ways:
 
 This is an intentional redesign. Campus area 2 is no longer a dynamic branch.
 
+The currently configured image assets are:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{dynamic\_campus\_area\_1/campus\_area\_1\_x64\_colored.png},
+    \item \texttt{dynamic\_campus\_area\_2/campus\_area\_2\_x64\_colored.png}.
+\end{itemize}
+
 \section{\texttt{static\_campus\_area\_2}}
 
 Campus area 2 has two semantic zones. The static branch samples:
@@ -109,6 +115,6 @@ The campus preparation code stores gray-region vertices as \texttt{visually\_fre
 
 \section{Practical Warning}
 
-If a campus run logs something like \texttt{zone\_cells=0} or otherwise behaves as though no campus zones exist, the first thing to check is the source image itself. The campus branch assumes the image was actually recolored with the intended zone colors. If the image colors are wrong, the semantic loader cannot recover the intended zones.
+If a campus run logs something like \texttt{zone\_cells=0} or otherwise behaves as though no campus zones exist, the first thing to check is the source image itself. The campus branch assumes the image was actually recolored with the intended zone colors. If the image colors are wrong, the semantic loader cannot recover the intended zones. Also verify that \texttt{master\_config.py} still points to the current renamed assets, namely \texttt{campus\_area\_1\_x64\_colored.png} and \texttt{campus\_area\_2\_x64\_colored.png}.
 
 \end{document}
