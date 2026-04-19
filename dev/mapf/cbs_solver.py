@@ -252,7 +252,15 @@ def _agent_lookup(agents):
     return {agent["id"]: agent for agent in agents}
 
 
-def _replan_static_agent(composite_map, agent, constraints, *, heuristic_weight):
+def _replan_static_agent(
+    composite_map,
+    agent,
+    constraints,
+    *,
+    heuristic_weight,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
+):
     return find_path_for_agent(
         cyclic_map=composite_map,
         agent_id=agent["id"],
@@ -260,6 +268,8 @@ def _replan_static_agent(composite_map, agent, constraints, *, heuristic_weight)
         goal=agent["goal"],
         constraints=constraints,
         heuristic_weight=heuristic_weight,
+        true_static_shortest_path_distance=true_static_shortest_path_distance,
+        tight_time_horizon=tight_time_horizon,
     )
 
 
@@ -268,6 +278,8 @@ def _solve_mapf_with_vanilla_cbs(
     agents,
     max_runtime_seconds=10.0,
     progress_callback=None,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
 ):
     start_time = time.perf_counter()
     next_report_seconds = 5
@@ -298,6 +310,8 @@ def _solve_mapf_with_vanilla_cbs(
             agent,
             root_constraints,
             heuristic_weight=1.0,
+            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            tight_time_horizon=tight_time_horizon,
         )
 
         if path is None:
@@ -372,6 +386,8 @@ def _solve_mapf_with_vanilla_cbs(
                 agent,
                 child_constraints,
                 heuristic_weight=1.0,
+                true_static_shortest_path_distance=true_static_shortest_path_distance,
+                tight_time_horizon=tight_time_horizon,
             )
             if new_path is None:
                 continue
@@ -422,6 +438,8 @@ def _solve_mapf_with_ecbs(
     max_runtime_seconds=10.0,
     progress_callback=None,
     suboptimality_factor: float = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
 ):
     start_time = time.perf_counter()
     next_report_seconds = 5
@@ -453,6 +471,8 @@ def _solve_mapf_with_ecbs(
             agent,
             root_constraints,
             heuristic_weight=suboptimality_factor,
+            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            tight_time_horizon=tight_time_horizon,
         )
         if path is None:
             return build_cbs_failure(
@@ -549,6 +569,8 @@ def _solve_mapf_with_ecbs(
                 agent,
                 child_constraints,
                 heuristic_weight=suboptimality_factor,
+                true_static_shortest_path_distance=true_static_shortest_path_distance,
+                tight_time_horizon=tight_time_horizon,
             )
             if new_path is None:
                 continue
@@ -576,6 +598,8 @@ def solve_mapf_with_cbs(
     progress_callback=None,
     use_ecbs=False,
     ecbs_suboptimality_factor: float | None = None,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
 ):
     """
     Global static MAPF entry point.
@@ -592,10 +616,14 @@ def solve_mapf_with_cbs(
             max_runtime_seconds=max_runtime_seconds,
             progress_callback=progress_callback,
             suboptimality_factor=_resolve_ecbs_suboptimality_factor(ecbs_suboptimality_factor),
+            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            tight_time_horizon=tight_time_horizon,
         )
     return _solve_mapf_with_vanilla_cbs(
         composite_map=composite_map,
         agents=agents,
         max_runtime_seconds=max_runtime_seconds,
         progress_callback=progress_callback,
+        true_static_shortest_path_distance=true_static_shortest_path_distance,
+        tight_time_horizon=tight_time_horizon,
     )

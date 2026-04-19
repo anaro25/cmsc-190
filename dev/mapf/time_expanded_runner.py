@@ -19,6 +19,14 @@ def current_ecbs_suboptimality_factor():
     return float(BRANCH_USER_CONFIGS[MAP_TYPE].get("ECBS_suboptimality", 1.5))
 
 
+def current_true_static_shortest_path_distance_enabled():
+    return bool(BRANCH_USER_CONFIGS[MAP_TYPE].get("true_static_shortest_path_distance", False))
+
+
+def current_tight_time_horizon_enabled():
+    return bool(BRANCH_USER_CONFIGS[MAP_TYPE].get("tight_time_horizon", False))
+
+
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
     mapping_output_dir = Path(output_root) / mapping_name / map_name
@@ -106,6 +114,8 @@ def run_time_expanded_mapf_for_loop(
         progress_callback=build_elapsed_time_reporter(),
         use_ecbs=bool(enhanced_CBS),
         ecbs_suboptimality_factor=current_ecbs_suboptimality_factor(),
+        true_static_shortest_path_distance=current_true_static_shortest_path_distance_enabled(),
+        tight_time_horizon=current_tight_time_horizon_enabled(),
     )
 
     if result["status"] != "solved":

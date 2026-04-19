@@ -1,7 +1,11 @@
 import heapq
 import itertools
 
+from dev.mapf.low_level_guidance import get_true_static_distances_for_static_map
 from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
+
+
+_STATIC_TIGHT_HORIZON_MAX_SLACK = 64
 
 
 def manhattan_vertex_distance(a, b):
@@ -60,7 +64,44 @@ def reconstruct_path(came_from, end_state):
     return path
 
 
-def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints, heuristic_weight=1.0):
+def _static_distance_lookup(cyclic_map, goal):
+    return get_true_static_distances_for_static_map(cyclic_map, goal)
+
+
+def _heuristic_value(position, goal, *, true_static_shortest_path_distance, static_distance_lookup):
+    if true_static_shortest_path_distance:
+        return static_distance_lookup.get(position, float("inf"))
+    return manhattan_vertex_distance(position, goal)
+
+
+def _resolve_time_horizon(
+    *,
+    cyclic_map,
+    latest_constraint_time,
+    base_goal_distance,
+    tight_time_horizon,
+):
+    num_free_vertices = len(get_all_free_vertices(cyclic_map))
+    if not tight_time_horizon:
+        return max(
+            latest_constraint_time,
+            (num_free_vertices * 4) + latest_constraint_time + 4,
+        )
+
+    slack = max(8, min(_STATIC_TIGHT_HORIZON_MAX_SLACK, max(1, num_free_vertices // 6)))
+    return max(20, latest_constraint_time + base_goal_distance + slack)
+
+
+def find_path_for_agent(
+    cyclic_map,
+    agent_id,
+    start,
+    goal,
+    constraints,
+    heuristic_weight=1.0,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
+):
     """
     Low-level A* for CBS / ECBS.
 
@@ -80,7 +121,8 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints, heuristi
         Because a wait action exists, unbounded time would create infinitely
         many distinct states at the same vertex. We therefore cap the search
         horizon to a conservative finite value based on map size plus the
-        latest relevant constraint time.
+        latest relevant constraint time, or to a tighter distance-aware bound
+        when tight_time_horizon=True.
     """
     heuristic_weight = max(1.0, float(heuristic_weight))
     agent_constraints = get_agent_constraints(constraints, agent_id)
@@ -89,10 +131,20 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints, heuristi
         return None
 
     latest_constraint_time = get_latest_constraint_time(agent_constraints)
-    num_free_vertices = len(get_all_free_vertices(cyclic_map))
-    max_time_horizon = max(
-        latest_constraint_time,
-        (num_free_vertices * 4) + latest_constraint_time + 4,
+    static_distance_lookup = {}
+    if true_static_shortest_path_distance or tight_time_horizon:
+        static_distance_lookup = _static_distance_lookup(cyclic_map, goal)
+        start_goal_distance = static_distance_lookup.get(start)
+        if start_goal_distance is None:
+            return None
+    else:
+        start_goal_distance = manhattan_vertex_distance(start, goal)
+
+    max_time_horizon = _resolve_time_horizon(
+        cyclic_map=cyclic_map,
+        latest_constraint_time=latest_constraint_time,
+        base_goal_distance=start_goal_distance,
+        tight_time_horizon=tight_time_horizon,
     )
 
     open_heap = []
@@ -102,7 +154,14 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints, heuristi
     came_from = {start_state: None}
     best_g = {start_state: 0}
 
-    start_h = manhattan_vertex_distance(start, goal)
+    start_h = _heuristic_value(
+        start,
+        goal,
+        true_static_shortest_path_distance=true_static_shortest_path_distance,
+        static_distance_lookup=static_distance_lookup,
+    )
+    if start_h == float("inf"):
+        return None
     start_f = start_h * heuristic_weight
     heapq.heappush(open_heap, (start_f, 0, next(counter), start_state))
 
@@ -136,6 +195,13 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints, heuristi
             ):
                 continue
 
+            if static_distance_lookup:
+                static_distance = static_distance_lookup.get(next_position)
+                if static_distance is None:
+                    continue
+            else:
+                static_distance = None
+
             next_state = (next_position, next_time)
             tentative_g = current_g + 1
 
@@ -145,7 +211,11 @@ def find_path_for_agent(cyclic_map, agent_id, start, goal, constraints, heuristi
             best_g[next_state] = tentative_g
             came_from[next_state] = current_state
 
-            h_value = manhattan_vertex_distance(next_position, goal)
+            h_value = (
+                static_distance
+                if true_static_shortest_path_distance and static_distance is not None
+                else manhattan_vertex_distance(next_position, goal)
+            )
             f_value = tentative_g + (heuristic_weight * h_value)
 
             heapq.heappush(

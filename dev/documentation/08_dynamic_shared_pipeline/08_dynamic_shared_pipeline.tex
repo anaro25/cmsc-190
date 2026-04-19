@@ -79,11 +79,17 @@ The most important recent change is that the dynamic pipeline no longer supports
     \item start distribution mode,
     \item goal distribution mode,
     \item optional distinct-zone campus sampling,
-    \item dispersed sets keep internal 8-neighbor separation while clustered sets are directly adjacent 8-neighbor-connected groups,
+    \item dispersed sets keep internal 8-neighbor separation while clustered sets follow the global \texttt{compact\_clustering} switch,
     \item one-to-one matching with optional individual reachability.
 \end{itemize}
 
 That means the dynamic pipeline still shares \emph{maps}, but each run configuration can now differ in a richer and more explicit way than the old \texttt{single\_cell\_target} toggle allowed.
+
+\section{Solver-Relevant Reuse of Shared State}
+
+The newer low-level guidance logic also benefits from the shared dynamic state. When a dynamic branch enables \texttt{true\_static\_shortest\_path\_distance}, the solver derives a static guidance graph from the already prepared mapped loop and reuses it across repeated low-level replans. When \texttt{tight\_time\_horizon} is enabled, that same static guidance distance is used to build a tighter search horizon for each agent.
+
+So the shared dynamic branch state is not only an experimental fairness device. It is also now the natural source of reusable structural information for low-level dynamic replanning.
 
 \section{Renderer-Only Visual Semantics}
 

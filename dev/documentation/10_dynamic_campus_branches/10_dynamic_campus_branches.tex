@@ -59,13 +59,13 @@ The project now uses the two campus source images in the following way:
     \item \texttt{dynamic\_campus\_area\_2}: dynamic image branch.
 \end{itemize}
 
-This is the same branch-role split as before, but the campus-area names have been intentionally swapped. The filenames remain \texttt{campus\_area\_1\_x64\_colored.png} and \texttt{campus\_area\_2\_x64\_colored.png}; what changed is which physical campus layout now lives under each name.
-
-The currently configured image assets are therefore still:
+Each campus branch now also has a \texttt{narrow\_lanes} boolean in \texttt{master\_config.py}. That toggle selects between:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{dynamic\_campus\_area\_1/campus\_area\_1\_x64\_colored.png},
-    \item \texttt{dynamic\_campus\_area\_2/campus\_area\_2\_x64\_colored.png}.
+    \item \texttt{dynamic\_campus\_area\_1/campus\_area\_1\_narrow\_lanes.png} or \texttt{campus\_area\_1\_wide\_lanes.png},
+    \item \texttt{dynamic\_campus\_area\_2/campus\_area\_2\_narrow\_lanes.png} or \texttt{campus\_area\_2\_wide\_lanes.png}.
 \end{itemize}
+
+The branch roles themselves do not change when the lane variant changes: \texttt{static\_campus\_area\_1} remains the static campus branch and \texttt{dynamic\_campus\_area\_2} remains the dynamic campus branch.
 
 \section{\texttt{static\_campus\_area\_1}}
 
@@ -103,7 +103,7 @@ The current campus assignment logic now follows these rules:
 \begin{itemize}[leftmargin=2em]
     \item one goal per agent,
     \item starts and goals are unique,
-    \item dispersed sets keep internal 8-neighbor separation while clustered sets are directly adjacent 8-neighbor-connected groups,
+    \item dispersed sets keep internal 8-neighbor separation while clustered sets follow the global \texttt{compact\_clustering} switch,
     \item starts and goals may be adjacent to one another,
     \item when campus distinct-zone mode is active, the start zone and goal zone must differ,
     \item optional individual reachability is checked before accepting a sample.
@@ -115,6 +115,6 @@ The campus preparation code stores gray-region vertices as \texttt{visually\_fre
 
 \section{Practical Warning}
 
-If a campus run logs something like \texttt{zone\_cells=0} or otherwise behaves as though no campus zones exist, the first thing to check is the source image itself. The campus branch assumes the image was actually recolored with the intended zone colors. If the image colors are wrong, the semantic loader cannot recover the intended zones. Also verify that \texttt{master\_config.py} still points to the intended branch/image pairing after the campus-name swap.
+If a campus run logs something like \texttt{zone\_cells=0} or otherwise behaves as though no campus zones exist, the first thing to check is the source image itself. The campus branch assumes the image was actually recolored with the intended zone colors. If the image colors are wrong, the semantic loader cannot recover the intended zones. Also verify that \texttt{master\_config.py} still points to the intended branch/image pairing and the intended \texttt{narrow\_lanes} variant.
 
 \end{document}

@@ -68,14 +68,28 @@ Changing this mapping would change reported metrics and stopping behavior.
 \subsection{Campus Semantic Contract}
 The campus branches depend on semantic colors, not just thresholding. Any update to campus input processing should preserve the meanings of zone colors, white walkways, and gray regions unless the experiment design itself is intentionally changed.
 
+\subsection{Campus Image Variant Contract}
+The campus branches select their source images through branch-level \texttt{narrow\_lanes} toggles in \texttt{master\_config.py}. If lane-variant filenames or selection logic change, update both the config helper and the recorded branch metadata so it remains obvious which campus layout variant was actually run.
+
 \subsection{One-to-One Assignment Contract}
 All current branches are one-to-one MAPF branches. Do not silently reintroduce many-to-one or one-to-many assignment semantics under a misleading flag name.
 
 \subsection{Global Solver Toggle Contract}
-The new \texttt{enhanced\_CBS} switch is global. Do not quietly make solver choice branch-specific unless that experiment-design change is intentional and documented. The current design uses one solver family for the whole run so solver behavior remains comparable across branches. However, each branch now stores its own editable \texttt{ECBS\_suboptimality} value in \texttt{master\_config.py}; if ECBS behavior changes, keep the propagation of that branch-level value into branch specs, runtime dispatch, solver internals, and recorded metadata consistent.
+The \texttt{enhanced\_CBS} switch is global. Do not quietly make solver choice branch-specific unless that experiment-design change is intentional and documented. The current design uses one solver family for the whole run so solver behavior remains comparable across branches.
+
+\subsection{Branch-Level Low-Level Guidance Contract}
+The new \texttt{true\_static\_shortest\_path\_distance} and \texttt{tight\_time\_horizon} values are branch-local, but they affect solver behavior deeply. If either one changes, keep the propagation consistent across:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{master\_config.py},
+    \item \texttt{experiments/branch\_specs.py},
+    \item \texttt{experiments/study/runtime.py},
+    \item the relevant low-level A* modules,
+    \item the CBS/ECBS wrappers that call those modules,
+    \item branch-header logging and recorded branch metadata.
+\end{itemize}
 
 \subsection{Output Contract}
-Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the new solver metadata fields written into branch specs and run records.
+Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the solver metadata fields written into branch specs and run records.
 
 \section{When Adding a New Branch}
 
@@ -95,8 +109,8 @@ Solver updates now touch more than just the planner implementation. Before chang
     \item \texttt{master\_config.py} if the user-facing toggle changes,
     \item \texttt{experiments/branch\_specs.py} if metadata recorded for the run changes,
     \item \texttt{experiments/study/runtime.py} if dispatch or result metadata changes,
-    \item \texttt{experiments/study/models.py} if run-record fields change,
-    \item documentation under \texttt{documentation/05\_solver\_behavior}, \texttt{11\_outputs\_and\_visualization}, and \texttt{12\_current\_configuration}.
+    \item the low-level guidance helpers if the heuristic or horizon policy changes,
+    \item documentation under \texttt{documentation/05\_solver\_behavior}, \texttt{08\_dynamic\_shared\_pipeline}, and \texttt{12\_current\_configuration}.
 \end{itemize}
 
 \section{When Changing Sampling Rules}
@@ -109,7 +123,7 @@ Sampling logic is branch-sensitive. Before changing it, check:
     \item whether the branch expects \texttt{dispersed} or \texttt{clustered} goal placement,
     \item whether the branch requires starts and goals to occupy different campus zones,
     \item whether the allowed start and goal vertices come from an image-semantic mask,
-    \item whether the branch should enforce dispersed 8-neighbor separation or directly adjacent clustered placement.
+    \item whether the branch should enforce dispersed 8-neighbor separation or clustered placement, and if clustered placement is active whether the project-wide \texttt{compact\_clustering} toggle should imply compact adjacency or connected one-cell-gap spacing.
 \end{itemize}
 
 \section{A Good Mental Rule}

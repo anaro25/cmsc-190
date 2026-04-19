@@ -22,9 +22,9 @@
 The experiment currently uses four branches:
 \begin{itemize}[leftmargin=2em]
     \item \textbf{Static artificial}
-    \item \textbf{Static campus\_area\_2}
+    \item \textbf{Static campus\_area\_1}
     \item \textbf{Dynamic port}
-    \item \textbf{Dynamic campus\_area\_1}
+    \item \textbf{Dynamic campus\_area\_2}
 \end{itemize}
 
 \section{Assignment Model}
@@ -35,9 +35,9 @@ All branches now use one-to-one MAPF assignments. The experiment does not curren
 
 \begin{itemize}[leftmargin=2em]
     \item \texttt{static\_artificial}: dispersed starts, dispersed goals.
-    \item \texttt{static\_campus\_area\_2}: dispersed starts in one campus zone, clustered goals in the other campus zone.
+    \item \texttt{static\_campus\_area\_1}: dispersed starts in one campus zone, clustered goals in the other campus zone.
     \item \texttt{dynamic\_port}: clustered starts, dispersed goals.
-    \item \texttt{dynamic\_campus\_area\_1}: clustered starts in one campus zone, clustered goals in one different campus zone.
+    \item \texttt{dynamic\_campus\_area\_2}: clustered starts in one campus zone, clustered goals in one different campus zone.
 \end{itemize}
 
 \section{Campus Semantics}
@@ -46,6 +46,6 @@ For the campus branches, zone colors are traversable and spawnable, white walkwa
 
 \section{Placement Rule}
 
-Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally, while \texttt{clustered} sets are sampled as directly adjacent 8-neighbor-connected groups. Start-goal adjacency is allowed.
+Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally. Clustered sets are controlled by the global \texttt{compact\_clustering} switch: when it is \texttt{True}, clustered sets are directly adjacent 8-neighbor-connected groups; when it is \texttt{False}, clustered sets stay connected while keeping one empty cell of separation in all 8 directions. Start-goal adjacency is allowed.
 
 \end{document}

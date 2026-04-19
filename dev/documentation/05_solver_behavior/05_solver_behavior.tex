@@ -36,7 +36,7 @@
 
 \section{Global Solver Toggle}
 
-The project now has one global solver switch in \texttt{master\_config.py}:
+The project has one global solver switch in \texttt{master\_config.py}:
 \begin{lstlisting}
 enhanced_CBS = True  # or False
 \end{lstlisting}
@@ -47,14 +47,15 @@ That toggle applies to the \emph{entire} project rather than to individual branc
     \item \texttt{True} selects Enhanced CBS (ECBS).
 \end{itemize}
 
-So the current experiment still compares \textbf{classical mapping vs.\ cyclic mapping} on matched run configurations, but both sides now use the same selected high-level solver family.
+So the experiment still compares \textbf{classical mapping vs.\ cyclic mapping} on matched run configurations, but both sides use the same selected high-level solver family.
 
 \section{Static Solver Path}
 
 Static runs go through:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{dev/mapf/cbs\_solver.py},
-    \item \texttt{dev/mapf/mapf\_low\_level\_astar.py}.
+    \item \texttt{dev/mapf/mapf\_low\_level\_astar.py},
+    \item \texttt{dev/mapf/low\_level\_guidance.py} when the newer low-level guidance toggles are enabled.
 \end{itemize}
 
 When \texttt{enhanced\_CBS=False}, the static branch uses standard CBS with admissible low-level A*.
@@ -72,20 +73,44 @@ The ECBS implementation no longer uses one hardcoded project-wide bound. Instead
 Dynamic runs go through:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{dev/mapf/time\_expanded\_cbs.py},
-    \item \texttt{dev/mapf/time\_expanded\_astar.py}.
+    \item \texttt{dev/mapf/time\_expanded\_astar.py},
+    \item \texttt{dev/mapf/low\_level\_guidance.py} when the newer low-level guidance toggles are enabled.
 \end{itemize}
 
 The search state is:
 \[
 (\text{position},\text{time}).
 \]
-At time \(t\), the active movement graph is read from
+At time $t$, the active movement graph is read from
 \[
 \texttt{mapped\_loop}[t \bmod L],
 \]
-where \(L\) is the loop length.
+where $L$ is the loop length.
 
-The same global toggle is respected here as well, so dynamic branches now also switch together between vanilla CBS and ECBS rather than maintaining a separate branch-specific solver choice. The selected branch's \texttt{ECBS\_suboptimality} value is passed into the time-expanded ECBS path in the same way as the static solver.
+The same global toggle is respected here as well, so dynamic branches also switch together between vanilla CBS and ECBS rather than maintaining a separate branch-specific solver choice. The selected branch's \texttt{ECBS\_suboptimality} value is passed into the time-expanded ECBS path in the same way as the static solver.
+
+\section{Branch-Level Low-Level Guidance Toggles}
+
+Each branch now also stores two low-level-planning booleans in \texttt{master\_config.py}:
+\begin{lstlisting}
+true_static_shortest_path_distance = ...
+tight_time_horizon = ...
+\end{lstlisting}
+
+These are branch-local rather than global.
+
+\subsection*{\texttt{true\_static\_shortest\_path\_distance}}
+When this is \texttt{False}, the project keeps the older Manhattan-style low-level heuristic.
+When this is \texttt{True}, the low-level planner uses the exact shortest-path distance on the branch's static movement graph as the heuristic.
+
+For static branches, that graph is the composite map itself.
+For dynamic branches, the helper code derives a static graph from the shared mapped loop while ignoring time-varying obstacle occupancy. In practice, this means the heuristic follows the static corridor structure rather than merely geometric proximity.
+
+\subsection*{\texttt{tight\_time\_horizon}}
+When this is \texttt{False}, the project keeps the older, more conservative finite horizon rule.
+When this is \texttt{True}, the low-level planner uses a tighter distance-aware cap based on the static start-to-goal distance, the latest relevant constraint time, and a bounded slack allowance.
+
+This change does not make the search infinite or unconstrained. It simply reduces the amount of gratuitous waiting-time exploration that the older horizon could allow.
 
 \section{Conflict Model}
 
@@ -99,11 +124,17 @@ Both the static and dynamic solver families detect:
 
 Once an agent reaches its final path position, it is no longer considered present for later conflict checks. This makes the system behave like a disappearing-agent MAPF model rather than a stay-at-goal blocking model.
 
-This assumption still matters in the clustered-target branches because agents reaching a compact goal region disappear instead of continuing to block that region for everyone behind them.
+This still matters in clustered-target branches because agents reaching the target cluster disappear instead of continuing to block that region for everyone behind them, regardless of whether the active cluster style is compact or spaced.
 
-\section{Why ECBS Was Added}
+\section{Why the New Low-Level Controls Exist}
 
-The motivation of the change is practical rather than cosmetic. The repository was already able to run higher-density cases more comfortably on \texttt{static\_artificial}, but several of the other branches were hitting computational difficulty at much lower agent counts. The new global ECBS toggle preserves the old vanilla baseline while making it possible to test whether a bounded-suboptimal solver can push those branches to higher agent numbers before the runtime cap dominates.
+The practical difficulty in the harder branches is not only high-level conflict branching. Some runs spend substantial time in low-level replanning or even in root-path construction. The new branch-level guidance toggles therefore target two specific costs:
+\begin{itemize}[leftmargin=2em]
+    \item a weak low-level heuristic in corridor-heavy maps,
+    \item an overly generous time horizon in dynamic time-expanded searches.
+\end{itemize}
+
+They do not change the experiment from CBS/ECBS into another solver family. They change how the existing low-level search is guided.
 
 \section{Runtime and Progress Reporting}
 

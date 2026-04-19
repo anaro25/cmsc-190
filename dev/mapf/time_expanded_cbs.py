@@ -182,7 +182,15 @@ def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level
     }
 
 
-def _replan_dynamic_agent(mapped_loop, agent, constraints, *, heuristic_weight):
+def _replan_dynamic_agent(
+    mapped_loop,
+    agent,
+    constraints,
+    *,
+    heuristic_weight,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
+):
     return find_time_expanded_path_for_agent(
         mapped_loop=mapped_loop,
         agent_id=agent["id"],
@@ -190,10 +198,19 @@ def _replan_dynamic_agent(mapped_loop, agent, constraints, *, heuristic_weight):
         goal=agent["goal"],
         constraints=constraints,
         heuristic_weight=heuristic_weight,
+        true_static_shortest_path_distance=true_static_shortest_path_distance,
+        tight_time_horizon=tight_time_horizon,
     )
 
 
-def _solve_time_expanded_with_vanilla_cbs(mapped_loop, agents, max_runtime_seconds=10.0, progress_callback=None):
+def _solve_time_expanded_with_vanilla_cbs(
+    mapped_loop,
+    agents,
+    max_runtime_seconds=10.0,
+    progress_callback=None,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
+):
     start_time = time.perf_counter()
     next_report_seconds = 5
     root_constraints = []
@@ -213,6 +230,8 @@ def _solve_time_expanded_with_vanilla_cbs(mapped_loop, agents, max_runtime_secon
             agent,
             root_constraints,
             heuristic_weight=1.0,
+            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            tight_time_horizon=tight_time_horizon,
         )
         if path is None:
             return build_failure("no_solution", 0, 0, solver_name="CBS")
@@ -252,6 +271,8 @@ def _solve_time_expanded_with_vanilla_cbs(mapped_loop, agents, max_runtime_secon
                 agents_by_id[agent_id],
                 child_constraints,
                 heuristic_weight=1.0,
+                true_static_shortest_path_distance=true_static_shortest_path_distance,
+                tight_time_horizon=tight_time_horizon,
             )
             if replanned_path is None:
                 continue
@@ -281,7 +302,15 @@ def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float
     return node_id, node
 
 
-def _solve_time_expanded_with_ecbs(mapped_loop, agents, max_runtime_seconds=10.0, progress_callback=None, suboptimality_factor: float = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR):
+def _solve_time_expanded_with_ecbs(
+    mapped_loop,
+    agents,
+    max_runtime_seconds=10.0,
+    progress_callback=None,
+    suboptimality_factor: float = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
+):
     start_time = time.perf_counter()
     next_report_seconds = 5
     root_constraints = []
@@ -301,6 +330,8 @@ def _solve_time_expanded_with_ecbs(mapped_loop, agents, max_runtime_seconds=10.0
             agent,
             root_constraints,
             heuristic_weight=suboptimality_factor,
+            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            tight_time_horizon=tight_time_horizon,
         )
         if path is None:
             return build_failure("no_solution", 0, 0, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
@@ -356,6 +387,8 @@ def _solve_time_expanded_with_ecbs(mapped_loop, agents, max_runtime_seconds=10.0
                 agents_by_id[agent_id],
                 child_constraints,
                 heuristic_weight=suboptimality_factor,
+                true_static_shortest_path_distance=true_static_shortest_path_distance,
+                tight_time_horizon=tight_time_horizon,
             )
             if replanned_path is None:
                 continue
@@ -369,7 +402,16 @@ def _solve_time_expanded_with_ecbs(mapped_loop, agents, max_runtime_seconds=10.0
     return build_failure("no_solution", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
 
 
-def solve_time_expanded_mapf_with_cbs(mapped_loop, agents, max_runtime_seconds=10.0, progress_callback=None, use_ecbs=False, ecbs_suboptimality_factor: float | None = None):
+def solve_time_expanded_mapf_with_cbs(
+    mapped_loop,
+    agents,
+    max_runtime_seconds=10.0,
+    progress_callback=None,
+    use_ecbs=False,
+    ecbs_suboptimality_factor: float | None = None,
+    true_static_shortest_path_distance=False,
+    tight_time_horizon=False,
+):
     if use_ecbs:
         return _solve_time_expanded_with_ecbs(
             mapped_loop=mapped_loop,
@@ -377,10 +419,14 @@ def solve_time_expanded_mapf_with_cbs(mapped_loop, agents, max_runtime_seconds=1
             max_runtime_seconds=max_runtime_seconds,
             progress_callback=progress_callback,
             suboptimality_factor=_resolve_ecbs_suboptimality_factor(ecbs_suboptimality_factor),
+            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            tight_time_horizon=tight_time_horizon,
         )
     return _solve_time_expanded_with_vanilla_cbs(
         mapped_loop=mapped_loop,
         agents=agents,
         max_runtime_seconds=max_runtime_seconds,
         progress_callback=progress_callback,
+        true_static_shortest_path_distance=true_static_shortest_path_distance,
+        tight_time_horizon=tight_time_horizon,
     )

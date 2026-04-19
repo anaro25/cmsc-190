@@ -38,11 +38,14 @@
 
 The current \texttt{master\_config.py} defines:
 \begin{itemize}[leftmargin=2em]
-    \item active \texttt{MAP\_TYPE}: \texttt{static\_artificial},
-    \item global consecutive failed paired sampling stop limit: \(15\),
+    \item active \texttt{MAP\_TYPE}: \texttt{dynamic\_campus\_area\_2},
+    \item global consecutive failed paired sampling stop limit: $15$,
     \item global solver toggle: \texttt{enhanced\_CBS=True},
     \item effective solver family: \texttt{ECBS},
-    \item active branch ECBS suboptimality factor: \(1.5\).
+    \item active branch ECBS suboptimality factor: $2.0$,
+    \item active branch \texttt{true\_static\_shortest\_path\_distance=False},
+    \item active branch \texttt{tight\_time\_horizon=False},
+    \item global clustering toggle: \texttt{compact\_clustering=True}.
 \end{itemize}
 
 \section{Current Branch Configurations}
@@ -58,7 +61,9 @@ branch & current important values \\
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=30.0};
 \texttt{ECBS\_suboptimality=1.5};
-\texttt{agent\_number\_range=(120,120,20)} so the planned sequence is \([120]\);
+\texttt{true\_static\_shortest\_path\_distance=False};
+\texttt{tight\_time\_horizon=False};
+\texttt{agent\_number\_range=(105,200,5)} so the planned sequence is $105,110,115,\dots,200$;
 \texttt{seed=101};
 \texttt{map\_size=(32,32)};
 \texttt{static\_obstacle\_density=0.40};
@@ -71,24 +76,29 @@ branch & current important values \\
 \texttt{num\_last\_runs\_to\_visualize=1};
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=5.0};
-\texttt{ECBS\_suboptimality=1.5};
-\texttt{agent\_number\_range=(10,10,2)} so the current planned sequence is \([10]\);
+\texttt{ECBS\_suboptimality=2.0};
+\texttt{true\_static\_shortest\_path\_distance=False};
+\texttt{tight\_time\_horizon=False};
+\texttt{agent\_number\_range=(10,10,2)} so the current planned sequence is $[10]$;
 \texttt{seed=201};
 \texttt{counted\_runs\_required=5};
 \texttt{start\_distribution\_mode=dispersed};
 \texttt{goal\_distribution\_mode=clustered};
 \texttt{require\_individual\_reachability=True};
 \texttt{zone\_relationship\_mode=distinct\_campus\_zones};
+\texttt{narrow\_lanes=True};
 \texttt{dynamic\_generation\_cell\_mode=zone\_colors\_only};
 \texttt{spawnable\_cell\_mode=zone\_colors\_only};
-\texttt{image\_path=dynamic\_campus\_area\_1/campus\_area\_1\_x64\_colored.png}. \\
+\texttt{image\_path=dynamic\_campus\_area\_1/campus\_area\_1\_narrow\_lanes.png}. \\
 
 \texttt{dynamic\_port} &
 \texttt{num\_last\_runs\_to\_visualize=1};
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=5.0};
-\texttt{ECBS\_suboptimality=1.5};
-\texttt{agent\_number\_range=(8,100,2)} so the planned sequence is \(8,10,12,\dots,100\);
+\texttt{ECBS\_suboptimality=2.0};
+\texttt{true\_static\_shortest\_path\_distance=False};
+\texttt{tight\_time\_horizon=False};
+\texttt{agent\_number\_range=(8,100,2)} so the planned sequence is $8,10,12,\dots,100$;
 \texttt{seed=301};
 \texttt{counted\_runs\_required=5};
 \texttt{target\_static\_obstacle\_density=0.15};
@@ -105,9 +115,11 @@ branch & current important values \\
 \texttt{dynamic\_campus\_area\_2} &
 \texttt{num\_last\_runs\_to\_visualize=1};
 \texttt{require\_jointly\_successful\_mappings=False};
-\texttt{time\_limit\_seconds=60.0};
-\texttt{ECBS\_suboptimality=1.5};
-\texttt{agent\_number\_range=(6,100,2)} so the planned sequence is \(6,8,10,\dots,100\);
+\texttt{time\_limit\_seconds=30.0};
+\texttt{ECBS\_suboptimality=2.0};
+\texttt{true\_static\_shortest\_path\_distance=False};
+\texttt{tight\_time\_horizon=False};
+\texttt{agent\_number\_range=(10,100,2)} so the planned sequence is $10,12,14,\dots,100$;
 \texttt{seed=401};
 \texttt{counted\_runs\_required=5};
 \texttt{target\_static\_obstacle\_density=None} meaning the source-image static layout is preserved;
@@ -119,15 +131,16 @@ branch & current important values \\
 \texttt{goal\_distribution\_mode=clustered};
 \texttt{require\_individual\_reachability=True};
 \texttt{zone\_relationship\_mode=distinct\_campus\_zones};
+\texttt{narrow\_lanes=True};
 \texttt{dynamic\_generation\_cell\_mode=zone\_colors\_only};
 \texttt{spawnable\_cell\_mode=zone\_colors\_only};
-\texttt{image\_path=dynamic\_campus\_area\_2/campus\_area\_2\_x64\_colored.png}. \\
+\texttt{image\_path=dynamic\_campus\_area\_2/campus\_area\_2\_narrow\_lanes.png}. \\
 
 \bottomrule
 \end{longtable}
 
 \section{Interpretation Advice}
 
-This file is a snapshot, not a substitute for \texttt{master\_config.py}. If a future change updates the project but this documentation is not refreshed, the code should win. Still, the values listed here are useful because they explain the current experimental shape: two static branches, two dynamic branches, direct control over dispersed versus clustered placement, campus-zone separation where required, one project-wide switch between vanilla CBS and ECBS, and one editable ECBS suboptimality value stored in each branch configuration even though only the active branch's value is used during a run.
+This file is a snapshot, not a substitute for \texttt{master\_config.py}. If a future change updates the project but this documentation is not refreshed, the code should win. Still, the values listed here are useful because they explain the current experimental shape: two static branches, two dynamic branches, direct control over dispersed versus clustered placement, a project-wide compact-versus-spaced cluster toggle, campus-zone separation where required, one project-wide switch between vanilla CBS and ECBS, one editable ECBS suboptimality value stored in each branch configuration, branch-level low-level guidance toggles for exact static-distance heuristics and tighter horizons, and branch-level lane-variant toggles for the campus images.
 
 \end{document}

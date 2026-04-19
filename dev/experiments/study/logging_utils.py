@@ -24,12 +24,16 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Active target type: {branch_spec.target_type_active}")
     logger.log(f"Start distribution mode: {branch_spec.start_distribution_mode}")
     logger.log(f"Goal distribution mode: {branch_spec.goal_distribution_mode}")
+    logger.log(f"Compact clustering: {branch_spec.compact_clustering}")
+    logger.log(f"Clustering style: {branch_spec.clustering_style_name}")
     logger.log(f"Require individual reachability: {branch_spec.require_individual_reachability}")
     logger.log(f"Zone relationship mode: {branch_spec.zone_relationship_mode}")
     logger.log(f"Solver: {branch_spec.solver_name}")
     logger.log(f"Enhanced CBS enabled: {branch_spec.enhanced_cbs_enabled}")
     if branch_spec.solver_suboptimality_factor is not None:
         logger.log(f"Solver suboptimality factor: {branch_spec.solver_suboptimality_factor:.2f}")
+    logger.log(f"True static shortest-path heuristic: {branch_spec.true_static_shortest_path_distance}")
+    logger.log(f"Tight time horizon: {branch_spec.tight_time_horizon}")
     logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Jointly viable counted pairs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
@@ -70,6 +74,8 @@ def log_dynamic_state(
 
     logger.log("Shared dynamic map prepared:")
     logger.log(f"  Image path: {branch_spec.image_path}")
+    if branch_spec.narrow_lanes is not None:
+        logger.log(f"  Narrow lanes image selected: {branch_spec.narrow_lanes}")
     if branch_spec.image_resize_longest_side is not None:
         logger.log(f"  Resized longest side: {branch_spec.image_resize_longest_side}")
     logger.log(f"  Dimensions: {rows}x{cols}")

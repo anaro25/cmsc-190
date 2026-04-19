@@ -36,7 +36,7 @@
 
 \section{Campus Zones Not Detected}
 
-If a campus run reports something that implies zero usable zones, such as a log with \texttt{zone\_cells=0}, check the source image before changing the code. The current campus loader expects the designated zone colors to be present in the actual image asset. After the campus-area name swap, also confirm that the branch/image pairing in \texttt{master\_config.py} is still the intended one: \texttt{static\_campus\_area\_1} should point to \texttt{campus\_area\_1\_x64\_colored.png} and \texttt{dynamic\_campus\_area\_2} should point to \texttt{campus\_area\_2\_x64\_colored.png}.
+If a campus run reports something that implies zero usable zones, such as a log with \texttt{zone\_cells=0}, check the source image before changing the code. The current campus loader expects the designated zone colors to be present in the actual image asset. Also confirm that the branch/image pairing and the \texttt{narrow\_lanes} settings in \texttt{master\_config.py} still point to the intended lane variant: \texttt{static\_campus\_area\_1} should select one of the \texttt{campus\_area\_1\_*\_lanes.png} files and \texttt{dynamic\_campus\_area\_2} should select one of the \texttt{campus\_area\_2\_*\_lanes.png} files.
 
 \section{Clustered Sampling Keeps Failing}
 
@@ -49,7 +49,7 @@ If a branch repeatedly fails during assignment preparation, inspect the interact
     \item reachability filtering.
 \end{itemize}
 
-A cluster request is intentionally loose, but it can still fail if one zone is too narrow or too fragmented to fit the requested count as one directly adjacent component.
+A cluster request is intentionally loose, but it can still fail if one zone is too narrow or too fragmented to fit the requested count under the active cluster style. With \texttt{compact\_clustering=True}, the cluster must fit as one directly adjacent component. With \texttt{compact\_clustering=False}, the cluster must still stay connected while keeping one empty cell of separation in all 8 directions.
 
 \section{Distinct-Zone Campus Sampling Fails}
 

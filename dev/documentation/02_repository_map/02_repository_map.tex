@@ -59,13 +59,16 @@ This is the single user-editable configuration file. It defines:
     \item which branch is active via \texttt{MAP\_TYPE},
     \item the global limit on consecutive failed paired sampling attempts,
     \item the global \texttt{enhanced\_CBS} toggle,
+    \item the global \texttt{compact\_clustering} toggle,
     \item each branch's editable \texttt{ECBS\_suboptimality} value,
+    \item each branch's low-level guidance toggles \texttt{true\_static\_shortest\_path\_distance} and \texttt{tight\_time\_horizon},
+    \item campus-image lane selectors such as \texttt{narrow\_lanes},
     \item all other branch-specific numeric parameters and toggles.
 \end{itemize}
 
 \subsection{\texttt{dev/experiments/branch\_specs.py}}
 
-This file converts user config dictionaries into normalized branch specifications. In practice, many parts of the runner depend on the \texttt{BranchSpec} dataclass rather than directly reading raw config dictionaries. The branch spec now also records the effective solver family metadata, including the active branch's ECBS suboptimality factor when ECBS is enabled, so the output directory keeps track of whether the run used vanilla CBS or ECBS and with what bound.
+This file converts user config dictionaries into normalized branch specifications. In practice, many parts of the runner depend on the \texttt{BranchSpec} dataclass rather than directly reading raw config dictionaries. The branch spec now also records the effective solver family metadata, the active clustering style, campus lane-variant metadata when relevant, and the two branch-level low-level guidance toggles, so the output directory keeps track of which heuristic and horizon policy were active for the run.
 
 \subsection{\texttt{dev/experiments/study/}}
 
@@ -88,6 +91,7 @@ This folder contains the actual planning code:
 \begin{itemize}[leftmargin=2em]
     \item static CBS/ECBS and low-level A*,
     \item time-expanded CBS/ECBS and low-level A*,
+    \item low-level guidance helpers in \texttt{low\_level\_guidance.py} for exact static-distance heuristics and tighter horizon support,
     \item conflict metrics,
     \item frame builders and image loggers.
 \end{itemize}
@@ -98,7 +102,7 @@ These modules implement the map representation, mapping overlays, cyclic cleanup
 
 \subsection{\texttt{dev/inputs/}}
 
-Image-based branches depend on this folder. The current dynamic input logic supports both ordinary thresholded port loading and campus semantic-color loading. The campus assets currently referenced by \texttt{master\_config.py} are \texttt{dynamic\_campus\_area\_1/campus\_area\_1\_x64\_colored.png} and \texttt{dynamic\_campus\_area\_2/campus\_area\_2\_x64\_colored.png}.
+Image-based branches depend on this folder. The current dynamic input logic supports both ordinary thresholded port loading and campus semantic-color loading. The campus assets currently referenced by \texttt{master\_config.py} are the lane variants under \texttt{dynamic\_campus\_area\_1/} and \texttt{dynamic\_campus\_area\_2/}, selected through each campus branch's \texttt{narrow\_lanes} toggle.
 
 \section{Legacy vs.\ Active Code}
 

@@ -116,8 +116,9 @@ Within any one sampled run configuration:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{dispersed} starts avoid edge and vertex adjacency to other starts,
     \item \texttt{dispersed} goals avoid edge and vertex adjacency to other goals,
-    \item \texttt{clustered} starts form one directly adjacent 8-neighbor-connected component,
-    \item \texttt{clustered} goals form one directly adjacent 8-neighbor-connected component,
+    \item when \texttt{compact\_clustering=True}, \texttt{clustered} starts form one directly adjacent 8-neighbor-connected component,
+    \item when \texttt{compact\_clustering=True}, \texttt{clustered} goals form one directly adjacent 8-neighbor-connected component,
+    \item when \texttt{compact\_clustering=False}, clustered starts and goals remain connected clusters but keep one empty cell of separation in all 8 directions,
     \item start-goal adjacency is allowed as long as the cells are not identical.
 \end{itemize}
 

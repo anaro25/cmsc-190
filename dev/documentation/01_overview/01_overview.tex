@@ -110,7 +110,7 @@ The current project implicitly assumes the following classical MAPF conditions u
     \item offline planning with full knowledge of the dynamic loop,
     \item vertex and edge conflict detection,
     \item one unique goal per agent,
-    \item dispersed sets avoid internal 8-neighbor adjacency, while clustered sets are sampled as directly adjacent 8-neighbor-connected components.
+    \item dispersed sets avoid internal 8-neighbor adjacency, while clustered sets are controlled by the global \texttt{compact\_clustering} switch: compact directly adjacent clusters when \texttt{True}, and connected one-cell-gap clusters when \texttt{False}.
 \end{itemize}
 
 \end{document}

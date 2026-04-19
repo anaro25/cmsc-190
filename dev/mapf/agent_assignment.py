@@ -1,11 +1,13 @@
 import random
 
 from dev.maps.connectivity_postprocessor import are_mutually_reachable, is_free_vertex
+from dev.master_config import compact_clustering
 from dev.utils.log_symbols import AGENT_LOG_SYMBOL, TARGET_LOG_SYMBOL
 
 
 MAX_ASSIGNMENT_ATTEMPTS = 200
 VERTEX_ADJACENCY_CLEARANCE = 2
+CLUSTER_GAP_ONE_STEP = 4
 
 
 def _build_label_info(num_agents):
@@ -62,6 +64,22 @@ def _vertices_are_direct_neighbors(vertex_a, vertex_b):
     return (row_delta != 0 or col_delta != 0) and row_delta <= 2 and col_delta <= 2
 
 
+def _vertices_are_gap_one_neighbors(vertex_a, vertex_b):
+    row_delta = abs(vertex_a[0] - vertex_b[0])
+    col_delta = abs(vertex_a[1] - vertex_b[1])
+    return (row_delta, col_delta) in {
+        (0, CLUSTER_GAP_ONE_STEP),
+        (CLUSTER_GAP_ONE_STEP, 0),
+        (CLUSTER_GAP_ONE_STEP, CLUSTER_GAP_ONE_STEP),
+    }
+
+
+def _vertices_are_cluster_neighbors(vertex_a, vertex_b):
+    if compact_clustering:
+        return _vertices_are_direct_neighbors(vertex_a, vertex_b)
+    return _vertices_are_gap_one_neighbors(vertex_a, vertex_b)
+
+
 def _subset_respects_clearance(vertices):
     for index, vertex in enumerate(vertices):
         for other in vertices[index + 1 :]:
@@ -75,6 +93,8 @@ def _subset_is_connected_cluster(vertices):
         return False
     if len(vertices) == 1:
         return True
+    if not compact_clustering and not _subset_respects_clearance(vertices):
+        return False
 
     remaining = set(vertices)
     stack = [remaining.pop()]
@@ -84,7 +104,7 @@ def _subset_is_connected_cluster(vertices):
         newly_reached = {
             other
             for other in tuple(remaining)
-            if _vertices_are_direct_neighbors(current, other)
+            if _vertices_are_cluster_neighbors(current, other)
         }
         if newly_reached:
             remaining -= newly_reached
@@ -132,8 +152,12 @@ def _sample_clustered_vertices(vertices, num_vertices, rng):
         while len(chosen) < num_vertices:
             frontier = []
             for candidate in vertex_set - chosen_set:
+                if not compact_clustering and any(
+                    _vertices_conflict_under_clearance(candidate, existing) for existing in chosen
+                ):
+                    continue
                 touching_vertices = sum(
-                    1 for existing in chosen if _vertices_are_direct_neighbors(candidate, existing)
+                    1 for existing in chosen if _vertices_are_cluster_neighbors(candidate, existing)
                 )
                 if touching_vertices == 0:
                     continue
@@ -151,8 +175,13 @@ def _sample_clustered_vertices(vertices, num_vertices, rng):
         if len(chosen) == num_vertices and _subset_is_connected_cluster(chosen):
             return chosen
 
+    cluster_description = (
+        "one compact directly adjacent component"
+        if compact_clustering
+        else "one spaced one-cell-gap component"
+    )
     raise ValueError(
-        f"Could not sample {num_vertices} clustered vertices as one directly adjacent component."
+        f"Could not sample {num_vertices} clustered vertices as {cluster_description}."
     )
 
 
@@ -248,7 +277,7 @@ def sample_agent_start_goal_pairs(
         * start != goal for each agent
         * when require_individual_reachability=True, each assigned start-goal pair must be reachable
         * dispersed sets respect 8-neighbor clearance internally
-        * clustered sets form one directly adjacent 8-neighbor component internally
+        * clustered sets form one connected cluster whose spacing is controlled by compact_clustering
         * clustered/dispersed controls only how each set is positioned, not assignment cardinality
     """
     if rng is None:

@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from dev.master_config import BRANCH_USER_CONFIGS, enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, compact_clustering, enhanced_CBS
 
 
 AgentNumberRange = tuple[int, int, int]
@@ -34,6 +34,9 @@ class BranchSpec:
     goal_distribution_mode: str = "dispersed"
     require_individual_reachability: bool = False
     zone_relationship_mode: str = "none"
+    compact_clustering: bool = True
+    clustering_style_name: str = "compact"
+    narrow_lanes: bool | None = None
     base_rows: int | None = None
     base_cols: int | None = None
     static_obstacle_density: float | None = None
@@ -49,6 +52,8 @@ class BranchSpec:
     solver_name: str = "CBS"
     enhanced_cbs_enabled: bool = False
     solver_suboptimality_factor: float | None = None
+    true_static_shortest_path_distance: bool = False
+    tight_time_horizon: bool = False
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -90,6 +95,16 @@ def _solver_metadata(config: dict[str, Any]) -> tuple[str, bool, float | None]:
     )
 
 
+def _clustering_style_name() -> str:
+    return "compact" if compact_clustering else "spaced"
+
+
+def _cluster_description() -> str:
+    if compact_clustering:
+        return "one compact directly adjacent 8-neighbor-connected group"
+    return "one spaced cluster whose members keep one empty cell of separation in all 8 directions"
+
+
 def _build_branch_specs() -> dict[str, BranchSpec]:
     static_cfg = BRANCH_USER_CONFIGS["static_artificial"]
     static_campus_1_cfg = BRANCH_USER_CONFIGS["static_campus_area_1"]
@@ -104,6 +119,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
     static_campus_1_solver_name, static_campus_1_enhanced_cbs_enabled, static_campus_1_solver_suboptimality_factor = _solver_metadata(static_campus_1_cfg)
     port_solver_name, port_enhanced_cbs_enabled, port_solver_suboptimality_factor = _solver_metadata(port_cfg)
     campus_2_solver_name, campus_2_enhanced_cbs_enabled, campus_2_solver_suboptimality_factor = _solver_metadata(campus_2_cfg)
+    clustering_style_name = _clustering_style_name()
+    cluster_description = _cluster_description()
 
     return {
         "static_artificial": BranchSpec(
@@ -125,9 +142,13 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(static_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=False,
+            compact_clustering=compact_clustering,
+            clustering_style_name=clustering_style_name,
             solver_name=static_solver_name,
             enhanced_cbs_enabled=static_enhanced_cbs_enabled,
             solver_suboptimality_factor=static_solver_suboptimality_factor,
+            true_static_shortest_path_distance=bool(static_cfg.get("true_static_shortest_path_distance", False)),
+            tight_time_horizon=bool(static_cfg.get("tight_time_horizon", False)),
             start_distribution_mode=str(static_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(static_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(static_cfg.get("require_individual_reachability", False)),
@@ -160,9 +181,14 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(static_campus_1_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=False,
+            compact_clustering=compact_clustering,
+            clustering_style_name=clustering_style_name,
+            narrow_lanes=bool(static_campus_1_cfg.get("narrow_lanes", False)),
             solver_name=static_campus_1_solver_name,
             enhanced_cbs_enabled=static_campus_1_enhanced_cbs_enabled,
             solver_suboptimality_factor=static_campus_1_solver_suboptimality_factor,
+            true_static_shortest_path_distance=bool(static_campus_1_cfg.get("true_static_shortest_path_distance", False)),
+            tight_time_horizon=bool(static_campus_1_cfg.get("tight_time_horizon", False)),
             start_distribution_mode=str(static_campus_1_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(static_campus_1_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(static_campus_1_cfg.get("require_individual_reachability", False)),
@@ -173,8 +199,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             spawnable_cell_mode=str(static_campus_1_cfg.get("spawnable_cell_mode", "zone_colors_only")),
             notes=(
                 "Static image-based campus branch with explicit zone-color semantics. Starts are dispersed in one zone, "
-                "targets are sampled as one directly adjacent cluster in a different zone, and assignments remain one-to-one. Zone colors are traversable "
-                "and spawnable, white walkways are traversable but non-spawnable, and gray is non-traversable."
+                f"targets are sampled as {cluster_description} in a different zone, and assignments remain one-to-one. "
+                "Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, and gray is non-traversable. "
+                f"The currently selected campus image variant is {'narrow lanes' if bool(static_campus_1_cfg.get('narrow_lanes', False)) else 'wide lanes'}."
             ),
         ),
         "dynamic_port": BranchSpec(
@@ -196,9 +223,13 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(port_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=True,
+            compact_clustering=compact_clustering,
+            clustering_style_name=clustering_style_name,
             solver_name=port_solver_name,
             enhanced_cbs_enabled=port_enhanced_cbs_enabled,
             solver_suboptimality_factor=port_solver_suboptimality_factor,
+            true_static_shortest_path_distance=bool(port_cfg.get("true_static_shortest_path_distance", False)),
+            tight_time_horizon=bool(port_cfg.get("tight_time_horizon", False)),
             start_distribution_mode=str(port_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(port_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(port_cfg.get("require_individual_reachability", True)),
@@ -215,9 +246,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_generation_cell_mode=str(port_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(port_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
-                "Image-based dynamic branch with clustered starts sampled as one directly adjacent group and dispersed one-to-one targets. Retained pairs are the run "
-                "configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated "
-                "from agent_number_range and the branch can stop early if the stopping rules trigger."
+                f"Image-based dynamic branch with clustered starts sampled as {cluster_description} and dispersed one-to-one targets. "
+                "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
+                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
         ),
         "dynamic_campus_area_2": BranchSpec(
@@ -239,9 +270,14 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(campus_2_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=True,
+            compact_clustering=compact_clustering,
+            clustering_style_name=clustering_style_name,
+            narrow_lanes=bool(campus_2_cfg.get("narrow_lanes", False)),
             solver_name=campus_2_solver_name,
             enhanced_cbs_enabled=campus_2_enhanced_cbs_enabled,
             solver_suboptimality_factor=campus_2_solver_suboptimality_factor,
+            true_static_shortest_path_distance=bool(campus_2_cfg.get("true_static_shortest_path_distance", False)),
+            tight_time_horizon=bool(campus_2_cfg.get("tight_time_horizon", False)),
             start_distribution_mode=str(campus_2_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(campus_2_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(campus_2_cfg.get("require_individual_reachability", True)),
@@ -259,8 +295,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             notes=(
                 "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways "
                 "are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles are generated only inside the "
-                "zone colors. Starts and targets are both sampled as directly adjacent clusters, assignments stay one-to-one, and the two clusters must come "
-                "from different campus zones."
+                f"zone colors. Starts and targets are both sampled as {cluster_description}, assignments stay one-to-one, "
+                "and the two clusters must come from different campus zones. "
+                f"The currently selected campus image variant is {'narrow lanes' if bool(campus_2_cfg.get('narrow_lanes', False)) else 'wide lanes'}."
             ),
         ),
     }
