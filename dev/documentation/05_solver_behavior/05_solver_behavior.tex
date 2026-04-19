@@ -65,7 +65,7 @@ When \texttt{enhanced\_CBS=True}, the same entry point switches to an ECBS-style
     \item weighted low-level A* replanning.
 \end{itemize}
 
-The current ECBS implementation uses a fixed suboptimality factor of \(1.5\).
+The ECBS implementation no longer uses one hardcoded project-wide bound. Instead, when \texttt{enhanced\_CBS=True}, the active branch contributes its own \texttt{ECBS\_suboptimality} value from \texttt{master\_config.py}. That same value is used for the static or dynamic ECBS low-level weighted A* calls, the focal-bound calculation, and the recorded solver metadata.
 
 \section{Dynamic Solver Path}
 
@@ -85,7 +85,7 @@ At time \(t\), the active movement graph is read from
 \]
 where \(L\) is the loop length.
 
-The same global toggle is respected here as well, so dynamic branches now also switch together between vanilla CBS and ECBS rather than maintaining a separate branch-specific solver choice.
+The same global toggle is respected here as well, so dynamic branches now also switch together between vanilla CBS and ECBS rather than maintaining a separate branch-specific solver choice. The selected branch's \texttt{ECBS\_suboptimality} value is passed into the time-expanded ECBS path in the same way as the static solver.
 
 \section{Conflict Model}
 

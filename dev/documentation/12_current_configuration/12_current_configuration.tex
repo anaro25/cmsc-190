@@ -38,11 +38,11 @@
 
 The current \texttt{master\_config.py} defines:
 \begin{itemize}[leftmargin=2em]
-    \item active \texttt{MAP\_TYPE}: \texttt{dynamic\_campus\_area\_2},
+    \item active \texttt{MAP\_TYPE}: \texttt{static\_artificial},
     \item global consecutive failed paired sampling stop limit: \(15\),
     \item global solver toggle: \texttt{enhanced\_CBS=True},
     \item effective solver family: \texttt{ECBS},
-    \item current ECBS suboptimality factor: \(1.5\).
+    \item active branch ECBS suboptimality factor: \(1.5\).
 \end{itemize}
 
 \section{Current Branch Configurations}
@@ -55,11 +55,12 @@ branch & current important values \\
 
 \texttt{static\_artificial} &
 \texttt{num\_last\_runs\_to\_visualize=1};
-\texttt{require\_jointly\_successful\_mappings=True};
-\texttt{time\_limit\_seconds=5.0};
-\texttt{agent\_number\_range=(30,100,2)} so the planned sequence is \(30,32,34,\dots,100\);
+\texttt{require\_jointly\_successful\_mappings=False};
+\texttt{time\_limit\_seconds=30.0};
+\texttt{ECBS\_suboptimality=1.5};
+\texttt{agent\_number\_range=(120,120,20)} so the planned sequence is \([120]\);
 \texttt{seed=101};
-\texttt{map\_size=(25,25)};
+\texttt{map\_size=(32,32)};
 \texttt{static\_obstacle\_density=0.40};
 \texttt{counted\_runs\_required=5};
 \texttt{start\_distribution\_mode=dispersed};
@@ -70,6 +71,7 @@ branch & current important values \\
 \texttt{num\_last\_runs\_to\_visualize=1};
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=5.0};
+\texttt{ECBS\_suboptimality=1.5};
 \texttt{agent\_number\_range=(10,10,2)} so the current planned sequence is \([10]\);
 \texttt{seed=201};
 \texttt{counted\_runs\_required=5};
@@ -85,6 +87,7 @@ branch & current important values \\
 \texttt{num\_last\_runs\_to\_visualize=1};
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=5.0};
+\texttt{ECBS\_suboptimality=1.5};
 \texttt{agent\_number\_range=(8,100,2)} so the planned sequence is \(8,10,12,\dots,100\);
 \texttt{seed=301};
 \texttt{counted\_runs\_required=5};
@@ -103,6 +106,7 @@ branch & current important values \\
 \texttt{num\_last\_runs\_to\_visualize=1};
 \texttt{require\_jointly\_successful\_mappings=False};
 \texttt{time\_limit\_seconds=60.0};
+\texttt{ECBS\_suboptimality=1.5};
 \texttt{agent\_number\_range=(6,100,2)} so the planned sequence is \(6,8,10,\dots,100\);
 \texttt{seed=401};
 \texttt{counted\_runs\_required=5};
@@ -124,6 +128,6 @@ branch & current important values \\
 
 \section{Interpretation Advice}
 
-This file is a snapshot, not a substitute for \texttt{master\_config.py}. If a future change updates the project but this documentation is not refreshed, the code should win. Still, the values listed here are useful because they explain the current experimental shape: two static branches, two dynamic branches, direct control over dispersed versus clustered placement, campus-zone separation where required, one project-wide switch between vanilla CBS and ECBS, and the current campus-area name swap between the static and dynamic campus roles.
+This file is a snapshot, not a substitute for \texttt{master\_config.py}. If a future change updates the project but this documentation is not refreshed, the code should win. Still, the values listed here are useful because they explain the current experimental shape: two static branches, two dynamic branches, direct control over dispersed versus clustered placement, campus-zone separation where required, one project-wide switch between vanilla CBS and ECBS, and one editable ECBS suboptimality value stored in each branch configuration even though only the active branch's value is used during a run.
 
 \end{document}

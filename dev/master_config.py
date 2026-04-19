@@ -19,17 +19,18 @@ CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
 enhanced_CBS = True
 
 # Uncomment exactly one MAP_TYPE.
-# MAP_TYPE = "static_artificial"
+MAP_TYPE = "static_artificial"
 # MAP_TYPE = "static_campus_area_1"
 # MAP_TYPE = "dynamic_port"
-MAP_TYPE = "dynamic_campus_area_2"
+# MAP_TYPE = "dynamic_campus_area_2"
 
 STATIC_ARTIFICIAL_CONFIG = {
     # common frequently edited constants
-    "agent_number_range": (30, 100, 2),
-    "time_limit_seconds": 5.0,
+    "agent_number_range": (105, 200, 5), # max 120
+    "time_limit_seconds": 30.0,
+    "ECBS_suboptimality": 1.5,
     "num_last_runs_to_visualize": 1,
-    "require_jointly_successful_mappings": True,
+    "require_jointly_successful_mappings": False,
     "seed": 101,
     
     # common permanent constants
@@ -40,14 +41,15 @@ STATIC_ARTIFICIAL_CONFIG = {
     "zone_relationship_mode": "none",
     
     # branch-specific constants
-    "map_size": (25, 25),
+    "map_size": (32, 32),
     "static_obstacle_density": 0.40,
 }
 
 STATIC_CAMPUS_AREA_1_CONFIG = {
-    # common frequently edited constant
+    # common frequently edited constants
     "agent_number_range": (10, 10, 2),
     "time_limit_seconds": 5.0,
+    "ECBS_suboptimality": 100.0,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,
     "seed": 201,
@@ -70,6 +72,7 @@ DYNAMIC_PORT_CONFIG = {
     # common frequently edited constants
     "agent_number_range": (8, 100, 2),
     "time_limit_seconds": 5.0,
+    "ECBS_suboptimality": 100.0,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,
     "seed": 301,    
@@ -94,8 +97,9 @@ DYNAMIC_PORT_CONFIG = {
 
 DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     # common frequently edited constants
-    "agent_number_range": (6, 100, 2),
-    "time_limit_seconds": 60.0,
+    "agent_number_range": (10, 100, 2),
+    "time_limit_seconds": 30.0,
+    "ECBS_suboptimality": 100.0,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,
     "seed": 401,

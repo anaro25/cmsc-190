@@ -65,14 +65,14 @@ The most important structured outputs are:
 
 The solver update makes two of those files more informative:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{branch\_spec.json} now records the effective solver family metadata for the whole branch run,
+    \item \texttt{branch\_spec.json} now records the effective solver family metadata for the whole branch run, including the active branch's ECBS bound when relevant,
     \item \texttt{run\_records.json}/\texttt{.csv} now record per-run solver metadata such as CBS vs.\ ECBS and the active suboptimality factor when ECBS is enabled.
 \end{itemize}
 
 
 \section{Logging Behavior}
 
-The experiment logger writes each line both to the branch log file and to stdout immediately. In practical terms, the periodic solver progress lines such as the 5-second classical/cyclic progress reports should now appear live during long runs instead of being buffered and dumped all at once later.
+The experiment logger writes each line both to the branch log file and to stdout immediately. In practical terms, the periodic solver progress lines such as the 5-second classical/cyclic progress reports should now appear live during long runs instead of being buffered and dumped all at once later. The condition header now prints as \texttt{Condition n} rather than \texttt{Condition n/(total conditions)}, and paired sampling attempts are separated by a blank line for readability.
 
 \section{Graphs}
 

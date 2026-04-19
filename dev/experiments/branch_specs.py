@@ -74,9 +74,20 @@ def _goal_type(config: dict[str, Any]) -> str:
     return "clustered_targets" if goal_distribution_mode == "clustered" else "dispersed_targets"
 
 
-def _solver_metadata() -> tuple[str, bool, float | None]:
+def _resolve_ecbs_suboptimality(config: dict[str, Any]) -> float:
+    value = float(config.get("ECBS_suboptimality", 1.5))
+    if value < 1.0:
+        raise ValueError("ECBS_suboptimality must be greater than or equal to 1.0")
+    return value
+
+
+def _solver_metadata(config: dict[str, Any]) -> tuple[str, bool, float | None]:
     enabled = bool(enhanced_CBS)
-    return ("ECBS" if enabled else "CBS", enabled, 1.5 if enabled else None)
+    return (
+        "ECBS" if enabled else "CBS",
+        enabled,
+        _resolve_ecbs_suboptimality(config) if enabled else None,
+    )
 
 
 def _build_branch_specs() -> dict[str, BranchSpec]:
@@ -89,7 +100,10 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
     static_campus_1_range = tuple(static_campus_1_cfg["agent_number_range"])
     port_range = tuple(port_cfg["agent_number_range"])
     campus_2_range = tuple(campus_2_cfg["agent_number_range"])
-    solver_name, enhanced_cbs_enabled, solver_suboptimality_factor = _solver_metadata()
+    static_solver_name, static_enhanced_cbs_enabled, static_solver_suboptimality_factor = _solver_metadata(static_cfg)
+    static_campus_1_solver_name, static_campus_1_enhanced_cbs_enabled, static_campus_1_solver_suboptimality_factor = _solver_metadata(static_campus_1_cfg)
+    port_solver_name, port_enhanced_cbs_enabled, port_solver_suboptimality_factor = _solver_metadata(port_cfg)
+    campus_2_solver_name, campus_2_enhanced_cbs_enabled, campus_2_solver_suboptimality_factor = _solver_metadata(campus_2_cfg)
 
     return {
         "static_artificial": BranchSpec(
@@ -111,9 +125,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(static_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=False,
-            solver_name=solver_name,
-            enhanced_cbs_enabled=enhanced_cbs_enabled,
-            solver_suboptimality_factor=solver_suboptimality_factor,
+            solver_name=static_solver_name,
+            enhanced_cbs_enabled=static_enhanced_cbs_enabled,
+            solver_suboptimality_factor=static_solver_suboptimality_factor,
             start_distribution_mode=str(static_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(static_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(static_cfg.get("require_individual_reachability", False)),
@@ -146,9 +160,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(static_campus_1_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=False,
-            solver_name=solver_name,
-            enhanced_cbs_enabled=enhanced_cbs_enabled,
-            solver_suboptimality_factor=solver_suboptimality_factor,
+            solver_name=static_campus_1_solver_name,
+            enhanced_cbs_enabled=static_campus_1_enhanced_cbs_enabled,
+            solver_suboptimality_factor=static_campus_1_solver_suboptimality_factor,
             start_distribution_mode=str(static_campus_1_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(static_campus_1_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(static_campus_1_cfg.get("require_individual_reachability", False)),
@@ -182,9 +196,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(port_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=True,
-            solver_name=solver_name,
-            enhanced_cbs_enabled=enhanced_cbs_enabled,
-            solver_suboptimality_factor=solver_suboptimality_factor,
+            solver_name=port_solver_name,
+            enhanced_cbs_enabled=port_enhanced_cbs_enabled,
+            solver_suboptimality_factor=port_solver_suboptimality_factor,
             start_distribution_mode=str(port_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(port_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(port_cfg.get("require_individual_reachability", True)),
@@ -225,9 +239,9 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             require_jointly_successful_mappings=bool(campus_2_cfg.get("require_jointly_successful_mappings", True)),
             path_length_graph_enabled=True,
             is_dynamic=True,
-            solver_name=solver_name,
-            enhanced_cbs_enabled=enhanced_cbs_enabled,
-            solver_suboptimality_factor=solver_suboptimality_factor,
+            solver_name=campus_2_solver_name,
+            enhanced_cbs_enabled=campus_2_enhanced_cbs_enabled,
+            solver_suboptimality_factor=campus_2_solver_suboptimality_factor,
             start_distribution_mode=str(campus_2_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(campus_2_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(campus_2_cfg.get("require_individual_reachability", True)),

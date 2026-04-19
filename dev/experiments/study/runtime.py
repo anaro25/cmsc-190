@@ -139,6 +139,7 @@ def run_static_mapping(
     runtime_limit_seconds: float,
     logger: ExperimentLogger,
     label: str,
+    solver_suboptimality_factor: float | None = None,
 ) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
@@ -148,6 +149,7 @@ def run_static_mapping(
             max_runtime_seconds=runtime_limit_seconds,
             progress_callback=build_progress_callback(logger, label),
             use_ecbs=bool(enhanced_CBS),
+            ecbs_suboptimality_factor=solver_suboptimality_factor,
         )
         elapsed_seconds = time.perf_counter() - start
         return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")
@@ -163,6 +165,7 @@ def run_dynamic_mapping(
     runtime_limit_seconds: float,
     logger: ExperimentLogger,
     label: str,
+    solver_suboptimality_factor: float | None = None,
 ) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
@@ -172,6 +175,7 @@ def run_dynamic_mapping(
             max_runtime_seconds=runtime_limit_seconds,
             progress_callback=build_progress_callback(logger, label),
             use_ecbs=bool(enhanced_CBS),
+            ecbs_suboptimality_factor=solver_suboptimality_factor,
         )
         elapsed_seconds = time.perf_counter() - start
         return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")

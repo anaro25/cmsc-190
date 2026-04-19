@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 
-from dev.master_config import enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, enhanced_CBS
 from dev.mapf.mapf_logger_dynamic import (
     write_dynamic_mapf_frames,
     write_dynamic_setup_frame,
@@ -13,6 +13,11 @@ from dev.mapf.time_expanded_cbs import solve_time_expanded_mapf_with_cbs
 
 
 PROGRESS_LOG_INTERVAL_SECONDS = 5
+
+
+def current_ecbs_suboptimality_factor():
+    return float(BRANCH_USER_CONFIGS[MAP_TYPE].get("ECBS_suboptimality", 1.5))
+
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
@@ -100,6 +105,7 @@ def run_time_expanded_mapf_for_loop(
         max_runtime_seconds=max_solver_runtime_seconds,
         progress_callback=build_elapsed_time_reporter(),
         use_ecbs=bool(enhanced_CBS),
+        ecbs_suboptimality_factor=current_ecbs_suboptimality_factor(),
     )
 
     if result["status"] != "solved":

@@ -72,7 +72,7 @@ The campus branches depend on semantic colors, not just thresholding. Any update
 All current branches are one-to-one MAPF branches. Do not silently reintroduce many-to-one or one-to-many assignment semantics under a misleading flag name.
 
 \subsection{Global Solver Toggle Contract}
-The new \texttt{enhanced\_CBS} switch is global. Do not quietly make solver choice branch-specific unless that experiment-design change is intentional and documented. The current design uses one solver family for the whole run so solver behavior remains comparable across branches.
+The new \texttt{enhanced\_CBS} switch is global. Do not quietly make solver choice branch-specific unless that experiment-design change is intentional and documented. The current design uses one solver family for the whole run so solver behavior remains comparable across branches. However, each branch now stores its own editable \texttt{ECBS\_suboptimality} value in \texttt{master\_config.py}; if ECBS behavior changes, keep the propagation of that branch-level value into branch specs, runtime dispatch, solver internals, and recorded metadata consistent.
 
 \subsection{Output Contract}
 Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the new solver metadata fields written into branch specs and run records.

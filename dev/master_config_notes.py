@@ -39,3 +39,8 @@
 #   Global solver toggle for the entire project.
 #   False -> vanilla CBS on both static and dynamic branches.
 #   True  -> ECBS on both static and dynamic branches.
+
+# ECBS_suboptimality
+#   Branch-level ECBS suboptimality factor used when enhanced_CBS=True.
+#   Keep this at 1.0 or above. The whole project still uses one global solver
+#   family at a time, but each branch stores its own editable ECBS factor.

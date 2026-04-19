@@ -2,7 +2,7 @@ import random
 import shutil
 from pathlib import Path
 
-from dev.master_config import enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, enhanced_CBS
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.mapf.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.mapf_logger import (
@@ -15,6 +15,10 @@ from dev.mapf.metrics import summarize_mapf_result
 
 
 PROGRESS_LOG_INTERVAL_SECONDS = 5
+
+
+def current_ecbs_suboptimality_factor():
+    return float(BRANCH_USER_CONFIGS[MAP_TYPE].get("ECBS_suboptimality", 1.5))
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
@@ -66,13 +70,16 @@ def solve_single_mapf_instance(
     agents,
     max_solver_runtime_seconds=10.0,
     progress_callback=None,
+    use_ecbs=None,
+    ecbs_suboptimality_factor=None,
 ):
     return solve_mapf_with_cbs(
         composite_map=composite_map,
         agents=agents,
         max_runtime_seconds=max_solver_runtime_seconds,
         progress_callback=progress_callback,
-        use_ecbs=bool(enhanced_CBS),
+        use_ecbs=bool(enhanced_CBS) if use_ecbs is None else bool(use_ecbs),
+        ecbs_suboptimality_factor=(current_ecbs_suboptimality_factor() if ecbs_suboptimality_factor is None else ecbs_suboptimality_factor),
     )
 
 
@@ -165,6 +172,7 @@ def run_single_mapf_for_map(
         max_solver_runtime_seconds=max_solver_runtime_seconds,
         progress_callback=build_elapsed_time_reporter(),
         use_ecbs=bool(enhanced_CBS),
+        ecbs_suboptimality_factor=current_ecbs_suboptimality_factor(),
     )
 
     if result["status"] != "solved":

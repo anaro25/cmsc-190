@@ -10,8 +10,8 @@ python -m dev.main
 
 `master_config.py` is the single user-editable file for branch seeds, map size,
 agent-number ranges, runtime limits, densities, thresholds, loop settings, start/goal
-positioning modes, the global consecutive failed paired sampling limit, and the
-project-wide `enhanced_CBS` solver toggle.
+positioning modes, the global consecutive failed paired sampling limit, the
+project-wide `enhanced_CBS` solver toggle, and each branch's `ECBS_suboptimality`.
 
 Results are written under `dev/outputs/<map_type>/`.
 
@@ -72,7 +72,7 @@ enhanced_CBS = True
 - `False` uses vanilla CBS
 - `True` uses ECBS
 
-This is intentionally global rather than branch-specific, so the whole run uses one solver family consistently. The current ECBS implementation uses a fixed suboptimality factor of `1.5`.
+This is intentionally global rather than branch-specific, so the whole run uses one solver family consistently. The ECBS mode now reads `ECBS_suboptimality` from the currently selected branch config, so each branch can keep its own editable suboptimality value in `master_config.py`.
 
 ## Current counted-run protocol
 

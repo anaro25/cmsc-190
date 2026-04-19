@@ -87,6 +87,7 @@ def _execute_mapping(
             runtime_limit_seconds=branch_spec.runtime_limit_seconds,
             logger=logger,
             label=label,
+            solver_suboptimality_factor=branch_spec.solver_suboptimality_factor,
         )
 
     composite_map = prepared_context.classical_map if mapping_name == "classical" else prepared_context.cyclic_map
@@ -98,6 +99,7 @@ def _execute_mapping(
         runtime_limit_seconds=branch_spec.runtime_limit_seconds,
         logger=logger,
         label=label,
+        solver_suboptimality_factor=branch_spec.solver_suboptimality_factor,
     )
 
 
@@ -235,6 +237,7 @@ def _run_jointly_viable_sampling(
             logger.log(
                 f"      Jointly viable counted pairs: {retained_pairs}/{branch_spec.counted_runs_required}"
             )
+            logger.log("")
         else:
             if (
                 classical_record.result_category == "unsolvable"
@@ -255,6 +258,8 @@ def _run_jointly_viable_sampling(
                     f"classical={classical_record.result_category} | "
                     f"cyclic={cyclic_record.result_category}"
                 )
+
+            logger.log("")
 
             if (
                 consecutive_failed_paired_sampling_attempts
@@ -390,7 +395,7 @@ def run_selected_experiment(
         logger.log("")
         logger.log("-" * 88)
         logger.log(
-            f"Condition {agent_number_index + 1}/{len(branch_spec.agent_numbers)} | "
+            f"Condition {agent_number_index + 1} | "
             f"agent_number={agent_number} | condition_id=agent_number[{branch_spec.branch_decimal}.{agent_number_index}]"
         )
         logger.log("-" * 88)
@@ -423,7 +428,7 @@ def run_selected_experiment(
             branch_stop_summary["reported_agent_numbers"].append(agent_number)
             print_aggregate_block(logger, aggregate)
             logger.log_elapsed(
-                f"Condition {agent_number_index + 1}/{len(branch_spec.agent_numbers)} completed "
+                f"Condition {agent_number_index + 1} completed "
                 f"(agent_number={agent_number})."
             )
             continue
@@ -438,7 +443,7 @@ def run_selected_experiment(
                 }
             )
             logger.log_elapsed(
-                f"Condition {agent_number_index + 1}/{len(branch_spec.agent_numbers)} stopped the branch "
+                f"Condition {agent_number_index + 1} stopped the branch "
                 f"(agent_number={agent_number})."
             )
             break

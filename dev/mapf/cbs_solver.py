@@ -6,7 +6,14 @@ from typing import Any
 from dev.mapf.mapf_low_level_astar import find_path_for_agent
 
 
-ECBS_SUBOPTIMALITY_FACTOR = 1.5
+DEFAULT_ECBS_SUBOPTIMALITY_FACTOR = 1.5
+
+
+def _resolve_ecbs_suboptimality_factor(suboptimality_factor: float | None) -> float:
+    value = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR if suboptimality_factor is None else float(suboptimality_factor)
+    if value < 1.0:
+        raise ValueError("ECBS suboptimality factor must be greater than or equal to 1.0")
+    return value
 
 
 def get_path_position(path, time_step):
@@ -174,7 +181,6 @@ def split_conflict_into_constraints(conflict):
     ]
 
 
-
 def make_constraint_signature(constraints):
     normalized = []
 
@@ -207,14 +213,14 @@ def make_cbs_node(constraints, paths_by_agent):
     }
 
 
-def build_cbs_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name):
+def build_cbs_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None):
     return {
         "status": reason,
         "paths_by_agent": None,
         "num_conflicts_detected": num_conflicts_detected,
         "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
         "solver_name": solver_name,
-        "solver_suboptimality_factor": None if solver_name == "CBS" else ECBS_SUBOPTIMALITY_FACTOR,
+        "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
     }
 
 
@@ -231,14 +237,14 @@ def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback
     return next_report_seconds
 
 
-def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name):
+def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None):
     return {
         "status": "solved",
         "paths_by_agent": paths_by_agent,
         "num_conflicts_detected": num_conflicts_detected,
         "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
         "solver_name": solver_name,
-        "solver_suboptimality_factor": None if solver_name == "CBS" else ECBS_SUBOPTIMALITY_FACTOR,
+        "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
     }
 
 
@@ -344,15 +350,12 @@ def _solve_mapf_with_vanilla_cbs(
 
         num_conflicts_detected += 1
 
-        new_constraints = split_conflict_into_constraints(conflict)
-
-        for added_constraint in new_constraints:
+        for added_constraint in split_conflict_into_constraints(conflict):
             next_report_seconds = maybe_report_elapsed_time(
                 start_time=start_time,
                 next_report_seconds=next_report_seconds,
                 progress_callback=progress_callback,
             )
-
             if time.perf_counter() - start_time > max_runtime_seconds:
                 return build_cbs_failure(
                     reason="bad_setup_timeout",
@@ -361,23 +364,19 @@ def _solve_mapf_with_vanilla_cbs(
                     solver_name="CBS",
                 )
 
-            child_constraints = list(current_node["constraints"])
-            child_constraints.append(added_constraint)
-
-            child_paths = dict(current_node["paths"])
+            child_constraints = list(current_node["constraints"]) + [added_constraint]
             constrained_agent_id = added_constraint["agent"]
             agent = agents_by_id[constrained_agent_id]
-
             new_path = _replan_static_agent(
                 composite_map,
                 agent,
                 child_constraints,
                 heuristic_weight=1.0,
             )
-
             if new_path is None:
                 continue
 
+            child_paths = dict(current_node["paths"])
             child_signature = make_constraint_signature(child_constraints)
             if child_signature in visited_constraint_sets:
                 continue
@@ -399,8 +398,8 @@ def _solve_mapf_with_vanilla_cbs(
     )
 
 
-def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float):
-    cost_bound = ECBS_SUBOPTIMALITY_FACTOR * best_cost
+def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float, *, suboptimality_factor: float):
+    cost_bound = suboptimality_factor * best_cost
     eligible = [
         (node["secondary_key"], node["cost"], node_id, node)
         for node_id, node in active_nodes.items()
@@ -422,6 +421,7 @@ def _solve_mapf_with_ecbs(
     agents,
     max_runtime_seconds=10.0,
     progress_callback=None,
+    suboptimality_factor: float = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR,
 ):
     start_time = time.perf_counter()
     next_report_seconds = 5
@@ -445,13 +445,14 @@ def _solve_mapf_with_ecbs(
                 num_conflicts_detected=0,
                 num_high_level_nodes_expanded=0,
                 solver_name="ECBS",
+                solver_suboptimality_factor=suboptimality_factor,
             )
 
         path = _replan_static_agent(
             composite_map,
             agent,
             root_constraints,
-            heuristic_weight=ECBS_SUBOPTIMALITY_FACTOR,
+            heuristic_weight=suboptimality_factor,
         )
         if path is None:
             return build_cbs_failure(
@@ -459,6 +460,7 @@ def _solve_mapf_with_ecbs(
                 num_conflicts_detected=0,
                 num_high_level_nodes_expanded=0,
                 solver_name="ECBS",
+                solver_suboptimality_factor=suboptimality_factor,
             )
         root_paths[agent["id"]] = path
 
@@ -488,6 +490,7 @@ def _solve_mapf_with_ecbs(
                 num_conflicts_detected=num_conflicts_detected,
                 num_high_level_nodes_expanded=num_high_level_nodes_expanded,
                 solver_name="ECBS",
+                solver_suboptimality_factor=suboptimality_factor,
             )
 
         _clean_open_heap(open_heap, active_nodes)
@@ -495,7 +498,11 @@ def _solve_mapf_with_ecbs(
             break
 
         best_cost = open_heap[0][0]
-        selected_node_id, current_node = _select_focal_node(active_nodes, best_cost)
+        selected_node_id, current_node = _select_focal_node(
+            active_nodes,
+            best_cost,
+            suboptimality_factor=suboptimality_factor,
+        )
         if current_node is None:
             break
 
@@ -509,6 +516,7 @@ def _solve_mapf_with_ecbs(
                 num_conflicts_detected,
                 num_high_level_nodes_expanded,
                 solver_name="ECBS",
+                solver_suboptimality_factor=suboptimality_factor,
             )
 
         num_conflicts_detected += 1
@@ -525,6 +533,7 @@ def _solve_mapf_with_ecbs(
                     num_conflicts_detected=num_conflicts_detected,
                     num_high_level_nodes_expanded=num_high_level_nodes_expanded,
                     solver_name="ECBS",
+                    solver_suboptimality_factor=suboptimality_factor,
                 )
 
             child_constraints = list(current_node["constraints"]) + [added_constraint]
@@ -539,7 +548,7 @@ def _solve_mapf_with_ecbs(
                 composite_map,
                 agent,
                 child_constraints,
-                heuristic_weight=ECBS_SUBOPTIMALITY_FACTOR,
+                heuristic_weight=suboptimality_factor,
             )
             if new_path is None:
                 continue
@@ -556,6 +565,7 @@ def _solve_mapf_with_ecbs(
         num_conflicts_detected=num_conflicts_detected,
         num_high_level_nodes_expanded=num_high_level_nodes_expanded,
         solver_name="ECBS",
+        solver_suboptimality_factor=suboptimality_factor,
     )
 
 
@@ -565,13 +575,15 @@ def solve_mapf_with_cbs(
     max_runtime_seconds=10.0,
     progress_callback=None,
     use_ecbs=False,
+    ecbs_suboptimality_factor: float | None = None,
 ):
     """
     Global static MAPF entry point.
 
     When use_ecbs=False, run vanilla CBS.
-    When use_ecbs=True, run Enhanced CBS (ECBS) with a fixed suboptimality
-    factor and focal-node selection biased toward lower-conflict solutions.
+    When use_ecbs=True, run Enhanced CBS (ECBS) with a configurable
+    suboptimality factor and focal-node selection biased toward lower-conflict
+    solutions.
     """
     if use_ecbs:
         return _solve_mapf_with_ecbs(
@@ -579,6 +591,7 @@ def solve_mapf_with_cbs(
             agents=agents,
             max_runtime_seconds=max_runtime_seconds,
             progress_callback=progress_callback,
+            suboptimality_factor=_resolve_ecbs_suboptimality_factor(ecbs_suboptimality_factor),
         )
     return _solve_mapf_with_vanilla_cbs(
         composite_map=composite_map,
