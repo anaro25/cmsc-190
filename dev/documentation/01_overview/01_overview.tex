@@ -90,14 +90,15 @@ After an agent reaches its goal, it is treated as absent from later timesteps fo
 
 \section{Current Execution Shape}
 
-At present, the code is best understood as a generalized branch runner with specialized preparation logic:
+At present, the code is best understood as a generalized branch runner with specialized preparation logic and one manual persistence layer:
 \begin{enumerate}[leftmargin=2em]
     \item resolve a branch specification from \texttt{master\_config.py},
+    \item optionally recompute branch-local raw MAPF data and save it under \texttt{dev/raw\_mapf\_data/<map\_type>/},
     \item prepare either a fresh static run context or a shared dynamic branch state,
     \item sample run configurations condition by condition,
     \item solve each retained configuration under both mappings using the currently selected global solver family,
-    \item aggregate the retained paired results,
-    \item write structured records, graphs, and selected Pillow visualizations.
+    \item save the raw branch result payload,
+    \item optionally regenerate either graphs/data outputs or Pillow visualizations from the saved raw payload.
 \end{enumerate}
 
 \section{What This Project Already Assumes}

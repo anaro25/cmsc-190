@@ -3,13 +3,12 @@ from __future__ import annotations
 import csv
 import json
 import math
-import shutil
 import time
 from pathlib import Path
 from typing import Any
 
 from dev.experiments.branch_specs import BranchSpec
-from dev.paths import OUTPUTS_ROOT
+from dev.paths import OUTPUTS_ROOT, clear_output_dir
 
 
 def format_elapsed_mmss(elapsed_seconds: float) -> str:
@@ -53,8 +52,6 @@ class BufferedExperimentLogger:
 class BranchOutputManager:
     def __init__(self, branch_spec: BranchSpec):
         self.branch_root = OUTPUTS_ROOT / branch_spec.map_type
-        if self.branch_root.exists():
-            shutil.rmtree(self.branch_root)
         self.branch_root.mkdir(parents=True, exist_ok=True)
         self.metadata_dir = self.branch_root / "metadata"
         self.records_dir = self.branch_root / "records"
@@ -71,6 +68,18 @@ class BranchOutputManager:
             self.visualizations_dir,
         ):
             directory.mkdir(parents=True, exist_ok=True)
+
+    def prepare_log_output(self) -> Path:
+        clear_output_dir(self.logs_dir)
+        return self.logs_dir / "experiment.log"
+
+    def clear_graphs_and_data_outputs(self) -> None:
+        clear_output_dir(self.records_dir)
+        clear_output_dir(self.aggregates_dir)
+        clear_output_dir(self.graphs_dir)
+
+    def clear_visualization_outputs(self) -> None:
+        clear_output_dir(self.visualizations_dir)
 
 
 def _clean_csv_value(value: Any) -> Any:

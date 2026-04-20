@@ -57,6 +57,8 @@ dev/main.py
 This is the single user-editable configuration file. It defines:
 \begin{itemize}[leftmargin=2em]
     \item which branch is active via \texttt{MAP\_TYPE},
+    \item whether raw MAPF data is recomputed via \texttt{recompute\_MAPF},
+    \item which presentation artifact family is regenerated via \texttt{to\_generate},
     \item the global limit on consecutive failed paired sampling attempts,
     \item the global \texttt{enhanced\_CBS} toggle,
     \item the global \texttt{compact\_clustering} toggle,
@@ -81,7 +83,8 @@ This is the active experiment engine. Its submodules are separated by responsibi
     \item \texttt{plotting.py}: metric graphs,
     \item \texttt{io\_utils.py}: output folder management, JSON/CSV writing, and immediate console/log flushing,
     \item \texttt{logging\_utils.py}: console/log formatting,
-    \item \texttt{visualization.py}: selection and rendering of final Pillow exports,
+    \item \texttt{raw\_data\_store.py}: branch-local persisted raw MAPF payload storage under \texttt{dev/raw\_mapf\_data/},
+    \item \texttt{visualization.py}: selection and rendering of final Pillow exports, with selection driven by the current visualization settings even when the frame ingredients come from persisted raw MAPF data,
     \item \texttt{orchestrator.py}: the main control flow.
 \end{itemize}
 
@@ -122,10 +125,14 @@ These are useful references for branch intent, but the current top-level executi
 
 \section{Output Contract}
 
-All active experiment outputs are written under:
+Presentation outputs are written under:
 \[
 \texttt{dev/outputs/<map\_type>/}
 \]
-with subfolders for metadata, records, aggregates, graphs, logs, and visualizations. This output shape is now part of the practical contract of the project.
+with subfolders for metadata, records, aggregates, graphs, logs, and visualizations. Persisted branch-local raw MAPF payloads are stored separately under:
+\[
+\texttt{dev/raw\_mapf\_data/<map\_type>/}
+\]
+so they survive later graph or visualization regeneration runs. This split between persisted raw data and disposable presentation outputs is now part of the practical contract of the project.
 
 \end{document}

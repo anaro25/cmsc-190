@@ -34,14 +34,17 @@
 \begin{document}
 \maketitle
 
-\section{Output Root}
+\section{Persisted Raw Data vs. Presentation Outputs}
 
-Every branch run writes into:
-\[
-\texttt{dev/outputs/<map\_type>/}.
-\]
+The project now distinguishes between:
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{persisted raw MAPF data} under \texttt{dev/raw\_mapf\_data/<map\_type>/},
+    \item \textbf{presentation outputs} under \texttt{dev/outputs/<map\_type>/}.
+\end{itemize}
 
-The active output manager creates the following subfolders:
+The raw payload is branch-local and survives across later runs. It is replaced only when \texttt{recompute\_MAPF=True}. The presentation outputs can then be regenerated from that saved raw payload without rerunning the expensive solver stage.
+
+The active output manager creates the following presentation-output subfolders:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{metadata},
     \item \texttt{records},
@@ -53,7 +56,7 @@ The active output manager creates the following subfolders:
 
 \section{Structured Files}
 
-The most important structured outputs are:
+When \texttt{to\_generate="graphs\_and\_data"}, the most important regenerated structured outputs are:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{metadata/branch\_spec.json},
     \item \texttt{metadata/branch\_stop\_summary.json},
@@ -73,6 +76,17 @@ The solver update makes two of those files more informative:
 \section{Logging Behavior}
 
 The experiment logger writes each line both to the branch log file and to stdout immediately. In practical terms, the periodic solver progress lines such as the 5-second classical/cyclic progress reports should now appear live during long runs instead of being buffered and dumped all at once later. The condition header now prints as \texttt{Condition n} rather than \texttt{Condition n/(total conditions)}, and paired sampling attempts are separated by a blank line for readability.
+
+\section{Generation Modes}
+
+The top-level manual control now has three modes:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{to\_generate="graphs\_and\_data"}: regenerate structured files and metric graphs from the saved raw payload,
+    \item \texttt{to\_generate="visualization"}: regenerate Pillow visualization frames only,
+    \item \texttt{to\_generate="nothing"}: do not regenerate presentation artifacts in that run.
+\end{itemize}
+
+Because the project now treats graphs/data and Pillow frames as separate artifact families, one family may intentionally remain older than the other until the user chooses to regenerate it.
 
 \section{Graphs}
 
@@ -108,15 +122,17 @@ When a run is selected for visualization, the renderer writes:
 
 \section{Visualization Selection Policy}
 
-Visualization is branch-configurable through:
+When \texttt{to\_generate="visualization"}, visualization selection is controlled by the current values in \texttt{master\_config.py}:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{num\_last\_runs\_to\_visualize},
     \item \texttt{require\_jointly\_successful\_mappings}.
 \end{itemize}
 
+As a result, changing only these two selection controls no longer requires a fresh MAPF solve. The renderer reuses the persisted raw payload for the selected branch and applies the \emph{current} visualization-selection settings when deciding which successful runs to render.
+
 \subsection{Joint Mode}
 
-If joint success is required, the code selects the last \(n\) run configurations for which both mappings were successful on the same paired configuration.
+If joint success is required, the code selects the last \(n\) run configurations for which both mappings were successful on the same paired configuration. This selection now follows the current \texttt{require\_jointly\_successful\_mappings} value rather than the persisted value stored with the raw MAPF payload.
 
 \subsection{Independent Mode}
 

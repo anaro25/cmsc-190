@@ -45,6 +45,7 @@ When modifying current behavior, the safest order of inspection is:
     \item \texttt{mapf/agent\_assignment.py},
     \item the relevant solver modules under \texttt{mapf/},
     \item \texttt{experiments/study/orchestrator.py},
+    \item \texttt{experiments/study/raw\_data\_store.py} if persisted raw-data behavior changes,
     \item \texttt{experiments/study/aggregation.py}, \texttt{plotting.py}, and \texttt{visualization.py} if outputs also change.
 \end{enumerate}
 
@@ -90,6 +91,9 @@ The new \texttt{true\_static\_shortest\_path\_distance} and \texttt{tight\_time\
 
 \subsection{Output Contract}
 Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the solver metadata fields written into branch specs and run records.
+
+\subsection{Persisted Raw-Data Contract}
+The project now stores branch-local raw MAPF payloads under \texttt{dev/raw\_mapf\_data/<map\_type>/}. Those payloads are reused manually through \texttt{recompute\_MAPF} rather than validated automatically against code or configuration. If compute-stage data shape changes, update both the writer/reader logic and the documentation, and assume older saved payloads may need manual replacement.
 
 \section{When Adding a New Branch}
 

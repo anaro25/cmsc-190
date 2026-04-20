@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from dev.experiments.branch_specs import get_branch_spec
@@ -30,6 +31,7 @@ from dev.experiments.study.models import (
     VisualizationCandidate,
 )
 from dev.experiments.study.plotting import generate_graphs
+from dev.experiments.study.raw_data_store import BranchRawDataStore
 from dev.experiments.study.preparation import (
     prepare_dynamic_branch_state,
     prepare_dynamic_run_context,
@@ -37,6 +39,7 @@ from dev.experiments.study.preparation import (
 )
 from dev.experiments.study.runtime import build_mapping_record, run_dynamic_mapping, run_static_mapping
 from dev.experiments.study.visualization import render_selected_visualizations
+from dev.master_config import recompute_MAPF, to_generate
 
 
 def _prepare_run_context(
@@ -343,23 +346,35 @@ def _run_jointly_viable_sampling(
     )
 
 
-def run_selected_experiment(
-    map_type: str,
-    *,
-    seed_base: int | None = None,
-    program_start_time: float | None = None,
-) -> dict[str, Any]:
-    branch_spec = get_branch_spec(map_type)
-    resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
-    output_manager = BranchOutputManager(branch_spec)
-    logger = ExperimentLogger(
-        output_manager.logs_dir / "experiment.log",
-        start_time=program_start_time,
-    )
-    log_branch_header(logger, branch_spec)
-    logger.log_elapsed("Program stopwatch started.")
-    write_json(output_manager.metadata_dir / "branch_spec.json", branch_spec.to_dict())
+VALID_GENERATION_TARGETS = {"graphs_and_data", "visualization", "nothing"}
 
+
+def _resolve_generation_target() -> str:
+    generation_target = str(to_generate)
+    if generation_target not in VALID_GENERATION_TARGETS:
+        raise ValueError(
+            "to_generate must be one of 'graphs_and_data', 'visualization', or 'nothing'."
+        )
+    return generation_target
+
+
+def _build_dynamic_state_metadata(dynamic_state: DynamicBranchState) -> dict[str, Any]:
+    return {
+        "map_identifier": dynamic_state.map_identifier,
+        "schedule_seed": dynamic_state.schedule_seed,
+        "generation_mode": dynamic_state.generation_mode,
+        "static_rows": len(dynamic_state.static_matrix),
+        "static_cols": len(dynamic_state.static_matrix[0]) if dynamic_state.static_matrix else 0,
+        "dynamic_loop_length": len(dynamic_state.dynamic_loop_frames),
+    }
+
+
+def _compute_raw_branch_data(
+    *,
+    branch_spec,
+    resolved_seed_base: int,
+    logger: ExperimentLogger,
+) -> dict[str, Any]:
     run_configurations: list[dict[str, Any]] = []
     run_records: list[dict[str, Any]] = []
     aggregates_payload: list[dict[str, Any]] = []
@@ -383,17 +398,6 @@ def run_selected_experiment(
         )
         log_dynamic_state(logger, branch_spec, dynamic_state)
         logger.log_elapsed("Shared dynamic map preparation completed.")
-        write_json(
-            output_manager.metadata_dir / "shared_dynamic_state.json",
-            {
-                "map_identifier": dynamic_state.map_identifier,
-                "schedule_seed": dynamic_state.schedule_seed,
-                "generation_mode": dynamic_state.generation_mode,
-                "static_rows": len(dynamic_state.static_matrix),
-                "static_cols": len(dynamic_state.static_matrix[0]) if dynamic_state.static_matrix else 0,
-                "dynamic_loop_length": len(dynamic_state.dynamic_loop_frames),
-            },
-        )
 
     for agent_number_index, agent_number in enumerate(branch_spec.agent_numbers):
         logger.log("")
@@ -452,6 +456,37 @@ def run_selected_experiment(
             )
             break
 
+    return {
+        "branch_spec": branch_spec,
+        "dynamic_state": dynamic_state,
+        "run_configurations": run_configurations,
+        "run_records": run_records,
+        "aggregates_payload": aggregates_payload,
+        "branch_stop_summary": branch_stop_summary,
+        "all_visualization_candidates": all_visualization_candidates,
+    }
+
+
+def _write_graphs_and_data_outputs(
+    *,
+    raw_payload: dict[str, Any],
+    output_manager: BranchOutputManager,
+    logger: ExperimentLogger,
+) -> list[Path]:
+    branch_spec = raw_payload["branch_spec"]
+    dynamic_state = raw_payload.get("dynamic_state")
+    run_configurations = list(raw_payload.get("run_configurations", []))
+    run_records = list(raw_payload.get("run_records", []))
+    aggregates_payload = list(raw_payload.get("aggregates_payload", []))
+    branch_stop_summary = dict(raw_payload.get("branch_stop_summary", {}))
+
+    output_manager.clear_graphs_and_data_outputs()
+    write_json(output_manager.metadata_dir / "branch_spec.json", branch_spec.to_dict())
+    if dynamic_state is not None:
+        write_json(
+            output_manager.metadata_dir / "shared_dynamic_state.json",
+            _build_dynamic_state_metadata(dynamic_state),
+        )
     write_json(output_manager.records_dir / "run_configurations.json", run_configurations)
     write_json(output_manager.records_dir / "run_records.json", run_records)
     write_json(output_manager.aggregates_dir / "condition_summary.json", aggregates_payload)
@@ -459,44 +494,149 @@ def run_selected_experiment(
     write_csv(output_manager.records_dir / "run_records.csv", run_records)
     write_csv(output_manager.aggregates_dir / "condition_summary.csv", aggregates_payload)
     write_json(output_manager.metadata_dir / "branch_stop_summary.json", branch_stop_summary)
-    logger.log_elapsed("Structured records and summaries written to disk.")
+    logger.log_elapsed("Structured records and summaries regenerated from persisted raw MAPF data.")
 
     aggregate_objects = [ConditionAggregate(**payload) for payload in aggregates_payload]
     graph_paths = generate_graphs(branch_spec, aggregate_objects, output_manager.graphs_dir)
-    visualization_summary = render_selected_visualizations(
-        branch_spec=branch_spec,
-        output_manager=output_manager,
-        dynamic_state=dynamic_state,
-        all_candidates=all_visualization_candidates,
-        logger=logger,
-    )
-    logger.log_elapsed("Graphs and visualization exports completed.")
+    logger.log_elapsed("Graphs regenerated from persisted raw MAPF data.")
 
     logger.log("")
     logger.log("Final aggregate table:")
     for aggregate in aggregate_objects:
         print_aggregate_block(logger, aggregate)
 
-    if branch_stop_summary["stop_triggered"]:
+    if branch_stop_summary.get("stop_triggered"):
         logger.log("")
         logger.log("Branch stopped early:")
-        logger.log(f"  Reason: {branch_stop_summary['stop_reason']}")
-        logger.log(f"  Details: {branch_stop_summary['stop_message']}")
+        logger.log(f"  Reason: {branch_stop_summary.get('stop_reason')}")
+        logger.log(f"  Details: {branch_stop_summary.get('stop_message')}")
         logger.log(
             "  Reported agent numbers: "
-            f"{branch_stop_summary['reported_agent_numbers']}"
+            f"{branch_stop_summary.get('reported_agent_numbers', [])}"
         )
 
-    logger.log("")
-    logger.log_elapsed("Experiment finished.")
     logger.log("")
     logger.log("Generated graph files:")
     for graph_path in graph_paths:
         logger.log(f"  - {graph_path}")
+    return graph_paths
+
+
+def _write_visualization_outputs(
+    *,
+    current_branch_spec,
+    raw_payload: dict[str, Any],
+    output_manager: BranchOutputManager,
+    logger: ExperimentLogger,
+) -> dict[str, Any]:
+    raw_branch_spec = raw_payload["branch_spec"]
+    dynamic_state = raw_payload.get("dynamic_state")
+    all_visualization_candidates = list(raw_payload.get("all_visualization_candidates", []))
+
+    logger.log(
+        "Visualization selection controls are being read from the current master_config.py "
+        f"for branch '{current_branch_spec.map_type}' "
+        f"(num_last_runs_to_visualize={current_branch_spec.num_last_runs_to_visualize}, "
+        f"require_jointly_successful_mappings={current_branch_spec.require_jointly_successful_mappings})."
+    )
+    output_manager.clear_visualization_outputs()
+    visualization_summary = render_selected_visualizations(
+        branch_spec=raw_branch_spec,
+        output_manager=output_manager,
+        dynamic_state=dynamic_state,
+        all_candidates=all_visualization_candidates,
+        logger=logger,
+        num_last_runs_to_visualize=current_branch_spec.num_last_runs_to_visualize,
+        require_jointly_successful_mappings=current_branch_spec.require_jointly_successful_mappings,
+    )
+    logger.log_elapsed("Pillow visualizations regenerated from persisted raw MAPF data using the current visualization controls.")
+    logger.log(
+        "Selected run configurations for visualization: "
+        f"{len(visualization_summary.get('selected_run_configurations', []))}"
+    )
+    return visualization_summary
+
+
+def run_selected_experiment(
+    map_type: str,
+    *,
+    seed_base: int | None = None,
+    program_start_time: float | None = None,
+) -> dict[str, Any]:
+    branch_spec = get_branch_spec(map_type)
+    resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
+    generation_target = _resolve_generation_target()
+    output_manager = BranchOutputManager(branch_spec)
+    log_path = output_manager.prepare_log_output()
+    logger = ExperimentLogger(log_path, start_time=program_start_time)
+    raw_store = BranchRawDataStore(branch_spec)
+
+    log_branch_header(logger, branch_spec)
+    logger.log(f"recompute_MAPF: {bool(recompute_MAPF)}")
+    logger.log(f"to_generate: {generation_target}")
+    logger.log(f"Persisted raw MAPF data path: {raw_store.payload_path}")
+    logger.log_elapsed("Program stopwatch started.")
+
+    if recompute_MAPF:
+        logger.log("")
+        logger.log("Recomputing raw MAPF data for the selected branch and replacing the saved copy...")
+        computed_payload = _compute_raw_branch_data(
+            branch_spec=branch_spec,
+            resolved_seed_base=resolved_seed_base,
+            logger=logger,
+        )
+        raw_store.save(computed_payload)
+        logger.log_elapsed("Raw MAPF data recomputed and saved.")
+        logger.log("If graphs or visualization are requested in this run, they will be regenerated from the saved raw MAPF data on disk.")
+    else:
+        logger.log("")
+        logger.log("recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.")
+
+    graph_paths: list[Path] = []
+    visualization_summary: dict[str, Any] = {
+        "selected_run_configurations": [],
+        "selected_run_configurations_by_mapping": {"classical": [], "cyclic": []},
+    }
+    raw_payload_used = False
+    result_branch_spec = branch_spec
+
+    if generation_target == "nothing":
+        logger.log("No graphs, data exports, or Pillow visualizations were generated because to_generate='nothing'.")
+    else:
+        try:
+            raw_payload = raw_store.load()
+        except FileNotFoundError as exc:
+            logger.log(str(exc))
+            raise
+        raw_payload_used = True
+        result_branch_spec = raw_payload["branch_spec"]
+        if recompute_MAPF:
+            logger.log("Reloaded the saved raw MAPF data from disk for output generation consistency.")
+        else:
+            logger.log("Loaded the persisted raw MAPF data for output generation.")
+
+        if generation_target == "graphs_and_data":
+            graph_paths = _write_graphs_and_data_outputs(
+                raw_payload=raw_payload,
+                output_manager=output_manager,
+                logger=logger,
+            )
+        elif generation_target == "visualization":
+            visualization_summary = _write_visualization_outputs(
+                current_branch_spec=branch_spec,
+                raw_payload=raw_payload,
+                output_manager=output_manager,
+                logger=logger,
+            )
+
+    logger.log("")
+    logger.log_elapsed("Experiment finished.")
 
     return {
-        "branch_spec": branch_spec.to_dict(),
+        "branch_spec": result_branch_spec.to_dict(),
         "output_root": str(output_manager.branch_root),
+        "raw_mapf_data_path": str(raw_store.payload_path),
+        "raw_mapf_data_summary_path": str(raw_store.summary_path),
         "run_configurations_path": str(output_manager.records_dir / "run_configurations.json"),
         "run_records_path": str(output_manager.records_dir / "run_records.json"),
         "condition_summary_path": str(output_manager.aggregates_dir / "condition_summary.json"),
@@ -504,6 +644,9 @@ def run_selected_experiment(
         "graph_paths": [str(path) for path in graph_paths],
         "visualizations_root": str(output_manager.visualizations_dir),
         "visualization_summary_path": str(output_manager.metadata_dir / "visualization_selection_summary.json"),
-        "num_visualized_run_configurations": len(visualization_summary["selected_run_configurations"]),
-        "log_path": str(output_manager.logs_dir / "experiment.log"),
+        "num_visualized_run_configurations": len(visualization_summary.get("selected_run_configurations", [])),
+        "log_path": str(log_path),
+        "generation_target": generation_target,
+        "recompute_MAPF": bool(recompute_MAPF),
+        "raw_payload_used_for_generation": raw_payload_used,
     }

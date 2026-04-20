@@ -33,11 +33,18 @@ enhanced_CBS = True
 #          of separation in all 8 directions while remaining one cluster.
 compact_clustering = True
 
-# Uncomment exactly one MAP_TYPE.
-# MAP_TYPE = "static_artificial"
-MAP_TYPE = "static_campus_area_1"
-# MAP_TYPE = "dynamic_port"
-# MAP_TYPE = "dynamic_campus_area_2"
+# Global raw-data recompute toggle for the whole project.
+# False -> keep the persisted raw MAPF data currently saved for the selected branch.
+# True  -> recompute raw MAPF data for the selected branch and replace the saved copy.
+recompute_MAPF = False
+
+# Select exactly one output target for this program execution.
+# graphs_and_data -> regenerate structured records and graphs from persisted raw MAPF data
+# visualization   -> regenerate Pillow visualization frames from persisted raw MAPF data
+# nothing         -> do not regenerate outputs in this run
+# to_generate = "graphs_and_data"
+# to_generate = "visualization"
+to_generate = "nothing"
 
 # shared constants
 SHARED_TIME_LIMIT_SECONDS = 30.0
@@ -47,14 +54,20 @@ SHARED_NARROW_LANES = True # doesn't help so set to True
 SHARED_TIGHT_TIME_HORIZON = False # doesn't help so set to False
 SHARED_COUNTED_RUNS_REQUIRED = 5
 
+# Uncomment exactly one MAP_TYPE.
+MAP_TYPE = "static_artificial"
+# MAP_TYPE = "static_campus_area_1"
+# MAP_TYPE = "dynamic_port"
+# MAP_TYPE = "dynamic_campus_area_2"
+
 STATIC_ARTIFICIAL_CONFIG = {
     # common frequently edited constants
     "seed": 101,
-    "agent_number_range": (80, 200, 5),
+    "agent_number_range": (4, 200, 4), # max 120 to 124
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,
-    "ECBS_suboptimality": 1.0, # vanilla CBS
+    "ECBS_suboptimality": 1.5, # w = 1.0 can't reach 40 agents
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
     
@@ -73,7 +86,7 @@ STATIC_ARTIFICIAL_CONFIG = {
 STATIC_CAMPUS_AREA_1_CONFIG = {
     # common frequently edited constants
     "seed": 201,
-    "agent_number_range": (10, 100, 2),
+    "agent_number_range": (2, 100, 1), # max 30 to 31
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,
@@ -103,7 +116,7 @@ STATIC_CAMPUS_AREA_1_CONFIG["image_path"] = _campus_lane_variant_image_path(
 DYNAMIC_PORT_CONFIG = {
     # common frequently edited constants
     "seed": 301,
-    "agent_number_range": (8, 100, 2),
+    "agent_number_range": (2, 100, 1), # max 18 to 19
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,
@@ -120,7 +133,7 @@ DYNAMIC_PORT_CONFIG = {
 
     # branch-exclusive constants
     "target_static_obstacle_density": 0.15,
-    "target_dynamic_obstacle_density": 0.05,
+    "target_dynamic_obstacle_density": 0.030,
     "loop_sequence_length": 100,
     "group_stay_durations": (7, 9, 11),
     "image_threshold": 127,
@@ -132,7 +145,7 @@ DYNAMIC_PORT_CONFIG = {
 DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     # common frequently edited constants
     "seed": 401,
-    "agent_number_range": (16, 100, 2),
+    "agent_number_range": (2, 100, 1), # max 16 to 17
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,

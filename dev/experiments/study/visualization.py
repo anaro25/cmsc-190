@@ -175,15 +175,29 @@ def render_selected_visualizations(
     dynamic_state: DynamicBranchState | None,
     all_candidates: list[VisualizationCandidate],
     logger: ExperimentLogger,
+    num_last_runs_to_visualize: int | None = None,
+    require_jointly_successful_mappings: bool | None = None,
 ) -> dict[str, Any]:
+    effective_num_last_runs_to_visualize = (
+        branch_spec.num_last_runs_to_visualize
+        if num_last_runs_to_visualize is None
+        else int(num_last_runs_to_visualize)
+    )
+    effective_require_jointly_successful_mappings = (
+        branch_spec.require_jointly_successful_mappings
+        if require_jointly_successful_mappings is None
+        else bool(require_jointly_successful_mappings)
+    )
+
     summary: dict[str, Any] = {
-        "num_last_runs_to_visualize": branch_spec.num_last_runs_to_visualize,
-        "require_jointly_successful_mappings": branch_spec.require_jointly_successful_mappings,
+        "num_last_runs_to_visualize": effective_num_last_runs_to_visualize,
+        "require_jointly_successful_mappings": effective_require_jointly_successful_mappings,
         "selection_mode": (
             "jointly_successful_mappings"
-            if branch_spec.require_jointly_successful_mappings
+            if effective_require_jointly_successful_mappings
             else "independently_successful_mappings"
         ),
+        "selection_config_source": "current_master_config",
         "selected_agent_numbers": [],
         "selected_agent_numbers_by_mapping": {"classical": [], "cyclic": []},
         "selected_run_configurations": [],
@@ -192,7 +206,7 @@ def render_selected_visualizations(
         "notes": "",
     }
 
-    if branch_spec.num_last_runs_to_visualize <= 0:
+    if effective_num_last_runs_to_visualize <= 0:
         summary["notes"] = "Visualization disabled because num_last_runs_to_visualize <= 0."
         write_json(output_manager.metadata_dir / "visualization_selection_summary.json", summary)
         logger.log("Visualization rendering skipped because num_last_runs_to_visualize <= 0.")
@@ -208,9 +222,9 @@ def render_selected_visualizations(
     selected_root = output_manager.visualizations_dir
     selected_root.mkdir(parents=True, exist_ok=True)
 
-    if branch_spec.require_jointly_successful_mappings:
+    if effective_require_jointly_successful_mappings:
         joint_groups = _build_joint_groups(all_candidates)
-        selected_groups = joint_groups[-branch_spec.num_last_runs_to_visualize :]
+        selected_groups = joint_groups[-effective_num_last_runs_to_visualize :]
         if not selected_groups:
             summary["notes"] = (
                 "No jointly successful classical-cyclic run configurations were available among the "
@@ -313,7 +327,7 @@ def render_selected_visualizations(
         mapping_candidates = [
             candidate for candidate in all_candidates if candidate.mapping_name == mapping_name
         ]
-        selected_candidates = mapping_candidates[-branch_spec.num_last_runs_to_visualize :]
+        selected_candidates = mapping_candidates[-effective_num_last_runs_to_visualize :]
         if not selected_candidates:
             logger.log(
                 f"  No successful {mapping_name} runs were available for visualization selection."
