@@ -93,7 +93,7 @@ The new \texttt{true\_static\_shortest\_path\_distance} and \texttt{tight\_time\
 Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the solver metadata fields written into branch specs and run records.
 
 \subsection{Persisted Raw-Data Contract}
-The project now stores branch-local raw MAPF payloads under \texttt{dev/raw\_mapf\_data/<map\_type>/}. Those payloads are reused manually through \texttt{recompute\_MAPF} rather than validated automatically against code or configuration. If compute-stage data shape changes, update both the writer/reader logic and the documentation, and assume older saved payloads may need manual replacement.
+The project now stores branch-local raw MAPF data under \texttt{dev/raw\_mapf\_data/<map\_type>/}. That store is split into a manifest, metadata files, and per-condition subfolders rather than one monolithic pickle. It is reused manually through \texttt{recompute\_MAPF} rather than validated automatically against code or configuration. If compute-stage data shape changes, update both the writer/reader logic and the documentation, and assume older saved layouts may need migration or replacement.
 
 \section{When Adding a New Branch}
 

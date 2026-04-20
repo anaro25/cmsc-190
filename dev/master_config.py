@@ -36,7 +36,7 @@ compact_clustering = True
 # Global raw-data recompute toggle for the whole project.
 # False -> keep the persisted raw MAPF data currently saved for the selected branch.
 # True  -> recompute raw MAPF data for the selected branch and replace the saved copy.
-recompute_MAPF = False
+recompute_MAPF = True
 
 # Select exactly one output target for this program execution.
 # graphs_and_data -> regenerate structured records and graphs from persisted raw MAPF data
@@ -46,6 +46,12 @@ recompute_MAPF = False
 # to_generate = "visualization"
 to_generate = "nothing"
 
+# Uncomment exactly one MAP_TYPE.
+MAP_TYPE = "static_artificial"
+# MAP_TYPE = "static_campus_area_1"
+# MAP_TYPE = "dynamic_port"
+# MAP_TYPE = "dynamic_campus_area_2"
+
 # shared constants
 SHARED_TIME_LIMIT_SECONDS = 30.0
 SHARED_ECBS_SUBOPTIMALITY = 2.0 # helps so set to 2.0
@@ -54,16 +60,11 @@ SHARED_NARROW_LANES = True # doesn't help so set to True
 SHARED_TIGHT_TIME_HORIZON = False # doesn't help so set to False
 SHARED_COUNTED_RUNS_REQUIRED = 5
 
-# Uncomment exactly one MAP_TYPE.
-MAP_TYPE = "static_artificial"
-# MAP_TYPE = "static_campus_area_1"
-# MAP_TYPE = "dynamic_port"
-# MAP_TYPE = "dynamic_campus_area_2"
-
 STATIC_ARTIFICIAL_CONFIG = {
     # common frequently edited constants
     "seed": 101,
-    "agent_number_range": (4, 200, 4), # max 120 to 124
+    # "agent_number_range": (4, 200, 4), # max 120 to 124
+    "agent_number_range": (10, 10, 1),
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize": 1,
     "require_jointly_successful_mappings": False,

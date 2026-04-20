@@ -574,7 +574,8 @@ def run_selected_experiment(
     log_branch_header(logger, branch_spec)
     logger.log(f"recompute_MAPF: {bool(recompute_MAPF)}")
     logger.log(f"to_generate: {generation_target}")
-    logger.log(f"Persisted raw MAPF data path: {raw_store.payload_path}")
+    logger.log(f"Persisted raw MAPF data root: {raw_store.branch_root}")
+    logger.log(f"Persisted raw MAPF manifest path: {raw_store.manifest_path}")
     logger.log_elapsed("Program stopwatch started.")
 
     if recompute_MAPF:
@@ -604,7 +605,10 @@ def run_selected_experiment(
         logger.log("No graphs, data exports, or Pillow visualizations were generated because to_generate='nothing'.")
     else:
         try:
-            raw_payload = raw_store.load()
+            if generation_target == "graphs_and_data":
+                raw_payload = raw_store.load_graphs_and_data_payload()
+            else:
+                raw_payload = raw_store.load_visualization_payload()
         except FileNotFoundError as exc:
             logger.log(str(exc))
             raise
@@ -635,7 +639,8 @@ def run_selected_experiment(
     return {
         "branch_spec": result_branch_spec.to_dict(),
         "output_root": str(output_manager.branch_root),
-        "raw_mapf_data_path": str(raw_store.payload_path),
+        "raw_mapf_data_path": str(raw_store.branch_root),
+        "raw_mapf_data_manifest_path": str(raw_store.manifest_path),
         "raw_mapf_data_summary_path": str(raw_store.summary_path),
         "run_configurations_path": str(output_manager.records_dir / "run_configurations.json"),
         "run_records_path": str(output_manager.records_dir / "run_records.json"),

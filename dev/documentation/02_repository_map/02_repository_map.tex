@@ -83,7 +83,7 @@ This is the active experiment engine. Its submodules are separated by responsibi
     \item \texttt{plotting.py}: metric graphs,
     \item \texttt{io\_utils.py}: output folder management, JSON/CSV writing, and immediate console/log flushing,
     \item \texttt{logging\_utils.py}: console/log formatting,
-    \item \texttt{raw\_data\_store.py}: branch-local persisted raw MAPF payload storage under \texttt{dev/raw\_mapf\_data/},
+    \item \texttt{raw\_data\_store.py}: branch-local persisted raw MAPF storage under \texttt{dev/raw\_mapf\_data/}, organized as a manifest plus metadata and per-condition files rather than one monolithic pickle,
     \item \texttt{visualization.py}: selection and rendering of final Pillow exports, with selection driven by the current visualization settings even when the frame ingredients come from persisted raw MAPF data,
     \item \texttt{orchestrator.py}: the main control flow.
 \end{itemize}
@@ -129,10 +129,10 @@ Presentation outputs are written under:
 \[
 \texttt{dev/outputs/<map\_type>/}
 \]
-with subfolders for metadata, records, aggregates, graphs, logs, and visualizations. Persisted branch-local raw MAPF payloads are stored separately under:
+with subfolders for metadata, records, aggregates, graphs, logs, and visualizations. Persisted branch-local raw MAPF data is stored separately under:
 \[
 \texttt{dev/raw\_mapf\_data/<map\_type>/}
 \]
-so they survive later graph or visualization regeneration runs. This split between persisted raw data and disposable presentation outputs is now part of the practical contract of the project.
+so they survive later graph or visualization regeneration runs. The persisted raw-data tree is now organized as a branch root containing a manifest, metadata files, and one subfolder per reported condition, which keeps large experiments more navigable than a single all-in-one pickle. This split between persisted raw data and disposable presentation outputs is now part of the practical contract of the project.
 
 \end{document}

@@ -85,8 +85,10 @@
 #   "nothing"         -> do not regenerate outputs in this run.
 #
 # Raw MAPF data is stored per branch and is intentionally controlled manually.
-# The program does not try to validate whether the current code or configuration
-# matches the saved raw data; set recompute_MAPF=True when you want to replace it.
+# Each branch now keeps a split raw-data directory with a manifest, metadata, and
+# per-condition files instead of one monolithic pickle. The program does not try
+# to validate whether the current code or configuration matches the saved raw data;
+# set recompute_MAPF=True when you want to replace it.
 # Visualization-selection controls such as num_last_runs_to_visualize and
 # require_jointly_successful_mappings are read from the current master_config.py
 # during visualization regeneration, so changing only those does not require a

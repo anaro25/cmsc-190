@@ -42,7 +42,9 @@ The project now distinguishes between:
     \item \textbf{presentation outputs} under \texttt{dev/outputs/<map\_type>/}.
 \end{itemize}
 
-The raw payload is branch-local and survives across later runs. It is replaced only when \texttt{recompute\_MAPF=True}. The presentation outputs can then be regenerated from that saved raw payload without rerunning the expensive solver stage.
+The raw MAPF store is branch-local and survives across later runs. It is replaced only when \texttt{recompute\_MAPF=True}. The presentation outputs can then be regenerated from that saved raw data without rerunning the expensive solver stage.
+
+The persisted raw-data tree is intentionally split rather than packed into one giant pickle. Each branch root now contains a manifest and metadata files at the top level, plus one condition subfolder per reported agent number. Inside each condition folder, the aggregate summary, retained run configurations, retained run records, and successful visualization candidates are stored separately. This keeps larger experiment ranges much easier to inspect and replace.
 
 The active output manager creates the following presentation-output subfolders:
 \begin{itemize}[leftmargin=2em]
@@ -53,6 +55,30 @@ The active output manager creates the following presentation-output subfolders:
     \item \texttt{logs},
     \item \texttt{visualizations}.
 \end{itemize}
+
+\subsection{Persisted Raw-Data Layout}
+A typical persisted raw-data tree for one branch now has the rough form:
+\begin{lstlisting}
+dev/raw_mapf_data/<map_type>/
+    manifest.json
+    raw_mapf_data_summary.json
+    metadata/
+        branch_spec.json
+        branch_stop_summary.json
+        dynamic_state.pkl               # dynamic branches only
+        dynamic_state_metadata.json     # dynamic branches only
+    conditions/
+        condition_001__agent_number_010/
+            condition_aggregate.json
+            run_configurations.json
+            run_records.json
+            visualization_candidates/
+                index.json
+                0001__classical__....pkl
+                0002__cyclic__....pkl
+        ...
+\end{lstlisting}
+The condition folders contain only the retained reported data for that agent number. The visualization-candidate pickles store the frame-building ingredients for successful runs, while the index file keeps the selection order and filenames explicit.
 
 \section{Structured Files}
 
