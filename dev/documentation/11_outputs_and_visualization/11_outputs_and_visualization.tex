@@ -55,43 +55,43 @@ The active output manager still uses the same presentation-output families:
     \item \texttt{logs},
     \item \texttt{visualizations}.
 \end{itemize}
-However, each family is now split first by execution purpose and then by an execution-specific folder. In other words, later runs add a new folder instead of clearing the old one. A typical branch output root now contains paths such as:
+However, the presentation-output tree is now \emph{latest-only}. Each purpose keeps one current copy and a newer run overwrites that same location instead of creating a fresh \texttt{execution\_...} folder. A typical branch output root now contains paths such as:
 \begin{lstlisting}
 dev/outputs/<map_type>/
     logs/
         computation/
-            execution_.../
-                experiment.log
+            experiment.log
         graphs_and_data/
-            execution_.../
-                experiment.log
+            experiment.log
         visualization/
-            execution_.../
-                experiment.log
+            experiment.log
+        computation__and__graphs_and_data/   # only when both happen together
+            experiment.log
     metadata/
         graphs_and_data/
-            execution_.../
-                ...
+            branch_spec.json
+            graph_generation_branch_spec.json
+            branch_stop_summary.json
+            shared_dynamic_state.json         # dynamic branches only
         visualization/
-            execution_.../
-                visualization_selection_summary.json
+            visualization_selection_summary.json
     records/
         graphs_and_data/
-            execution_.../
-                ...
+            run_configurations.json
+            run_configurations.csv
+            run_records.json
+            run_records.csv
     aggregates/
         graphs_and_data/
-            execution_.../
-                ...
+            condition_summary.json
+            condition_summary.csv
     graphs/
         graphs_and_data/
-            execution_.../
-                ...
+            ...
     visualizations/
         visualization/
-            execution_.../
-                jointly_successful/
-                independently_successful/
+            jointly_successful/
+            independently_successful/
 \end{lstlisting}
 
 \subsection{Persisted Raw-Data Layout}
@@ -120,14 +120,14 @@ The condition folders contain only the retained reported data for that agent num
 
 \section{Structured Files}
 
-When \texttt{to\_generate="graphs\_and\_data"}, the most important regenerated structured outputs inside the current \texttt{graphs\_and\_data/<execution>/} folders are:
+When \texttt{to\_generate="graphs\_and\_data"}, the most important regenerated structured outputs inside the current \texttt{graphs\_and\_data/} folders are:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{metadata/graphs\_and\_data/<execution>/branch\_spec.json},
-    \item \texttt{metadata/graphs\_and\_data/<execution>/branch\_stop\_summary.json},
-    \item \texttt{metadata/graphs\_and\_data/<execution>/shared\_dynamic\_state.json} for dynamic branches,
-    \item \texttt{records/graphs\_and\_data/<execution>/run\_configurations.json} and \texttt{.csv},
-    \item \texttt{records/graphs\_and\_data/<execution>/run\_records.json} and \texttt{.csv},
-    \item \texttt{aggregates/graphs\_and\_data/<execution>/condition\_summary.json} and \texttt{.csv}.
+    \item \texttt{metadata/graphs\_and\_data/branch\_spec.json},
+    \item \texttt{metadata/graphs\_and\_data/branch\_stop\_summary.json},
+    \item \texttt{metadata/graphs\_and\_data/shared\_dynamic\_state.json} for dynamic branches,
+    \item \texttt{records/graphs\_and\_data/run\_configurations.json} and \texttt{.csv},
+    \item \texttt{records/graphs\_and\_data/run\_records.json} and \texttt{.csv},
+    \item \texttt{aggregates/graphs\_and\_data/condition\_summary.json} and \texttt{.csv}.
 \end{itemize}
 
 The solver update makes two of those files more informative:
@@ -153,6 +153,13 @@ The top-level manual control now has three modes:
 Because the project now treats graphs/data and Pillow frames as separate artifact families, one family may intentionally remain older than the other until the user chooses to regenerate it.
 
 \section{Graphs}
+
+\subsection{Graph X-Axis Domain}
+
+When \texttt{to\_generate="graphs\_and\_data"} is run against already-saved raw MAPF data, the plotted metric values and the x-axis tick labels are both derived from the agent numbers that are actually present in the persisted branch records being graphed. The graphing layer still forces every such x-value to be labeled explicitly, so Matplotlib does not silently skip labels such as showing only \(2,4,6,\dots\).
+
+This keeps regenerated graphs compact: if the current branch domain in \texttt{master\_config.py} extends far beyond the previously computed results, the x-axis no longer stretches across that unused range. Backward compatibility is preserved because older saved raw data remains readable without needing to recompute it under the newer domain.
+
 
 Each accepted condition can contribute to up to three graphs:
 \begin{itemize}[leftmargin=2em]
@@ -208,6 +215,11 @@ The code independently selects:
 and writes them under a dedicated \texttt{independently\_successful/} folder.
 
 Both visualization variants are generated in one visualization-only execution, so the old rerun that flipped a boolean selection mode is no longer needed.
+
+
+\section{Visualization Logging Granularity}
+
+The visualization-only execution now emits more stopwatch updates while Pillow frames are being generated. The log records elapsed-time milestones after each selected mapping render, and jointly successful selections also record a completion milestone per selected run configuration. This makes long frame-generation stretches easier to monitor from both the terminal and the saved \texttt{experiment.log}.
 
 \section{Dynamic Visualization Detail}
 

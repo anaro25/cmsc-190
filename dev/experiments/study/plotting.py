@@ -16,6 +16,12 @@ from dev.experiments.study.models import ConditionAggregate
 MARKER_SIZE = 8
 CLASSICAL_LABEL_OFFSET = (6, 6)
 CYCLIC_LABEL_OFFSET = (6, -10)
+BASE_FIGURE_WIDTH = 10
+MAX_FIGURE_WIDTH = 40
+FIGURE_HEIGHT = 6.5
+TICK_FONT_SIZE_DEFAULT = 10
+TICK_FONT_SIZE_DENSE = 8
+TICK_FONT_SIZE_VERY_DENSE = 6
 
 
 def _annotate_series(
@@ -39,6 +45,28 @@ def _annotate_series(
         )
 
 
+def _resolve_display_x_ticks(data_x_values: list[int]) -> list[int]:
+    return sorted({int(value) for value in data_x_values})
+
+
+def _resolve_figure_width(num_ticks: int) -> float:
+    if num_ticks <= 0:
+        return BASE_FIGURE_WIDTH
+    return min(MAX_FIGURE_WIDTH, max(BASE_FIGURE_WIDTH, 0.28 * num_ticks))
+
+
+def _tick_label_rotation(num_ticks: int) -> int:
+    return 90 if num_ticks > 20 else 0
+
+
+def _tick_font_size(num_ticks: int) -> int:
+    if num_ticks > 120:
+        return TICK_FONT_SIZE_VERY_DENSE
+    if num_ticks > 50:
+        return TICK_FONT_SIZE_DENSE
+    return TICK_FONT_SIZE_DEFAULT
+
+
 def plot_metric_graph(
     *,
     branch_spec: BranchSpec,
@@ -59,7 +87,8 @@ def plot_metric_graph(
         for aggregate in aggregates
     ]
 
-    figure = plt.figure(figsize=(10, 6))
+    display_x_ticks = _resolve_display_x_ticks(x_values)
+    figure = plt.figure(figsize=(_resolve_figure_width(len(display_x_ticks)), FIGURE_HEIGHT))
     axes = figure.add_subplot(111)
     axes.plot(
         x_values,
@@ -78,6 +107,14 @@ def plot_metric_graph(
     _annotate_series(axes, x_values, classical_values, offset=CLASSICAL_LABEL_OFFSET)
     _annotate_series(axes, x_values, cyclic_values, offset=CYCLIC_LABEL_OFFSET)
     axes.set_xlabel("Agent number")
+    axes.set_xticks(display_x_ticks)
+    axes.set_xticklabels(
+        [str(value) for value in display_x_ticks],
+        rotation=_tick_label_rotation(len(display_x_ticks)),
+        fontsize=_tick_font_size(len(display_x_ticks)),
+    )
+    if display_x_ticks:
+        axes.set_xlim(display_x_ticks[0] - 0.5, display_x_ticks[-1] + 0.5)
     axes.set_ylabel(y_label)
     axes.set_title(title)
     axes.grid(True, alpha=0.3)

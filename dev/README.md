@@ -142,7 +142,7 @@ pathological infinite loops. It remains only a protective implementation detail.
 - The assignment sampler now treats dispersed sets and clustered sets differently: dispersed sets keep 8-neighbor separation within the set, while clustered sets follow the global `compact_clustering` switch in `master_config.py`.
 - When `compact_clustering=True`, clustered sets are sampled as directly adjacent 8-neighbor-connected groups.
 - When `compact_clustering=False`, clustered sets remain one cluster but keep one empty cell of separation in all 8 directions.
-- Presentation outputs are now append-only across executions: logs, regenerated graphs/data, and regenerated Pillow visualizations are written into purpose-specific execution folders instead of clearing the previous run.
+- Presentation outputs now keep only the latest regenerated version per output family. Logs and regenerated artifacts overwrite the prior copy instead of creating new `execution_...` folders.
 - Persisted branch-local raw MAPF storage now lives under `dev/outputs/raw_mapf_files/<map_type>/`. Older branch roots from `dev/raw_mapf_data/<map_type>/` or `dev/raw_mapf_files/<map_type>/` are migrated automatically when the branch is loaded again.
 - Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize_jointly_successful` and `num_last_runs_to_visualize_independently_successful` in `master_config.py`, and a visualization-only execution now generates both folder variants automatically.
 - Branch metadata and per-run records now also capture the active solver family (`CBS` or `ECBS`) so output files remain interpretable after solver-toggle changes.

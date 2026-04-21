@@ -35,8 +35,8 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 
 recompute_MAPF = False
 
-# to_generate = "graphs_and_data"
-to_generate = "visualization"
+to_generate = "graphs_and_data"
+# to_generate = "visualization"
 # to_generate = "nothing"
 
 # MAP_TYPE = "static_artificial"

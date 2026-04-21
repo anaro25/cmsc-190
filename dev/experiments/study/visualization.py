@@ -267,6 +267,11 @@ def _render_jointly_successful_visualizations(
             classical_setup_map=classical_setup_map,
             cyclic_setup_map=cyclic_setup_map,
         )
+        logger.log_elapsed(
+            "Rendered jointly successful classical Pillow frames for "
+            f"{run_configuration.run_config_id} "
+            f"({len(classical_frames)} frame files)."
+        )
         cyclic_frames = _render_candidate(
             branch_spec=branch_spec,
             dynamic_state=dynamic_state,
@@ -274,6 +279,11 @@ def _render_jointly_successful_visualizations(
             run_output_dir=cyclic_run_output_dir,
             classical_setup_map=classical_setup_map,
             cyclic_setup_map=cyclic_setup_map,
+        )
+        logger.log_elapsed(
+            "Rendered jointly successful cyclic Pillow frames for "
+            f"{run_configuration.run_config_id} "
+            f"({len(cyclic_frames)} frame files)."
         )
 
         record = {
@@ -298,6 +308,10 @@ def _render_jointly_successful_visualizations(
         section["selected_agent_numbers_by_mapping"]["cyclic"].append(run_configuration.agent_number)
         section["selected_run_configurations_by_mapping"]["classical"].append(record)
         section["selected_run_configurations_by_mapping"]["cyclic"].append(record)
+        logger.log_elapsed(
+            "Completed jointly successful visualization set "
+            f"{selection_index}/{len(selected_groups)} for {run_configuration.run_config_id}."
+        )
 
     section["notes"] = (
         "These are the final jointly successful classical-cyclic run configurations from the "
@@ -374,6 +388,10 @@ def _render_independently_successful_visualizations(
                 run_output_dir=run_output_dir,
                 classical_setup_map=classical_setup_map,
                 cyclic_setup_map=cyclic_setup_map,
+            )
+            logger.log_elapsed(
+                f"Rendered independently successful {mapping_name} Pillow frames for "
+                f"{run_configuration.run_config_id} ({len(frames)} frame files)."
             )
             record = {
                 "mapping_name": mapping_name,

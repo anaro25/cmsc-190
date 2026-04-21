@@ -3,8 +3,8 @@ from __future__ import annotations
 import csv
 import json
 import math
+import shutil
 import time
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -61,10 +61,6 @@ def _build_execution_stage_name(*, recompute_mapf: bool, generation_target: str)
     return "__and__".join(active_stages)
 
 
-def _build_execution_token() -> str:
-    return datetime.now().strftime("execution_%Y%m%d_%H%M%S_%f")
-
-
 class BranchOutputManager:
     def __init__(
         self,
@@ -80,28 +76,34 @@ class BranchOutputManager:
             recompute_mapf=bool(recompute_mapf),
             generation_target=str(generation_target),
         )
-        self.execution_token = _build_execution_token()
+        self.generation_target = str(generation_target)
 
-        self.metadata_dir = self.branch_root / "metadata" / self.execution_stage_name / self.execution_token
-        self.records_dir = self.branch_root / "records" / self.execution_stage_name / self.execution_token
-        self.aggregates_dir = self.branch_root / "aggregates" / self.execution_stage_name / self.execution_token
-        self.graphs_dir = self.branch_root / "graphs" / self.execution_stage_name / self.execution_token
-        self.logs_dir = self.branch_root / "logs" / self.execution_stage_name / self.execution_token
-        self.visualizations_dir = self.branch_root / "visualizations" / self.execution_stage_name / self.execution_token
+        self.metadata_dir = self.branch_root / "metadata" / self.generation_target
+        self.records_dir = self.branch_root / "records" / "graphs_and_data"
+        self.aggregates_dir = self.branch_root / "aggregates" / "graphs_and_data"
+        self.graphs_dir = self.branch_root / "graphs" / "graphs_and_data"
+        self.logs_dir = self.branch_root / "logs" / self.execution_stage_name
+        self.visualizations_dir = self.branch_root / "visualizations" / "visualization"
+
+    @staticmethod
+    def _reset_dir(path: Path) -> None:
+        if path.exists():
+            shutil.rmtree(path)
+        path.mkdir(parents=True, exist_ok=True)
 
     def prepare_log_output(self) -> Path:
-        self.logs_dir.mkdir(parents=True, exist_ok=True)
+        self._reset_dir(self.logs_dir)
         return self.logs_dir / "experiment.log"
 
     def clear_graphs_and_data_outputs(self) -> None:
-        self.metadata_dir.mkdir(parents=True, exist_ok=True)
-        self.records_dir.mkdir(parents=True, exist_ok=True)
-        self.aggregates_dir.mkdir(parents=True, exist_ok=True)
-        self.graphs_dir.mkdir(parents=True, exist_ok=True)
+        self._reset_dir(self.metadata_dir)
+        self._reset_dir(self.records_dir)
+        self._reset_dir(self.aggregates_dir)
+        self._reset_dir(self.graphs_dir)
 
     def clear_visualization_outputs(self) -> None:
-        self.metadata_dir.mkdir(parents=True, exist_ok=True)
-        self.visualizations_dir.mkdir(parents=True, exist_ok=True)
+        self._reset_dir(self.metadata_dir)
+        self._reset_dir(self.visualizations_dir)
 
 
 def _clean_csv_value(value: Any) -> Any:

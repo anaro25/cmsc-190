@@ -83,6 +83,10 @@
 #   "visualization"   -> regenerate Pillow visualizations from saved raw MAPF data.
 #   "nothing"         -> do not regenerate outputs in this run.
 #
+# Presentation outputs are latest-only. Regenerating logs, graphs/data, or
+# visualizations replaces the previous copy for that same purpose instead of
+# creating a new execution_xxxxxx_xxxxxx_xxxxxx folder.
+#
 # Raw MAPF data is stored per branch and is intentionally controlled manually.
 # Each branch now keeps a split raw-data directory with a manifest, metadata, and
 # per-condition files instead of one monolithic pickle. The program does not try

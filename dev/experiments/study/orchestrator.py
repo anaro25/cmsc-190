@@ -469,11 +469,12 @@ def _compute_raw_branch_data(
 
 def _write_graphs_and_data_outputs(
     *,
+    current_branch_spec,
     raw_payload: dict[str, Any],
     output_manager: BranchOutputManager,
     logger: ExperimentLogger,
 ) -> list[Path]:
-    branch_spec = raw_payload["branch_spec"]
+    raw_branch_spec = raw_payload["branch_spec"]
     dynamic_state = raw_payload.get("dynamic_state")
     run_configurations = list(raw_payload.get("run_configurations", []))
     run_records = list(raw_payload.get("run_records", []))
@@ -481,7 +482,11 @@ def _write_graphs_and_data_outputs(
     branch_stop_summary = dict(raw_payload.get("branch_stop_summary", {}))
 
     output_manager.clear_graphs_and_data_outputs()
-    write_json(output_manager.metadata_dir / "branch_spec.json", branch_spec.to_dict())
+    write_json(output_manager.metadata_dir / "branch_spec.json", raw_branch_spec.to_dict())
+    write_json(
+        output_manager.metadata_dir / "graph_generation_branch_spec.json",
+        current_branch_spec.to_dict(),
+    )
     if dynamic_state is not None:
         write_json(
             output_manager.metadata_dir / "shared_dynamic_state.json",
@@ -497,7 +502,12 @@ def _write_graphs_and_data_outputs(
     logger.log_elapsed("Structured records and summaries regenerated from persisted raw MAPF data.")
 
     aggregate_objects = [ConditionAggregate(**payload) for payload in aggregates_payload]
-    graph_paths = generate_graphs(branch_spec, aggregate_objects, output_manager.graphs_dir)
+    graph_paths = generate_graphs(current_branch_spec, aggregate_objects, output_manager.graphs_dir)
+    if raw_branch_spec.agent_numbers != current_branch_spec.agent_numbers:
+        logger.log(
+            "Graph tick labels are generated from the agent numbers that are actually present in the persisted raw MAPF data, "
+            "so later master_config.py domain edits do not stretch the x-axis when regenerating old graphs."
+        )
     logger.log_elapsed("Graphs regenerated from persisted raw MAPF data.")
 
     logger.log("")
@@ -633,6 +643,7 @@ def run_selected_experiment(
 
         if generation_target == "graphs_and_data":
             graph_paths = _write_graphs_and_data_outputs(
+                current_branch_spec=branch_spec,
                 raw_payload=raw_payload,
                 output_manager=output_manager,
                 logger=logger,
