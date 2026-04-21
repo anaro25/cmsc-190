@@ -36,8 +36,8 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 recompute_MAPF = False
 
 # to_generate = "graphs_and_data"
-# to_generate = "visualization"
-to_generate = "nothing"
+to_generate = "visualization"
+# to_generate = "nothing"
 
 MAP_TYPE = "static_artificial"
 # MAP_TYPE = "static_campus_area_1"
@@ -47,9 +47,9 @@ MAP_TYPE = "static_artificial"
 STATIC_ARTIFICIAL_CONFIG = {
     # common frequently edited constants
     "seed": 101,
-    "agent_number_range": (4, 200, 4), # max 120 to 124
+    "agent_number_range": (4, 300, 4), # max 120 to 124
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize": 1,
+    "num_last_runs_to_visualize": 3,
     "require_jointly_successful_mappings": False,
     "ECBS_suboptimality": 1.5, # w = 1.0 can't reach 40 agents
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
