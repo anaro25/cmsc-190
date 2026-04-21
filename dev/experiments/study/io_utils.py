@@ -4,11 +4,12 @@ import csv
 import json
 import math
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from dev.experiments.branch_specs import BranchSpec
-from dev.paths import OUTPUTS_ROOT, clear_output_dir
+from dev.paths import OUTPUTS_ROOT
 
 
 def format_elapsed_mmss(elapsed_seconds: float) -> str:
@@ -49,37 +50,58 @@ class BufferedExperimentLogger:
             logger.log(message)
 
 
+def _build_execution_stage_name(*, recompute_mapf: bool, generation_target: str) -> str:
+    active_stages: list[str] = []
+    if recompute_mapf:
+        active_stages.append("computation")
+    if generation_target != "nothing":
+        active_stages.append(str(generation_target))
+    if not active_stages:
+        return "no_generation"
+    return "__and__".join(active_stages)
+
+
+def _build_execution_token() -> str:
+    return datetime.now().strftime("execution_%Y%m%d_%H%M%S_%f")
+
+
 class BranchOutputManager:
-    def __init__(self, branch_spec: BranchSpec):
+    def __init__(
+        self,
+        branch_spec: BranchSpec,
+        *,
+        generation_target: str,
+        recompute_mapf: bool,
+    ):
         self.branch_root = OUTPUTS_ROOT / branch_spec.map_type
         self.branch_root.mkdir(parents=True, exist_ok=True)
-        self.metadata_dir = self.branch_root / "metadata"
-        self.records_dir = self.branch_root / "records"
-        self.aggregates_dir = self.branch_root / "aggregates"
-        self.graphs_dir = self.branch_root / "graphs"
-        self.logs_dir = self.branch_root / "logs"
-        self.visualizations_dir = self.branch_root / "visualizations"
-        for directory in (
-            self.metadata_dir,
-            self.records_dir,
-            self.aggregates_dir,
-            self.graphs_dir,
-            self.logs_dir,
-            self.visualizations_dir,
-        ):
-            directory.mkdir(parents=True, exist_ok=True)
+
+        self.execution_stage_name = _build_execution_stage_name(
+            recompute_mapf=bool(recompute_mapf),
+            generation_target=str(generation_target),
+        )
+        self.execution_token = _build_execution_token()
+
+        self.metadata_dir = self.branch_root / "metadata" / self.execution_stage_name / self.execution_token
+        self.records_dir = self.branch_root / "records" / self.execution_stage_name / self.execution_token
+        self.aggregates_dir = self.branch_root / "aggregates" / self.execution_stage_name / self.execution_token
+        self.graphs_dir = self.branch_root / "graphs" / self.execution_stage_name / self.execution_token
+        self.logs_dir = self.branch_root / "logs" / self.execution_stage_name / self.execution_token
+        self.visualizations_dir = self.branch_root / "visualizations" / self.execution_stage_name / self.execution_token
 
     def prepare_log_output(self) -> Path:
-        clear_output_dir(self.logs_dir)
+        self.logs_dir.mkdir(parents=True, exist_ok=True)
         return self.logs_dir / "experiment.log"
 
     def clear_graphs_and_data_outputs(self) -> None:
-        clear_output_dir(self.records_dir)
-        clear_output_dir(self.aggregates_dir)
-        clear_output_dir(self.graphs_dir)
+        self.metadata_dir.mkdir(parents=True, exist_ok=True)
+        self.records_dir.mkdir(parents=True, exist_ok=True)
+        self.aggregates_dir.mkdir(parents=True, exist_ok=True)
+        self.graphs_dir.mkdir(parents=True, exist_ok=True)
 
     def clear_visualization_outputs(self) -> None:
-        clear_output_dir(self.visualizations_dir)
+        self.metadata_dir.mkdir(parents=True, exist_ok=True)
+        self.visualizations_dir.mkdir(parents=True, exist_ok=True)
 
 
 def _clean_csv_value(value: Any) -> Any:

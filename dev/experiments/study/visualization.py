@@ -168,173 +168,188 @@ def _build_joint_groups(
     ]
 
 
-def render_selected_visualizations(
-    *,
-    branch_spec: BranchSpec,
-    output_manager: BranchOutputManager,
-    dynamic_state: DynamicBranchState | None,
-    all_candidates: list[VisualizationCandidate],
-    logger: ExperimentLogger,
-    num_last_runs_to_visualize: int | None = None,
-    require_jointly_successful_mappings: bool | None = None,
-) -> dict[str, Any]:
-    effective_num_last_runs_to_visualize = (
-        branch_spec.num_last_runs_to_visualize
-        if num_last_runs_to_visualize is None
-        else int(num_last_runs_to_visualize)
-    )
-    effective_require_jointly_successful_mappings = (
-        branch_spec.require_jointly_successful_mappings
-        if require_jointly_successful_mappings is None
-        else bool(require_jointly_successful_mappings)
-    )
 
-    summary: dict[str, Any] = {
-        "num_last_runs_to_visualize": effective_num_last_runs_to_visualize,
-        "require_jointly_successful_mappings": effective_require_jointly_successful_mappings,
-        "selection_mode": (
-            "jointly_successful_mappings"
-            if effective_require_jointly_successful_mappings
-            else "independently_successful_mappings"
-        ),
-        "selection_config_source": "current_master_config",
+def _empty_selection_section(*, selection_mode: str, num_last_runs_to_visualize: int, output_root: Path) -> dict[str, Any]:
+    return {
+        "selection_mode": selection_mode,
+        "num_last_runs_to_visualize": int(num_last_runs_to_visualize),
         "selected_agent_numbers": [],
         "selected_agent_numbers_by_mapping": {"classical": [], "cyclic": []},
         "selected_run_configurations": [],
         "selected_run_configurations_by_mapping": {"classical": [], "cyclic": []},
-        "visualizations_root": str(output_manager.visualizations_dir),
+        "visualizations_root": str(output_root),
         "notes": "",
     }
 
-    if effective_num_last_runs_to_visualize <= 0:
-        summary["notes"] = "Visualization disabled because num_last_runs_to_visualize <= 0."
-        write_json(output_manager.metadata_dir / "visualization_selection_summary.json", summary)
-        logger.log("Visualization rendering skipped because num_last_runs_to_visualize <= 0.")
-        return summary
 
-    classical_setup_map = None
-    cyclic_setup_map = None
-    if branch_spec.is_dynamic:
-        if dynamic_state is None:
-            raise ValueError("dynamic_state is required for dynamic visualization rendering")
-        classical_setup_map, cyclic_setup_map = build_static_only_setup_maps(dynamic_state.static_matrix)
+def _write_visualization_summary(
+    *,
+    output_manager: BranchOutputManager,
+    summary: dict[str, Any],
+    logger: ExperimentLogger,
+) -> None:
+    summary_path = output_manager.metadata_dir / "visualization_selection_summary.json"
+    write_json(summary_path, summary)
+    logger.log(f"Visualization summary written to {summary_path}")
 
-    selected_root = output_manager.visualizations_dir
-    selected_root.mkdir(parents=True, exist_ok=True)
 
-    if effective_require_jointly_successful_mappings:
-        joint_groups = _build_joint_groups(all_candidates)
-        selected_groups = joint_groups[-effective_num_last_runs_to_visualize :]
-        if not selected_groups:
-            summary["notes"] = (
-                "No jointly successful classical-cyclic run configurations were available among the "
-                "reported branch results, so no Pillow visualizations were generated."
-            )
-            write_json(output_manager.metadata_dir / "visualization_selection_summary.json", summary)
-            logger.log(
-                "Visualization rendering skipped because no jointly successful classical-cyclic "
-                "run configurations were available in the reported branch results."
-            )
-            return summary
-
-        classical_root = selected_root / "classical"
-        cyclic_root = selected_root / "cyclic"
-        classical_root.mkdir(parents=True, exist_ok=True)
-        cyclic_root.mkdir(parents=True, exist_ok=True)
-        logger.log("")
-        logger.log(
-            "Generating Pillow visualizations for the final jointly successful classical-cyclic runs..."
-        )
-
-        for selection_index, group in enumerate(selected_groups, start=1):
-            classical_candidate = group["classical"]
-            cyclic_candidate = group["cyclic"]
-            run_configuration = classical_candidate.run_configuration
-            run_slug = _slugify(run_configuration.run_config_id)
-            agent_number = run_configuration.agent_number
-            classical_run_output_dir = classical_root / (
-                f"selection_{selection_index:02d}__agent_number_{agent_number:03d}__{run_slug}"
-            )
-            cyclic_run_output_dir = cyclic_root / (
-                f"selection_{selection_index:02d}__agent_number_{agent_number:03d}__{run_slug}"
-            )
-            classical_run_output_dir.mkdir(parents=True, exist_ok=True)
-            cyclic_run_output_dir.mkdir(parents=True, exist_ok=True)
-            logger.log(
-                f"  Rendering jointly successful visualization set {selection_index}/{len(selected_groups)} | "
-                f"run_config_id={run_configuration.run_config_id}"
-            )
-
-            classical_frames = _render_candidate(
-                branch_spec=branch_spec,
-                dynamic_state=dynamic_state,
-                candidate=classical_candidate,
-                run_output_dir=classical_run_output_dir,
-                classical_setup_map=classical_setup_map,
-                cyclic_setup_map=cyclic_setup_map,
-            )
-            cyclic_frames = _render_candidate(
-                branch_spec=branch_spec,
-                dynamic_state=dynamic_state,
-                candidate=cyclic_candidate,
-                run_output_dir=cyclic_run_output_dir,
-                classical_setup_map=classical_setup_map,
-                cyclic_setup_map=cyclic_setup_map,
-            )
-
-            record = {
-                "selection_index": selection_index,
-                "run_config_id": run_configuration.run_config_id,
-                "agent_number": run_configuration.agent_number,
-                "run_index": run_configuration.run_index,
-                "assignment_seed": run_configuration.assignment_seed,
-                "map_identifier": run_configuration.map_identifier,
-                "output_dir": {
-                    "classical": str(classical_run_output_dir),
-                    "cyclic": str(cyclic_run_output_dir),
-                },
-                "classical_dir": str(classical_run_output_dir),
-                "cyclic_dir": str(cyclic_run_output_dir),
-                "classical_num_frames": len(classical_frames),
-                "cyclic_num_frames": len(cyclic_frames),
-            }
-            summary["selected_run_configurations"].append(record)
-            summary["selected_agent_numbers"].append(run_configuration.agent_number)
-            summary["selected_agent_numbers_by_mapping"]["classical"].append(run_configuration.agent_number)
-            summary["selected_agent_numbers_by_mapping"]["cyclic"].append(run_configuration.agent_number)
-            summary["selected_run_configurations_by_mapping"]["classical"].append(record)
-            summary["selected_run_configurations_by_mapping"]["cyclic"].append(record)
-
-        summary["notes"] = (
-            "These are the final jointly successful classical-cyclic run configurations from the "
-            "reported experiment, limited by num_last_runs_to_visualize."
-        )
-        write_json(output_manager.metadata_dir / "visualization_selection_summary.json", summary)
-        logger.log(
-            f"Visualization summary written to {output_manager.metadata_dir / 'visualization_selection_summary.json'}"
-        )
-        return summary
-
-    independent_root = selected_root
-    independent_root.mkdir(parents=True, exist_ok=True)
-    logger.log("")
-    logger.log(
-        "Generating Pillow visualizations for the final independently successful runs of each mapping..."
+def _render_jointly_successful_visualizations(
+    *,
+    branch_spec: BranchSpec,
+    output_root: Path,
+    dynamic_state: DynamicBranchState | None,
+    all_candidates: list[VisualizationCandidate],
+    logger: ExperimentLogger,
+    num_last_runs_to_visualize: int,
+    classical_setup_map: list[list[Any]] | None,
+    cyclic_setup_map: list[list[Any]] | None,
+) -> dict[str, Any]:
+    section = _empty_selection_section(
+        selection_mode="jointly_successful_mappings",
+        num_last_runs_to_visualize=num_last_runs_to_visualize,
+        output_root=output_root,
     )
+    if num_last_runs_to_visualize <= 0:
+        section["notes"] = (
+            "Jointly successful visualization generation skipped because "
+            "num_last_runs_to_visualize_jointly_successful <= 0."
+        )
+        logger.log(
+            "Jointly successful visualization generation skipped because "
+            "num_last_runs_to_visualize_jointly_successful <= 0."
+        )
+        return section
+
+    joint_groups = _build_joint_groups(all_candidates)
+    selected_groups = joint_groups[-num_last_runs_to_visualize :]
+    if not selected_groups:
+        section["notes"] = (
+            "No jointly successful classical-cyclic run configurations were available among the "
+            "reported branch results, so no jointly successful Pillow visualizations were generated."
+        )
+        logger.log(
+            "No jointly successful classical-cyclic run configurations were available, "
+            "so the jointly successful visualization folder was left empty."
+        )
+        return section
+
+    classical_root = output_root / "classical"
+    cyclic_root = output_root / "cyclic"
+    classical_root.mkdir(parents=True, exist_ok=True)
+    cyclic_root.mkdir(parents=True, exist_ok=True)
+    logger.log("")
+    logger.log("Generating jointly successful Pillow visualizations...")
+
+    for selection_index, group in enumerate(selected_groups, start=1):
+        classical_candidate = group["classical"]
+        cyclic_candidate = group["cyclic"]
+        run_configuration = classical_candidate.run_configuration
+        run_slug = _slugify(run_configuration.run_config_id)
+        agent_number = run_configuration.agent_number
+        classical_run_output_dir = classical_root / (
+            f"selection_{selection_index:02d}__agent_number_{agent_number:03d}__{run_slug}"
+        )
+        cyclic_run_output_dir = cyclic_root / (
+            f"selection_{selection_index:02d}__agent_number_{agent_number:03d}__{run_slug}"
+        )
+        classical_run_output_dir.mkdir(parents=True, exist_ok=True)
+        cyclic_run_output_dir.mkdir(parents=True, exist_ok=True)
+        logger.log(
+            f"  Rendering jointly successful visualization set {selection_index}/{len(selected_groups)} | "
+            f"run_config_id={run_configuration.run_config_id}"
+        )
+
+        classical_frames = _render_candidate(
+            branch_spec=branch_spec,
+            dynamic_state=dynamic_state,
+            candidate=classical_candidate,
+            run_output_dir=classical_run_output_dir,
+            classical_setup_map=classical_setup_map,
+            cyclic_setup_map=cyclic_setup_map,
+        )
+        cyclic_frames = _render_candidate(
+            branch_spec=branch_spec,
+            dynamic_state=dynamic_state,
+            candidate=cyclic_candidate,
+            run_output_dir=cyclic_run_output_dir,
+            classical_setup_map=classical_setup_map,
+            cyclic_setup_map=cyclic_setup_map,
+        )
+
+        record = {
+            "selection_index": selection_index,
+            "run_config_id": run_configuration.run_config_id,
+            "agent_number": run_configuration.agent_number,
+            "run_index": run_configuration.run_index,
+            "assignment_seed": run_configuration.assignment_seed,
+            "map_identifier": run_configuration.map_identifier,
+            "output_dir": {
+                "classical": str(classical_run_output_dir),
+                "cyclic": str(cyclic_run_output_dir),
+            },
+            "classical_dir": str(classical_run_output_dir),
+            "cyclic_dir": str(cyclic_run_output_dir),
+            "classical_num_frames": len(classical_frames),
+            "cyclic_num_frames": len(cyclic_frames),
+        }
+        section["selected_run_configurations"].append(record)
+        section["selected_agent_numbers"].append(run_configuration.agent_number)
+        section["selected_agent_numbers_by_mapping"]["classical"].append(run_configuration.agent_number)
+        section["selected_agent_numbers_by_mapping"]["cyclic"].append(run_configuration.agent_number)
+        section["selected_run_configurations_by_mapping"]["classical"].append(record)
+        section["selected_run_configurations_by_mapping"]["cyclic"].append(record)
+
+    section["notes"] = (
+        "These are the final jointly successful classical-cyclic run configurations from the "
+        "reported experiment, limited by num_last_runs_to_visualize_jointly_successful."
+    )
+    return section
+
+
+def _render_independently_successful_visualizations(
+    *,
+    branch_spec: BranchSpec,
+    output_root: Path,
+    dynamic_state: DynamicBranchState | None,
+    all_candidates: list[VisualizationCandidate],
+    logger: ExperimentLogger,
+    num_last_runs_to_visualize: int,
+    classical_setup_map: list[list[Any]] | None,
+    cyclic_setup_map: list[list[Any]] | None,
+) -> dict[str, Any]:
+    section = _empty_selection_section(
+        selection_mode="independently_successful_mappings",
+        num_last_runs_to_visualize=num_last_runs_to_visualize,
+        output_root=output_root,
+    )
+    if num_last_runs_to_visualize <= 0:
+        section["notes"] = (
+            "Independently successful visualization generation skipped because "
+            "num_last_runs_to_visualize_independently_successful <= 0."
+        )
+        logger.log(
+            "Independently successful visualization generation skipped because "
+            "num_last_runs_to_visualize_independently_successful <= 0."
+        )
+        return section
+
+    output_root.mkdir(parents=True, exist_ok=True)
+    logger.log("")
+    logger.log("Generating independently successful Pillow visualizations...")
 
     total_selected = 0
     for mapping_name in ("classical", "cyclic"):
         mapping_candidates = [
             candidate for candidate in all_candidates if candidate.mapping_name == mapping_name
         ]
-        selected_candidates = mapping_candidates[-effective_num_last_runs_to_visualize :]
+        selected_candidates = mapping_candidates[-num_last_runs_to_visualize :]
         if not selected_candidates:
             logger.log(
-                f"  No successful {mapping_name} runs were available for visualization selection."
+                f"  No successful {mapping_name} runs were available for independent visualization selection."
             )
             continue
 
-        mapping_root = independent_root / mapping_name
+        mapping_root = output_root / mapping_name
         mapping_root.mkdir(parents=True, exist_ok=True)
         logger.log(
             f"  Rendering {len(selected_candidates)} independently successful {mapping_name} run(s)..."
@@ -372,28 +387,107 @@ def render_selected_visualizations(
                 "mapping_dir": str(run_output_dir),
                 "num_frames": len(frames),
             }
-            summary["selected_run_configurations"].append(record)
-            summary["selected_run_configurations_by_mapping"][mapping_name].append(record)
-            summary["selected_agent_numbers"].append(run_configuration.agent_number)
-            summary["selected_agent_numbers_by_mapping"][mapping_name].append(run_configuration.agent_number)
+            section["selected_run_configurations"].append(record)
+            section["selected_run_configurations_by_mapping"][mapping_name].append(record)
+            section["selected_agent_numbers"].append(run_configuration.agent_number)
+            section["selected_agent_numbers_by_mapping"][mapping_name].append(run_configuration.agent_number)
             total_selected += 1
 
     if total_selected == 0:
-        summary["notes"] = (
+        section["notes"] = (
             "No successful mapping-specific run configurations were available among the reported branch "
-            "results, so no Pillow visualizations were generated."
+            "results, so no independently successful Pillow visualizations were generated."
         )
-        write_json(output_manager.metadata_dir / "visualization_selection_summary.json", summary)
         logger.log(
-            "Visualization rendering skipped because no successful mapping-specific run configurations "
-            "were available in the reported branch results."
+            "No successful mapping-specific run configurations were available, "
+            "so the independently successful visualization folder was left empty."
         )
-        return summary
+        return section
 
-    summary["notes"] = (
+    section["notes"] = (
         "These are the final independently successful runs per mapping from the reported experiment, "
-        "limited by num_last_runs_to_visualize for each mapping."
+        "limited by num_last_runs_to_visualize_independently_successful for each mapping."
     )
-    write_json(output_manager.metadata_dir / "visualization_selection_summary.json", summary)
-    logger.log(f"Visualization summary written to {output_manager.metadata_dir / 'visualization_selection_summary.json'}")
+    return section
+
+
+def render_selected_visualizations(
+    *,
+    branch_spec: BranchSpec,
+    output_manager: BranchOutputManager,
+    dynamic_state: DynamicBranchState | None,
+    all_candidates: list[VisualizationCandidate],
+    logger: ExperimentLogger,
+    num_last_runs_to_visualize_jointly_successful: int | None = None,
+    num_last_runs_to_visualize_independently_successful: int | None = None,
+) -> dict[str, Any]:
+    effective_jointly_successful_limit = (
+        branch_spec.num_last_runs_to_visualize_jointly_successful
+        if num_last_runs_to_visualize_jointly_successful is None
+        else int(num_last_runs_to_visualize_jointly_successful)
+    )
+    effective_independently_successful_limit = (
+        branch_spec.num_last_runs_to_visualize_independently_successful
+        if num_last_runs_to_visualize_independently_successful is None
+        else int(num_last_runs_to_visualize_independently_successful)
+    )
+
+    summary: dict[str, Any] = {
+        "selection_config_source": "current_master_config",
+        "visualizations_root": str(output_manager.visualizations_dir),
+        "jointly_successful": {},
+        "independently_successful": {},
+        "total_selected_run_configurations": 0,
+        "notes": "",
+    }
+
+    classical_setup_map = None
+    cyclic_setup_map = None
+    if branch_spec.is_dynamic:
+        if dynamic_state is None:
+            raise ValueError("dynamic_state is required for dynamic visualization rendering")
+        classical_setup_map, cyclic_setup_map = build_static_only_setup_maps(dynamic_state.static_matrix)
+
+    jointly_successful_root = output_manager.visualizations_dir / "jointly_successful"
+    independently_successful_root = output_manager.visualizations_dir / "independently_successful"
+    jointly_successful_root.mkdir(parents=True, exist_ok=True)
+    independently_successful_root.mkdir(parents=True, exist_ok=True)
+
+    summary["jointly_successful"] = _render_jointly_successful_visualizations(
+        branch_spec=branch_spec,
+        output_root=jointly_successful_root,
+        dynamic_state=dynamic_state,
+        all_candidates=all_candidates,
+        logger=logger,
+        num_last_runs_to_visualize=effective_jointly_successful_limit,
+        classical_setup_map=classical_setup_map,
+        cyclic_setup_map=cyclic_setup_map,
+    )
+    summary["independently_successful"] = _render_independently_successful_visualizations(
+        branch_spec=branch_spec,
+        output_root=independently_successful_root,
+        dynamic_state=dynamic_state,
+        all_candidates=all_candidates,
+        logger=logger,
+        num_last_runs_to_visualize=effective_independently_successful_limit,
+        classical_setup_map=classical_setup_map,
+        cyclic_setup_map=cyclic_setup_map,
+    )
+    summary["total_selected_run_configurations"] = (
+        len(summary["jointly_successful"].get("selected_run_configurations", []))
+        + len(summary["independently_successful"].get("selected_run_configurations", []))
+    )
+
+    if summary["total_selected_run_configurations"] == 0:
+        summary["notes"] = (
+            "No jointly successful or independently successful visualization selections were available, "
+            "so no Pillow visualizations were generated."
+        )
+    else:
+        summary["notes"] = (
+            "Both jointly successful and independently successful visualization variants were generated "
+            "using the current master_config.py selection limits."
+        )
+
+    _write_visualization_summary(output_manager=output_manager, summary=summary, logger=logger)
     return summary

@@ -10,7 +10,7 @@ from typing import Any
 
 from dev.experiments.branch_specs import BranchSpec
 from dev.experiments.study.io_utils import write_json
-from dev.paths import RAW_MAPF_DATA_ROOT
+from dev.paths import LEGACY_RAW_MAPF_DATA_ROOTS, RAW_MAPF_DATA_ROOT
 
 
 RAW_MAPF_DATA_FORMAT_VERSION = 2
@@ -20,6 +20,7 @@ class BranchRawDataStore:
     def __init__(self, branch_spec: BranchSpec):
         self.branch_spec = branch_spec
         self.branch_root = RAW_MAPF_DATA_ROOT / branch_spec.map_type
+        self.legacy_branch_roots = [root / branch_spec.map_type for root in LEGACY_RAW_MAPF_DATA_ROOTS]
         self.manifest_path = self.branch_root / "manifest.json"
         self.summary_path = self.branch_root / "raw_mapf_data_summary.json"
         self.metadata_dir = self.branch_root / "metadata"
@@ -226,9 +227,11 @@ class BranchRawDataStore:
         return payload
 
     def has_payload(self) -> bool:
+        self._ensure_branch_root_location()
         return self.manifest_path.exists() or self.legacy_payload_path.exists()
 
     def _load_manifest(self) -> dict[str, Any]:
+        self._ensure_branch_root_location()
         self._ensure_current_layout()
         if not self.manifest_path.exists():
             raise FileNotFoundError(
@@ -245,6 +248,16 @@ class BranchRawDataStore:
             return
         legacy_payload = self._load_legacy_payload()
         self.save(legacy_payload)
+
+    def _ensure_branch_root_location(self) -> None:
+        if self.branch_root.exists():
+            return
+        for legacy_branch_root in self.legacy_branch_roots:
+            if not legacy_branch_root.exists():
+                continue
+            self.branch_root.parent.mkdir(parents=True, exist_ok=True)
+            shutil.move(str(legacy_branch_root), str(self.branch_root))
+            return
 
     def _load_legacy_payload(self) -> dict[str, Any]:
         with self.legacy_payload_path.open("rb") as handle:
@@ -264,6 +277,30 @@ class BranchRawDataStore:
             branch_spec_payload["dynamic_group_stay_durations"] = tuple(
                 branch_spec_payload["dynamic_group_stay_durations"]
             )
+
+        legacy_visualization_limit = branch_spec_payload.pop("num_last_runs_to_visualize", None)
+        legacy_joint_requirement = branch_spec_payload.pop("require_jointly_successful_mappings", None)
+        if "num_last_runs_to_visualize_jointly_successful" not in branch_spec_payload:
+            if legacy_visualization_limit is None:
+                branch_spec_payload["num_last_runs_to_visualize_jointly_successful"] = 0
+            elif bool(legacy_joint_requirement):
+                branch_spec_payload["num_last_runs_to_visualize_jointly_successful"] = int(legacy_visualization_limit)
+            else:
+                branch_spec_payload["num_last_runs_to_visualize_jointly_successful"] = 0
+        if "num_last_runs_to_visualize_independently_successful" not in branch_spec_payload:
+            if legacy_visualization_limit is None:
+                branch_spec_payload["num_last_runs_to_visualize_independently_successful"] = 0
+            elif legacy_joint_requirement is None:
+                branch_spec_payload["num_last_runs_to_visualize_independently_successful"] = int(
+                    legacy_visualization_limit
+                )
+            elif bool(legacy_joint_requirement):
+                branch_spec_payload["num_last_runs_to_visualize_independently_successful"] = 0
+            else:
+                branch_spec_payload["num_last_runs_to_visualize_independently_successful"] = int(
+                    legacy_visualization_limit
+                )
+
         return BranchSpec(**branch_spec_payload)
 
     def _load_dynamic_state(self, manifest: dict[str, Any]) -> Any:
@@ -272,11 +309,14 @@ class BranchRawDataStore:
             return None
         return self._read_pickle_relative(dynamic_state_path)
 
+    def _normalize_relative_path(self, relative_path: str) -> Path:
+        return Path(str(relative_path).replace("\\", "/"))
+
     def _read_json_relative(self, relative_path: str) -> Any:
-        return self._read_json(self.branch_root / relative_path)
+        return self._read_json(self.branch_root / self._normalize_relative_path(relative_path))
 
     def _read_pickle_relative(self, relative_path: str) -> Any:
-        with (self.branch_root / relative_path).open("rb") as handle:
+        with (self.branch_root / self._normalize_relative_path(relative_path)).open("rb") as handle:
             return pickle.load(handle)
 
     def _build_summary(

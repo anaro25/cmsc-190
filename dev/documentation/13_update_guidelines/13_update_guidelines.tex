@@ -90,10 +90,20 @@ The new \texttt{true\_static\_shortest\_path\_distance} and \texttt{tight\_time\
 \end{itemize}
 
 \subsection{Output Contract}
-Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the solver metadata fields written into branch specs and run records.
+Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the solver metadata fields written into branch specs and run records. The presentation-output tree is now append-only across executions: each run writes into a purpose-specific execution folder such as \texttt{logs/computation/<execution>/}, \texttt{records/graphs\_and\_data/<execution>/}, or \texttt{visualizations/visualization/<execution>/}. Do not quietly reintroduce destructive clearing of those output families.
 
 \subsection{Persisted Raw-Data Contract}
-The project now stores branch-local raw MAPF data under \texttt{dev/raw\_mapf\_data/<map\_type>/}. That store is split into a manifest, metadata files, and per-condition subfolders rather than one monolithic pickle. It is reused manually through \texttt{recompute\_MAPF} rather than validated automatically against code or configuration. If compute-stage data shape changes, update both the writer/reader logic and the documentation, and assume older saved layouts may need migration or replacement.
+The project now stores branch-local raw MAPF data under \texttt{dev/outputs/raw\_mapf\_files/<map\_type>/}. That store is split into a manifest, metadata files, and per-condition subfolders rather than one monolithic pickle. It is reused manually through \texttt{recompute\_MAPF} rather than validated automatically against code or configuration. The loader currently knows how to migrate older branch roots from the previous top-level raw-data folders, so future layout changes should keep backward-compatibility in mind. If compute-stage data shape changes, update both the writer/reader logic and the documentation, and assume older saved layouts may need migration or replacement.
+
+\subsection{Visualization Selection Contract}
+The visualization stage no longer flips between one joint-selection mode and one independent-selection mode. Instead, one visualization-only execution now renders both output variants, controlled by \texttt{num\_last\_runs\_to\_visualize\_jointly\_successful} and \texttt{num\_last\_runs\_to\_visualize\_independently\_successful}. If you change how those selections work, update:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{master\_config.py},
+    \item \texttt{experiments/branch\_specs.py},
+    \item \texttt{experiments/study/raw\_data\_store.py} if backward compatibility with saved branch specs matters,
+    \item \texttt{experiments/study/visualization.py},
+    \item documentation under \texttt{documentation/11\_outputs\_and\_visualization} and \texttt{12\_current\_configuration}.
+\end{itemize}
 
 \section{When Adding a New Branch}
 

@@ -35,8 +35,8 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 
 recompute_MAPF = False
 
-# to_generate = "graphs_and_data"
-to_generate = "visualization"
+to_generate = "graphs_and_data"
+# to_generate = "visualization"
 # to_generate = "nothing"
 
 MAP_TYPE = "static_artificial"
@@ -49,8 +49,8 @@ STATIC_ARTIFICIAL_CONFIG = {
     "seed": 101,
     "agent_number_range": (4, 300, 4), # max 120 to 124
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize": 3,
-    "require_jointly_successful_mappings": False,
+    "num_last_runs_to_visualize_jointly_successful": 3,
+    "num_last_runs_to_visualize_independently_successful": 3,
     "ECBS_suboptimality": 1.5, # w = 1.0 can't reach 40 agents
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -72,8 +72,8 @@ STATIC_CAMPUS_AREA_1_CONFIG = {
     "seed": 201,
     "agent_number_range": (2, 100, 1), # max 30 to 31
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize": 1,
-    "require_jointly_successful_mappings": False,
+    "num_last_runs_to_visualize_jointly_successful": 1,
+    "num_last_runs_to_visualize_independently_successful": 1,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "narrow_lanes": SHARED_NARROW_LANES,
@@ -102,8 +102,8 @@ DYNAMIC_PORT_CONFIG = {
     "seed": 301,
     "agent_number_range": (2, 100, 1), # max 18 to 19
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize": 1,
-    "require_jointly_successful_mappings": False,
+    "num_last_runs_to_visualize_jointly_successful": 1,
+    "num_last_runs_to_visualize_independently_successful": 1,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -131,8 +131,8 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     "seed": 401,
     "agent_number_range": (2, 100, 1), # max 16 to 17
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize": 1,
-    "require_jointly_successful_mappings": False,
+    "num_last_runs_to_visualize_jointly_successful": 1,
+    "num_last_runs_to_visualize_independently_successful": 1,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "narrow_lanes": SHARED_NARROW_LANES,

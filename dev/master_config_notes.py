@@ -31,19 +31,18 @@
 #
 # agent_number_range = (start_agent_number, max_agent_number, step_size)
 # Example: (8, 40, 4) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
-# num_last_runs_to_visualize controls how many successful runs receive Pillow
-# frame output when to_generate = "visualization".
+# num_last_runs_to_visualize_jointly_successful controls how many of the final
+# jointly successful classical-cyclic paired runs receive Pillow frame output.
+# num_last_runs_to_visualize_independently_successful controls how many of the
+# final successful runs of each mapping are rendered independently.
 #
-# require_jointly_successful_mappings = True
-#   Select the last n run configurations for which both classical and cyclic
-#   are successful on the same paired instance.
-# require_jointly_successful_mappings = False
-#   Select the last n successful classical runs and the last n successful cyclic
-#   runs independently, even when they come from different paired instances.
+# When to_generate = "visualization", the renderer now creates BOTH versions:
+# - jointly_successful
+# - independently_successful
 #
-# Important: these two visualization-selection controls are read from the
-# current master_config.py during visualization regeneration. They do not force
-# a new MAPF recomputation by themselves as long as compatible persisted raw data
+# Important: these visualization-selection controls are read from the current
+# master_config.py during visualization regeneration. They do not force a new
+# MAPF recomputation by themselves as long as compatible persisted raw data
 # already exists for the selected branch.
 # require_individual_reachbility
 #   Set this to "True" for branches whose maps are not manually generated. This
@@ -89,7 +88,9 @@
 # per-condition files instead of one monolithic pickle. The program does not try
 # to validate whether the current code or configuration matches the saved raw data;
 # set recompute_MAPF=True when you want to replace it.
-# Visualization-selection controls such as num_last_runs_to_visualize and
-# require_jointly_successful_mappings are read from the current master_config.py
-# during visualization regeneration, so changing only those does not require a
-# fresh MAPF recomputation as long as saved raw data already exists.
+# Visualization-selection controls such as
+# num_last_runs_to_visualize_jointly_successful and
+# num_last_runs_to_visualize_independently_successful are read from the current
+# master_config.py during visualization regeneration, so changing only those
+# does not require a fresh MAPF recomputation as long as saved raw data already
+# exists.

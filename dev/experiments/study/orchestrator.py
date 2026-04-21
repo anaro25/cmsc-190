@@ -536,8 +536,12 @@ def _write_visualization_outputs(
     logger.log(
         "Visualization selection controls are being read from the current master_config.py "
         f"for branch '{current_branch_spec.map_type}' "
-        f"(num_last_runs_to_visualize={current_branch_spec.num_last_runs_to_visualize}, "
-        f"require_jointly_successful_mappings={current_branch_spec.require_jointly_successful_mappings})."
+        "("
+        f"num_last_runs_to_visualize_jointly_successful="
+        f"{current_branch_spec.num_last_runs_to_visualize_jointly_successful}, "
+        f"num_last_runs_to_visualize_independently_successful="
+        f"{current_branch_spec.num_last_runs_to_visualize_independently_successful}"
+        ")."
     )
     output_manager.clear_visualization_outputs()
     visualization_summary = render_selected_visualizations(
@@ -546,13 +550,17 @@ def _write_visualization_outputs(
         dynamic_state=dynamic_state,
         all_candidates=all_visualization_candidates,
         logger=logger,
-        num_last_runs_to_visualize=current_branch_spec.num_last_runs_to_visualize,
-        require_jointly_successful_mappings=current_branch_spec.require_jointly_successful_mappings,
+        num_last_runs_to_visualize_jointly_successful=(
+            current_branch_spec.num_last_runs_to_visualize_jointly_successful
+        ),
+        num_last_runs_to_visualize_independently_successful=(
+            current_branch_spec.num_last_runs_to_visualize_independently_successful
+        ),
     )
     logger.log_elapsed("Pillow visualizations regenerated from persisted raw MAPF data using the current visualization controls.")
     logger.log(
-        "Selected run configurations for visualization: "
-        f"{len(visualization_summary.get('selected_run_configurations', []))}"
+        "Selected visualization entries generated across both variants: "
+        f"{visualization_summary.get('total_selected_run_configurations', 0)}"
     )
     return visualization_summary
 
@@ -566,7 +574,11 @@ def run_selected_experiment(
     branch_spec = get_branch_spec(map_type)
     resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
     generation_target = _resolve_generation_target()
-    output_manager = BranchOutputManager(branch_spec)
+    output_manager = BranchOutputManager(
+        branch_spec,
+        generation_target=generation_target,
+        recompute_mapf=bool(recompute_MAPF),
+    )
     log_path = output_manager.prepare_log_output()
     logger = ExperimentLogger(log_path, start_time=program_start_time)
     raw_store = BranchRawDataStore(branch_spec)
@@ -649,7 +661,9 @@ def run_selected_experiment(
         "graph_paths": [str(path) for path in graph_paths],
         "visualizations_root": str(output_manager.visualizations_dir),
         "visualization_summary_path": str(output_manager.metadata_dir / "visualization_selection_summary.json"),
-        "num_visualized_run_configurations": len(visualization_summary.get("selected_run_configurations", [])),
+        "num_visualized_run_configurations": int(
+            visualization_summary.get("total_selected_run_configurations", 0)
+        ),
         "log_path": str(log_path),
         "generation_target": generation_target,
         "recompute_MAPF": bool(recompute_MAPF),

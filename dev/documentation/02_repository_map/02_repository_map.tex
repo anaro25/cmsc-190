@@ -131,8 +131,8 @@ Presentation outputs are written under:
 \]
 with subfolders for metadata, records, aggregates, graphs, logs, and visualizations. Persisted branch-local raw MAPF data is stored separately under:
 \[
-\texttt{dev/raw\_mapf\_data/<map\_type>/}
+\texttt{dev/outputs/raw\_mapf\_files/<map\_type>/}
 \]
-so they survive later graph or visualization regeneration runs. The persisted raw-data tree is now organized as a branch root containing a manifest, metadata files, and one subfolder per reported condition, which keeps large experiments more navigable than a single all-in-one pickle. This split between persisted raw data and disposable presentation outputs is now part of the practical contract of the project.
+so they survive later graph or visualization regeneration runs. The persisted raw-data tree is now organized as a branch root containing a manifest, metadata files, and one subfolder per reported condition, which keeps large experiments more navigable than a single all-in-one pickle. The loader also migrates older branch roots from \texttt{dev/raw\_mapf\_data/<map\_type>/} or \texttt{dev/raw\_mapf\_files/<map\_type>/} the next time that branch is accessed. This split between persisted raw data and disposable presentation outputs is now part of the practical contract of the project.
 
 \end{document}

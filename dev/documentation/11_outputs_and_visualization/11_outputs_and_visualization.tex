@@ -38,15 +38,15 @@
 
 The project now distinguishes between:
 \begin{itemize}[leftmargin=2em]
-    \item \textbf{persisted raw MAPF data} under \texttt{dev/raw\_mapf\_data/<map\_type>/},
+    \item \textbf{persisted raw MAPF data} under \texttt{dev/outputs/raw\_mapf\_files/<map\_type>/},
     \item \textbf{presentation outputs} under \texttt{dev/outputs/<map\_type>/}.
 \end{itemize}
 
-The raw MAPF store is branch-local and survives across later runs. It is replaced only when \texttt{recompute\_MAPF=True}. The presentation outputs can then be regenerated from that saved raw data without rerunning the expensive solver stage.
+The raw MAPF store is branch-local and survives across later runs. It is replaced only when \texttt{recompute\_MAPF=True}. The presentation outputs can then be regenerated from that saved raw data without rerunning the expensive solver stage. Older branch-local roots that still live under \texttt{dev/raw\_mapf\_data/<map\_type>/} or \texttt{dev/raw\_mapf\_files/<map\_type>/} are migrated automatically into the new \texttt{outputs/raw\_mapf\_files} location when the branch is loaded.
 
 The persisted raw-data tree is intentionally split rather than packed into one giant pickle. Each branch root now contains a manifest and metadata files at the top level, plus one condition subfolder per reported agent number. Inside each condition folder, the aggregate summary, retained run configurations, retained run records, and successful visualization candidates are stored separately. This keeps larger experiment ranges much easier to inspect and replace.
 
-The active output manager creates the following presentation-output subfolders:
+The active output manager still uses the same presentation-output families:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{metadata},
     \item \texttt{records},
@@ -55,11 +55,49 @@ The active output manager creates the following presentation-output subfolders:
     \item \texttt{logs},
     \item \texttt{visualizations}.
 \end{itemize}
+However, each family is now split first by execution purpose and then by an execution-specific folder. In other words, later runs add a new folder instead of clearing the old one. A typical branch output root now contains paths such as:
+\begin{lstlisting}
+dev/outputs/<map_type>/
+    logs/
+        computation/
+            execution_.../
+                experiment.log
+        graphs_and_data/
+            execution_.../
+                experiment.log
+        visualization/
+            execution_.../
+                experiment.log
+    metadata/
+        graphs_and_data/
+            execution_.../
+                ...
+        visualization/
+            execution_.../
+                visualization_selection_summary.json
+    records/
+        graphs_and_data/
+            execution_.../
+                ...
+    aggregates/
+        graphs_and_data/
+            execution_.../
+                ...
+    graphs/
+        graphs_and_data/
+            execution_.../
+                ...
+    visualizations/
+        visualization/
+            execution_.../
+                jointly_successful/
+                independently_successful/
+\end{lstlisting}
 
 \subsection{Persisted Raw-Data Layout}
 A typical persisted raw-data tree for one branch now has the rough form:
 \begin{lstlisting}
-dev/raw_mapf_data/<map_type>/
+dev/outputs/raw_mapf_files/<map_type>/
     manifest.json
     raw_mapf_data_summary.json
     metadata/
@@ -82,14 +120,14 @@ The condition folders contain only the retained reported data for that agent num
 
 \section{Structured Files}
 
-When \texttt{to\_generate="graphs\_and\_data"}, the most important regenerated structured outputs are:
+When \texttt{to\_generate="graphs\_and\_data"}, the most important regenerated structured outputs inside the current \texttt{graphs\_and\_data/<execution>/} folders are:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{metadata/branch\_spec.json},
-    \item \texttt{metadata/branch\_stop\_summary.json},
-    \item \texttt{metadata/shared\_dynamic\_state.json} for dynamic branches,
-    \item \texttt{records/run\_configurations.json} and \texttt{.csv},
-    \item \texttt{records/run\_records.json} and \texttt{.csv},
-    \item \texttt{aggregates/condition\_summary.json} and \texttt{.csv}.
+    \item \texttt{metadata/graphs\_and\_data/<execution>/branch\_spec.json},
+    \item \texttt{metadata/graphs\_and\_data/<execution>/branch\_stop\_summary.json},
+    \item \texttt{metadata/graphs\_and\_data/<execution>/shared\_dynamic\_state.json} for dynamic branches,
+    \item \texttt{records/graphs\_and\_data/<execution>/run\_configurations.json} and \texttt{.csv},
+    \item \texttt{records/graphs\_and\_data/<execution>/run\_records.json} and \texttt{.csv},
+    \item \texttt{aggregates/graphs\_and\_data/<execution>/condition\_summary.json} and \texttt{.csv}.
 \end{itemize}
 
 The solver update makes two of those files more informative:
@@ -101,7 +139,7 @@ The solver update makes two of those files more informative:
 
 \section{Logging Behavior}
 
-The experiment logger writes each line both to the branch log file and to stdout immediately. In practical terms, the periodic solver progress lines such as the 5-second classical/cyclic progress reports should now appear live during long runs instead of being buffered and dumped all at once later. The condition header now prints as \texttt{Condition n} rather than \texttt{Condition n/(total conditions)}, and paired sampling attempts are separated by a blank line for readability.
+The experiment logger writes each line both to the stage-specific log file and to stdout immediately. In practical terms, the periodic solver progress lines such as the 5-second classical/cyclic progress reports should now appear live during long runs instead of being buffered and dumped all at once later. The condition header now prints as \texttt{Condition n} rather than \texttt{Condition n/(total conditions)}, paired sampling attempts are separated by a blank line for readability, and the branch header no longer prints the full long list of planned agent numbers.
 
 \section{Generation Modes}
 
@@ -150,23 +188,26 @@ When a run is selected for visualization, the renderer writes:
 
 When \texttt{to\_generate="visualization"}, visualization selection is controlled by the current values in \texttt{master\_config.py}:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{num\_last\_runs\_to\_visualize},
-    \item \texttt{require\_jointly\_successful\_mappings}.
+    \item \texttt{num\_last\_runs\_to\_visualize\_jointly\_successful},
+    \item \texttt{num\_last\_runs\_to\_visualize\_independently\_successful}.
 \end{itemize}
 
-As a result, changing only these two selection controls no longer requires a fresh MAPF solve. The renderer reuses the persisted raw payload for the selected branch and applies the \emph{current} visualization-selection settings when deciding which successful runs to render.
+As a result, changing only these selection controls no longer requires a fresh MAPF solve. The renderer reuses the persisted raw payload for the selected branch and applies the \emph{current} visualization-selection settings when deciding which successful runs to render.
 
-\subsection{Joint Mode}
+\subsection{Jointly Successful Variant}
 
-If joint success is required, the code selects the last \(n\) run configurations for which both mappings were successful on the same paired configuration. This selection now follows the current \texttt{require\_jointly\_successful\_mappings} value rather than the persisted value stored with the raw MAPF payload.
+The code selects the last \(n\) run configurations for which both mappings were successful on the same paired configuration and writes them under a dedicated \texttt{jointly\_successful/} folder.
 
-\subsection{Independent Mode}
+\subsection{Independently Successful Variant}
 
-If joint success is not required, the code independently selects:
+The code independently selects:
 \begin{itemize}[leftmargin=2em]
     \item the last \(n\) successful classical runs,
-    \item the last \(n\) successful cyclic runs.
+    \item the last \(n\) successful cyclic runs,
 \end{itemize}
+and writes them under a dedicated \texttt{independently\_successful/} folder.
+
+Both visualization variants are generated in one visualization-only execution, so the old rerun that flipped a boolean selection mode is no longer needed.
 
 \section{Dynamic Visualization Detail}
 

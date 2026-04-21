@@ -26,8 +26,8 @@ class BranchSpec:
     agent_numbers: list[int]
     runtime_limit_seconds: float
     counted_runs_required: int
-    num_last_runs_to_visualize: int
-    require_jointly_successful_mappings: bool
+    num_last_runs_to_visualize_jointly_successful: int
+    num_last_runs_to_visualize_independently_successful: int
     path_length_graph_enabled: bool
     is_dynamic: bool
     start_distribution_mode: str = "dispersed"
@@ -138,8 +138,18 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(static_range),
             runtime_limit_seconds=float(static_cfg["time_limit_seconds"]),
             counted_runs_required=int(static_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize=int(static_cfg.get("num_last_runs_to_visualize", 0)),
-            require_jointly_successful_mappings=bool(static_cfg.get("require_jointly_successful_mappings", True)),
+            num_last_runs_to_visualize_jointly_successful=int(
+                static_cfg.get(
+                    "num_last_runs_to_visualize_jointly_successful",
+                    static_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
+            num_last_runs_to_visualize_independently_successful=int(
+                static_cfg.get(
+                    "num_last_runs_to_visualize_independently_successful",
+                    static_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
             path_length_graph_enabled=True,
             is_dynamic=False,
             compact_clustering=compact_clustering,
@@ -177,8 +187,18 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(static_campus_1_range),
             runtime_limit_seconds=float(static_campus_1_cfg["time_limit_seconds"]),
             counted_runs_required=int(static_campus_1_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize=int(static_campus_1_cfg.get("num_last_runs_to_visualize", 0)),
-            require_jointly_successful_mappings=bool(static_campus_1_cfg.get("require_jointly_successful_mappings", True)),
+            num_last_runs_to_visualize_jointly_successful=int(
+                static_campus_1_cfg.get(
+                    "num_last_runs_to_visualize_jointly_successful",
+                    static_campus_1_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
+            num_last_runs_to_visualize_independently_successful=int(
+                static_campus_1_cfg.get(
+                    "num_last_runs_to_visualize_independently_successful",
+                    static_campus_1_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
             path_length_graph_enabled=True,
             is_dynamic=False,
             compact_clustering=compact_clustering,
@@ -219,8 +239,18 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(port_range),
             runtime_limit_seconds=float(port_cfg["time_limit_seconds"]),
             counted_runs_required=int(port_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize=int(port_cfg.get("num_last_runs_to_visualize", 0)),
-            require_jointly_successful_mappings=bool(port_cfg.get("require_jointly_successful_mappings", True)),
+            num_last_runs_to_visualize_jointly_successful=int(
+                port_cfg.get(
+                    "num_last_runs_to_visualize_jointly_successful",
+                    port_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
+            num_last_runs_to_visualize_independently_successful=int(
+                port_cfg.get(
+                    "num_last_runs_to_visualize_independently_successful",
+                    port_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
             path_length_graph_enabled=True,
             is_dynamic=True,
             compact_clustering=compact_clustering,
@@ -266,8 +296,18 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             agent_numbers=expand_agent_number_range(campus_2_range),
             runtime_limit_seconds=float(campus_2_cfg["time_limit_seconds"]),
             counted_runs_required=int(campus_2_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize=int(campus_2_cfg.get("num_last_runs_to_visualize", 0)),
-            require_jointly_successful_mappings=bool(campus_2_cfg.get("require_jointly_successful_mappings", True)),
+            num_last_runs_to_visualize_jointly_successful=int(
+                campus_2_cfg.get(
+                    "num_last_runs_to_visualize_jointly_successful",
+                    campus_2_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
+            num_last_runs_to_visualize_independently_successful=int(
+                campus_2_cfg.get(
+                    "num_last_runs_to_visualize_independently_successful",
+                    campus_2_cfg.get("num_last_runs_to_visualize", 0),
+                )
+            ),
             path_length_graph_enabled=True,
             is_dynamic=True,
             compact_clustering=compact_clustering,

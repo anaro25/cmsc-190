@@ -40,7 +40,7 @@ The current top-level controls in \texttt{master\_config.py} are:
 \begin{itemize}[leftmargin=2em]
     \item selected branch: \texttt{MAP\_TYPE="static\_artificial"},
     \item raw-data recompute: \texttt{recompute\_MAPF=False},
-    \item output generation target: \texttt{to\_generate="nothing"},
+    \item output generation target: \texttt{to\_generate="graphs\_and\_data"},
     \item solver family: \texttt{enhanced\_CBS=True}, so the active solver family is ECBS,
     \item global clustering toggle: \texttt{compact\_clustering=True},
     \item consecutive failed paired sampling stop limit: \texttt{15}.
@@ -67,13 +67,13 @@ branch & current important values \\
 \endhead
 
 \texttt{static\_artificial} &
-\texttt{num\_last\_runs\_to\_visualize=1};
-\texttt{require\_jointly\_successful\_mappings=False};
+\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=3};
+\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=3};
 \texttt{time\_limit\_seconds=30.0};
 \texttt{ECBS\_suboptimality=1.5};
 \texttt{true\_static\_shortest\_path\_distance=True};
 \texttt{tight\_time\_horizon=False};
-\texttt{agent\_number\_range=(4,200,4)} so the planned sequence is $4,8,12,\dots,200$;
+\texttt{agent\_number\_range=(4,300,4)} so the planned sequence is $4,8,12,\dots,300$;
 \texttt{seed=101};
 \texttt{map\_size=(32,32)};
 \texttt{static\_obstacle\_density=0.40};
@@ -83,8 +83,8 @@ branch & current important values \\
 \texttt{require\_individual\_reachability=False}. \\
 
 \texttt{static\_campus\_area\_1} &
-\texttt{num\_last\_runs\_to\_visualize=1};
-\texttt{require\_jointly\_successful\_mappings=False};
+\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=1};
+\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=1};
 \texttt{time\_limit\_seconds=30.0};
 \texttt{ECBS\_suboptimality=2.0};
 \texttt{true\_static\_shortest\_path\_distance=True};
@@ -102,8 +102,8 @@ branch & current important values \\
 \texttt{image\_path=dynamic\_campus\_area\_1/campus\_area\_1\_narrow\_lanes.png}. \\
 
 \texttt{dynamic\_port} &
-\texttt{num\_last\_runs\_to\_visualize=1};
-\texttt{require\_jointly\_successful\_mappings=False};
+\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=1};
+\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=1};
 \texttt{time\_limit\_seconds=30.0};
 \texttt{ECBS\_suboptimality=2.0};
 \texttt{true\_static\_shortest\_path\_distance=True};
@@ -123,8 +123,8 @@ branch & current important values \\
 \texttt{dynamic\_generation\_cell\_mode=all\_free}. \\
 
 \texttt{dynamic\_campus\_area\_2} &
-\texttt{num\_last\_runs\_to\_visualize=1};
-\texttt{require\_jointly\_successful\_mappings=False};
+\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=1};
+\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=1};
 \texttt{time\_limit\_seconds=30.0};
 \texttt{ECBS\_suboptimality=2.0};
 \texttt{true\_static\_shortest\_path\_distance=True};
@@ -151,6 +151,6 @@ branch & current important values \\
 
 \section{Interpretation Advice}
 
-This file is a snapshot, not a substitute for \texttt{master\_config.py}. The important current design fact is that the project now uses manual branch-local raw-data persistence: solver-stage results are stored under \texttt{dev/raw\_mapf\_data/<map\_type>/}, while graphs/data exports and Pillow visualizations are regenerated separately on demand. In particular, the visualization-selection controls \texttt{num\_last\_runs\_to\_visualize} and \texttt{require\_jointly\_successful\_mappings} are intended to be changed without forcing a new MAPF recomputation.
+This file is a snapshot, not a substitute for \texttt{master\_config.py}. The important current design fact is that the project now uses manual branch-local raw-data persistence: solver-stage results are stored under \texttt{dev/outputs/raw\_mapf\_files/<map\_type>/}, while graphs/data exports and Pillow visualizations are regenerated separately on demand. Older branch roots in the previous top-level raw-data folders are migrated automatically when the branch is accessed again. In particular, the visualization-selection controls \texttt{num\_last\_runs\_to\_visualize\_jointly\_successful} and \texttt{num\_last\_runs\_to\_visualize\_independently\_successful} are intended to be changed without forcing a new MAPF recomputation, and one visualization-only execution now generates both output variants.
 
 \end{document}

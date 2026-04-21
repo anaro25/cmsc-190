@@ -42,7 +42,11 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
         "Agent number range: "
         f"start={start_agent_number}, end={max_agent_number}, step={step_size}"
     )
-    logger.log(f"Planned agent numbers before early stopping: {branch_spec.agent_numbers}")
+    logger.log(
+        "Planned agent-number conditions before early stopping: "
+        f"{len(branch_spec.agent_numbers)} "
+        f"(first={branch_spec.agent_numbers[0]}, last={branch_spec.agent_numbers[-1]})"
+    )
     logger.log(
         "Early-stop rule 1: discard the current condition and stop when cyclic unfinished runs "
         "exceed cyclic successful runs within the retained counted pairs."

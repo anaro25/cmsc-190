@@ -4,7 +4,11 @@ from pathlib import Path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 OUTPUTS_ROOT = PACKAGE_ROOT / "outputs"
-RAW_MAPF_DATA_ROOT = PACKAGE_ROOT / "raw_mapf_data"
+RAW_MAPF_DATA_ROOT = OUTPUTS_ROOT / "raw_mapf_files"
+LEGACY_RAW_MAPF_DATA_ROOTS = [
+    PACKAGE_ROOT / "raw_mapf_data",
+    PACKAGE_ROOT / "raw_mapf_files",
+]
 
 STATIC_ARTIFICIAL_DIR = OUTPUTS_ROOT / "static_artificial"
 DYNAMIC_PORT_DIR = OUTPUTS_ROOT / "dynamic_port"
