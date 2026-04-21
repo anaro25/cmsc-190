@@ -4,5 +4,4 @@ __pycache__/
 # Compiled Python files
 *.pyc
 
-dev/outputs/
-dev/raw_mapf_data/
+# dev/outputs/

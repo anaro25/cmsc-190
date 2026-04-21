@@ -1,0 +1,37 @@
+========================================================================================
+Branch: Dynamic Campus Area 2 (dynamic_campus_area_2)
+Map obstacle type: dynamic
+Documented target type: clustered_targets
+Active target type: clustered_targets
+Start distribution mode: clustered
+Goal distribution mode: clustered
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: True
+Zone relationship mode: distinct_campus_zones
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 2.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Seed: 403
+Jointly viable counted pairs required (n): 5
+Runtime limit per run: 30.00s
+Agent number range: start=2, end=200, step=1
+Planned agent-number conditions before early stopping: 199 (first=2, last=200)
+Early-stop rule 1: discard the current condition and stop when cyclic unfinished runs exceed cyclic successful runs within the retained counted pairs.
+Early-stop rule 2: discard the current condition and stop after 15 consecutive failed paired sampling attempts.
+Notes: Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles are generated only inside the zone colors. Starts and targets are both sampled as one compact directly adjacent 8-neighbor-connected group, assignments stay one-to-one, and the two clusters must come from different campus zones. The currently selected campus image variant is narrow lanes.
+========================================================================================
+recompute_MAPF: False
+to_generate: visualization
+Persisted raw MAPF data root: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/dynamic_campus_area_2
+Persisted raw MAPF manifest path: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/dynamic_campus_area_2/manifest.json
+[Elapsed: 00m 00s] Program stopwatch started.
+
+recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.
+Loaded the persisted raw MAPF data for output generation.
+Visualization selection controls are being read from the current master_config.py for branch 'dynamic_campus_area_2' (num_last_runs_to_visualize_jointly_successful=4, num_last_runs_to_visualize_independently_successful=8).
+
+Generating jointly successful Pillow visualizations...
+  Rendering jointly successful visualization set 1/4 | run_config_id=run[1.1.9.0]
