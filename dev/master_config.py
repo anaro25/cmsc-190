@@ -39,15 +39,15 @@ recompute_MAPF = False
 to_generate = "visualization"
 # to_generate = "nothing"
 
-# MAP_TYPE = "static_artificial"
-MAP_TYPE = "static_campus_area_1"
+MAP_TYPE = "static_artificial"
+# MAP_TYPE = "static_campus_area_1"
 # MAP_TYPE = "dynamic_port"
 # MAP_TYPE = "dynamic_campus_area_2"
 
 STATIC_ARTIFICIAL_CONFIG = {
     # common frequently edited constants
     "seed": 101,
-    "agent_number_range": (4, 300, 4),
+    "agent_number_range": (4, 300, 4), # max 100 (seed 101)
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize_jointly_successful": 3,
     "num_last_runs_to_visualize_independently_successful": 3,
