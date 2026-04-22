@@ -89,9 +89,8 @@ dev/outputs/<map_type>/
         graphs_and_data/
             ...
     visualizations/
-        visualization/
-            jointly_successful/
-            independently_successful/
+        jointly_successful/
+        independently_successful/
 \end{lstlisting}
 
 \subsection{Persisted Raw-Data Layout}
@@ -201,6 +200,8 @@ When \texttt{to\_generate="visualization"}, visualization selection is controlle
 
 As a result, changing only these selection controls no longer requires a fresh MAPF solve. The renderer reuses the persisted raw payload for the selected branch and applies the \emph{current} visualization-selection settings when deciding which successful runs to render.
 
+Gray campus regions may be carried separately as render-only visually free vertices. When that semantic mask is present, the visualization pipeline now reconstructs the current gray-mask semantics from the branch image and applies them twice: it passes the visually free vertex set to the renderer and also builds a render-only composite-map copy in which those gray obstacle vertices are temporarily replaced by free-space cells for drawing. This keeps gray campus regions visibly white and open-looking in Pillow outputs while the solver still treats them as non-traversable. Because the reconstruction comes from the current branch image, older persisted raw MAPF stores can still be reused without recomputing solver-stage data.
+
 \subsection{Jointly Successful Variant}
 
 The code selects the last \(n\) run configurations for which both mappings were successful on the same paired configuration and writes them under a dedicated \texttt{jointly\_successful/} folder.
@@ -219,7 +220,7 @@ Both visualization variants are generated in one visualization-only execution, s
 
 \section{Visualization Logging Granularity}
 
-The visualization-only execution now emits more stopwatch updates while Pillow frames are being generated. The log records elapsed-time milestones after each selected mapping render, and jointly successful selections also record a completion milestone per selected run configuration. This makes long frame-generation stretches easier to monitor from both the terminal and the saved \texttt{experiment.log}.
+The visualization-only execution now emits more stopwatch updates while Pillow frames are being generated. The log records elapsed-time milestones after each selected mapping render, and jointly successful selections also record a completion milestone per selected run configuration. This makes long frame-generation stretches easier to monitor from both the terminal and the saved \texttt{experiment.log}. Visualization outputs are written directly under \texttt{visualizations/} rather than under an extra nested \texttt{visualization/} folder.
 
 \section{Dynamic Visualization Detail}
 

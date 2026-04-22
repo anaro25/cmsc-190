@@ -111,7 +111,9 @@ The current campus assignment logic now follows these rules:
 
 \section{Renderer Note}
 
-The campus preparation code stores gray-region vertices as \texttt{visually\_free\_vertices}. In practice, this means a gray campus region can be drawn like an open area in some Pillow outputs even though it remains non-traversable for the actual solver.
+The campus preparation code stores gray-region vertices as \texttt{visually\_free\_vertices}. During visualization regeneration, the renderer now also builds a render-only composite-map copy that temporarily converts those gray obstacle vertices into free-space cells before drawing. In practice, this makes gray campus regions appear as ordinary white open areas in Pillow outputs even though they remain non-traversable for the actual solver and are still excluded from sampling.
+
+This behavior is now enforced both for freshly computed runs and for visualization-only reruns that reuse already persisted raw MAPF data. During static-campus visualization regeneration, the renderer reconstructs the gray-cell mask from the \emph{current} campus image and applies it as a render-only override, so old persisted run data can still be visualized correctly without recomputing the solver stage.
 
 \section{Practical Warning}
 

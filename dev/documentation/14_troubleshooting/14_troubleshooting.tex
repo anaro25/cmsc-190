@@ -64,7 +64,7 @@ If any of those three conditions fails, the run configuration is rejected and a 
 
 \section{Campus Visualization Looks Open but Solver Treats It as Blocked}
 
-Gray campus regions may be recorded as \texttt{visually\_free\_vertices} for rendering purposes. That does not make them solver-traversable. If a visualization looks more open than the solver behavior suggests, check whether the region is semantically gray rather than truly traversable.
+Gray campus regions may be recorded as \texttt{visually\_free\_vertices} for rendering purposes. That does not make them solver-traversable. The current visualization path should reconstruct the current campus semantic mask from the branch image and then build a render-only composite-map copy in which those gray vertices are temporarily drawn as free cells. This should happen even when visualization is regenerated from older persisted raw MAPF data. If a campus visualization still shows gray regions as solid obstacles, inspect whether the branch image path or semantic-color interpretation has changed. If a visualization looks more open than the solver behavior suggests, check whether the region is semantically gray rather than truly traversable.
 
 \section{Progress Lines Appear in a Burst}
 

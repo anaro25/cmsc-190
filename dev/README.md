@@ -135,7 +135,7 @@ pathological infinite loops. It remains only a protective implementation detail.
 
 - The project now uses explicit `start_distribution_mode` and `goal_distribution_mode` settings instead of the older shared-goal campus toggle.
 - All current branches remain one-to-one MAPF setups. The experiment varies spatial placement, not assignment cardinality.
-- The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, gray regions are non-traversable.
+- The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, and gray regions are non-traversable for the solver. During Pillow visualization generation, gray campus cells are reconstructed from the current semantic image and rendered through a temporary render-only free-space override so they appear as ordinary white open cells without changing solver behavior, while already persisted raw MAPF data remains reusable.
 - `static_campus_area_1` now uses campus area 1 as the static branch, with dispersed starts in one zone and clustered goals in the other zone.
 - `dynamic_port` now uses clustered starts and dispersed goals.
 - `dynamic_campus_area_2` now uses campus area 2 as the dynamic campus branch, with clustered starts and clustered goals forced into different campus zones.
@@ -144,7 +144,7 @@ pathological infinite loops. It remains only a protective implementation detail.
 - When `compact_clustering=False`, clustered sets remain one cluster but keep one empty cell of separation in all 8 directions.
 - Presentation outputs now keep only the latest regenerated version per output family. Logs and regenerated artifacts overwrite the prior copy instead of creating new `execution_...` folders.
 - Persisted branch-local raw MAPF storage now lives under `dev/outputs/raw_mapf_files/<map_type>/`. Older branch roots from `dev/raw_mapf_data/<map_type>/` or `dev/raw_mapf_files/<map_type>/` are migrated automatically when the branch is loaded again.
-- Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize_jointly_successful` and `num_last_runs_to_visualize_independently_successful` in `master_config.py`, and a visualization-only execution now generates both folder variants automatically.
+- Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize_jointly_successful` and `num_last_runs_to_visualize_independently_successful` in `master_config.py`, and a visualization-only execution now generates both folder variants automatically under `dev/outputs/<map_type>/visualizations/`.
 - Branch metadata and per-run records now also capture the active solver family (`CBS` or `ECBS`) so output files remain interpretable after solver-toggle changes.
 
 - `static_campus_area_1` and `dynamic_campus_area_2` now each expose a branch-level `narrow_lanes` boolean in `master_config.py`, which switches their campus input between the `*_narrow_lanes.png` and `*_wide_lanes.png` variants.

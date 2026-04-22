@@ -83,7 +83,7 @@ class BranchOutputManager:
         self.aggregates_dir = self.branch_root / "aggregates" / "graphs_and_data"
         self.graphs_dir = self.branch_root / "graphs" / "graphs_and_data"
         self.logs_dir = self.branch_root / "logs" / self.execution_stage_name
-        self.visualizations_dir = self.branch_root / "visualizations" / "visualization"
+        self.visualizations_dir = self.branch_root / "visualizations"
 
     @staticmethod
     def _reset_dir(path: Path) -> None:

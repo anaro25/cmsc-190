@@ -5,10 +5,12 @@ from collections import OrderedDict
 from pathlib import Path
 from typing import Any
 
+from dev.core.composite_elements import Vertex
 from dev.experiments.branch_specs import BranchSpec
 from dev.experiments.dynamic_port.pipeline import build_static_only_setup_maps
 from dev.experiments.study.io_utils import BranchOutputManager, ExperimentLogger, write_json
 from dev.experiments.study.models import DynamicBranchState, VisualizationCandidate
+from dev.inputs.dynamic_port.loader import load_campus_semantic_masks
 from dev.mapf.mapf_logger import (
     write_empty_map_config_frame,
     write_mapf_frames,
@@ -28,6 +30,68 @@ def _slugify(text: str) -> str:
     return compact or "run"
 
 
+def _mask_to_composite_positions(mask: list[list[bool]]) -> set[tuple[int, int]]:
+    positions: set[tuple[int, int]] = set()
+    for row_index, row in enumerate(mask):
+        for column_index, enabled in enumerate(row):
+            if enabled:
+                positions.add((2 * row_index, 2 * column_index))
+    return positions
+
+
+def _load_static_render_visually_free_vertices(
+    branch_spec: BranchSpec,
+) -> set[tuple[int, int]] | None:
+    if branch_spec.is_dynamic:
+        return None
+    if branch_spec.image_path is None:
+        return None
+
+    # This helper is intentionally permissive for static campus rendering.
+    # Visualization-only executions may be driven from persisted raw MAPF data
+    # whose stored BranchSpec can lag behind the current code/config. In that
+    # case, render-only gray-campus handling must still work for older payloads.
+    likely_campus_semantic_image = (
+        branch_spec.spawnable_cell_mode == "zone_colors_only"
+        or branch_spec.zone_relationship_mode == "distinct_campus_zones"
+        or "campus" in str(branch_spec.map_type).lower()
+        or "campus" in str(branch_spec.image_path).lower()
+    )
+    if not likely_campus_semantic_image:
+        return None
+
+    try:
+        campus_semantics = load_campus_semantic_masks(
+            image_path=branch_spec.image_path,
+            resize_longest_side=branch_spec.image_resize_longest_side,
+        )
+    except ValueError:
+        # If the image is not a campus-semantic image after all, fall back to
+        # the default renderer behavior instead of breaking visualization.
+        return None
+
+    visually_free_vertices = _mask_to_composite_positions(campus_semantics["gray_mask"])
+    return visually_free_vertices or None
+
+
+def _build_render_only_composite_map(
+    composite_map: list[list[Any]],
+    visually_free_vertex_positions: set[tuple[int, int]] | None,
+) -> list[list[Any]]:
+    if not visually_free_vertex_positions:
+        return composite_map
+
+    render_only_map = [list(row) for row in composite_map]
+    for row_index, column_index in visually_free_vertex_positions:
+        if row_index < 0 or row_index >= len(render_only_map):
+            continue
+        if column_index < 0 or column_index >= len(render_only_map[row_index]):
+            continue
+        if render_only_map[row_index][column_index] == Vertex.OBSTACLE:
+            render_only_map[row_index][column_index] = Vertex.FREE_SPACE
+    return render_only_map
+
+
 def _render_static_mapping(
     *,
     mapping_name: str,
@@ -37,23 +101,27 @@ def _render_static_mapping(
     run_output_dir: Path,
     visually_free_vertex_positions: set[tuple[int, int]] | None = None,
 ) -> list[Path]:
+    render_composite_map = _build_render_only_composite_map(
+        composite_map,
+        visually_free_vertex_positions,
+    )
     write_empty_map_config_frame(
         map_name=mapping_name,
-        composite_map=composite_map,
+        composite_map=render_composite_map,
         output_root=run_output_dir,
         visually_free_vertex_positions=visually_free_vertex_positions,
         nest_by_map=False,
     )
     write_showcase_frame(
         map_name=mapping_name,
-        composite_map=composite_map,
+        composite_map=render_composite_map,
         output_root=run_output_dir,
         visually_free_vertex_positions=visually_free_vertex_positions,
         nest_by_map=False,
     )
     write_setup_frame(
         map_name=mapping_name,
-        composite_map=composite_map,
+        composite_map=render_composite_map,
         agents=agents,
         output_root=run_output_dir,
         visually_free_vertex_positions=visually_free_vertex_positions,
@@ -61,7 +129,7 @@ def _render_static_mapping(
     )
     return write_mapf_frames(
         map_name=mapping_name,
-        composite_map=composite_map,
+        composite_map=render_composite_map,
         agents=agents,
         paths_by_agent=paths_by_agent,
         output_root=run_output_dir,
@@ -81,23 +149,31 @@ def _render_dynamic_mapping(
     run_output_dir: Path,
     visually_free_vertex_positions: set[tuple[int, int]] | None = None,
 ) -> list[Path]:
+    render_setup_composite_map = _build_render_only_composite_map(
+        setup_composite_map,
+        visually_free_vertex_positions,
+    )
+    render_composite_loop = [
+        _build_render_only_composite_map(frame, visually_free_vertex_positions)
+        for frame in composite_loop
+    ]
     write_dynamic_obstacle_only_frame(
         map_name=mapping_name,
-        composite_map=setup_composite_map,
+        composite_map=render_setup_composite_map,
         output_root=run_output_dir,
         visually_free_vertex_positions=visually_free_vertex_positions,
         nest_by_map=False,
     )
     write_dynamic_showcase_frame(
         map_name=mapping_name,
-        composite_map=setup_composite_map,
+        composite_map=render_setup_composite_map,
         output_root=run_output_dir,
         visually_free_vertex_positions=visually_free_vertex_positions,
         nest_by_map=False,
     )
     write_dynamic_setup_frame(
         map_name=mapping_name,
-        composite_map=setup_composite_map,
+        composite_map=render_setup_composite_map,
         agents=agents,
         output_root=run_output_dir,
         visually_free_vertex_positions=visually_free_vertex_positions,
@@ -105,7 +181,7 @@ def _render_dynamic_mapping(
     )
     return write_dynamic_mapf_frames(
         map_name=mapping_name,
-        composite_loop=composite_loop,
+        composite_loop=render_composite_loop,
         dynamic_matrix_loop=dynamic_matrix_loop,
         agents=agents,
         paths_by_agent=paths_by_agent,
@@ -123,6 +199,7 @@ def _render_candidate(
     run_output_dir: Path,
     classical_setup_map: list[list[Any]] | None,
     cyclic_setup_map: list[list[Any]] | None,
+    static_visually_free_vertex_positions: set[tuple[int, int]] | None,
 ) -> list[Path]:
     mapping_name = candidate.mapping_name
     if branch_spec.is_dynamic:
@@ -151,7 +228,7 @@ def _render_candidate(
         agents=candidate.agents,
         paths_by_agent=candidate.solver_result["paths_by_agent"],
         run_output_dir=run_output_dir,
-        visually_free_vertex_positions=None,
+        visually_free_vertex_positions=static_visually_free_vertex_positions,
     )
 
 
@@ -203,6 +280,7 @@ def _render_jointly_successful_visualizations(
     num_last_runs_to_visualize: int,
     classical_setup_map: list[list[Any]] | None,
     cyclic_setup_map: list[list[Any]] | None,
+    static_visually_free_vertex_positions: set[tuple[int, int]] | None,
 ) -> dict[str, Any]:
     section = _empty_selection_section(
         selection_mode="jointly_successful_mappings",
@@ -266,6 +344,7 @@ def _render_jointly_successful_visualizations(
             run_output_dir=classical_run_output_dir,
             classical_setup_map=classical_setup_map,
             cyclic_setup_map=cyclic_setup_map,
+            static_visually_free_vertex_positions=static_visually_free_vertex_positions,
         )
         logger.log_elapsed(
             "Rendered jointly successful classical Pillow frames for "
@@ -279,6 +358,7 @@ def _render_jointly_successful_visualizations(
             run_output_dir=cyclic_run_output_dir,
             classical_setup_map=classical_setup_map,
             cyclic_setup_map=cyclic_setup_map,
+            static_visually_free_vertex_positions=static_visually_free_vertex_positions,
         )
         logger.log_elapsed(
             "Rendered jointly successful cyclic Pillow frames for "
@@ -330,6 +410,7 @@ def _render_independently_successful_visualizations(
     num_last_runs_to_visualize: int,
     classical_setup_map: list[list[Any]] | None,
     cyclic_setup_map: list[list[Any]] | None,
+    static_visually_free_vertex_positions: set[tuple[int, int]] | None,
 ) -> dict[str, Any]:
     section = _empty_selection_section(
         selection_mode="independently_successful_mappings",
@@ -388,6 +469,7 @@ def _render_independently_successful_visualizations(
                 run_output_dir=run_output_dir,
                 classical_setup_map=classical_setup_map,
                 cyclic_setup_map=cyclic_setup_map,
+                static_visually_free_vertex_positions=static_visually_free_vertex_positions,
             )
             logger.log_elapsed(
                 f"Rendered independently successful {mapping_name} Pillow frames for "
@@ -461,6 +543,7 @@ def render_selected_visualizations(
 
     classical_setup_map = None
     cyclic_setup_map = None
+    static_visually_free_vertex_positions = _load_static_render_visually_free_vertices(branch_spec)
     if branch_spec.is_dynamic:
         if dynamic_state is None:
             raise ValueError("dynamic_state is required for dynamic visualization rendering")
@@ -480,6 +563,7 @@ def render_selected_visualizations(
         num_last_runs_to_visualize=effective_jointly_successful_limit,
         classical_setup_map=classical_setup_map,
         cyclic_setup_map=cyclic_setup_map,
+        static_visually_free_vertex_positions=static_visually_free_vertex_positions,
     )
     summary["independently_successful"] = _render_independently_successful_visualizations(
         branch_spec=branch_spec,
@@ -490,6 +574,7 @@ def render_selected_visualizations(
         num_last_runs_to_visualize=effective_independently_successful_limit,
         classical_setup_map=classical_setup_map,
         cyclic_setup_map=cyclic_setup_map,
+        static_visually_free_vertex_positions=static_visually_free_vertex_positions,
     )
     summary["total_selected_run_configurations"] = (
         len(summary["jointly_successful"].get("selected_run_configurations", []))

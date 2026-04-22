@@ -197,6 +197,18 @@ class PillowMapfRenderer:
         palette = build_distinct_rgb_palette(len(agents))
         return {agent["id"]: palette[index] for index, agent in enumerate(agents)}
 
+    def _build_render_composite_map(self, composite_map, visually_free_vertex_positions=None):
+        if not visually_free_vertex_positions:
+            return composite_map
+
+        render_composite_map = [list(row) for row in composite_map]
+        for row_index, column_index in visually_free_vertex_positions:
+            if not self._cell_is_in_bounds(render_composite_map, row_index, column_index):
+                continue
+            if render_composite_map[row_index][column_index] == Vertex.OBSTACLE:
+                render_composite_map[row_index][column_index] = Vertex.FREE_SPACE
+        return render_composite_map
+
     def _draw_base_grid(
         self,
         draw,
@@ -207,18 +219,23 @@ class PillowMapfRenderer:
         dynamic_vertex_positions=None,
         visually_free_vertex_positions=None,
     ):
-        for row_index, row in enumerate(composite_map):
+        visually_free_vertex_positions = visually_free_vertex_positions or set()
+        render_composite_map = self._build_render_composite_map(
+            composite_map,
+            visually_free_vertex_positions=visually_free_vertex_positions,
+        )
+        for row_index, row in enumerate(render_composite_map):
             for column_index, cell_value in enumerate(row):
                 bounds = self._get_cell_bounds(row_index, column_index)
                 background_color = self._draw_cell_background(
                     draw=draw,
-                    composite_map=composite_map,
+                    composite_map=render_composite_map,
                     row_index=row_index,
                     column_index=column_index,
                     bounds=bounds,
                     cell_value=cell_value,
                     dynamic_vertex_positions=dynamic_vertex_positions or set(),
-                    visually_free_vertex_positions=visually_free_vertex_positions or set(),
+                    visually_free_vertex_positions=visually_free_vertex_positions,
                 )
                 self._draw_transition_symbol(
                     draw=draw,
