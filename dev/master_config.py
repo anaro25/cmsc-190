@@ -35,19 +35,19 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 
 recompute_MAPF = False
 
-to_generate = "graphs_and_data"
-# to_generate = "visualization"
+# to_generate = "graphs_and_data"
+to_generate = "visualization"
 # to_generate = "nothing"
 
 # MAP_TYPE = "static_artificial"
 # MAP_TYPE = "static_campus_area_1"
-# MAP_TYPE = "dynamic_port"
-MAP_TYPE = "dynamic_campus_area_2"
+MAP_TYPE = "dynamic_port"
+# MAP_TYPE = "dynamic_campus_area_2"
 
 STATIC_ARTIFICIAL_CONFIG = {
     # common frequently edited constants
     "seed": 101,
-    "agent_number_range": (4, 300, 4), # max 120 to 124
+    "agent_number_range": (4, 300, 4),
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize_jointly_successful": 3,
     "num_last_runs_to_visualize_independently_successful": 3,
@@ -64,7 +64,7 @@ STATIC_ARTIFICIAL_CONFIG = {
 
     # branch-specific constants
     "map_size": (32, 32),
-    "static_obstacle_density": 0.40,
+    "static_obstacle_density": 0.40, # 40%
 }
 
 STATIC_CAMPUS_AREA_1_CONFIG = {
@@ -72,8 +72,8 @@ STATIC_CAMPUS_AREA_1_CONFIG = {
     "seed": 201,
     "agent_number_range": (2, 100, 1), # max 30 to 31
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize_jointly_successful": 1,
-    "num_last_runs_to_visualize_independently_successful": 1,
+    "num_last_runs_to_visualize_jointly_successful": 3,
+    "num_last_runs_to_visualize_independently_successful": 6,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "narrow_lanes": SHARED_NARROW_LANES,
@@ -99,11 +99,11 @@ STATIC_CAMPUS_AREA_1_CONFIG["image_path"] = _campus_lane_variant_image_path(
 
 DYNAMIC_PORT_CONFIG = {
     # common frequently edited constants
-    "seed": 301,
-    "agent_number_range": (2, 100, 1), # max 18 to 19
+    "seed": 310,
+    "agent_number_range": (2, 200, 1), # max 16 (seed 310)
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize_jointly_successful": 1,
-    "num_last_runs_to_visualize_independently_successful": 1,
+    "num_last_runs_to_visualize_jointly_successful": 3,
+    "num_last_runs_to_visualize_independently_successful": 3,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -116,8 +116,8 @@ DYNAMIC_PORT_CONFIG = {
     "zone_relationship_mode": "none",
 
     # branch-exclusive constants
-    "target_static_obstacle_density": 0.15,
-    "target_dynamic_obstacle_density": 0.030,
+    "target_static_obstacle_density": 0.15, # 15%
+    "target_dynamic_obstacle_density": 0.030, # 3%
     "loop_sequence_length": 100,
     "group_stay_durations": (7, 9, 11),
     "image_threshold": 127,
@@ -129,7 +129,7 @@ DYNAMIC_PORT_CONFIG = {
 DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     # common frequently edited constants
     "seed": 403,
-    "agent_number_range": (2, 200, 1), # max 17
+    "agent_number_range": (2, 200, 1), # max 17 (seed 403)
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize_jointly_successful": 3,
     "num_last_runs_to_visualize_independently_successful": 6,
@@ -148,7 +148,7 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     # branch-exclusive constants
     #   Campus Area 2 preserves the source-image static layout; this value is intentionally not applied.
     "target_static_obstacle_density": None,
-    "target_dynamic_obstacle_density": 0.015,
+    "target_dynamic_obstacle_density": 0.015, # 1.5%
     "loop_sequence_length": 100,
     "group_stay_durations": (7, 9, 11),
     "image_threshold": 127,

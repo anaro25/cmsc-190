@@ -1,0 +1,94 @@
+========================================================================================
+Branch: Dynamic Port (dynamic_port)
+Map obstacle type: dynamic
+Documented target type: dispersed_targets
+Active target type: dispersed_targets
+Start distribution mode: clustered
+Goal distribution mode: dispersed
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: True
+Zone relationship mode: none
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 2.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Seed: 310
+Jointly viable counted pairs required (n): 5
+Runtime limit per run: 30.00s
+Agent number range: start=2, end=200, step=1
+Planned agent-number conditions before early stopping: 199 (first=2, last=200)
+Early-stop rule 1: discard the current condition and stop when cyclic unfinished runs exceed cyclic successful runs within the retained counted pairs.
+Early-stop rule 2: discard the current condition and stop after 15 consecutive failed paired sampling attempts.
+Notes: Image-based dynamic branch with clustered starts sampled as one compact directly adjacent 8-neighbor-connected group and dispersed one-to-one targets. Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger.
+========================================================================================
+recompute_MAPF: False
+to_generate: graphs_and_data
+Persisted raw MAPF data root: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/dynamic_port
+Persisted raw MAPF manifest path: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/dynamic_port/manifest.json
+[Elapsed: 00m 00s] Program stopwatch started.
+
+recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.
+Loaded the persisted raw MAPF data for output generation.
+[Elapsed: 00m 00s] Structured records and summaries regenerated from persisted raw MAPF data.
+[Elapsed: 00m 01s] Graphs regenerated from persisted raw MAPF data.
+
+Final aggregate table:
+    Condition aggregate | agent_number[1.0.0] | agent_number=2 | retained_pairs=5/5
+      Classical | successful=5 | unfinished=0 | avg_time_halted=0.17 | avg_conflicts_at_halt=0.00 | avg_path=22.30
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.24 | avg_conflicts_at_halt=0.00 | avg_path=44.70
+    Condition aggregate | agent_number[1.0.1] | agent_number=3 | retained_pairs=5/5
+      Classical | successful=3 | unfinished=2 | avg_time_halted=12.00 | avg_conflicts_at_halt=9269.40 | avg_path=22.22
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.00 | avg_conflicts_at_halt=0.20 | avg_path=46.20
+    Condition aggregate | agent_number[1.0.2] | agent_number=4 | retained_pairs=5/5
+      Classical | successful=4 | unfinished=1 | avg_time_halted=6.00 | avg_conflicts_at_halt=9791.80 | avg_path=31.56
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=1.60 | avg_path=45.70
+    Condition aggregate | agent_number[1.0.3] | agent_number=5 | retained_pairs=5/5
+      Classical | successful=5 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=1.60 | avg_path=26.36
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=2.40 | avg_path=35.20
+    Condition aggregate | agent_number[1.0.4] | agent_number=6 | retained_pairs=5/5
+      Classical | successful=4 | unfinished=1 | avg_time_halted=6.01 | avg_conflicts_at_halt=4141.60 | avg_path=28.75
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=1.60 | avg_path=38.10
+    Condition aggregate | agent_number[1.0.5] | agent_number=7 | retained_pairs=5/5
+      Classical | successful=3 | unfinished=2 | avg_time_halted=12.01 | avg_conflicts_at_halt=10359.40 | avg_path=29.76
+      Cyclic | successful=4 | unfinished=1 | avg_time_halted=6.02 | avg_conflicts_at_halt=867.20 | avg_path=45.21
+    Condition aggregate | agent_number[1.0.6] | agent_number=8 | retained_pairs=5/5
+      Classical | successful=2 | unfinished=3 | avg_time_halted=18.01 | avg_conflicts_at_halt=12397.80 | avg_path=32.75
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=3.40 | avg_path=49.75
+    Condition aggregate | agent_number[1.0.7] | agent_number=9 | retained_pairs=5/5
+      Classical | successful=4 | unfinished=1 | avg_time_halted=6.02 | avg_conflicts_at_halt=4738.60 | avg_path=28.69
+      Cyclic | successful=3 | unfinished=2 | avg_time_halted=12.01 | avg_conflicts_at_halt=4966.00 | avg_path=32.04
+    Condition aggregate | agent_number[1.0.8] | agent_number=10 | retained_pairs=5/5
+      Classical | successful=0 | unfinished=5 | avg_time_halted=30.00 | avg_conflicts_at_halt=18680.80 | avg_path=null
+      Cyclic | successful=4 | unfinished=1 | avg_time_halted=6.11 | avg_conflicts_at_halt=5564.40 | avg_path=41.73
+    Condition aggregate | agent_number[1.0.9] | agent_number=11 | retained_pairs=5/5
+      Classical | successful=2 | unfinished=3 | avg_time_halted=18.02 | avg_conflicts_at_halt=13428.80 | avg_path=34.86
+      Cyclic | successful=3 | unfinished=2 | avg_time_halted=12.02 | avg_conflicts_at_halt=7962.20 | avg_path=51.79
+    Condition aggregate | agent_number[1.0.10] | agent_number=12 | retained_pairs=5/5
+      Classical | successful=2 | unfinished=3 | avg_time_halted=18.03 | avg_conflicts_at_halt=11120.80 | avg_path=28.92
+      Cyclic | successful=3 | unfinished=2 | avg_time_halted=12.07 | avg_conflicts_at_halt=3955.00 | avg_path=38.14
+    Condition aggregate | agent_number[1.0.11] | agent_number=13 | retained_pairs=5/5
+      Classical | successful=3 | unfinished=2 | avg_time_halted=12.02 | avg_conflicts_at_halt=7288.40 | avg_path=24.36
+      Cyclic | successful=4 | unfinished=1 | avg_time_halted=6.07 | avg_conflicts_at_halt=2060.80 | avg_path=37.92
+    Condition aggregate | agent_number[1.0.12] | agent_number=14 | retained_pairs=5/5
+      Classical | successful=1 | unfinished=4 | avg_time_halted=24.02 | avg_conflicts_at_halt=17064.40 | avg_path=29.29
+      Cyclic | successful=5 | unfinished=0 | avg_time_halted=0.26 | avg_conflicts_at_halt=44.60 | avg_path=49.29
+    Condition aggregate | agent_number[1.0.13] | agent_number=15 | retained_pairs=5/5
+      Classical | successful=2 | unfinished=3 | avg_time_halted=18.04 | avg_conflicts_at_halt=9412.00 | avg_path=31.23
+      Cyclic | successful=4 | unfinished=1 | avg_time_halted=6.33 | avg_conflicts_at_halt=570.20 | avg_path=42.32
+    Condition aggregate | agent_number[1.0.14] | agent_number=16 | retained_pairs=5/5
+      Classical | successful=1 | unfinished=4 | avg_time_halted=24.01 | avg_conflicts_at_halt=12756.20 | avg_path=29.06
+      Cyclic | successful=4 | unfinished=1 | avg_time_halted=6.27 | avg_conflicts_at_halt=3342.40 | avg_path=40.38
+
+Branch stopped early:
+  Reason: cyclic_unfinished_exceeded_successful
+  Details: Stop rule triggered: cyclic unfinished runs exceeded cyclic successful runs within the retained counted pairs at agent_number=17 (3 unfinished > 2 successful). The current condition is discarded and the branch stops before higher agent numbers.
+  Reported agent numbers: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+Generated graph files:
+  - /workspaces/cmsc-190/dev/outputs/dynamic_port/graphs/graphs_and_data/dynamic_port_runtime.png
+  - /workspaces/cmsc-190/dev/outputs/dynamic_port/graphs/graphs_and_data/dynamic_port_conflicts.png
+  - /workspaces/cmsc-190/dev/outputs/dynamic_port/graphs/graphs_and_data/dynamic_port_path_length.png
+
+[Elapsed: 00m 01s] Experiment finished.
