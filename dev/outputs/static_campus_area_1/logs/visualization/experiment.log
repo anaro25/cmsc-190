@@ -31,18 +31,51 @@ Persisted raw MAPF manifest path: D:\projects\cmsc-190\dev\outputs\raw_mapf_file
 
 recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.
 Loaded the persisted raw MAPF data for output generation.
-Visualization selection controls are being read from the current master_config.py for branch 'static_campus_area_1' (num_last_runs_to_visualize_jointly_successful=0, num_last_runs_to_visualize_independently_successful=1).
-Jointly successful visualization generation skipped because num_last_runs_to_visualize_jointly_successful <= 0.
+Visualization selection controls are being read from the current master_config.py for branch 'static_campus_area_1' (num_last_runs_to_visualize_jointly_successful=3, num_last_runs_to_visualize_independently_successful=6).
+
+Generating jointly successful Pillow visualizations...
+  Rendering jointly successful visualization set 1/3 | run_config_id=run[0.1.26.2]
+[Elapsed: 00m 34s] Rendered jointly successful classical Pillow frames for run[0.1.26.2] (88 frame files).
+[Elapsed: 01m 07s] Rendered jointly successful cyclic Pillow frames for run[0.1.26.2] (90 frame files).
+[Elapsed: 01m 07s] Completed jointly successful visualization set 1/3 for run[0.1.26.2].
+  Rendering jointly successful visualization set 2/3 | run_config_id=run[0.1.27.1]
+[Elapsed: 01m 41s] Rendered jointly successful classical Pillow frames for run[0.1.27.1] (86 frame files).
+[Elapsed: 02m 16s] Rendered jointly successful cyclic Pillow frames for run[0.1.27.1] (88 frame files).
+[Elapsed: 02m 16s] Completed jointly successful visualization set 2/3 for run[0.1.27.1].
+  Rendering jointly successful visualization set 3/3 | run_config_id=run[0.1.27.3]
+[Elapsed: 02m 53s] Rendered jointly successful classical Pillow frames for run[0.1.27.3] (91 frame files).
+[Elapsed: 03m 29s] Rendered jointly successful cyclic Pillow frames for run[0.1.27.3] (94 frame files).
+[Elapsed: 03m 29s] Completed jointly successful visualization set 3/3 for run[0.1.27.3].
 
 Generating independently successful Pillow visualizations...
-  Rendering 1 independently successful classical run(s)...
-    Rendering classical visualization set 1/1 | run_config_id=run[0.1.27.3]
-[Elapsed: 00m 35s] Rendered independently successful classical Pillow frames for run[0.1.27.3] (91 frame files).
-  Rendering 1 independently successful cyclic run(s)...
-    Rendering cyclic visualization set 1/1 | run_config_id=run[0.1.27.4]
-[Elapsed: 01m 13s] Rendered independently successful cyclic Pillow frames for run[0.1.27.4] (100 frame files).
+  Rendering 6 independently successful classical run(s)...
+    Rendering classical visualization set 1/6 | run_config_id=run[0.1.25.0]
+[Elapsed: 04m 02s] Rendered independently successful classical Pillow frames for run[0.1.25.0] (81 frame files).
+    Rendering classical visualization set 2/6 | run_config_id=run[0.1.25.4]
+[Elapsed: 04m 39s] Rendered independently successful classical Pillow frames for run[0.1.25.4] (92 frame files).
+    Rendering classical visualization set 3/6 | run_config_id=run[0.1.26.0]
+[Elapsed: 05m 15s] Rendered independently successful classical Pillow frames for run[0.1.26.0] (88 frame files).
+    Rendering classical visualization set 4/6 | run_config_id=run[0.1.26.2]
+[Elapsed: 05m 52s] Rendered independently successful classical Pillow frames for run[0.1.26.2] (88 frame files).
+    Rendering classical visualization set 5/6 | run_config_id=run[0.1.27.1]
+[Elapsed: 06m 28s] Rendered independently successful classical Pillow frames for run[0.1.27.1] (86 frame files).
+    Rendering classical visualization set 6/6 | run_config_id=run[0.1.27.3]
+[Elapsed: 07m 06s] Rendered independently successful classical Pillow frames for run[0.1.27.3] (91 frame files).
+  Rendering 6 independently successful cyclic run(s)...
+    Rendering cyclic visualization set 1/6 | run_config_id=run[0.1.26.2]
+[Elapsed: 07m 43s] Rendered independently successful cyclic Pillow frames for run[0.1.26.2] (90 frame files).
+    Rendering cyclic visualization set 2/6 | run_config_id=run[0.1.26.3]
+[Elapsed: 08m 20s] Rendered independently successful cyclic Pillow frames for run[0.1.26.3] (93 frame files).
+    Rendering cyclic visualization set 3/6 | run_config_id=run[0.1.26.4]
+[Elapsed: 08m 55s] Rendered independently successful cyclic Pillow frames for run[0.1.26.4] (88 frame files).
+    Rendering cyclic visualization set 4/6 | run_config_id=run[0.1.27.1]
+[Elapsed: 09m 31s] Rendered independently successful cyclic Pillow frames for run[0.1.27.1] (88 frame files).
+    Rendering cyclic visualization set 5/6 | run_config_id=run[0.1.27.3]
+[Elapsed: 10m 09s] Rendered independently successful cyclic Pillow frames for run[0.1.27.3] (94 frame files).
+    Rendering cyclic visualization set 6/6 | run_config_id=run[0.1.27.4]
+[Elapsed: 10m 49s] Rendered independently successful cyclic Pillow frames for run[0.1.27.4] (100 frame files).
 Visualization summary written to D:\projects\cmsc-190\dev\outputs\static_campus_area_1\metadata\visualization\visualization_selection_summary.json
-[Elapsed: 01m 13s] Pillow visualizations regenerated from persisted raw MAPF data using the current visualization controls.
-Selected visualization entries generated across both variants: 2
+[Elapsed: 10m 49s] Pillow visualizations regenerated from persisted raw MAPF data using the current visualization controls.
+Selected visualization entries generated across both variants: 15
 
-[Elapsed: 01m 13s] Experiment finished.
+[Elapsed: 10m 49s] Experiment finished.
