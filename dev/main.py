@@ -8,6 +8,8 @@ def main() -> None:
     program_start_time = time.perf_counter()
     run_selected_experiment(MAP_TYPE, program_start_time=program_start_time)
 
+    print("\n===========================" * 25) # not shown in log files
+
 
 if __name__ == "__main__":
     main()

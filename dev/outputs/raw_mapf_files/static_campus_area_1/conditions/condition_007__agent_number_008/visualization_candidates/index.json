@@ -1,0 +1,82 @@
+[
+  {
+    "candidate_index": 1,
+    "mapping_name": "classical",
+    "run_config_id": "run[0.1.6.0]",
+    "agent_number": 8,
+    "run_index": 0,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0001__classical__run_0.1.6.0.pkl"
+  },
+  {
+    "candidate_index": 2,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[0.1.6.0]",
+    "agent_number": 8,
+    "run_index": 0,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0002__cyclic__run_0.1.6.0.pkl"
+  },
+  {
+    "candidate_index": 3,
+    "mapping_name": "classical",
+    "run_config_id": "run[0.1.6.1]",
+    "agent_number": 8,
+    "run_index": 1,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0003__classical__run_0.1.6.1.pkl"
+  },
+  {
+    "candidate_index": 4,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[0.1.6.1]",
+    "agent_number": 8,
+    "run_index": 1,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0004__cyclic__run_0.1.6.1.pkl"
+  },
+  {
+    "candidate_index": 5,
+    "mapping_name": "classical",
+    "run_config_id": "run[0.1.6.2]",
+    "agent_number": 8,
+    "run_index": 2,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0005__classical__run_0.1.6.2.pkl"
+  },
+  {
+    "candidate_index": 6,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[0.1.6.2]",
+    "agent_number": 8,
+    "run_index": 2,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0006__cyclic__run_0.1.6.2.pkl"
+  },
+  {
+    "candidate_index": 7,
+    "mapping_name": "classical",
+    "run_config_id": "run[0.1.6.3]",
+    "agent_number": 8,
+    "run_index": 3,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0007__classical__run_0.1.6.3.pkl"
+  },
+  {
+    "candidate_index": 8,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[0.1.6.3]",
+    "agent_number": 8,
+    "run_index": 3,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0008__cyclic__run_0.1.6.3.pkl"
+  },
+  {
+    "candidate_index": 9,
+    "mapping_name": "classical",
+    "run_config_id": "run[0.1.6.4]",
+    "agent_number": 8,
+    "run_index": 4,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0009__classical__run_0.1.6.4.pkl"
+  },
+  {
+    "candidate_index": 10,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[0.1.6.4]",
+    "agent_number": 8,
+    "run_index": 4,
+    "relative_path": "conditions/condition_007__agent_number_008/visualization_candidates/0010__cyclic__run_0.1.6.4.pkl"
+  }
+]

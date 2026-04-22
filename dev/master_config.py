@@ -40,8 +40,8 @@ to_generate = "visualization"
 # to_generate = "nothing"
 
 # MAP_TYPE = "static_artificial"
-# MAP_TYPE = "static_campus_area_1"
-MAP_TYPE = "dynamic_port"
+MAP_TYPE = "static_campus_area_1"
+# MAP_TYPE = "dynamic_port"
 # MAP_TYPE = "dynamic_campus_area_2"
 
 STATIC_ARTIFICIAL_CONFIG = {
@@ -69,8 +69,8 @@ STATIC_ARTIFICIAL_CONFIG = {
 
 STATIC_CAMPUS_AREA_1_CONFIG = {
     # common frequently edited constants
-    "seed": 201,
-    "agent_number_range": (2, 100, 1), # max 30 to 31
+    "seed": 205,
+    "agent_number_range": (2, 200, 1), # max 29 (seed 205)
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize_jointly_successful": 3,
     "num_last_runs_to_visualize_independently_successful": 6,
