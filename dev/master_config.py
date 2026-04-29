@@ -39,9 +39,9 @@ recompute_MAPF = False
 to_generate = "visualization"
 # to_generate = "nothing"
 
-MAP_TYPE = "static_artificial"
+# MAP_TYPE = "static_artificial"
 # MAP_TYPE = "static_campus_area_1"
-# MAP_TYPE = "dynamic_port"
+MAP_TYPE = "dynamic_port"
 # MAP_TYPE = "dynamic_campus_area_2"
 
 STATIC_ARTIFICIAL_CONFIG = {
@@ -111,7 +111,7 @@ DYNAMIC_PORT_CONFIG = {
     # common permanent constants
     "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
     "start_distribution_mode": "clustered",
-    "goal_distribution_mode": "dispersed",
+    "goal_distribution_mode": "clustered",
     "require_individual_reachability": True,
     "zone_relationship_mode": "none",
 
