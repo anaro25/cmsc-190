@@ -8,6 +8,20 @@ from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_out
 _STATIC_TIGHT_HORIZON_MAX_SLACK = 64
 
 
+class AStarNode:
+    def __init__(self, position, time_step, g=0, h=0.0, parent=None):
+        self.position = position
+        self.time_step = time_step
+        self.g = g
+        self.h = h
+        self.f = g + h
+        self.parent = parent
+
+    @property
+    def state(self):
+        return (self.position, self.time_step)
+
+
 def manhattan_vertex_distance(a, b):
     """
     Composite-map vertices are spaced by 2 cells.
@@ -51,14 +65,12 @@ def get_latest_constraint_time(agent_constraints):
     return max(constraint["time"] for constraint in agent_constraints)
 
 
-def reconstruct_path(came_from, end_state):
+def reconstruct_path(end_node: AStarNode):
     path = []
-    current_state = end_state
-
-    while current_state is not None:
-        position, _ = current_state
-        path.append(position)
-        current_state = came_from[current_state]
+    current = end_node
+    while current is not None:
+        path.append(current.position)
+        current = current.parent
 
     path.reverse()
     return path
@@ -149,11 +161,8 @@ def find_path_for_agent(
 
     open_heap = []
     counter = itertools.count()
-
-    start_state = (start, 0)
-    came_from = {start_state: None}
-    best_g = {start_state: 0}
-
+    closed_states = set()
+    best_g = {}
     start_h = _heuristic_value(
         start,
         goal,
@@ -162,18 +171,30 @@ def find_path_for_agent(
     )
     if start_h == float("inf"):
         return None
-    start_f = start_h * heuristic_weight
-    heapq.heappush(open_heap, (start_f, 0, next(counter), start_state))
+    start_node = AStarNode(
+        position=start,
+        time_step=0,
+        g=0,
+        h=(heuristic_weight * start_h),
+        parent=None,
+    )
+    best_g[start_node.state] = 0
+    heapq.heappush(open_heap, (start_node.f, next(counter), start_node))
 
     while open_heap:
-        _, current_g, _, current_state = heapq.heappop(open_heap)
+        _, _, current_node = heapq.heappop(open_heap)
+        current_state = current_node.state
         current_position, current_time = current_state
+        current_g = current_node.g
 
         if current_g != best_g.get(current_state):
             continue
+        if current_state in closed_states:
+            continue
+        closed_states.add(current_state)
 
         if current_position == goal and current_time >= latest_constraint_time:
-            return reconstruct_path(came_from, current_state)
+            return reconstruct_path(current_node)
 
         if current_time >= max_time_horizon:
             continue
@@ -209,18 +230,22 @@ def find_path_for_agent(
                 continue
 
             best_g[next_state] = tentative_g
-            came_from[next_state] = current_state
-
             h_value = (
                 static_distance
                 if true_static_shortest_path_distance and static_distance is not None
                 else manhattan_vertex_distance(next_position, goal)
             )
-            f_value = tentative_g + (heuristic_weight * h_value)
+            next_node = AStarNode(
+                position=next_position,
+                time_step=next_time,
+                g=tentative_g,
+                h=(heuristic_weight * h_value),
+                parent=current_node,
+            )
 
             heapq.heappush(
                 open_heap,
-                (f_value, tentative_g, next(counter), next_state),
+                (next_node.f, next(counter), next_node),
             )
 
     return None

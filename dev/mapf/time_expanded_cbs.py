@@ -49,28 +49,6 @@ def detect_first_conflict(paths_by_agent):
                 }
             occupied_positions[position] = agent_id
 
-        if time_step == 0:
-            continue
-
-        transitions = {}
-        for agent_id in agent_ids:
-            prev_position = get_path_position(paths_by_agent[agent_id], time_step - 1)
-            current_position = get_path_position(paths_by_agent[agent_id], time_step)
-            if prev_position is None or current_position is None:
-                continue
-
-            edge = (prev_position, current_position)
-            reverse_edge = (current_position, prev_position)
-            if reverse_edge in transitions and prev_position != current_position:
-                other_agent_id = transitions[reverse_edge]
-                return {
-                    "type": "edge",
-                    "time": time_step,
-                    "from_to": edge,
-                    "agents": (other_agent_id, agent_id),
-                }
-            transitions[edge] = agent_id
-
     return None
 
 
