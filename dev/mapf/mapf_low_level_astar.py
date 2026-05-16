@@ -1,312 +1,192 @@
 
-import heapq
-import itertools
+# A node represents one possible position of the agent.
 
-from dev.mapf.low_level_guidance import get_true_static_distances_for_static_map
-from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
+class AStarNode:
+    def __init__(self, position, time, g, h, parent):
+        self.position = position
+        self.time = time
+
+        # g(n) = distance from the start node to this node
+        self.g = g
+
+        # h(n) = estimated distance from this node to the target
+        self.h = h
+
+        # f(n) = g(n) + h(n)
+        self.f = g + h
+
+        # parent is used later to trace back the final path
+        self.parent = parent
 
 
-_STATIC_TIGHT_HORIZON_MAX_SLACK = 64
+# This is the heuristic used by A*.
+# For grid maps, we commonly use Manhattan distance.
 
+def manhattan_distance(current_position, target_position):
+    current_x, current_y = current_position
+    target_x, target_y = target_position
 
-def manhattan_vertex_distance(a, b):
-    """
-    h(n) = horizontal distance + vertical distance to the target
+    horizontal_distance = abs(current_x - target_x)
+    vertical_distance = abs(current_y - target_y)
 
-    Composite-map vertices are spaced by 2 cells in the stored grid, so we
-    divide by 2 to express the distance in movement steps.
-    """
-    horizontal_distance = abs(a[0] - b[0]) // 2
-    vertical_distance = abs(a[1] - b[1]) // 2
     return horizontal_distance + vertical_distance
 
 
-def get_agent_constraints(constraints, agent_id):
-    """Keep only the CBS constraints that apply to this specific agent."""
-    return [constraint for constraint in constraints if constraint["agent"] == agent_id]
+# This function returns the neighboring cells that the agent
+# can move to.
+# In the actual project, this depends on the graph transitions.
+# For explanation, we just show the idea.
+
+def get_neighbors(current_position):
+    x, y = current_position
+
+    neighbors = [
+        (x, y - 1),  # move up
+        (x, y + 1),  # move down
+        (x - 1, y),  # move left
+        (x + 1, y),  # move right
+        (x, y),      # wait in place
+    ]
+
+    return neighbors
 
 
-def violates_vertex_constraint(agent_constraints, position, time_step):
-    """
-    A vertex constraint says:
-        this agent cannot be at this position at this time.
-    """
-    for constraint in agent_constraints:
-        if constraint["type"] != "vertex":
-            continue
-        if constraint["position"] == position and constraint["time"] == time_step:
-            return True
-    return False
+# This checks whether a position can be visited.
+#
+# In the actual project, this would check:
+#   - if the cell is inside the map
+#   - if the cell is not an obstacle
+#   - if the transition is allowed
+#   - if the move violates any CBS constraint
+
+def is_valid_move(position, next_time, constraints):
+    # This is only a placeholder for presentation.
+    # We write it this way so the logic is easy to explain.
+
+    if position in constraints:
+        return False
+
+    return True
 
 
-def violates_edge_constraint(agent_constraints, from_position, to_position, time_step):
-    """
-    An edge constraint says:
-        this agent cannot move from one position to another at this time.
+# This is the simplified A* algorithm.
 
-    Here, time_step is the arrival time of the move.
-    """
-    for constraint in agent_constraints:
-        if constraint["type"] != "edge":
-            continue
-        if (
-            constraint["from"] == from_position
-            and constraint["to"] == to_position
-            and constraint["time"] == time_step
-        ):
-            return True
-    return False
+def low_level_astar(start_position, target_position, constraints):
+    # OPEN contains discovered but unexplored nodes.
+    OPEN = []
+
+    # CLOSED contains nodes that were already explored.
+    CLOSED = set()
+
+    # Create the first node at the agent's starting position.
+    start_h = manhattan_distance(start_position, target_position)
+
+    start_node = AStarNode(
+        position=start_position,
+        time=0,
+        g=0,
+        h=start_h,
+        parent=None
+    )
+
+    OPEN.append(start_node)
+
+    # Keep searching while there are still nodes to explore.
+    while OPEN:
+
+        # Step 1:
+        # Select the node in OPEN with the smallest f(n).
+
+        selected_node = min(OPEN, key=lambda node: node.f)
+
+        OPEN.remove(selected_node)
+
+        # Step 2:
+        # Check if the selected node is already the target.
+        # If yes, A* is done.
+
+        if selected_node.position == target_position:
+            final_path = reconstruct_path(selected_node)
+            return final_path
+
+        # Step 3:
+        # Move the selected node to CLOSED.
+        # This means we are done exploring it.
+
+        CLOSED.add((selected_node.position, selected_node.time))
+
+        # Step 4:
+        # Look at all neighboring positions.
+
+        for neighbor_position in get_neighbors(selected_node.position):
+            next_time = selected_node.time + 1
+
+            # Skip neighbor if it is blocked or violates constraints.
+            if not is_valid_move(neighbor_position, next_time, constraints):
+                continue
+
+            # Skip neighbor if it was already explored.
+            if (neighbor_position, next_time) in CLOSED:
+                continue
+
+            # Step 5:
+            # Compute g, h, and f for the neighbor.
+
+            new_g = selected_node.g + 1
+            new_h = manhattan_distance(neighbor_position, target_position)
+
+            neighbor_node = AStarNode(
+                position=neighbor_position,
+                time=next_time,
+                g=new_g,
+                h=new_h,
+                parent=selected_node
+            )
+
+            # Step 6:
+            # Add the neighbor to OPEN.
+
+            OPEN.append(neighbor_node)
+
+    # If OPEN becomes empty, then there is no path.
+    return None
 
 
-def get_latest_constraint_time(agent_constraints):
-    """
-    The disappearing-agent model lets the agent disappear after reaching its goal.
-    However, it should not disappear before its own later constraints matter.
-    """
-    if not agent_constraints:
-        return 0
-    return max(constraint["time"] for constraint in agent_constraints)
+# Once the target is found, we reconstruct the path.
+# We do this by starting from the target node and repeatedly
+# going back to its parent.
 
-
-def reconstruct_path(parent_of_node, target_node):
-    """
-    Rebuild the path by walking backward from the target node to the start node.
-
-    In the small A* hand solution, the path may look like the selected nodes.
-    In the code, the safer rule is to follow the recorded parent links.
-    """
+def reconstruct_path(target_node):
     path = []
+
     current_node = target_node
 
     while current_node is not None:
-        position, _ = current_node
-        path.append(position)
-        current_node = parent_of_node[current_node]
+        path.append(current_node.position)
+        current_node = current_node.parent
 
+    # The path was collected from target to start,
+    # so we reverse it.
     path.reverse()
+
     return path
 
 
-def _static_distance_lookup(cyclic_map, goal):
-    return get_true_static_distances_for_static_map(cyclic_map, goal)
+# Example idea:
+# start_position  = agent's current cell
+# target_position = agent's goal cell
+# A* searches for a path from start_position to target_position.
 
+def example_usage():
+    start_position = (0, 0)
+    target_position = (2, 2)
 
-def _find_h_value(position, goal, *, true_static_shortest_path_distance, static_distance_lookup):
-    """
-    Find h(n), the estimated remaining distance to the goal.
+    constraints = []
 
-    By default, this is the Manhattan distance. Some experiments can instead
-    use the true shortest static distance as a stronger heuristic.
-    """
-    if true_static_shortest_path_distance:
-        return static_distance_lookup.get(position, float("inf"))
-    return manhattan_vertex_distance(position, goal)
-
-
-def _find_f_value(g_value, h_value, heuristic_weight):
-    """
-    Standard A*:          f(n) = g(n) + h(n)
-    Weighted A* / ECBS:   f(n) = g(n) + weight * h(n)
-
-    When heuristic_weight is 1.0, this is the ordinary A* formula.
-    """
-    return g_value + (heuristic_weight * h_value)
-
-
-def _add_node_to_OPEN(OPEN, insertion_counter, node, g_value, h_value, heuristic_weight):
-    """
-    Add a discovered node to OPEN.
-
-    OPEN is implemented as a heap so that Python can quickly get the node with
-    the smallest f(n).
-
-    Tie-breaking rule:
-        If two nodes have the same f(n), choose the one with the smaller h(n),
-        meaning the one that looks closer to the target. If there is still a
-        tie, choose the one that entered OPEN earlier.
-    """
-    f_value = _find_f_value(g_value, h_value, heuristic_weight)
-    heapq.heappush(OPEN, (f_value, h_value, next(insertion_counter), node))
-
-
-def _resolve_time_horizon(
-    *,
-    cyclic_map,
-    latest_constraint_time,
-    base_goal_distance,
-    tight_time_horizon,
-):
-    """
-    A wait action means time can keep increasing forever.
-    To keep the search finite, we stop expanding nodes beyond a time limit.
-    """
-    num_free_vertices = len(get_all_free_vertices(cyclic_map))
-    if not tight_time_horizon:
-        return max(
-            latest_constraint_time,
-            (num_free_vertices * 4) + latest_constraint_time + 4,
-        )
-
-    slack = max(8, min(_STATIC_TIGHT_HORIZON_MAX_SLACK, max(1, num_free_vertices // 6)))
-    return max(20, latest_constraint_time + base_goal_distance + slack)
-
-
-def find_path_for_agent(
-    cyclic_map,
-    agent_id,
-    start,
-    goal,
-    constraints,
-    heuristic_weight=1.0,
-    true_static_shortest_path_distance=False,
-    tight_time_horizon=False,
-):
-    """
-    Find one agent's path using A* while respecting CBS constraints.
-
-    The names below intentionally match the A* explanation:
-        OPEN          = discovered but unexplored nodes
-        CLOSED        = explored nodes
-        selected_node = the node chosen from OPEN because it has the least f(n)
-        g_score       = recorded distance from the start to a node
-        h_value       = estimated distance from a node to the target
-        f_value       = g(n) + h(n), or g(n) + weight * h(n)
-    """
-    heuristic_weight = max(1.0, float(heuristic_weight))
-    agent_constraints = get_agent_constraints(constraints, agent_id)
-
-    # If the start itself is forbidden at time 0, no path is possible.
-    if violates_vertex_constraint(agent_constraints, start, 0):
-        return None
-
-    latest_constraint_time = get_latest_constraint_time(agent_constraints)
-
-    # Some experiment settings use a precomputed true distance table.
-    static_distance_lookup = {}
-    if true_static_shortest_path_distance or tight_time_horizon:
-        static_distance_lookup = _static_distance_lookup(cyclic_map, goal)
-        start_goal_distance = static_distance_lookup.get(start)
-        if start_goal_distance is None:
-            return None
-    else:
-        start_goal_distance = manhattan_vertex_distance(start, goal)
-
-    max_time_horizon = _resolve_time_horizon(
-        cyclic_map=cyclic_map,
-        latest_constraint_time=latest_constraint_time,
-        base_goal_distance=start_goal_distance,
-        tight_time_horizon=tight_time_horizon,
+    path = low_level_astar(
+        start_position=start_position,
+        target_position=target_position,
+        constraints=constraints
     )
 
-    # Iteration 0 in the hand solution:
-    # OPEN initially contains the agent's node, while CLOSED is empty.
-    OPEN = []
-    CLOSED = set()
-    insertion_counter = itertools.count()
-
-    start_node = (start, 0)
-    parent_of_node = {start_node: None}
-    g_score = {start_node: 0}
-
-    start_h = _find_h_value(
-        start,
-        goal,
-        true_static_shortest_path_distance=true_static_shortest_path_distance,
-        static_distance_lookup=static_distance_lookup,
-    )
-    if start_h == float("inf"):
-        return None
-
-    _add_node_to_OPEN(
-        OPEN,
-        insertion_counter,
-        start_node,
-        g_value=0,
-        h_value=start_h,
-        heuristic_weight=heuristic_weight,
-    )
-
-    while OPEN:
-        # From OPEN, select the node with the least f(n).
-        _, _, _, selected_node = heapq.heappop(OPEN)
-
-        # The same node can enter OPEN more than once if a better parent is found.
-        # If it was already explored, skip the duplicate entry.
-        if selected_node in CLOSED:
-            continue
-
-        selected_position, selected_time = selected_node
-        selected_g = g_score[selected_node]
-
-        # Move the selected node to CLOSED.
-        CLOSED.add(selected_node)
-
-        # In A*, we check whether the selected node is the target node.
-        # We stop only when the target is selected from OPEN, not merely seen.
-        if selected_position == goal and selected_time >= latest_constraint_time:
-            return reconstruct_path(parent_of_node, selected_node)
-
-        # Do not keep expanding forever in time.
-        if selected_time >= max_time_horizon:
-            continue
-
-        next_time = selected_time + 1
-
-        # Add neighbors of the selected node to OPEN.
-        # The wait action means the agent may stay on the same position for one timestep.
-        neighboring_positions = list(get_outgoing_neighbors(cyclic_map, selected_position))
-        neighboring_positions.append(selected_position)
-
-        for neighbor_position in neighboring_positions:
-            if violates_vertex_constraint(agent_constraints, neighbor_position, next_time):
-                continue
-
-            if violates_edge_constraint(
-                agent_constraints,
-                selected_position,
-                neighbor_position,
-                next_time,
-            ):
-                continue
-
-            # If a true-distance table exists, positions missing from the table
-            # cannot reach the goal under the static movement rules.
-            if static_distance_lookup:
-                static_distance = static_distance_lookup.get(neighbor_position)
-                if static_distance is None:
-                    continue
-            else:
-                static_distance = None
-
-            neighbor_node = (neighbor_position, next_time)
-            if neighbor_node in CLOSED:
-                continue
-
-            # Moving to a neighbor costs 1 timestep.
-            tentative_g = selected_g + 1
-
-            # If we already know an equal or better way to reach this node,
-            # there is no need to update it.
-            if tentative_g >= g_score.get(neighbor_node, float("inf")):
-                continue
-
-            parent_of_node[neighbor_node] = selected_node
-            g_score[neighbor_node] = tentative_g
-
-            neighbor_h = (
-                static_distance
-                if true_static_shortest_path_distance and static_distance is not None
-                else manhattan_vertex_distance(neighbor_position, goal)
-            )
-
-            _add_node_to_OPEN(
-                OPEN,
-                insertion_counter,
-                neighbor_node,
-                g_value=tentative_g,
-                h_value=neighbor_h,
-                heuristic_weight=heuristic_weight,
-            )
-
-    # OPEN became empty, so all reachable possibilities were exhausted.
-    return None
+    return path
