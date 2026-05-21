@@ -33,14 +33,14 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 
 # ===================================
 
-recompute_MAPF = False
+recompute_MAPF = True
 
 # to_generate = "graphs_and_data"
 to_generate = "visualization"
 # to_generate = "nothing"
 
-MAP_TYPE = "static_artificial"
-# MAP_TYPE = "static_campus_area_1"
+# MAP_TYPE = "static_artificial"
+MAP_TYPE = "static_campus_area_1"
 # MAP_TYPE = "dynamic_port"
 # MAP_TYPE = "dynamic_campus_area_2"
 
@@ -69,11 +69,11 @@ STATIC_ARTIFICIAL_CONFIG = {
 
 STATIC_CAMPUS_AREA_1_CONFIG = {
     # common frequently edited constants
-    "seed": 205,
-    "agent_number_range": (2, 200, 1), # max 29 (seed 205)
+    "seed": 201,
+    "agent_number_range": (10, 10, 1),
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize_jointly_successful": 3,
-    "num_last_runs_to_visualize_independently_successful": 6,
+    "num_last_runs_to_visualize_jointly_successful": 0,
+    "num_last_runs_to_visualize_independently_successful": 1,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "narrow_lanes": SHARED_NARROW_LANES,
@@ -81,8 +81,8 @@ STATIC_CAMPUS_AREA_1_CONFIG = {
 
     # common permanent constants
     "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
-    "start_distribution_mode": "dispersed",
-    "goal_distribution_mode": "clustered",
+    "start_distribution_mode": "clustered",
+    "goal_distribution_mode": "single",
     "require_individual_reachability": True,
     "zone_relationship_mode": "distinct_campus_zones",
 

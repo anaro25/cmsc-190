@@ -1,4 +1,4 @@
-from dev.mapf.cbs_solver import compute_solution_cost
+from dev.mapf.full.cbs_solver import compute_solution_cost
 
 
 def summarize_mapf_result(result):

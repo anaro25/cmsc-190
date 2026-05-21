@@ -106,7 +106,7 @@ The current project varies run configurations along three sampling axes.
 A branch can request \texttt{dispersed} or \texttt{clustered} starts.
 
 \subsection{Goal Distribution Mode}
-A branch can request \texttt{dispersed} or \texttt{clustered} goals.
+A branch can request \texttt{dispersed}, \texttt{clustered}, or \texttt{single} goals. The \texttt{single} mode is target-only and gives all agents one shared literal target cell.
 
 \subsection{Zone Relationship Mode}
 Campus branches can require starts and goals to come from \emph{different} semantic zones. This is what forces transitions through bottlenecks and connectors rather than allowing both groups to occupy the same campus region.
@@ -119,6 +119,7 @@ Within any one sampled run configuration:
     \item when \texttt{compact\_clustering=True}, \texttt{clustered} starts form one directly adjacent 8-neighbor-connected component,
     \item when \texttt{compact\_clustering=True}, \texttt{clustered} goals form one directly adjacent 8-neighbor-connected component,
     \item when \texttt{compact\_clustering=False}, clustered starts and goals remain connected clusters but keep one empty cell of separation in all 8 directions,
+    \item \texttt{single} goals use one shared target cell for all agents,
     \item start-goal adjacency is allowed as long as the cells are not identical.
 \end{itemize}
 

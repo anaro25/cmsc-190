@@ -14,6 +14,8 @@
 # - "dispersed": unique one-to-one positions sampled across the allowed set
 # - "clustered": unique one-to-one positions sampled as one connected cluster
 #   whose exact internal spacing is controlled globally by compact_clustering
+# - "single": target-only mode where all agents share one literal target cell
+#   and disappear there after arrival. Do not use "single" for start_distribution_mode.
 #
 # compact_clustering
 # - True: clustered sets are compact directly adjacent 8-neighbor-connected groups

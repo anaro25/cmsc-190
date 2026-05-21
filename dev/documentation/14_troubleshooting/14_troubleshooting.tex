@@ -57,7 +57,7 @@ In campus \texttt{distinct\_campus\_zones} mode, the code must find:
 \begin{itemize}[leftmargin=2em]
     \item enough valid start vertices in one zone,
     \item enough valid goal vertices in a different zone,
-    \item a one-to-one reachable matching between those two sets when reachability is required.
+    \item a one-to-one reachable matching between those two sets when reachability is required, or one shared reachable target when \texttt{goal\_distribution\_mode="single"}.
 \end{itemize}
 
 If any of those three conditions fails, the run configuration is rejected and a new one is sampled.

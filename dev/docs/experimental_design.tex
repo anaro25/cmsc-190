@@ -29,7 +29,7 @@ The experiment currently uses four branches:
 
 \section{Assignment Model}
 
-All branches now use one-to-one MAPF assignments. The experiment does not currently include any many-to-one shared-goal setup. What changes across branches is the \emph{positioning} of starts and goals.
+Branches normally use one-to-one MAPF assignments when goals are \texttt{dispersed} or \texttt{clustered}. The project also supports a target-only \texttt{single} goal distribution mode, where all agents share one literal target cell and disappear there after arrival. What changes across branches is therefore both the \emph{positioning} of starts and goals and, when \texttt{single} is selected for targets, the assignment cardinality.
 
 \section{Current Spatial Patterns}
 
@@ -46,6 +46,6 @@ For the campus branches, zone colors are traversable and spawnable, white walkwa
 
 \section{Placement Rule}
 
-Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally. Clustered sets are controlled by the global \texttt{compact\_clustering} switch: when it is \texttt{True}, clustered sets are directly adjacent 8-neighbor-connected groups; when it is \texttt{False}, clustered sets stay connected while keeping one empty cell of separation in all 8 directions. Start-goal adjacency is allowed.
+Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally. Clustered sets are controlled by the global \texttt{compact\_clustering} switch: when it is \texttt{True}, clustered sets are directly adjacent 8-neighbor-connected groups; when it is \texttt{False}, clustered sets stay connected while keeping one empty cell of separation in all 8 directions. The \texttt{single} mode applies only to targets and samples one shared target cell. Start-goal adjacency is allowed, but a start and its assigned goal cannot be the same cell.
 
 \end{document}

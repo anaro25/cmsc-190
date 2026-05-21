@@ -3,7 +3,7 @@ import itertools
 import time
 from typing import Any
 
-from dev.mapf.mapf_low_level_astar import find_path_for_agent
+from dev.mapf.full.mapf_low_level_astar import find_path_for_agent
 
 
 DEFAULT_ECBS_SUBOPTIMALITY_FACTOR = 1.5

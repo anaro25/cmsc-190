@@ -74,16 +74,17 @@ For campus images, white walkways remain traversable but non-spawnable, and gray
 
 \section{What Changed in the Assignment Layer}
 
-The most important recent change is that the dynamic pipeline no longer supports a many-to-one shared campus goal. Instead, the assignment layer now exposes:
+The assignment layer now exposes explicit distribution modes instead of a separate hidden shared-goal toggle:
 \begin{itemize}[leftmargin=2em]
     \item start distribution mode,
     \item goal distribution mode,
     \item optional distinct-zone campus sampling,
     \item dispersed sets keep internal 8-neighbor separation while clustered sets follow the global \texttt{compact\_clustering} switch,
-    \item one-to-one matching with optional individual reachability.
+    \item \texttt{single} target mode for many-to-one shared goals,
+    \item one-to-one matching for dispersed and clustered targets, with optional individual reachability.
 \end{itemize}
 
-That means the dynamic pipeline still shares \emph{maps}, but each run configuration can now differ in a richer and more explicit way than the old \texttt{single\_cell\_target} toggle allowed.
+That means the dynamic pipeline still shares \emph{maps}, but each run configuration can now differ in a richer and more explicit way through \texttt{start\_distribution\_mode} and \texttt{goal\_distribution\_mode}.
 
 \section{Solver-Relevant Reuse of Shared State}
 

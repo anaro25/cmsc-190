@@ -8,6 +8,8 @@ from dev.utils.log_symbols import AGENT_LOG_SYMBOL, TARGET_LOG_SYMBOL
 MAX_ASSIGNMENT_ATTEMPTS = 200
 VERTEX_ADJACENCY_CLEARANCE = 2
 CLUSTER_GAP_ONE_STEP = 4
+START_DISTRIBUTION_MODES = {"dispersed", "clustered"}
+GOAL_DISTRIBUTION_MODES = {"dispersed", "clustered", "single"}
 
 
 def _build_label_info(num_agents):
@@ -186,7 +188,7 @@ def _sample_clustered_vertices(vertices, num_vertices, rng):
 
 
 def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode):
-    if distribution_mode not in {"dispersed", "clustered"}:
+    if distribution_mode not in START_DISTRIBUTION_MODES:
         raise ValueError(f"Unsupported distribution_mode '{distribution_mode}'.")
     if len(vertices) < num_vertices:
         raise ValueError(
@@ -196,6 +198,19 @@ def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode):
     if distribution_mode == "clustered":
         return _sample_clustered_vertices(vertices, num_vertices, rng)
     return _sample_dispersed_vertices(vertices, num_vertices, rng)
+
+
+def _resolve_single_goal(composite_map, starts, candidate_goals, rng, require_individual_reachability):
+    possible_goals = [goal for goal in candidate_goals if goal not in set(starts)]
+    rng.shuffle(possible_goals)
+
+    for goal in possible_goals:
+        if not require_individual_reachability:
+            return goal
+        if all(are_mutually_reachable(composite_map, start, goal) for start in starts):
+            return goal
+
+    return None
 
 
 def _build_reachability_adjacency(composite_map, starts, goals):
@@ -273,12 +288,14 @@ def sample_agent_start_goal_pairs(
     Constraints:
         * starts must be free vertices
         * goals must be free vertices
-        * starts and goals remain unique one-to-one positions when shared_goal=False
+        * starts remain unique positions
+        * goals remain unique one-to-one positions for dispersed and clustered target modes
+        * goal_distribution_mode="single" gives all agents the same literal target cell
         * start != goal for each agent
         * when require_individual_reachability=True, each assigned start-goal pair must be reachable
         * dispersed sets respect 8-neighbor clearance internally
         * clustered sets form one connected cluster whose spacing is controlled by compact_clustering
-        * clustered/dispersed controls only how each set is positioned, not assignment cardinality
+        * "single" is valid only for goal_distribution_mode, not start_distribution_mode
     """
     if rng is None:
         rng = random.Random()
@@ -288,16 +305,29 @@ def sample_agent_start_goal_pairs(
     if allowed_goal_vertices is None:
         allowed_goal_vertices = allowed_spawn_vertices
 
+    if shared_goal:
+        goal_distribution_mode = "single"
+
+    if start_distribution_mode not in START_DISTRIBUTION_MODES:
+        raise ValueError(
+            f"Unsupported start_distribution_mode '{start_distribution_mode}'. "
+            f"Valid start modes are: {sorted(START_DISTRIBUTION_MODES)}. "
+            "The 'single' mode can only be used for targets/goals."
+        )
+    if goal_distribution_mode not in GOAL_DISTRIBUTION_MODES:
+        raise ValueError(
+            f"Unsupported goal_distribution_mode '{goal_distribution_mode}'. "
+            f"Valid goal modes are: {sorted(GOAL_DISTRIBUTION_MODES)}."
+        )
+
     labels = _build_label_info(num_agents)
     start_vertices = _filter_allowed_vertices(composite_map, allowed_start_vertices)
     goal_vertices = _filter_allowed_vertices(composite_map, allowed_goal_vertices)
 
-    if shared_goal:
-        raise ValueError("shared_goal mode is no longer supported in the current project configuration.")
-
-    if len(start_vertices) < num_agents or len(goal_vertices) < num_agents:
+    minimum_goal_vertices = 1 if goal_distribution_mode == "single" else num_agents
+    if len(start_vertices) < num_agents or len(goal_vertices) < minimum_goal_vertices:
         raise ValueError(
-            f"Not enough free vertices for {num_agents} unique starts and goals."
+            f"Not enough free vertices for {num_agents} starts and goal_distribution_mode={goal_distribution_mode}."
         )
 
     for _ in range(MAX_ASSIGNMENT_ATTEMPTS):
@@ -308,6 +338,20 @@ def sample_agent_start_goal_pairs(
             continue
 
         remaining_goal_vertices = [vertex for vertex in goal_vertices if vertex not in set(starts)]
+
+        if goal_distribution_mode == "single":
+            shared_target = _resolve_single_goal(
+                composite_map=composite_map,
+                starts=starts,
+                candidate_goals=remaining_goal_vertices,
+                rng=rng,
+                require_individual_reachability=require_individual_reachability,
+            )
+            if shared_target is None:
+                continue
+            paired_goals = [shared_target for _ in starts]
+            return _build_agents_from_assignment(labels, starts, paired_goals)
+
         if len(remaining_goal_vertices) < num_agents:
             continue
 

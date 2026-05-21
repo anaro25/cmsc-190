@@ -76,7 +76,11 @@ def expand_agent_number_range(agent_number_range: AgentNumberRange) -> list[int]
 
 def _goal_type(config: dict[str, Any]) -> str:
     goal_distribution_mode = str(config.get("goal_distribution_mode", "dispersed"))
-    return "clustered_targets" if goal_distribution_mode == "clustered" else "dispersed_targets"
+    if goal_distribution_mode == "clustered":
+        return "clustered_targets"
+    if goal_distribution_mode == "single":
+        return "single_target"
+    return "dispersed_targets"
 
 
 def _resolve_ecbs_suboptimality(config: dict[str, Any]) -> float:
@@ -105,6 +109,20 @@ def _cluster_description() -> str:
     return "one spaced cluster whose members keep one empty cell of separation in all 8 directions"
 
 
+def _goal_distribution_description(goal_distribution_mode: str, cluster_description: str) -> str:
+    if goal_distribution_mode == "single":
+        return "one literal shared target cell"
+    if goal_distribution_mode == "clustered":
+        return f"targets sampled as {cluster_description}"
+    return "dispersed one-to-one targets"
+
+
+def _assignment_cardinality_description(goal_distribution_mode: str) -> str:
+    if goal_distribution_mode == "single":
+        return "assignments are many-to-one"
+    return "assignments remain one-to-one"
+
+
 def _build_branch_specs() -> dict[str, BranchSpec]:
     static_cfg = BRANCH_USER_CONFIGS["static_artificial"]
     static_campus_1_cfg = BRANCH_USER_CONFIGS["static_campus_area_1"]
@@ -121,6 +139,21 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
     campus_2_solver_name, campus_2_enhanced_cbs_enabled, campus_2_solver_suboptimality_factor = _solver_metadata(campus_2_cfg)
     clustering_style_name = _clustering_style_name()
     cluster_description = _cluster_description()
+
+    static_goal_mode = str(static_cfg.get("goal_distribution_mode", "dispersed"))
+    static_campus_1_goal_mode = str(static_campus_1_cfg.get("goal_distribution_mode", "dispersed"))
+    port_goal_mode = str(port_cfg.get("goal_distribution_mode", "dispersed"))
+    campus_2_goal_mode = str(campus_2_cfg.get("goal_distribution_mode", "dispersed"))
+
+    static_goal_description = _goal_distribution_description(static_goal_mode, cluster_description)
+    static_campus_1_goal_description = _goal_distribution_description(static_campus_1_goal_mode, cluster_description)
+    port_goal_description = _goal_distribution_description(port_goal_mode, cluster_description)
+    campus_2_goal_description = _goal_distribution_description(campus_2_goal_mode, cluster_description)
+
+    static_assignment_description = _assignment_cardinality_description(static_goal_mode)
+    static_campus_1_assignment_description = _assignment_cardinality_description(static_campus_1_goal_mode)
+    port_assignment_description = _assignment_cardinality_description(port_goal_mode)
+    campus_2_assignment_description = _assignment_cardinality_description(campus_2_goal_mode)
 
     return {
         "static_artificial": BranchSpec(
@@ -167,7 +200,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             base_cols=int(static_cfg["map_size"][1]),
             static_obstacle_density=float(static_cfg["static_obstacle_density"]),
             notes=(
-                "Fresh artificial map per run configuration. Starts and goals are both dispersed one-to-one sets. "
+                f"Fresh artificial map per run configuration. Starts are sampled as a dispersed set, goals use {static_goal_description}, "
+                f"and {static_assignment_description}. "
                 "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
                 "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
@@ -219,7 +253,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             spawnable_cell_mode=str(static_campus_1_cfg.get("spawnable_cell_mode", "zone_colors_only")),
             notes=(
                 "Static image-based campus branch with explicit zone-color semantics. Starts are dispersed in one zone, "
-                f"targets are sampled as {cluster_description} in a different zone, and assignments remain one-to-one. "
+                f"targets use {static_campus_1_goal_description} in a different zone, and {static_campus_1_assignment_description}. "
                 "Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, and gray is non-traversable. "
                 f"The currently selected campus image variant is {'narrow lanes' if bool(static_campus_1_cfg.get('narrow_lanes', False)) else 'wide lanes'}."
             ),
@@ -276,7 +310,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_generation_cell_mode=str(port_cfg.get("dynamic_generation_cell_mode", "all_free")),
             spawnable_cell_mode=str(port_cfg.get("spawnable_cell_mode", "all_free")),
             notes=(
-                f"Image-based dynamic branch with clustered starts sampled as {cluster_description} and dispersed one-to-one targets. "
+                f"Image-based dynamic branch with clustered starts sampled as {cluster_description}; goals use {port_goal_description}, "
+                f"and {port_assignment_description}. "
                 "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
                 "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
             ),
@@ -335,8 +370,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             notes=(
                 "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways "
                 "are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles are generated only inside the "
-                f"zone colors. Starts and targets are both sampled as {cluster_description}, assignments stay one-to-one, "
-                "and the two clusters must come from different campus zones. "
+                f"zone colors. Starts are sampled as {cluster_description}, targets use {campus_2_goal_description}, "
+                f"{campus_2_assignment_description}, and the start and target selections must come from different campus zones. "
                 f"The currently selected campus image variant is {'narrow lanes' if bool(campus_2_cfg.get('narrow_lanes', False)) else 'wide lanes'}."
             ),
         ),

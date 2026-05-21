@@ -72,8 +72,8 @@ The campus branches depend on semantic colors, not just thresholding. Any update
 \subsection{Campus Image Variant Contract}
 The campus branches select their source images through branch-level \texttt{narrow\_lanes} toggles in \texttt{master\_config.py}. If lane-variant filenames or selection logic change, update both the config helper and the recorded branch metadata so it remains obvious which campus layout variant was actually run.
 
-\subsection{One-to-One Assignment Contract}
-All current branches are one-to-one MAPF branches. Do not silently reintroduce many-to-one or one-to-many assignment semantics under a misleading flag name.
+\subsection{Assignment Cardinality Contract}
+Dispersed and clustered goal modes are one-to-one MAPF setups. The \texttt{single} goal mode is the explicit target-only many-to-one setup, where all agents share one literal target cell. Do not use \texttt{single} for start placement, and do not introduce one-to-many assignment semantics under a misleading flag name.
 
 \subsection{Global Solver Toggle Contract}
 The \texttt{enhanced\_CBS} switch is global. Do not quietly make solver choice branch-specific unless that experiment-design change is intentional and documented. The current design uses one solver family for the whole run so solver behavior remains comparable across branches.
@@ -135,10 +135,10 @@ Solver updates now touch more than just the planner implementation. Before chang
 
 Sampling logic is branch-sensitive. Before changing it, check:
 \begin{itemize}[leftmargin=2em]
-    \item whether starts and goals must remain unique,
+    \item whether goals must remain unique or use the target-only \texttt{single} mode,
     \item whether the branch requires individual reachability,
     \item whether the branch expects \texttt{dispersed} or \texttt{clustered} start placement,
-    \item whether the branch expects \texttt{dispersed} or \texttt{clustered} goal placement,
+    \item whether the branch expects \texttt{dispersed}, \texttt{clustered}, or \texttt{single} goal placement,
     \item whether the branch requires starts and goals to occupy different campus zones,
     \item whether the allowed start and goal vertices come from an image-semantic mask,
     \item whether the branch should enforce dispersed 8-neighbor separation or clustered placement, and if clustered placement is active whether the project-wide \texttt{compact\_clustering} toggle should imply compact adjacency or connected one-cell-gap spacing.

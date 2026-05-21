@@ -4,7 +4,7 @@ from pathlib import Path
 
 from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, enhanced_CBS
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
-from dev.mapf.cbs_solver import solve_mapf_with_cbs
+from dev.mapf.full.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.mapf_logger import (
     write_empty_map_config_frame,
     write_mapf_frames,

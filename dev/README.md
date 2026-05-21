@@ -134,12 +134,12 @@ pathological infinite loops. It remains only a protective implementation detail.
 ## Notes
 
 - The project now uses explicit `start_distribution_mode` and `goal_distribution_mode` settings instead of the older shared-goal campus toggle.
-- All current branches remain one-to-one MAPF setups. The experiment varies spatial placement, not assignment cardinality.
+- `goal_distribution_mode` can now be `dispersed`, `clustered`, or `single`. `single` is target-only and means all agents share one literal target cell where they disappear after arrival.
 - The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, and gray regions are non-traversable for the solver. During Pillow visualization generation, gray campus cells are reconstructed from the current semantic image and rendered through a temporary render-only free-space override so they appear as ordinary white open cells without changing solver behavior, while already persisted raw MAPF data remains reusable.
 - `static_campus_area_1` now uses campus area 1 as the static branch, with dispersed starts in one zone and clustered goals in the other zone.
 - `dynamic_port` now uses clustered starts and dispersed goals.
 - `dynamic_campus_area_2` now uses campus area 2 as the dynamic campus branch, with clustered starts and clustered goals forced into different campus zones.
-- The assignment sampler now treats dispersed sets and clustered sets differently: dispersed sets keep 8-neighbor separation within the set, while clustered sets follow the global `compact_clustering` switch in `master_config.py`.
+- The assignment sampler now treats dispersed, clustered, and single target modes differently: dispersed sets keep 8-neighbor separation within the set, clustered sets follow the global `compact_clustering` switch in `master_config.py`, and single targets use many-to-one assignment.
 - When `compact_clustering=True`, clustered sets are sampled as directly adjacent 8-neighbor-connected groups.
 - When `compact_clustering=False`, clustered sets remain one cluster but keep one empty cell of separation in all 8 directions.
 - Presentation outputs now keep only the latest regenerated version per output family. Logs and regenerated artifacts overwrite the prior copy instead of creating new `execution_...` folders.

@@ -6,8 +6,8 @@ from typing import Any, Callable
 from dev.experiments.study.io_utils import ExperimentLogger
 from dev.experiments.study.models import MappingRunRecord, RunConfiguration
 from dev.master_config import enhanced_CBS
-from dev.mapf.cbs_solver import compute_solution_cost as compute_static_solution_cost
-from dev.mapf.cbs_solver import solve_mapf_with_cbs
+from dev.mapf.full.cbs_solver import compute_solution_cost as compute_static_solution_cost
+from dev.mapf.full.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.time_expanded_cbs import compute_solution_cost as compute_dynamic_solution_cost
 from dev.mapf.time_expanded_cbs import solve_time_expanded_mapf_with_cbs
 
