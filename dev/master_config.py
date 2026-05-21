@@ -53,8 +53,8 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 
 recompute_MAPF = True
 
-# to_generate = "graphs_and_data"
-to_generate = "visualization"
+to_generate = "graphs_and_data"
+# to_generate = "visualization"
 # to_generate = "nothing"
 
 # Traditional MAPF
@@ -64,11 +64,11 @@ to_generate = "visualization"
 
 # Campus Crowd Simulation
 # MAP_TYPE = "static_campus_area_1"
-# MAP_TYPE = "dynamic_campus_area_1"
+MAP_TYPE = "dynamic_campus_area_1"
 # MAP_TYPE = "static_campus_area_2"
 # MAP_TYPE = "dynamic_campus_area_2"
 # MAP_TYPE = "static_campus_area_3"
-MAP_TYPE = "dynamic_campus_area_3"
+# MAP_TYPE = "dynamic_campus_area_3"
 
 # All 9 map-type configs are defined completely in this file.
 # Edit the selected branch dictionary below, then set MAP_TYPE above.
@@ -80,7 +80,7 @@ STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
         "num_last_runs_to_visualize_jointly_successful": 3,
         "num_last_runs_to_visualize_independently_successful": 3,
-        "ECBS_suboptimality": 1.5,
+        "ECBS_suboptimality": 3.0,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
 
@@ -119,8 +119,8 @@ STATIC_PORT_CONFIG = _with_shared_runtime(
         "seed": 201,
         "agent_number_range": (2, 200, 1),
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-        "num_last_runs_to_visualize_jointly_successful": 3,
-        "num_last_runs_to_visualize_independently_successful": 3,
+        "num_last_runs_to_visualize_jointly_successful": 0,
+        "num_last_runs_to_visualize_independently_successful": 1,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -182,7 +182,7 @@ DYNAMIC_PORT_CONFIG = _with_shared_runtime(
         # dynamic-map constants
         "target_static_obstacle_density": 0.15,
         "target_dynamic_obstacle_density": 0.030,
-        "loop_sequence_length": 100,
+        "loop_sequence_length": 250,
         "group_stay_durations": (7, 9, 11),
         "dynamic_generation_cell_mode": "all_free",
 
@@ -224,7 +224,7 @@ STATIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
         # dynamic-map constants
         "target_static_obstacle_density": None,
         "target_dynamic_obstacle_density": None,
-        "loop_sequence_length": None,
+        "loop_sequence_length": 250,
         "group_stay_durations": None,
         "dynamic_generation_cell_mode": "zone_colors_only",
 
@@ -243,8 +243,8 @@ DYNAMIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
         "seed": 501,
         "agent_number_range": (2, 200, 1),
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-        "num_last_runs_to_visualize_jointly_successful": 3,
-        "num_last_runs_to_visualize_independently_successful": 3,
+        "num_last_runs_to_visualize_jointly_successful": 0,
+        "num_last_runs_to_visualize_independently_successful": 1,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -265,8 +265,8 @@ DYNAMIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
         # dynamic-map constants
         "target_static_obstacle_density": None,
         "target_dynamic_obstacle_density": 0.015,
-        "loop_sequence_length": 100,
-        "group_stay_durations": (7, 9, 11),
+        "loop_sequence_length": 250,
+        "group_stay_durations": (17, 29, 37),
         "dynamic_generation_cell_mode": "all_free",
 
         # branch-specific constants
@@ -306,7 +306,7 @@ STATIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
         # dynamic-map constants
         "target_static_obstacle_density": None,
         "target_dynamic_obstacle_density": None,
-        "loop_sequence_length": None,
+        "loop_sequence_length": 250,
         "group_stay_durations": None,
         "dynamic_generation_cell_mode": "zone_colors_only",
 
@@ -347,8 +347,8 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
         # dynamic-map constants
         "target_static_obstacle_density": None,
         "target_dynamic_obstacle_density": 0.015,
-        "loop_sequence_length": 100,
-        "group_stay_durations": (7, 9, 11),
+        "loop_sequence_length": 250,
+        "group_stay_durations": (17, 29, 37),
         "dynamic_generation_cell_mode": "all_free",
 
         # branch-specific constants
@@ -429,7 +429,7 @@ DYNAMIC_CAMPUS_AREA_3_CONFIG = _with_shared_runtime(
         # dynamic-map constants
         "target_static_obstacle_density": None,
         "target_dynamic_obstacle_density": 0.010,
-        "loop_sequence_length": 100,
+        "loop_sequence_length": 250,
         "group_stay_durations": (17, 29, 37),
         "dynamic_generation_cell_mode": "all_free",
 
