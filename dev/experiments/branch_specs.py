@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from dev.master_config import BRANCH_USER_CONFIGS, compact_clustering, enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, agent_cohesion, cohesion_factor, compact_clustering, enhanced_CBS
 
 
 AgentNumberRange = tuple[int, int, int]
@@ -53,6 +53,8 @@ class BranchSpec:
     solver_suboptimality_factor: float | None = None
     true_static_shortest_path_distance: bool = False
     tight_time_horizon: bool = False
+    agent_cohesion_enabled: bool = False
+    cohesion_factor: float = 0.0
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -100,6 +102,15 @@ def _solver_metadata(config: dict[str, Any]) -> tuple[str, bool, float | None]:
 
 def _clustering_style_name() -> str:
     return "compact" if compact_clustering else "spaced"
+
+
+def _campus_cohesion_factor() -> float:
+    if not agent_cohesion:
+        return 0.0
+    try:
+        return max(0.0, float(cohesion_factor))
+    except (TypeError, ValueError):
+        return 0.0
 
 
 def _cluster_description() -> str:
@@ -191,6 +202,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             solver_suboptimality_factor=static_solver_suboptimality_factor,
             true_static_shortest_path_distance=bool(static_cfg.get("true_static_shortest_path_distance", False)),
             tight_time_horizon=bool(static_cfg.get("tight_time_horizon", False)),
+            agent_cohesion_enabled=False,
+            cohesion_factor=0.0,
             start_distribution_mode=str(static_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(static_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(static_cfg.get("require_individual_reachability", False)),
@@ -241,6 +254,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             solver_suboptimality_factor=static_campus_1_solver_suboptimality_factor,
             true_static_shortest_path_distance=bool(static_campus_1_cfg.get("true_static_shortest_path_distance", False)),
             tight_time_horizon=bool(static_campus_1_cfg.get("tight_time_horizon", False)),
+            agent_cohesion_enabled=bool(agent_cohesion),
+            cohesion_factor=_campus_cohesion_factor(),
             start_distribution_mode=str(static_campus_1_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(static_campus_1_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(static_campus_1_cfg.get("require_individual_reachability", False)),
@@ -292,6 +307,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             solver_suboptimality_factor=port_solver_suboptimality_factor,
             true_static_shortest_path_distance=bool(port_cfg.get("true_static_shortest_path_distance", False)),
             tight_time_horizon=bool(port_cfg.get("tight_time_horizon", False)),
+            agent_cohesion_enabled=False,
+            cohesion_factor=0.0,
             start_distribution_mode=str(port_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(port_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(port_cfg.get("require_individual_reachability", True)),
@@ -350,6 +367,8 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             solver_suboptimality_factor=campus_2_solver_suboptimality_factor,
             true_static_shortest_path_distance=bool(campus_2_cfg.get("true_static_shortest_path_distance", False)),
             tight_time_horizon=bool(campus_2_cfg.get("tight_time_horizon", False)),
+            agent_cohesion_enabled=bool(agent_cohesion),
+            cohesion_factor=_campus_cohesion_factor(),
             start_distribution_mode=str(campus_2_cfg.get("start_distribution_mode", "dispersed")),
             goal_distribution_mode=str(campus_2_cfg.get("goal_distribution_mode", "dispersed")),
             require_individual_reachability=bool(campus_2_cfg.get("require_individual_reachability", True)),

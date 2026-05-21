@@ -37,6 +37,8 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
         logger.log(f"Solver suboptimality factor: {branch_spec.solver_suboptimality_factor:.2f}")
     logger.log(f"True static shortest-path heuristic: {branch_spec.true_static_shortest_path_distance}")
     logger.log(f"Tight time horizon: {branch_spec.tight_time_horizon}")
+    logger.log(f"Agent cohesion enabled: {branch_spec.agent_cohesion_enabled}")
+    logger.log(f"Cohesion factor: {branch_spec.cohesion_factor:.2f}")
     logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Jointly viable counted pairs required (n): {branch_spec.counted_runs_required}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")

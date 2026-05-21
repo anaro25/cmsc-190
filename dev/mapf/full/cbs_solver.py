@@ -307,6 +307,8 @@ def _replan_static_agent(
     heuristic_weight,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
+    cohesion_reference_paths=None,
 ):
     """Run the low-level A* search for one agent."""
     return find_path_for_agent(
@@ -318,6 +320,8 @@ def _replan_static_agent(
         heuristic_weight=heuristic_weight,
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,
+        agent_cohesion_enabled=agent_cohesion_enabled,
+        cohesion_reference_paths=cohesion_reference_paths,
     )
 
 
@@ -329,6 +333,7 @@ def _build_solver_success(
     *,
     solver_name,
     solver_suboptimality_factor=None,
+    agent_cohesion_enabled=False,
 ):
     return {
         "status": "solved",
@@ -337,6 +342,7 @@ def _build_solver_success(
         "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
         "solver_name": solver_name,
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
+        "agent_cohesion_enabled": bool(agent_cohesion_enabled),
     }
 
 
@@ -348,6 +354,7 @@ def build_cbs_failure(
     *,
     solver_name,
     solver_suboptimality_factor=None,
+    agent_cohesion_enabled=False,
 ):
     return {
         "status": reason,
@@ -356,6 +363,7 @@ def build_cbs_failure(
         "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
         "solver_name": solver_name,
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
+        "agent_cohesion_enabled": bool(agent_cohesion_enabled),
     }
 
 
@@ -447,6 +455,7 @@ def _solve_mapf_with_cbs_style(
     suboptimality_factor=None,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
 ):
     """
     Run the high-level CBS search.
@@ -489,6 +498,7 @@ def _solve_mapf_with_cbs_style(
                 0,
                 solver_name=solver_name,
                 solver_suboptimality_factor=suboptimality_factor,
+                agent_cohesion_enabled=agent_cohesion_enabled,
             )
 
         path = _replan_static_agent(
@@ -498,6 +508,8 @@ def _solve_mapf_with_cbs_style(
             heuristic_weight=heuristic_weight,
             true_static_shortest_path_distance=true_static_shortest_path_distance,
             tight_time_horizon=tight_time_horizon,
+            agent_cohesion_enabled=agent_cohesion_enabled,
+            cohesion_reference_paths=root_paths,
         )
 
         if path is None:
@@ -507,6 +519,7 @@ def _solve_mapf_with_cbs_style(
                 0,
                 solver_name=solver_name,
                 solver_suboptimality_factor=suboptimality_factor,
+                agent_cohesion_enabled=agent_cohesion_enabled,
             )
 
         root_paths[agent["id"]] = path
@@ -551,6 +564,7 @@ def _solve_mapf_with_cbs_style(
                 num_high_level_nodes_expanded,
                 solver_name=solver_name,
                 solver_suboptimality_factor=suboptimality_factor,
+                agent_cohesion_enabled=agent_cohesion_enabled,
             )
 
         # Step 3 in the user's pseudocode:
@@ -585,6 +599,7 @@ def _solve_mapf_with_cbs_style(
                 num_high_level_nodes_expanded,
                 solver_name=solver_name,
                 solver_suboptimality_factor=suboptimality_factor,
+                agent_cohesion_enabled=agent_cohesion_enabled,
             )
 
         num_conflicts_detected += 1
@@ -604,6 +619,7 @@ def _solve_mapf_with_cbs_style(
                     num_high_level_nodes_expanded,
                     solver_name=solver_name,
                     solver_suboptimality_factor=suboptimality_factor,
+                    agent_cohesion_enabled=agent_cohesion_enabled,
                 )
 
             child_constraints = list(current_node["constraints"]) + [added_constraint]
@@ -624,6 +640,8 @@ def _solve_mapf_with_cbs_style(
                 heuristic_weight=heuristic_weight,
                 true_static_shortest_path_distance=true_static_shortest_path_distance,
                 tight_time_horizon=tight_time_horizon,
+                agent_cohesion_enabled=agent_cohesion_enabled,
+                cohesion_reference_paths=current_node["paths"],
             )
 
             if new_path is None:
@@ -648,6 +666,7 @@ def _solve_mapf_with_cbs_style(
         num_high_level_nodes_expanded,
         solver_name=solver_name,
         solver_suboptimality_factor=suboptimality_factor,
+        agent_cohesion_enabled=agent_cohesion_enabled,
     )
 
 
@@ -659,6 +678,7 @@ def _solve_mapf_with_vanilla_cbs(
     progress_callback=None,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
 ):
     return _solve_mapf_with_cbs_style(
         composite_map,
@@ -669,6 +689,7 @@ def _solve_mapf_with_vanilla_cbs(
         heuristic_weight=1.0,
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,
+        agent_cohesion_enabled=agent_cohesion_enabled,
     )
 
 
@@ -681,6 +702,7 @@ def _solve_mapf_with_ecbs(
     suboptimality_factor: float = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
 ):
     return _solve_mapf_with_cbs_style(
         composite_map,
@@ -692,6 +714,7 @@ def _solve_mapf_with_ecbs(
         suboptimality_factor=suboptimality_factor,
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,
+        agent_cohesion_enabled=agent_cohesion_enabled,
     )
 
 
@@ -705,6 +728,7 @@ def solve_mapf_with_cbs(
     ecbs_suboptimality_factor: float | None = None,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
 ):
     """
     Static MAPF entry point.
@@ -722,6 +746,7 @@ def solve_mapf_with_cbs(
             suboptimality_factor=_resolve_ecbs_suboptimality_factor(ecbs_suboptimality_factor),
             true_static_shortest_path_distance=true_static_shortest_path_distance,
             tight_time_horizon=tight_time_horizon,
+            agent_cohesion_enabled=agent_cohesion_enabled,
         )
 
     return _solve_mapf_with_vanilla_cbs(
@@ -731,4 +756,5 @@ def solve_mapf_with_cbs(
         progress_callback=progress_callback,
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,
+        agent_cohesion_enabled=agent_cohesion_enabled,
     )

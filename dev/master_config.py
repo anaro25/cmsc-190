@@ -23,6 +23,17 @@ CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
 # shared constants
 enhanced_CBS = True
 compact_clustering = True
+
+# Campus-crowd behavior controls.
+# agent_cohesion turns the behavior on/off for campus branches.
+# cohesion_factor controls how strongly A* avoids single-file trail reuse in
+# open areas after bottlenecks. It remains a soft planning preference only;
+# agents still follow the selected mapping's legal transitions.
+#   0.00 = normal MAPF behavior
+#   0.35 = mild line-spreading preference
+#   1.00 = stronger anti-snake preference
+agent_cohesion: bool = True
+cohesion_factor: float = 1.0
 SHARED_TIME_LIMIT_SECONDS = 30.0
 SHARED_ECBS_SUBOPTIMALITY = 3.0 # helps so set to 3.0
 SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True # helps so set to True
@@ -68,7 +79,7 @@ STATIC_ARTIFICIAL_CONFIG = {
 STATIC_CAMPUS_AREA_1_CONFIG = {
     # common frequently edited constants
     "seed": 201,
-    "agent_number_range": (10, 10, 1),
+    "agent_number_range": (11, 11, 1),
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize_jointly_successful": 0,
     "num_last_runs_to_visualize_independently_successful": 1,

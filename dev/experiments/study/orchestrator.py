@@ -94,6 +94,7 @@ def _execute_mapping(
             solver_suboptimality_factor=branch_spec.solver_suboptimality_factor,
             true_static_shortest_path_distance=branch_spec.true_static_shortest_path_distance,
             tight_time_horizon=branch_spec.tight_time_horizon,
+            agent_cohesion_enabled=branch_spec.agent_cohesion_enabled,
         )
 
     composite_map = prepared_context.classical_map if mapping_name == "classical" else prepared_context.cyclic_map
@@ -108,6 +109,7 @@ def _execute_mapping(
         solver_suboptimality_factor=branch_spec.solver_suboptimality_factor,
         true_static_shortest_path_distance=branch_spec.true_static_shortest_path_distance,
         tight_time_horizon=branch_spec.tight_time_horizon,
+        agent_cohesion_enabled=branch_spec.agent_cohesion_enabled,
     )
 
 

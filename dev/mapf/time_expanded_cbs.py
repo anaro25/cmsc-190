@@ -150,7 +150,7 @@ def make_cbs_node(constraints, paths_by_agent):
     }
 
 
-def build_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None):
+def build_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None, agent_cohesion_enabled=False):
     return {
         "status": reason,
         "paths_by_agent": None,
@@ -158,6 +158,7 @@ def build_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded,
         "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
         "solver_name": solver_name,
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
+        "agent_cohesion_enabled": bool(agent_cohesion_enabled),
     }
 
 
@@ -171,7 +172,7 @@ def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback
     return next_report_seconds
 
 
-def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None):
+def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None, agent_cohesion_enabled=False):
     return {
         "status": "solved",
         "paths_by_agent": paths_by_agent,
@@ -179,6 +180,7 @@ def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level
         "num_high_level_nodes_expanded": num_high_level_nodes_expanded,
         "solver_name": solver_name,
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
+        "agent_cohesion_enabled": bool(agent_cohesion_enabled),
     }
 
 
@@ -190,6 +192,8 @@ def _replan_dynamic_agent(
     heuristic_weight,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
+    cohesion_reference_paths=None,
 ):
     return find_time_expanded_path_for_agent(
         mapped_loop=mapped_loop,
@@ -200,6 +204,8 @@ def _replan_dynamic_agent(
         heuristic_weight=heuristic_weight,
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,
+        agent_cohesion_enabled=agent_cohesion_enabled,
+        cohesion_reference_paths=cohesion_reference_paths,
     )
 
 
@@ -210,6 +216,7 @@ def _solve_time_expanded_with_vanilla_cbs(
     progress_callback=None,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
 ):
     start_time = time.perf_counter()
     next_report_seconds = 5
@@ -223,7 +230,7 @@ def _solve_time_expanded_with_vanilla_cbs(
     for agent in agents:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", 0, 0, solver_name="CBS")
+            return build_failure("bad_setup_timeout", 0, 0, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
 
         path = _replan_dynamic_agent(
             mapped_loop,
@@ -232,9 +239,11 @@ def _solve_time_expanded_with_vanilla_cbs(
             heuristic_weight=1.0,
             true_static_shortest_path_distance=true_static_shortest_path_distance,
             tight_time_horizon=tight_time_horizon,
+            agent_cohesion_enabled=agent_cohesion_enabled,
+            cohesion_reference_paths=root_paths,
         )
         if path is None:
-            return build_failure("no_solution", 0, 0, solver_name="CBS")
+            return build_failure("no_solution", 0, 0, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
         root_paths[agent["id"]] = path
 
     open_heap = []
@@ -248,14 +257,14 @@ def _solve_time_expanded_with_vanilla_cbs(
     while open_heap:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS")
+            return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
 
         _, _, node = heapq.heappop(open_heap)
         num_high_level_nodes_expanded += 1
 
         conflict = detect_first_conflict(node["paths"])
         if conflict is None:
-            return _build_solver_success(node["paths"], num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS")
+            return _build_solver_success(node["paths"], num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
 
         num_conflicts_detected += 1
         for new_constraint in split_conflict_into_constraints(conflict):
@@ -273,6 +282,8 @@ def _solve_time_expanded_with_vanilla_cbs(
                 heuristic_weight=1.0,
                 true_static_shortest_path_distance=true_static_shortest_path_distance,
                 tight_time_horizon=tight_time_horizon,
+                agent_cohesion_enabled=agent_cohesion_enabled,
+                cohesion_reference_paths=node["paths"],
             )
             if replanned_path is None:
                 continue
@@ -281,7 +292,7 @@ def _solve_time_expanded_with_vanilla_cbs(
             child = make_cbs_node(child_constraints, child_paths)
             heapq.heappush(open_heap, (child["cost"], next(counter), child))
 
-    return build_failure("no_solution", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS")
+    return build_failure("no_solution", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
 
 
 def _clean_open_heap(open_heap, active_nodes):
@@ -310,6 +321,7 @@ def _solve_time_expanded_with_ecbs(
     suboptimality_factor: float = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
 ):
     start_time = time.perf_counter()
     next_report_seconds = 5
@@ -323,7 +335,7 @@ def _solve_time_expanded_with_ecbs(
     for agent in agents:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", 0, 0, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
+            return build_failure("bad_setup_timeout", 0, 0, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
         path = _replan_dynamic_agent(
             mapped_loop,
@@ -332,9 +344,11 @@ def _solve_time_expanded_with_ecbs(
             heuristic_weight=suboptimality_factor,
             true_static_shortest_path_distance=true_static_shortest_path_distance,
             tight_time_horizon=tight_time_horizon,
+            agent_cohesion_enabled=agent_cohesion_enabled,
+            cohesion_reference_paths=root_paths,
         )
         if path is None:
-            return build_failure("no_solution", 0, 0, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
+            return build_failure("no_solution", 0, 0, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
         root_paths[agent["id"]] = path
 
     root = make_cbs_node(root_constraints, root_paths)
@@ -352,7 +366,7 @@ def _solve_time_expanded_with_ecbs(
     while active_nodes:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
+            return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
         _clean_open_heap(open_heap, active_nodes)
         if not open_heap:
@@ -367,13 +381,13 @@ def _solve_time_expanded_with_ecbs(
 
         conflict = detect_first_conflict(node["paths"])
         if conflict is None:
-            return _build_solver_success(node["paths"], num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
+            return _build_solver_success(node["paths"], num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
         num_conflicts_detected += 1
         for new_constraint in split_conflict_into_constraints(conflict):
             next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
             if time.perf_counter() - start_time > max_runtime_seconds:
-                return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
+                return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
             child_constraints = list(node["constraints"]) + [new_constraint]
             signature = make_constraint_signature(child_constraints)
@@ -389,6 +403,8 @@ def _solve_time_expanded_with_ecbs(
                 heuristic_weight=suboptimality_factor,
                 true_static_shortest_path_distance=true_static_shortest_path_distance,
                 tight_time_horizon=tight_time_horizon,
+                agent_cohesion_enabled=agent_cohesion_enabled,
+                cohesion_reference_paths=node["paths"],
             )
             if replanned_path is None:
                 continue
@@ -399,7 +415,7 @@ def _solve_time_expanded_with_ecbs(
             active_nodes[child_node_id] = child
             heapq.heappush(open_heap, (child["cost"], child["secondary_key"], child_node_id))
 
-    return build_failure("no_solution", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor)
+    return build_failure("no_solution", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
 
 def solve_time_expanded_mapf_with_cbs(
@@ -411,6 +427,7 @@ def solve_time_expanded_mapf_with_cbs(
     ecbs_suboptimality_factor: float | None = None,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
 ):
     if use_ecbs:
         return _solve_time_expanded_with_ecbs(
@@ -421,6 +438,7 @@ def solve_time_expanded_mapf_with_cbs(
             suboptimality_factor=_resolve_ecbs_suboptimality_factor(ecbs_suboptimality_factor),
             true_static_shortest_path_distance=true_static_shortest_path_distance,
             tight_time_horizon=tight_time_horizon,
+            agent_cohesion_enabled=agent_cohesion_enabled,
         )
     return _solve_time_expanded_with_vanilla_cbs(
         mapped_loop=mapped_loop,
@@ -429,4 +447,5 @@ def solve_time_expanded_mapf_with_cbs(
         progress_callback=progress_callback,
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,
+        agent_cohesion_enabled=agent_cohesion_enabled,
     )

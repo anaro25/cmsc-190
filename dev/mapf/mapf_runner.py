@@ -2,7 +2,7 @@ import random
 import shutil
 from pathlib import Path
 
-from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, agent_cohesion, enhanced_CBS
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.mapf.full.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.mapf_logger import (
@@ -27,6 +27,10 @@ def current_true_static_shortest_path_distance_enabled():
 
 def current_tight_time_horizon_enabled():
     return bool(BRANCH_USER_CONFIGS[MAP_TYPE].get("tight_time_horizon", False))
+
+
+def current_agent_cohesion_enabled():
+    return bool(agent_cohesion) and MAP_TYPE in {"static_campus_area_1", "dynamic_campus_area_2"}
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
@@ -82,6 +86,7 @@ def solve_single_mapf_instance(
     ecbs_suboptimality_factor=None,
     true_static_shortest_path_distance=None,
     tight_time_horizon=None,
+    agent_cohesion_enabled=None,
 ):
     return solve_mapf_with_cbs(
         composite_map=composite_map,
@@ -92,6 +97,7 @@ def solve_single_mapf_instance(
         ecbs_suboptimality_factor=(current_ecbs_suboptimality_factor() if ecbs_suboptimality_factor is None else ecbs_suboptimality_factor),
         true_static_shortest_path_distance=(current_true_static_shortest_path_distance_enabled() if true_static_shortest_path_distance is None else bool(true_static_shortest_path_distance)),
         tight_time_horizon=(current_tight_time_horizon_enabled() if tight_time_horizon is None else bool(tight_time_horizon)),
+        agent_cohesion_enabled=(current_agent_cohesion_enabled() if agent_cohesion_enabled is None else bool(agent_cohesion_enabled)),
     )
 
 
@@ -187,6 +193,7 @@ def run_single_mapf_for_map(
         ecbs_suboptimality_factor=current_ecbs_suboptimality_factor(),
         true_static_shortest_path_distance=current_true_static_shortest_path_distance_enabled(),
         tight_time_horizon=current_tight_time_horizon_enabled(),
+        agent_cohesion_enabled=current_agent_cohesion_enabled(),
     )
 
     if result["status"] != "solved":

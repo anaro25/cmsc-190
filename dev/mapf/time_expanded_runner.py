@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 
-from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, agent_cohesion, enhanced_CBS
 from dev.mapf.mapf_logger_dynamic import (
     write_dynamic_mapf_frames,
     write_dynamic_setup_frame,
@@ -26,6 +26,9 @@ def current_true_static_shortest_path_distance_enabled():
 def current_tight_time_horizon_enabled():
     return bool(BRANCH_USER_CONFIGS[MAP_TYPE].get("tight_time_horizon", False))
 
+
+def current_agent_cohesion_enabled():
+    return bool(agent_cohesion) and MAP_TYPE in {"static_campus_area_1", "dynamic_campus_area_2"}
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
@@ -116,6 +119,7 @@ def run_time_expanded_mapf_for_loop(
         ecbs_suboptimality_factor=current_ecbs_suboptimality_factor(),
         true_static_shortest_path_distance=current_true_static_shortest_path_distance_enabled(),
         tight_time_horizon=current_tight_time_horizon_enabled(),
+        agent_cohesion_enabled=current_agent_cohesion_enabled(),
     )
 
     if result["status"] != "solved":

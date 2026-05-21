@@ -1,6 +1,8 @@
 import heapq
 import itertools
+from collections.abc import Mapping
 
+from dev.mapf.agent_cohesion import cohesion_penalty
 from dev.mapf.low_level_guidance import (
     get_dynamic_static_free_vertex_count,
     get_true_static_distances_for_dynamic_map,
@@ -66,6 +68,27 @@ def get_neighbors_at_time(mapped_loop, position, time_step):
     return get_outgoing_neighbors(frame, position)
 
 
+def _cell_is_free_space(cell):
+    return getattr(cell, "name", None) == "FREE_SPACE"
+
+
+def count_adjacent_free_vertices_at_time(mapped_loop, position, time_step):
+    """Count nearby free vertices without changing directed transition rules."""
+    frame = mapped_loop[time_step % len(mapped_loop)]
+    i, j = position
+    count = 0
+    for di, dj in ((-2, 0), (2, 0), (0, -2), (0, 2)):
+        ni = i + di
+        nj = j + dj
+        if ni < 0 or ni >= len(frame):
+            continue
+        if nj < 0 or nj >= len(frame[ni]):
+            continue
+        if _cell_is_free_space(frame[ni][nj]):
+            count += 1
+    return count
+
+
 def _heuristic_value(position, goal, *, true_static_shortest_path_distance, static_distance_lookup):
     if true_static_shortest_path_distance:
         return static_distance_lookup.get(position, float("inf"))
@@ -97,6 +120,8 @@ def find_time_expanded_path_for_agent(
     heuristic_weight=1.0,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
+    cohesion_reference_paths: Mapping[int, list[tuple[int, int]]] | None = None,
 ):
     heuristic_weight = max(1.0, float(heuristic_weight))
     agent_constraints = get_agent_constraints(constraints, agent_id)
@@ -134,12 +159,22 @@ def find_time_expanded_path_for_agent(
     )
     if start_h == float("inf"):
         return None
-    heapq.heappush(open_heap, (start_h * heuristic_weight, 0, next(counter), start_state))
+    start_cohesion_penalty = cohesion_penalty(
+        start,
+        0,
+        reference_paths=cohesion_reference_paths,
+        excluded_agent_id=agent_id,
+        enabled=agent_cohesion_enabled,
+        previous_position=None,
+        goal=goal,
+        local_free_neighbor_count=count_adjacent_free_vertices_at_time(mapped_loop, start, 0),
+    )
+    heapq.heappush(open_heap, ((start_h * heuristic_weight) + start_cohesion_penalty, start_cohesion_penalty, 0, next(counter), start_state))
     came_from = {start_state: None}
     g_score = {start_state: 0}
 
     while open_heap:
-        _, current_g, _, current_state = heapq.heappop(open_heap)
+        _, _, current_g, _, current_state = heapq.heappop(open_heap)
         current_position, current_time = current_state
 
         if current_g != g_score.get(current_state):
@@ -183,6 +218,16 @@ def find_time_expanded_path_for_agent(
                 else manhattan_vertex_distance(next_position, goal)
             )
             f_score = tentative_g + (heuristic_weight * h_score)
-            heapq.heappush(open_heap, (f_score, tentative_g, next(counter), next_state))
+            soft_cohesion_penalty = cohesion_penalty(
+                next_position,
+                next_time,
+                reference_paths=cohesion_reference_paths,
+                excluded_agent_id=agent_id,
+                enabled=agent_cohesion_enabled,
+                previous_position=current_position,
+                goal=goal,
+                local_free_neighbor_count=count_adjacent_free_vertices_at_time(mapped_loop, next_position, next_time),
+            )
+            heapq.heappush(open_heap, (f_score + soft_cohesion_penalty, soft_cohesion_penalty, tentative_g, next(counter), next_state))
 
     return None

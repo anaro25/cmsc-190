@@ -1,7 +1,9 @@
 
 import heapq
 import itertools
+from collections.abc import Mapping
 
+from dev.mapf.agent_cohesion import cohesion_penalty
 from dev.mapf.low_level_guidance import get_true_static_distances_for_static_map
 from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
 
@@ -91,6 +93,26 @@ def _static_distance_lookup(cyclic_map, goal):
     return get_true_static_distances_for_static_map(cyclic_map, goal)
 
 
+def _cell_is_free_space(cell):
+    return getattr(cell, "name", None) == "FREE_SPACE"
+
+
+def count_adjacent_free_vertices(cyclic_map, position):
+    """Count nearby free vertices without changing directed transition rules."""
+    i, j = position
+    count = 0
+    for di, dj in ((-2, 0), (2, 0), (0, -2), (0, 2)):
+        ni = i + di
+        nj = j + dj
+        if ni < 0 or ni >= len(cyclic_map):
+            continue
+        if nj < 0 or nj >= len(cyclic_map[ni]):
+            continue
+        if _cell_is_free_space(cyclic_map[ni][nj]):
+            count += 1
+    return count
+
+
 def _find_h_value(position, goal, *, true_static_shortest_path_distance, static_distance_lookup):
     """
     Find h(n), the estimated remaining distance to the goal.
@@ -113,7 +135,16 @@ def _find_f_value(g_value, h_value, heuristic_weight):
     return g_value + (heuristic_weight * h_value)
 
 
-def _add_node_to_OPEN(OPEN, insertion_counter, node, g_value, h_value, heuristic_weight):
+def _add_node_to_OPEN(
+    OPEN,
+    insertion_counter,
+    node,
+    g_value,
+    h_value,
+    heuristic_weight,
+    *,
+    soft_cohesion_penalty=0.0,
+):
     """
     Add a discovered node to OPEN.
 
@@ -126,7 +157,8 @@ def _add_node_to_OPEN(OPEN, insertion_counter, node, g_value, h_value, heuristic
         tie, choose the one that entered OPEN earlier.
     """
     f_value = _find_f_value(g_value, h_value, heuristic_weight)
-    heapq.heappush(OPEN, (f_value, h_value, next(insertion_counter), node))
+    priority_value = f_value + float(soft_cohesion_penalty)
+    heapq.heappush(OPEN, (priority_value, soft_cohesion_penalty, h_value, next(insertion_counter), node))
 
 
 def _resolve_time_horizon(
@@ -160,6 +192,8 @@ def find_path_for_agent(
     heuristic_weight=1.0,
     true_static_shortest_path_distance=False,
     tight_time_horizon=False,
+    agent_cohesion_enabled=False,
+    cohesion_reference_paths: Mapping[int, list[tuple[int, int]]] | None = None,
 ):
     """
     Find one agent's path using A* while respecting CBS constraints.
@@ -224,11 +258,21 @@ def find_path_for_agent(
         g_value=0,
         h_value=start_h,
         heuristic_weight=heuristic_weight,
+        soft_cohesion_penalty=cohesion_penalty(
+            start,
+            0,
+            reference_paths=cohesion_reference_paths,
+            excluded_agent_id=agent_id,
+            enabled=agent_cohesion_enabled,
+            previous_position=None,
+            goal=goal,
+            local_free_neighbor_count=count_adjacent_free_vertices(cyclic_map, start),
+        ),
     )
 
     while OPEN:
         # From OPEN, select the node with the least f(n).
-        _, _, _, selected_node = heapq.heappop(OPEN)
+        _, _, _, _, selected_node = heapq.heappop(OPEN)
 
         # The same node can enter OPEN more than once if a better parent is found.
         # If it was already explored, skip the duplicate entry.
@@ -306,6 +350,16 @@ def find_path_for_agent(
                 g_value=tentative_g,
                 h_value=neighbor_h,
                 heuristic_weight=heuristic_weight,
+                soft_cohesion_penalty=cohesion_penalty(
+                    neighbor_position,
+                    next_time,
+                    reference_paths=cohesion_reference_paths,
+                    excluded_agent_id=agent_id,
+                    enabled=agent_cohesion_enabled,
+                    previous_position=selected_position,
+                    goal=goal,
+                    local_free_neighbor_count=count_adjacent_free_vertices(cyclic_map, neighbor_position),
+                ),
             )
 
     # OPEN became empty, so all reachable possibilities were exhausted.
