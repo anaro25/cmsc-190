@@ -4,11 +4,16 @@
 #
 # dynamic_generation_cell_mode controls which raster cells participate in dynamic
 # obstacle generation and free-space connectivity checks:
-# - "all_free": every non-black source-image cell is traversable
+# - "all_free": every traversable source-image cell is eligible. For campus maps,
+#   this means both campus zone colors and white walkways; gray/black cells remain
+#   non-traversable.
 # - "pure_white_only": only pure-white source-image cells are traversable
-# - "zone_colors_only": only designated campus zone-color cells are eligible
-#   for spawning or dynamic-obstacle generation; white walkways remain traversable
-#   but non-spawnable, and gray areas remain non-traversable.
+# - "zone_colors_only": only designated campus zone-color cells are eligible for
+#   dynamic-obstacle generation; white walkways remain traversable but are not used
+#   for dynamic obstacles in this mode.
+#
+# Note: spawnable_cell_mode is separate. Campus agents/targets can still be
+# restricted to zone colors even when dynamic obstacles use "all_free".
 #
 # start_distribution_mode / goal_distribution_mode:
 # - "dispersed": unique one-to-one positions sampled across the allowed set

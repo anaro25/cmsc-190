@@ -187,13 +187,13 @@ def _notes_for_branch(
 
     if _is_campus_branch(map_type, config):
         dynamic_part = (
-            "Dynamic obstacles are generated only inside campus zone-color cells. "
+            "Dynamic obstacles are generated on all campus traversable cells, including zone colors and white walkways. "
             if is_dynamic
             else "The source-image static layout is used without dynamic obstacles. "
         )
         return (
             "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways "
-            "are traversable but non-spawnable, and gray/black cells are non-traversable. "
+            "are traversable but non-spawnable for agents/targets, and gray/black cells are non-traversable. "
             f"{dynamic_part}Starts are sampled as {start_mode} in one zone, targets use {goal_description} in a different zone, "
             f"and {assignment_description}. When single target mode is active, the shared target is sampled only from "
             "dark marker cells inside the selected target zone."

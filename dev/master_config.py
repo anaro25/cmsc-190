@@ -32,90 +32,6 @@ def _with_shared_runtime(config: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
-def _static_image_config(
-    *,
-    seed: int,
-    agent_number_range: tuple[int, int, int],
-    image_path: str,
-    start_distribution_mode: str,
-    goal_distribution_mode: str,
-    display_name: str,
-    map_family: str,
-    require_individual_reachability: bool = True,
-    zone_relationship_mode: str = "none",
-    spawnable_cell_mode: str = "all_free",
-    image_resize_longest_side: int | None = None,
-    num_last_runs_to_visualize_jointly_successful: int = 3,
-    num_last_runs_to_visualize_independently_successful: int = 3,
-) -> dict[str, Any]:
-    return _with_shared_runtime(
-        {
-            "seed": seed,
-            "agent_number_range": agent_number_range,
-            "num_last_runs_to_visualize_jointly_successful": num_last_runs_to_visualize_jointly_successful,
-            "num_last_runs_to_visualize_independently_successful": num_last_runs_to_visualize_independently_successful,
-            "start_distribution_mode": start_distribution_mode,
-            "goal_distribution_mode": goal_distribution_mode,
-            "require_individual_reachability": require_individual_reachability,
-            "zone_relationship_mode": zone_relationship_mode,
-            "spawnable_cell_mode": spawnable_cell_mode,
-            "image_threshold": 127,
-            "image_path": image_path,
-            "image_resize_longest_side": image_resize_longest_side,
-            "dynamic_generation_cell_mode": spawnable_cell_mode,
-            "is_dynamic": False,
-            "display_name": display_name,
-            "map_family": map_family,
-        }
-    )
-
-
-def _dynamic_image_config(
-    *,
-    seed: int,
-    agent_number_range: tuple[int, int, int],
-    image_path: str,
-    start_distribution_mode: str,
-    goal_distribution_mode: str,
-    display_name: str,
-    map_family: str,
-    target_static_obstacle_density: float | None,
-    target_dynamic_obstacle_density: float,
-    require_individual_reachability: bool = True,
-    zone_relationship_mode: str = "none",
-    spawnable_cell_mode: str = "all_free",
-    dynamic_generation_cell_mode: str = "all_free",
-    image_resize_longest_side: int | None = None,
-    num_last_runs_to_visualize_jointly_successful: int = 3,
-    num_last_runs_to_visualize_independently_successful: int = 3,
-) -> dict[str, Any]:
-    return _with_shared_runtime(
-        {
-            "seed": seed,
-            "agent_number_range": agent_number_range,
-            "num_last_runs_to_visualize_jointly_successful": num_last_runs_to_visualize_jointly_successful,
-            "num_last_runs_to_visualize_independently_successful": num_last_runs_to_visualize_independently_successful,
-            "start_distribution_mode": start_distribution_mode,
-            "goal_distribution_mode": goal_distribution_mode,
-            "require_individual_reachability": require_individual_reachability,
-            "zone_relationship_mode": zone_relationship_mode,
-            "target_static_obstacle_density": target_static_obstacle_density,
-            "target_dynamic_obstacle_density": target_dynamic_obstacle_density,
-            "loop_sequence_length": 100,
-            "group_stay_durations": (7, 9, 11),
-            "image_threshold": 127,
-            "image_path": image_path,
-            "image_resize_longest_side": image_resize_longest_side,
-            "dynamic_generation_cell_mode": dynamic_generation_cell_mode,
-            "spawnable_cell_mode": spawnable_cell_mode,
-            "is_dynamic": True,
-            "display_name": display_name,
-            "map_family": map_family,
-        }
-    )
-
-
-
 # If the current agent-number condition reaches this many consecutive jointly
 # non-viable paired sampling attempts, that entire condition is discarded and
 # the branch stops before higher agent numbers.
@@ -154,7 +70,7 @@ to_generate = "visualization"
 # MAP_TYPE = "static_campus_area_3"
 MAP_TYPE = "dynamic_campus_area_3"
 
-# All 9 map-type configs are defined in this file.
+# All 9 map-type configs are defined completely in this file.
 # Edit the selected branch dictionary below, then set MAP_TYPE above.
 STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
     {
@@ -174,6 +90,19 @@ STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
         "goal_distribution_mode": "dispersed",
         "require_individual_reachability": False,
         "zone_relationship_mode": "none",
+        "spawnable_cell_mode": "all_free",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": None,
+        "image_resize_longest_side": None,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": None,
+        "loop_sequence_length": None,
+        "group_stay_durations": None,
+        "dynamic_generation_cell_mode": "all_free",
 
         # branch-specific constants
         "map_size": (32, 32),
@@ -184,112 +113,333 @@ STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
     }
 )
 
-STATIC_PORT_CONFIG = _static_image_config(
-    seed=201,
-    agent_number_range=(2, 200, 1),
-    image_path=_port_image_path(),
-    start_distribution_mode="dispersed",
-    goal_distribution_mode="clustered",
-    display_name="Static Port",
-    map_family="traditional_mapf",
-    image_resize_longest_side=40,
+STATIC_PORT_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 201,
+        "agent_number_range": (2, 200, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 3,
+        "num_last_runs_to_visualize_independently_successful": 3,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "dispersed",
+        "goal_distribution_mode": "clustered",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "none",
+        "spawnable_cell_mode": "all_free",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _port_image_path(),
+        "image_resize_longest_side": 40,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": None,
+        "loop_sequence_length": None,
+        "group_stay_durations": None,
+        "dynamic_generation_cell_mode": "all_free",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": False,
+        "display_name": "Static Port",
+        "map_family": "traditional_mapf",
+    }
 )
 
-DYNAMIC_PORT_CONFIG = _dynamic_image_config(
-    seed=301,
-    agent_number_range=(2, 200, 1),
-    image_path=_port_image_path(),
-    start_distribution_mode="clustered",
-    goal_distribution_mode="clustered",
-    display_name="Dynamic Port",
-    map_family="traditional_mapf",
-    target_static_obstacle_density=0.15,
-    target_dynamic_obstacle_density=0.030,
-    image_resize_longest_side=40,
+DYNAMIC_PORT_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 301,
+        "agent_number_range": (2, 200, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 3,
+        "num_last_runs_to_visualize_independently_successful": 3,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "clustered",
+        "goal_distribution_mode": "clustered",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "none",
+        "spawnable_cell_mode": "all_free",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _port_image_path(),
+        "image_resize_longest_side": 40,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": 0.15,
+        "target_dynamic_obstacle_density": 0.030,
+        "loop_sequence_length": 100,
+        "group_stay_durations": (7, 9, 11),
+        "dynamic_generation_cell_mode": "all_free",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": True,
+        "display_name": "Dynamic Port",
+        "map_family": "traditional_mapf",
+    }
 )
 
 # Campus Crowd Simulation
-# These six campus map configs are intentionally written out explicitly here so
-# the static/dynamic setup for each campus area can be edited from master_config.py.
-STATIC_CAMPUS_AREA_1_CONFIG = _static_image_config(
-    seed=401,
-    agent_number_range=(2, 200, 1),
-    image_path=_campus_area_image_path(area_number=1),
-    start_distribution_mode="dispersed",
-    goal_distribution_mode="single",
-    display_name="Static Campus Area 1",
-    map_family="campus_crowd_simulation",
-    zone_relationship_mode="distinct_campus_zones",
-    spawnable_cell_mode="zone_colors_only",
+STATIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 401,
+        "agent_number_range": (2, 200, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 3,
+        "num_last_runs_to_visualize_independently_successful": 3,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "dispersed",
+        "goal_distribution_mode": "single",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "distinct_campus_zones",
+        "spawnable_cell_mode": "zone_colors_only",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _campus_area_image_path(area_number=1),
+        "image_resize_longest_side": None,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": None,
+        "loop_sequence_length": None,
+        "group_stay_durations": None,
+        "dynamic_generation_cell_mode": "zone_colors_only",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": False,
+        "display_name": "Static Campus Area 1",
+        "map_family": "campus_crowd_simulation",
+    }
 )
 
-DYNAMIC_CAMPUS_AREA_1_CONFIG = _dynamic_image_config(
-    seed=501,
-    agent_number_range=(2, 200, 1),
-    image_path=_campus_area_image_path(area_number=1),
-    start_distribution_mode="clustered",
-    goal_distribution_mode="single",
-    display_name="Dynamic Campus Area 1",
-    map_family="campus_crowd_simulation",
-    target_static_obstacle_density=None,
-    target_dynamic_obstacle_density=0.015,
-    zone_relationship_mode="distinct_campus_zones",
-    spawnable_cell_mode="zone_colors_only",
-    dynamic_generation_cell_mode="zone_colors_only",
+DYNAMIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 501,
+        "agent_number_range": (2, 200, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 3,
+        "num_last_runs_to_visualize_independently_successful": 3,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "clustered",
+        "goal_distribution_mode": "single",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "distinct_campus_zones",
+        "spawnable_cell_mode": "zone_colors_only",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _campus_area_image_path(area_number=1),
+        "image_resize_longest_side": None,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": 0.015,
+        "loop_sequence_length": 100,
+        "group_stay_durations": (7, 9, 11),
+        "dynamic_generation_cell_mode": "all_free",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": True,
+        "display_name": "Dynamic Campus Area 1",
+        "map_family": "campus_crowd_simulation",
+    }
 )
 
-STATIC_CAMPUS_AREA_2_CONFIG = _static_image_config(
-    seed=601,
-    agent_number_range=(2, 200, 1),
-    image_path=_campus_area_image_path(area_number=2),
-    start_distribution_mode="dispersed",
-    goal_distribution_mode="single",
-    display_name="Static Campus Area 2",
-    map_family="campus_crowd_simulation",
-    zone_relationship_mode="distinct_campus_zones",
-    spawnable_cell_mode="zone_colors_only",
+STATIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 601,
+        "agent_number_range": (2, 200, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 3,
+        "num_last_runs_to_visualize_independently_successful": 3,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "dispersed",
+        "goal_distribution_mode": "single",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "distinct_campus_zones",
+        "spawnable_cell_mode": "zone_colors_only",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _campus_area_image_path(area_number=2),
+        "image_resize_longest_side": None,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": None,
+        "loop_sequence_length": None,
+        "group_stay_durations": None,
+        "dynamic_generation_cell_mode": "zone_colors_only",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": False,
+        "display_name": "Static Campus Area 2",
+        "map_family": "campus_crowd_simulation",
+    }
 )
 
-DYNAMIC_CAMPUS_AREA_2_CONFIG = _dynamic_image_config(
-    seed=701,
-    agent_number_range=(2, 200, 1),
-    image_path=_campus_area_image_path(area_number=2),
-    start_distribution_mode="clustered",
-    goal_distribution_mode="single",
-    display_name="Dynamic Campus Area 2",
-    map_family="campus_crowd_simulation",
-    target_static_obstacle_density=None,
-    target_dynamic_obstacle_density=0.015,
-    zone_relationship_mode="distinct_campus_zones",
-    spawnable_cell_mode="zone_colors_only",
-    dynamic_generation_cell_mode="zone_colors_only",
+DYNAMIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 701,
+        "agent_number_range": (2, 200, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 3,
+        "num_last_runs_to_visualize_independently_successful": 3,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "clustered",
+        "goal_distribution_mode": "single",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "distinct_campus_zones",
+        "spawnable_cell_mode": "zone_colors_only",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _campus_area_image_path(area_number=2),
+        "image_resize_longest_side": None,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": 0.015,
+        "loop_sequence_length": 100,
+        "group_stay_durations": (7, 9, 11),
+        "dynamic_generation_cell_mode": "all_free",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": True,
+        "display_name": "Dynamic Campus Area 2",
+        "map_family": "campus_crowd_simulation",
+    }
 )
 
-STATIC_CAMPUS_AREA_3_CONFIG = _static_image_config(
-    seed=801,
-    agent_number_range=(2, 200, 1),
-    image_path=_campus_area_image_path(area_number=3),
-    start_distribution_mode="dispersed",
-    goal_distribution_mode="single",
-    display_name="Static Campus Area 3",
-    map_family="campus_crowd_simulation",
-    zone_relationship_mode="distinct_campus_zones",
-    spawnable_cell_mode="zone_colors_only",
+STATIC_CAMPUS_AREA_3_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 801,
+        "agent_number_range": (2, 200, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 3,
+        "num_last_runs_to_visualize_independently_successful": 3,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "dispersed",
+        "goal_distribution_mode": "single",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "distinct_campus_zones",
+        "spawnable_cell_mode": "zone_colors_only",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _campus_area_image_path(area_number=3),
+        "image_resize_longest_side": None,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": None,
+        "loop_sequence_length": None,
+        "group_stay_durations": None,
+        "dynamic_generation_cell_mode": "zone_colors_only",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": False,
+        "display_name": "Static Campus Area 3",
+        "map_family": "campus_crowd_simulation",
+    }
 )
 
-DYNAMIC_CAMPUS_AREA_3_CONFIG = _dynamic_image_config(
-    seed=901,
-    agent_number_range=(10, 10, 1),
-    image_path=_campus_area_image_path(area_number=3),
-    start_distribution_mode="clustered",
-    goal_distribution_mode="single",
-    display_name="Dynamic Campus Area 3",
-    map_family="campus_crowd_simulation",
-    target_static_obstacle_density=None,
-    target_dynamic_obstacle_density=0.015,
-    zone_relationship_mode="distinct_campus_zones",
-    spawnable_cell_mode="zone_colors_only",
-    dynamic_generation_cell_mode="zone_colors_only",
+DYNAMIC_CAMPUS_AREA_3_CONFIG = _with_shared_runtime(
+    {
+        # common frequently edited constants
+        "seed": 901,
+        "agent_number_range": (10, 10, 1),
+        "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
+        "num_last_runs_to_visualize_jointly_successful": 0,
+        "num_last_runs_to_visualize_independently_successful": 1,
+        "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
+        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
+        "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
+
+        # common permanent constants
+        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "start_distribution_mode": "clustered",
+        "goal_distribution_mode": "single",
+        "require_individual_reachability": True,
+        "zone_relationship_mode": "distinct_campus_zones",
+        "spawnable_cell_mode": "zone_colors_only",
+
+        # image-map constants
+        "image_threshold": 127,
+        "image_path": _campus_area_image_path(area_number=3),
+        "image_resize_longest_side": None,
+
+        # dynamic-map constants
+        "target_static_obstacle_density": None,
+        "target_dynamic_obstacle_density": 0.010,
+        "loop_sequence_length": 100,
+        "group_stay_durations": (17, 29, 37),
+        "dynamic_generation_cell_mode": "all_free",
+
+        # branch-specific constants
+        "map_size": None,
+        "static_obstacle_density": None,
+        "is_dynamic": True,
+        "display_name": "Dynamic Campus Area 3",
+        "map_family": "campus_crowd_simulation",
+    }
 )
 
 BRANCH_USER_CONFIGS = {

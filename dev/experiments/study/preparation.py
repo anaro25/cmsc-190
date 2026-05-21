@@ -437,7 +437,14 @@ def prepare_dynamic_branch_state(
         campus_zone_vertices_by_id = _zone_id_matrix_to_composite_positions(campus_semantics["zone_id_matrix"])
         campus_single_target_vertices_by_id = _zone_id_matrix_to_composite_positions(campus_semantics["single_target_id_matrix"])
         visually_free_vertices = _spawn_mask_to_composite_positions(campus_semantics["gray_mask"])
-        eligible_dynamic_cells = _mask_to_matrix_positions(campus_semantics["zone_spawn_mask"])
+        zone_dynamic_cells = _mask_to_matrix_positions(campus_semantics["zone_spawn_mask"])
+        walkway_dynamic_cells = _mask_to_matrix_positions(campus_semantics["walkway_mask"])
+        if branch_spec.dynamic_generation_cell_mode == "zone_colors_only":
+            eligible_dynamic_cells = zone_dynamic_cells
+        elif branch_spec.dynamic_generation_cell_mode == "pure_white_only":
+            eligible_dynamic_cells = walkway_dynamic_cells
+        else:
+            eligible_dynamic_cells = None
         zone_cell_count = sum(cell for row in campus_semantics["zone_spawn_mask"] for cell in row)
         single_target_cell_count = sum(cell for row in campus_semantics["single_target_mask"] for cell in row)
         walkway_cell_count = sum(cell for row in campus_semantics["walkway_mask"] for cell in row)
@@ -486,7 +493,14 @@ def prepare_dynamic_branch_state(
             f"  Using campus zone-color cells only for grouped dynamic-obstacle generation | eligible_cells={len(eligible_dynamic_cells or set())}",
         )
     else:
-        _log(logger, "  Using all thresholded non-black cells for grouped dynamic-obstacle generation and connectivity checks.")
+        if branch_spec.spawnable_cell_mode == "zone_colors_only":
+            _log(
+                logger,
+                "  Using all campus traversable cells for grouped dynamic-obstacle generation "
+                "(zone colors + white walkways). Agent/target spawning still follows campus zone rules.",
+            )
+        else:
+            _log(logger, "  Using all thresholded non-black cells for grouped dynamic-obstacle generation and connectivity checks.")
 
     if branch_spec.dynamic_target_static_obstacle_density is None:
         _log(logger, "  Preserving source-image static obstacle layout (no static-density preprocessing).")
