@@ -48,11 +48,16 @@ class BranchRawDataStore:
         run_configurations = list(payload.get("run_configurations", []))
         run_records = list(payload.get("run_records", []))
         aggregates_payload = list(payload.get("aggregates_payload", []))
+        discarded_runtime_selection_batches = list(payload.get("discarded_runtime_selection_batches", []))
         branch_stop_summary = dict(payload.get("branch_stop_summary", {}))
         all_visualization_candidates = list(payload.get("all_visualization_candidates", []))
 
         write_json(metadata_dir / "branch_spec.json", branch_spec.to_dict())
         write_json(metadata_dir / "branch_stop_summary.json", branch_stop_summary)
+        write_json(
+            metadata_dir / "runtime_selection_discarded_batches.json",
+            discarded_runtime_selection_batches,
+        )
         if dynamic_state is not None:
             with (metadata_dir / "dynamic_state.pkl").open("wb") as handle:
                 pickle.dump(dynamic_state, handle, protocol=pickle.HIGHEST_PROTOCOL)
@@ -146,6 +151,9 @@ class BranchRawDataStore:
             "branch_stop_summary_path": str(
                 (metadata_dir / "branch_stop_summary.json").relative_to(temp_root)
             ),
+            "runtime_selection_discarded_batches_path": str(
+                (metadata_dir / "runtime_selection_discarded_batches.json").relative_to(temp_root)
+            ),
             "dynamic_state_path": (
                 str((metadata_dir / "dynamic_state.pkl").relative_to(temp_root))
                 if dynamic_state is not None
@@ -195,12 +203,17 @@ class BranchRawDataStore:
                 self._read_json_relative(condition_entry["condition_aggregate_path"])
             )
         branch_stop_summary = self._read_json_relative(manifest["branch_stop_summary_path"])
+        discarded_path = manifest.get("runtime_selection_discarded_batches_path")
+        discarded_runtime_selection_batches = (
+            self._read_json_relative(discarded_path) if discarded_path else []
+        )
         return {
             "branch_spec": branch_spec,
             "dynamic_state": dynamic_state,
             "run_configurations": run_configurations,
             "run_records": run_records,
             "aggregates_payload": aggregates_payload,
+            "discarded_runtime_selection_batches": discarded_runtime_selection_batches,
             "branch_stop_summary": branch_stop_summary,
         }
 

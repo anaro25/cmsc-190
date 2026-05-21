@@ -55,6 +55,8 @@ class BranchSpec:
     tight_time_horizon: bool = False
     agent_cohesion_enabled: bool = False
     cohesion_factor: float = 0.0
+    rerun_until_cyclic_faster: bool = False
+    rerun_until_cyclic_faster_max_batches: int | None = None
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -281,6 +283,8 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         tight_time_horizon=bool(config.get("tight_time_horizon", False)),
         agent_cohesion_enabled=bool(agent_cohesion) if campus_branch else False,
         cohesion_factor=_campus_cohesion_factor() if campus_branch else 0.0,
+        rerun_until_cyclic_faster=bool(config.get("rerun_until_cyclic_faster", False)),
+        rerun_until_cyclic_faster_max_batches=_int_or_none(config.get("rerun_until_cyclic_faster_max_batches")),
         notes=_notes_for_branch(
             map_type=map_type,
             config=config,

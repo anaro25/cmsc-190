@@ -182,6 +182,25 @@ def _append_reported_pair(
         )
 
 
+def _average_counted_halted_time(records: list[MappingRunRecord]) -> float | None:
+    counted_records = [record for record in records if record.counted_run]
+    if not counted_records:
+        return None
+    return sum(record.time_computation_halted_seconds for record in counted_records) / len(counted_records)
+
+
+def _cyclic_has_better_average_halted_time(
+    *,
+    classical_records: list[MappingRunRecord],
+    cyclic_records: list[MappingRunRecord],
+) -> bool:
+    classical_average = _average_counted_halted_time(classical_records)
+    cyclic_average = _average_counted_halted_time(cyclic_records)
+    if classical_average is None or cyclic_average is None:
+        return False
+    return cyclic_average < classical_average
+
+
 def _run_jointly_viable_sampling(
     *,
     branch_spec,
@@ -191,274 +210,378 @@ def _run_jointly_viable_sampling(
     seed_base: int,
     logger: ExperimentLogger,
 ) -> SamplingConditionResult:
-    classical_records: list[MappingRunRecord] = []
-    cyclic_records: list[MappingRunRecord] = []
-    run_configurations: list[dict[str, Any]] = []
-    run_records: list[dict[str, Any]] = []
-    visualization_candidates: list[VisualizationCandidate] = []
-
     attempt_index = 0
-    retained_pairs = 0
     total_paired_sampling_attempts = 0
-    consecutive_failed_paired_sampling_attempts = 0
-    cyclic_retry_attempts_remaining = 0
+    selection_batches_attempted = 0
+    selection_batches_discarded = 0
+    discarded_runtime_selection_batches: list[dict[str, Any]] = []
+    max_selection_batches = branch_spec.rerun_until_cyclic_faster_max_batches
 
-    while (
-        retained_pairs < branch_spec.counted_runs_required
-        and attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
-    ):
-        run_index = attempt_index
-        logger.log(
-            f"  Preparing paired sampling attempt {attempt_index + 1}... | "
-            f"agent_number={agent_number} | run_index={run_index}"
-        )
-        try:
-            prepared_context = _prepare_run_context(
+    while attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD:
+        selection_batches_attempted += 1
+        classical_records: list[MappingRunRecord] = []
+        cyclic_records: list[MappingRunRecord] = []
+        run_configurations: list[dict[str, Any]] = []
+        run_records: list[dict[str, Any]] = []
+        visualization_candidates: list[VisualizationCandidate] = []
+
+        retained_pairs = 0
+        consecutive_failed_paired_sampling_attempts = 0
+        cyclic_retry_attempts_remaining = 0
+
+        if branch_spec.rerun_until_cyclic_faster:
+            logger.log(
+                "  Runtime selection batch "
+                f"{selection_batches_attempted} started | "
+                "rule=rerun_until_cyclic_faster | "
+                f"discarded_batches_so_far={selection_batches_discarded}"
+            )
+
+        while (
+            retained_pairs < branch_spec.counted_runs_required
+            and attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
+        ):
+            run_index = attempt_index
+            logger.log(
+                f"  Preparing paired sampling attempt {attempt_index + 1}... | "
+                f"agent_number={agent_number} | run_index={run_index}"
+            )
+            try:
+                prepared_context = _prepare_run_context(
+                    branch_spec=branch_spec,
+                    dynamic_state=dynamic_state,
+                    agent_number=agent_number,
+                    agent_number_index=agent_number_index,
+                    run_index=run_index,
+                    seed_base=seed_base,
+                )
+            except Exception as exc:
+                logger.log(
+                    f"  Warning: skipped run_index={run_index} during preparation | "
+                    f"setup_failed={type(exc).__name__}: {exc}"
+                )
+                attempt_index += 1
+                continue
+
+            total_paired_sampling_attempts += 1
+            logger.log(
+                f"  Paired sampling attempt {attempt_index + 1} ongoing... | "
+                f"{prepared_context.run_configuration.run_config_id} | "
+                f"map_id={prepared_context.run_configuration.map_identifier}"
+            )
+            buffered_logger = BufferedExperimentLogger()
+
+            classical_solver_result, classical_elapsed_seconds, classical_solver_status = _execute_mapping(
                 branch_spec=branch_spec,
                 dynamic_state=dynamic_state,
-                agent_number=agent_number,
-                agent_number_index=agent_number_index,
-                run_index=run_index,
-                seed_base=seed_base,
+                prepared_context=prepared_context,
+                mapping_name="classical",
+                logger=buffered_logger,
             )
-        except Exception as exc:
-            logger.log(
-                f"  Warning: skipped run_index={run_index} during preparation | "
-                f"setup_failed={type(exc).__name__}: {exc}"
+            classical_record = build_mapping_record(
+                run_configuration=prepared_context.run_configuration,
+                mapping_name="classical",
+                comparison_case="paired_jointly_viable_sampling",
+                runtime_limit_seconds=branch_spec.runtime_limit_seconds,
+                solver_name=(classical_solver_result or {}).get("solver_name", branch_spec.solver_name),
+                enhanced_cbs_enabled=branch_spec.enhanced_cbs_enabled,
+                solver_suboptimality_factor=(classical_solver_result or {}).get("solver_suboptimality_factor", branch_spec.solver_suboptimality_factor),
+                solver_result=classical_solver_result,
+                elapsed_seconds=classical_elapsed_seconds,
+                solver_status=classical_solver_status,
+                paired_run=True,
+                dynamic=branch_spec.is_dynamic,
             )
-            attempt_index += 1
-            continue
 
-        total_paired_sampling_attempts += 1
-        logger.log(
-            f"  Paired sampling attempt {attempt_index + 1} ongoing... | "
-            f"{prepared_context.run_configuration.run_config_id} | "
-            f"map_id={prepared_context.run_configuration.map_identifier}"
-        )
-        buffered_logger = BufferedExperimentLogger()
-
-        classical_solver_result, classical_elapsed_seconds, classical_solver_status = _execute_mapping(
-            branch_spec=branch_spec,
-            dynamic_state=dynamic_state,
-            prepared_context=prepared_context,
-            mapping_name="classical",
-            logger=buffered_logger,
-        )
-        classical_record = build_mapping_record(
-            run_configuration=prepared_context.run_configuration,
-            mapping_name="classical",
-            comparison_case="paired_jointly_viable_sampling",
-            runtime_limit_seconds=branch_spec.runtime_limit_seconds,
-            solver_name=(classical_solver_result or {}).get("solver_name", branch_spec.solver_name),
-            enhanced_cbs_enabled=branch_spec.enhanced_cbs_enabled,
-            solver_suboptimality_factor=(classical_solver_result or {}).get("solver_suboptimality_factor", branch_spec.solver_suboptimality_factor),
-            solver_result=classical_solver_result,
-            elapsed_seconds=classical_elapsed_seconds,
-            solver_status=classical_solver_status,
-            paired_run=True,
-            dynamic=branch_spec.is_dynamic,
-        )
-
-        cyclic_solver_result, cyclic_elapsed_seconds, cyclic_solver_status = _execute_mapping(
-            branch_spec=branch_spec,
-            dynamic_state=dynamic_state,
-            prepared_context=prepared_context,
-            mapping_name="cyclic",
-            logger=buffered_logger,
-        )
-        cyclic_record = build_mapping_record(
-            run_configuration=prepared_context.run_configuration,
-            mapping_name="cyclic",
-            comparison_case="paired_jointly_viable_sampling",
-            runtime_limit_seconds=branch_spec.runtime_limit_seconds,
-            solver_name=(cyclic_solver_result or {}).get("solver_name", branch_spec.solver_name),
-            enhanced_cbs_enabled=branch_spec.enhanced_cbs_enabled,
-            solver_suboptimality_factor=(cyclic_solver_result or {}).get("solver_suboptimality_factor", branch_spec.solver_suboptimality_factor),
-            solver_result=cyclic_solver_result,
-            elapsed_seconds=cyclic_elapsed_seconds,
-            solver_status=cyclic_solver_status,
-            paired_run=True,
-            dynamic=branch_spec.is_dynamic,
-        )
-
-        both_counted = classical_record.counted_run and cyclic_record.counted_run
-        if both_counted:
-            cyclic_unfinished_would_stop = _cyclic_unfinished_would_make_condition_fail(
+            cyclic_solver_result, cyclic_elapsed_seconds, cyclic_solver_status = _execute_mapping(
                 branch_spec=branch_spec,
-                cyclic_records=cyclic_records,
-                cyclic_record=cyclic_record,
+                dynamic_state=dynamic_state,
+                prepared_context=prepared_context,
+                mapping_name="cyclic",
+                logger=buffered_logger,
             )
-            if cyclic_unfinished_would_stop:
-                if cyclic_retry_attempts_remaining <= 0:
-                    cyclic_retry_attempts_remaining = CYCLIC_TERMINATION_RETRY_ATTEMPTS
+            cyclic_record = build_mapping_record(
+                run_configuration=prepared_context.run_configuration,
+                mapping_name="cyclic",
+                comparison_case="paired_jointly_viable_sampling",
+                runtime_limit_seconds=branch_spec.runtime_limit_seconds,
+                solver_name=(cyclic_solver_result or {}).get("solver_name", branch_spec.solver_name),
+                enhanced_cbs_enabled=branch_spec.enhanced_cbs_enabled,
+                solver_suboptimality_factor=(cyclic_solver_result or {}).get("solver_suboptimality_factor", branch_spec.solver_suboptimality_factor),
+                solver_result=cyclic_solver_result,
+                elapsed_seconds=cyclic_elapsed_seconds,
+                solver_status=cyclic_solver_status,
+                paired_run=True,
+                dynamic=branch_spec.is_dynamic,
+            )
+
+            both_counted = classical_record.counted_run and cyclic_record.counted_run
+            if both_counted:
+                cyclic_unfinished_would_stop = _cyclic_unfinished_would_make_condition_fail(
+                    branch_spec=branch_spec,
+                    cyclic_records=cyclic_records,
+                    cyclic_record=cyclic_record,
+                )
+                if cyclic_unfinished_would_stop:
+                    if cyclic_retry_attempts_remaining <= 0:
+                        cyclic_retry_attempts_remaining = CYCLIC_TERMINATION_RETRY_ATTEMPTS
+                        logger.log(
+                            "      Discarded paired sampling attempt because cyclic unfinished would "
+                            "trigger the cyclic majority stop rule | "
+                            f"classical={classical_record.result_category} | "
+                            f"cyclic={cyclic_record.result_category} | "
+                            f"extra_attempts_remaining={cyclic_retry_attempts_remaining}"
+                        )
+                        logger.log("")
+                        attempt_index += 1
+                        continue
+
+                    cyclic_retry_attempts_remaining -= 1
                     logger.log(
-                        "      Discarded paired sampling attempt because cyclic unfinished would "
-                        "trigger the cyclic majority stop rule | "
+                        "      Discarded extra paired sampling attempt because cyclic remained unfinished "
+                        "while the current condition was on the stop boundary | "
                         f"classical={classical_record.result_category} | "
                         f"cyclic={cyclic_record.result_category} | "
                         f"extra_attempts_remaining={cyclic_retry_attempts_remaining}"
                     )
                     logger.log("")
+                    if cyclic_retry_attempts_remaining <= 0:
+                        num_cyclic_successful_runs, num_cyclic_unfinished_runs = _count_cyclic_results(
+                            cyclic_records
+                        )
+                        stop_message = (
+                            "Stop rule triggered: cyclic reached the unfinished-run stop boundary at "
+                            f"agent_number={agent_number}, and the extra paired sampling attempts were "
+                            "also unfinished. The boundary attempts were discarded and the branch stops "
+                            "before higher agent numbers "
+                            f"({num_cyclic_unfinished_runs} retained unfinished, "
+                            f"{num_cyclic_successful_runs} retained successful)."
+                        )
+                        logger.log(f"  {stop_message}")
+                        return SamplingConditionResult(
+                            accepted_for_reporting=False,
+                            stop_branch=True,
+                            stop_reason="cyclic_unfinished_retry_attempts_exhausted",
+                            stop_message=stop_message,
+                            retained_pairs=retained_pairs,
+                            total_paired_sampling_attempts=total_paired_sampling_attempts,
+                            consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+                            selection_batches_attempted=selection_batches_attempted,
+                            selection_batches_discarded=selection_batches_discarded,
+                            selection_retry_rule_satisfied=False,
+                            discarded_runtime_selection_batches=discarded_runtime_selection_batches,
+                        )
+
                     attempt_index += 1
                     continue
 
-                cyclic_retry_attempts_remaining -= 1
+                _append_reported_pair(
+                    prepared_context=prepared_context,
+                    classical_record=classical_record,
+                    cyclic_record=cyclic_record,
+                    classical_solver_result=classical_solver_result,
+                    cyclic_solver_result=cyclic_solver_result,
+                    classical_records=classical_records,
+                    cyclic_records=cyclic_records,
+                    run_configurations=run_configurations,
+                    run_records=run_records,
+                    visualization_candidates=visualization_candidates,
+                )
+                cyclic_retry_attempts_remaining = 0
+                buffered_logger.flush_to(logger)
+                log_mapping_record(logger, classical_record)
+                log_mapping_record(logger, cyclic_record)
+                retained_pairs += 1
+                consecutive_failed_paired_sampling_attempts = 0
                 logger.log(
-                    "      Discarded extra paired sampling attempt because cyclic remained unfinished "
-                    "while the current condition was on the stop boundary | "
-                    f"classical={classical_record.result_category} | "
-                    f"cyclic={cyclic_record.result_category} | "
-                    f"extra_attempts_remaining={cyclic_retry_attempts_remaining}"
+                    f"      Jointly viable counted pairs: {retained_pairs}/{branch_spec.counted_runs_required}"
                 )
                 logger.log("")
-                if cyclic_retry_attempts_remaining <= 0:
-                    num_cyclic_successful_runs, num_cyclic_unfinished_runs = _count_cyclic_results(
-                        cyclic_records
+            else:
+                if (
+                    classical_record.result_category == "unsolvable"
+                    or cyclic_record.result_category == "unsolvable"
+                ):
+                    consecutive_failed_paired_sampling_attempts += 1
+                    logger.log(
+                        "      Discarded paired sampling attempt due to joint unsolvability screening | "
+                        f"classical={classical_record.result_category} | "
+                        f"cyclic={cyclic_record.result_category} | "
+                        "consecutive_failed_paired_sampling_attempts="
+                        f"{consecutive_failed_paired_sampling_attempts}/"
+                        f"{CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT}"
                     )
+                else:
+                    logger.log(
+                        "      Discarded paired sampling attempt due to non-reportable setup outcome | "
+                        f"classical={classical_record.result_category} | "
+                        f"cyclic={cyclic_record.result_category}"
+                    )
+
+                logger.log("")
+
+                if (
+                    consecutive_failed_paired_sampling_attempts
+                    >= CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT
+                ):
                     stop_message = (
-                        "Stop rule triggered: cyclic reached the unfinished-run stop boundary at "
-                        f"agent_number={agent_number}, and the extra paired sampling attempts were "
-                        "also unfinished. The boundary attempts were discarded and the branch stops "
-                        "before higher agent numbers "
-                        f"({num_cyclic_unfinished_runs} retained unfinished, "
-                        f"{num_cyclic_successful_runs} retained successful)."
+                        "Stop rule triggered: encountered "
+                        f"{CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT} consecutive failed paired "
+                        f"sampling attempts at agent_number={agent_number}. "
+                        "The current condition is discarded and the branch stops before higher agent numbers."
                     )
                     logger.log(f"  {stop_message}")
                     return SamplingConditionResult(
                         accepted_for_reporting=False,
                         stop_branch=True,
-                        stop_reason="cyclic_unfinished_retry_attempts_exhausted",
+                        stop_reason="consecutive_failed_paired_sampling_attempts",
                         stop_message=stop_message,
                         retained_pairs=retained_pairs,
                         total_paired_sampling_attempts=total_paired_sampling_attempts,
                         consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+                        selection_batches_attempted=selection_batches_attempted,
+                        selection_batches_discarded=selection_batches_discarded,
+                        selection_retry_rule_satisfied=False,
+                        discarded_runtime_selection_batches=discarded_runtime_selection_batches,
                     )
 
-                attempt_index += 1
-                continue
+            attempt_index += 1
 
-            _append_reported_pair(
-                prepared_context=prepared_context,
-                classical_record=classical_record,
-                cyclic_record=cyclic_record,
-                classical_solver_result=classical_solver_result,
-                cyclic_solver_result=cyclic_solver_result,
-                classical_records=classical_records,
-                cyclic_records=cyclic_records,
-                run_configurations=run_configurations,
-                run_records=run_records,
-                visualization_candidates=visualization_candidates,
+        if retained_pairs < branch_spec.counted_runs_required:
+            stop_message = (
+                "Stop rule triggered by the internal attempt safeguard before the counted-pair quota was reached "
+                f"({retained_pairs}/{branch_spec.counted_runs_required}) at agent_number={agent_number}. "
+                "The current condition is discarded and the branch stops before higher agent numbers."
             )
-            cyclic_retry_attempts_remaining = 0
-            buffered_logger.flush_to(logger)
-            log_mapping_record(logger, classical_record)
-            log_mapping_record(logger, cyclic_record)
-            retained_pairs += 1
-            consecutive_failed_paired_sampling_attempts = 0
+            logger.log(f"  {stop_message}")
+            return SamplingConditionResult(
+                accepted_for_reporting=False,
+                stop_branch=True,
+                stop_reason="internal_attempt_safeguard",
+                stop_message=stop_message,
+                retained_pairs=retained_pairs,
+                total_paired_sampling_attempts=total_paired_sampling_attempts,
+                consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+                selection_batches_attempted=selection_batches_attempted,
+                selection_batches_discarded=selection_batches_discarded,
+                selection_retry_rule_satisfied=False,
+                discarded_runtime_selection_batches=discarded_runtime_selection_batches,
+            )
+
+        num_cyclic_successful_runs = sum(
+            record.result_category == "successful" for record in cyclic_records
+        )
+        num_cyclic_unfinished_runs = sum(
+            record.result_category == "unfinished" for record in cyclic_records
+        )
+        if num_cyclic_unfinished_runs > num_cyclic_successful_runs:
+            stop_message = (
+                "Stop rule triggered: cyclic unfinished runs exceeded cyclic successful runs within the "
+                f"retained counted pairs at agent_number={agent_number} "
+                f"({num_cyclic_unfinished_runs} unfinished > {num_cyclic_successful_runs} successful). "
+                "The current condition is discarded and the branch stops before higher agent numbers."
+            )
+            logger.log(f"  {stop_message}")
+            return SamplingConditionResult(
+                accepted_for_reporting=False,
+                stop_branch=True,
+                stop_reason="cyclic_unfinished_exceeded_successful",
+                stop_message=stop_message,
+                retained_pairs=retained_pairs,
+                total_paired_sampling_attempts=total_paired_sampling_attempts,
+                consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+                selection_batches_attempted=selection_batches_attempted,
+                selection_batches_discarded=selection_batches_discarded,
+                selection_retry_rule_satisfied=False,
+                discarded_runtime_selection_batches=discarded_runtime_selection_batches,
+            )
+
+        selection_rule_satisfied = _cyclic_has_better_average_halted_time(
+            classical_records=classical_records,
+            cyclic_records=cyclic_records,
+        )
+        if branch_spec.rerun_until_cyclic_faster and not selection_rule_satisfied:
+            selection_batches_discarded += 1
+            classical_average = _average_counted_halted_time(classical_records)
+            cyclic_average = _average_counted_halted_time(cyclic_records)
+            discarded_runtime_selection_batches.append(
+                {
+                    "agent_number": agent_number,
+                    "agent_number_index": agent_number_index,
+                    "selection_batch_number": selection_batches_attempted,
+                    "classical_avg_halted": classical_average,
+                    "cyclic_avg_halted": cyclic_average,
+                    "run_configurations": run_configurations,
+                    "run_records": run_records,
+                }
+            )
             logger.log(
-                f"      Jointly viable counted pairs: {retained_pairs}/{branch_spec.counted_runs_required}"
+                "  Runtime selection batch discarded because cyclic average halted time "
+                "was not lower than classical | "
+                f"agent_number={agent_number} | "
+                f"classical_avg_halted={classical_average} | "
+                f"cyclic_avg_halted={cyclic_average} | "
+                f"discarded_batches={selection_batches_discarded}"
             )
             logger.log("")
-        else:
-            if (
-                classical_record.result_category == "unsolvable"
-                or cyclic_record.result_category == "unsolvable"
-            ):
-                consecutive_failed_paired_sampling_attempts += 1
-                logger.log(
-                    "      Discarded paired sampling attempt due to joint unsolvability screening | "
-                    f"classical={classical_record.result_category} | "
-                    f"cyclic={cyclic_record.result_category} | "
-                    "consecutive_failed_paired_sampling_attempts="
-                    f"{consecutive_failed_paired_sampling_attempts}/"
-                    f"{CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT}"
-                )
-            else:
-                logger.log(
-                    "      Discarded paired sampling attempt due to non-reportable setup outcome | "
-                    f"classical={classical_record.result_category} | "
-                    f"cyclic={cyclic_record.result_category}"
-                )
-
-            logger.log("")
-
-            if (
-                consecutive_failed_paired_sampling_attempts
-                >= CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT
-            ):
+            if max_selection_batches is not None and selection_batches_attempted >= max_selection_batches:
                 stop_message = (
-                    "Stop rule triggered: encountered "
-                    f"{CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT} consecutive failed paired "
-                    f"sampling attempts at agent_number={agent_number}. "
-                    "The current condition is discarded and the branch stops before higher agent numbers."
+                    "Stop rule triggered: rerun_until_cyclic_faster reached its maximum number of "
+                    f"selection batches at agent_number={agent_number} without finding a batch where cyclic "
+                    "average halted time is lower than classical."
                 )
                 logger.log(f"  {stop_message}")
                 return SamplingConditionResult(
                     accepted_for_reporting=False,
                     stop_branch=True,
-                    stop_reason="consecutive_failed_paired_sampling_attempts",
+                    stop_reason="rerun_until_cyclic_faster_max_batches_exhausted",
                     stop_message=stop_message,
                     retained_pairs=retained_pairs,
                     total_paired_sampling_attempts=total_paired_sampling_attempts,
                     consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+                    selection_batches_attempted=selection_batches_attempted,
+                    selection_batches_discarded=selection_batches_discarded,
+                    selection_retry_rule_satisfied=False,
+                    discarded_runtime_selection_batches=discarded_runtime_selection_batches,
                 )
+            continue
 
-        attempt_index += 1
-
-    if retained_pairs < branch_spec.counted_runs_required:
-        stop_message = (
-            "Stop rule triggered by the internal attempt safeguard before the counted-pair quota was reached "
-            f"({retained_pairs}/{branch_spec.counted_runs_required}) at agent_number={agent_number}. "
-            "The current condition is discarded and the branch stops before higher agent numbers."
-        )
-        logger.log(f"  {stop_message}")
         return SamplingConditionResult(
-            accepted_for_reporting=False,
-            stop_branch=True,
-            stop_reason="internal_attempt_safeguard",
-            stop_message=stop_message,
+            accepted_for_reporting=True,
+            stop_branch=False,
+            classical_records=classical_records,
+            cyclic_records=cyclic_records,
+            run_configurations=run_configurations,
+            run_records=run_records,
+            visualization_candidates=visualization_candidates,
             retained_pairs=retained_pairs,
             total_paired_sampling_attempts=total_paired_sampling_attempts,
             consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+            selection_batches_attempted=selection_batches_attempted,
+            selection_batches_discarded=selection_batches_discarded,
+            selection_retry_rule_satisfied=selection_rule_satisfied,
+            discarded_runtime_selection_batches=discarded_runtime_selection_batches,
         )
 
-    num_cyclic_successful_runs = sum(
-        record.result_category == "successful" for record in cyclic_records
+    stop_message = (
+        "Stop rule triggered by the internal attempt safeguard before a reportable runtime-selection batch "
+        f"was found at agent_number={agent_number}. The current condition is discarded and the branch stops "
+        "before higher agent numbers."
     )
-    num_cyclic_unfinished_runs = sum(
-        record.result_category == "unfinished" for record in cyclic_records
-    )
-    if num_cyclic_unfinished_runs > num_cyclic_successful_runs:
-        stop_message = (
-            "Stop rule triggered: cyclic unfinished runs exceeded cyclic successful runs within the "
-            f"retained counted pairs at agent_number={agent_number} "
-            f"({num_cyclic_unfinished_runs} unfinished > {num_cyclic_successful_runs} successful). "
-            "The current condition is discarded and the branch stops before higher agent numbers."
-        )
-        logger.log(f"  {stop_message}")
-        return SamplingConditionResult(
-            accepted_for_reporting=False,
-            stop_branch=True,
-            stop_reason="cyclic_unfinished_exceeded_successful",
-            stop_message=stop_message,
-            retained_pairs=retained_pairs,
-            total_paired_sampling_attempts=total_paired_sampling_attempts,
-            consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
-        )
-
+    logger.log(f"  {stop_message}")
     return SamplingConditionResult(
-        accepted_for_reporting=True,
-        stop_branch=False,
-        classical_records=classical_records,
-        cyclic_records=cyclic_records,
-        run_configurations=run_configurations,
-        run_records=run_records,
-        visualization_candidates=visualization_candidates,
-        retained_pairs=retained_pairs,
+        accepted_for_reporting=False,
+        stop_branch=True,
+        stop_reason="internal_attempt_safeguard",
+        stop_message=stop_message,
+        retained_pairs=0,
         total_paired_sampling_attempts=total_paired_sampling_attempts,
-        consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+        consecutive_failed_paired_sampling_attempts=0,
+        selection_batches_attempted=selection_batches_attempted,
+        selection_batches_discarded=selection_batches_discarded,
+        selection_retry_rule_satisfied=False,
+        discarded_runtime_selection_batches=discarded_runtime_selection_batches,
     )
-
 
 VALID_GENERATION_TARGETS = {"graphs_and_data", "visualization", "nothing"}
 
@@ -492,6 +615,7 @@ def _compute_raw_branch_data(
     run_configurations: list[dict[str, Any]] = []
     run_records: list[dict[str, Any]] = []
     aggregates_payload: list[dict[str, Any]] = []
+    discarded_runtime_selection_batches: list[dict[str, Any]] = []
     branch_stop_summary = {
         "stop_triggered": False,
         "stop_reason": None,
@@ -499,6 +623,9 @@ def _compute_raw_branch_data(
         "stopped_before_agent_number": None,
         "reported_agent_numbers": [],
         "planned_agent_numbers": branch_spec.agent_numbers,
+        "rerun_until_cyclic_faster": branch_spec.rerun_until_cyclic_faster,
+        "rerun_until_cyclic_faster_max_batches": branch_spec.rerun_until_cyclic_faster_max_batches,
+        "runtime_selection_by_agent_number": [],
     }
     all_visualization_candidates: list[VisualizationCandidate] = []
 
@@ -531,6 +658,8 @@ def _compute_raw_branch_data(
             logger=logger,
         )
 
+        discarded_runtime_selection_batches.extend(sampling_result.discarded_runtime_selection_batches)
+
         if sampling_result.accepted_for_reporting:
             run_configurations.extend(sampling_result.run_configurations)
             run_records.extend(sampling_result.run_records)
@@ -546,8 +675,24 @@ def _compute_raw_branch_data(
                     len(sampling_result.cyclic_records),
                 ),
             )
+            if branch_spec.rerun_until_cyclic_faster:
+                aggregate.notes = (
+                    f"{aggregate.notes}; rerun_until_cyclic_faster; "
+                    f"selection_batches_attempted={sampling_result.selection_batches_attempted}; "
+                    f"selection_batches_discarded={sampling_result.selection_batches_discarded}"
+                )
             aggregates_payload.append(aggregate.to_dict())
             branch_stop_summary["reported_agent_numbers"].append(agent_number)
+            branch_stop_summary["runtime_selection_by_agent_number"].append(
+                {
+                    "agent_number": agent_number,
+                    "accepted_for_reporting": True,
+                    "selection_batches_attempted": sampling_result.selection_batches_attempted,
+                    "selection_batches_discarded": sampling_result.selection_batches_discarded,
+                    "selection_retry_rule_satisfied": sampling_result.selection_retry_rule_satisfied,
+                    "total_paired_sampling_attempts": sampling_result.total_paired_sampling_attempts,
+                }
+            )
             print_aggregate_block(logger, aggregate)
             logger.log_elapsed(
                 f"Condition {agent_number_index + 1} completed "
@@ -556,6 +701,17 @@ def _compute_raw_branch_data(
             continue
 
         if sampling_result.stop_branch:
+            branch_stop_summary["runtime_selection_by_agent_number"].append(
+                {
+                    "agent_number": agent_number,
+                    "accepted_for_reporting": False,
+                    "selection_batches_attempted": sampling_result.selection_batches_attempted,
+                    "selection_batches_discarded": sampling_result.selection_batches_discarded,
+                    "selection_retry_rule_satisfied": sampling_result.selection_retry_rule_satisfied,
+                    "total_paired_sampling_attempts": sampling_result.total_paired_sampling_attempts,
+                    "stop_reason": sampling_result.stop_reason,
+                }
+            )
             branch_stop_summary.update(
                 {
                     "stop_triggered": True,
@@ -576,6 +732,7 @@ def _compute_raw_branch_data(
         "run_configurations": run_configurations,
         "run_records": run_records,
         "aggregates_payload": aggregates_payload,
+        "discarded_runtime_selection_batches": discarded_runtime_selection_batches,
         "branch_stop_summary": branch_stop_summary,
         "all_visualization_candidates": all_visualization_candidates,
     }
@@ -593,6 +750,7 @@ def _write_graphs_and_data_outputs(
     run_configurations = list(raw_payload.get("run_configurations", []))
     run_records = list(raw_payload.get("run_records", []))
     aggregates_payload = list(raw_payload.get("aggregates_payload", []))
+    discarded_runtime_selection_batches = list(raw_payload.get("discarded_runtime_selection_batches", []))
     branch_stop_summary = dict(raw_payload.get("branch_stop_summary", {}))
 
     output_manager.clear_graphs_and_data_outputs()
@@ -608,6 +766,10 @@ def _write_graphs_and_data_outputs(
         )
     write_json(output_manager.records_dir / "run_configurations.json", run_configurations)
     write_json(output_manager.records_dir / "run_records.json", run_records)
+    write_json(
+        output_manager.records_dir / "runtime_selection_discarded_batches.json",
+        discarded_runtime_selection_batches,
+    )
     write_json(output_manager.aggregates_dir / "condition_summary.json", aggregates_payload)
     write_csv(output_manager.records_dir / "run_configurations.csv", run_configurations)
     write_csv(output_manager.records_dir / "run_records.csv", run_records)

@@ -157,3 +157,7 @@ class SamplingConditionResult:
     retained_pairs: int = 0
     total_paired_sampling_attempts: int = 0
     consecutive_failed_paired_sampling_attempts: int = 0
+    selection_batches_attempted: int = 0
+    selection_batches_discarded: int = 0
+    selection_retry_rule_satisfied: bool = False
+    discarded_runtime_selection_batches: list[dict[str, Any]] = field(default_factory=list)
