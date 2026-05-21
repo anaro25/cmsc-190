@@ -24,9 +24,11 @@
 # - False: clustered sets are spaced groups whose members keep one empty cell of
 #   separation in all 8 directions while still forming one connected cluster
 #
-# Campus input images
-#   static_campus_area_1 uses dev/inputs/static_campus_area_1/campus_area_1.png.
-#   dynamic_campus_area_2 uses dev/inputs/dynamic_campus_area_2/campus_area_2.png.
+# Image inputs
+#   static_port and dynamic_port both use dev/inputs/dynamic_port/port_map.png.
+#   static_campus_area_1 and dynamic_campus_area_1 both use dev/inputs/campus_area_1.png.
+#   static_campus_area_2 and dynamic_campus_area_2 both use dev/inputs/campus_area_2.png.
+#   static_campus_area_3 and dynamic_campus_area_3 both use dev/inputs/campus_area_3.png.
 #   Dark blue, dark green, and dark red pixels are treated as target-only marker
 #   cells for campus single-target mode while still belonging to their zones.
 #

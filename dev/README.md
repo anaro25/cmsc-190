@@ -37,12 +37,22 @@ The `study` package is split by responsibility:
 
 ## Current branches
 
-The configured branch set is now:
+The configured branch set now contains 9 map types.
 
-- `static_artificial`
-- `static_campus_area_1`
-- `dynamic_port`
-- `dynamic_campus_area_2`
+Traditional MAPF:
+
+- `static_artificial` — dispersed starts to dispersed targets
+- `static_port` — dispersed starts to clustered targets
+- `dynamic_port` — clustered starts to clustered targets
+
+Campus Crowd Simulation:
+
+- `static_campus_area_1` — dispersed starts to one shared single target
+- `dynamic_campus_area_1` — clustered starts to one shared single target
+- `static_campus_area_2` — dispersed starts to one shared single target
+- `dynamic_campus_area_2` — clustered starts to one shared single target
+- `static_campus_area_3` — dispersed starts to one shared single target
+- `dynamic_campus_area_3` — clustered starts to one shared single target
 
 ## Agent-number progression
 
@@ -137,9 +147,9 @@ pathological infinite loops. It remains only a protective implementation detail.
 - `goal_distribution_mode` can now be `dispersed`, `clustered`, or `single`. `single` is target-only and means all agents share one literal target cell where they disappear after arrival.
 - In campus branches, `single` targets are sampled only from the dark marker cells inside the selected target zone. The dark blue, dark green, and dark red marker pixels still count as zone cells for traversal and ordinary spawn masks.
 - The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, and gray regions are non-traversable for the solver. During Pillow visualization generation, gray campus cells are reconstructed from the current semantic image and rendered through a temporary render-only free-space override so they appear as ordinary white open cells without changing solver behavior, while already persisted raw MAPF data remains reusable.
-- `static_campus_area_1` now uses campus area 1 as the static branch, with dispersed starts in one zone and clustered goals in the other zone.
-- `dynamic_port` now uses clustered starts and dispersed goals.
-- `dynamic_campus_area_2` now uses campus area 2 as the dynamic campus branch, with clustered starts and clustered goals forced into different campus zones.
+- Port and campus images now support both static and dynamic map types. The static variants use the same source image without dynamic obstacles, while the dynamic variants add generated moving obstacles.
+- `static_port` uses dispersed starts and clustered targets. `dynamic_port` uses clustered starts and clustered targets.
+- Every static campus branch uses dispersed starts in one campus zone and one shared single target cell in a different zone. Every dynamic campus branch uses clustered starts in one campus zone and one shared single target cell in a different zone.
 - The assignment sampler now treats dispersed, clustered, and single target modes differently: dispersed sets keep 8-neighbor separation within the set, clustered sets follow the global `compact_clustering` switch in `master_config.py`, and single targets use many-to-one assignment.
 - When `compact_clustering=True`, clustered sets are sampled as directly adjacent 8-neighbor-connected groups.
 - When `compact_clustering=False`, clustered sets remain one cluster but keep one empty cell of separation in all 8 directions.
@@ -148,4 +158,4 @@ pathological infinite loops. It remains only a protective implementation detail.
 - Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize_jointly_successful` and `num_last_runs_to_visualize_independently_successful` in `master_config.py`, and a visualization-only execution now generates both folder variants automatically under `dev/outputs/<map_type>/visualizations/`.
 - Branch metadata and per-run records now also capture the active solver family (`CBS` or `ECBS`) so output files remain interpretable after solver-toggle changes.
 
-- Campus image inputs now use `dev/inputs/static_campus_area_1/campus_area_1.png` and `dev/inputs/dynamic_campus_area_2/campus_area_2.png`.
+- Image inputs now use `dev/inputs/dynamic_port/port_map.png`, `dev/inputs/campus_area_1.png`, `dev/inputs/campus_area_2.png`, and `dev/inputs/campus_area_3.png`.

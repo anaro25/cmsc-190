@@ -19,33 +19,35 @@
 
 \section{Branches}
 
-The experiment currently uses four branches:
+The experiment currently uses nine map types grouped into two study families.
+
+\subsection{Traditional MAPF}
 \begin{itemize}[leftmargin=2em]
-    \item \textbf{Static artificial}
-    \item \textbf{Static campus\_area\_1}
-    \item \textbf{Dynamic port}
-    \item \textbf{Dynamic campus\_area\_2}
+    \item \textbf{Static artificial}: dispersed starts to dispersed targets.
+    \item \textbf{Static port}: dispersed starts to clustered targets.
+    \item \textbf{Dynamic port}: clustered starts to clustered targets.
+\end{itemize}
+
+\subsection{Campus Crowd Simulation}
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{Static campus\_area\_1}: dispersed starts to one shared single target.
+    \item \textbf{Dynamic campus\_area\_1}: clustered starts to one shared single target.
+    \item \textbf{Static campus\_area\_2}: dispersed starts to one shared single target.
+    \item \textbf{Dynamic campus\_area\_2}: clustered starts to one shared single target.
+    \item \textbf{Static campus\_area\_3}: dispersed starts to one shared single target.
+    \item \textbf{Dynamic campus\_area\_3}: clustered starts to one shared single target.
 \end{itemize}
 
 \section{Assignment Model}
 
 Branches normally use one-to-one MAPF assignments when goals are \texttt{dispersed} or \texttt{clustered}. The project also supports a target-only \texttt{single} goal distribution mode, where all agents share one literal target cell and disappear there after arrival. What changes across branches is therefore both the \emph{positioning} of starts and goals and, when \texttt{single} is selected for targets, the assignment cardinality.
 
-\section{Current Spatial Patterns}
-
-\begin{itemize}[leftmargin=2em]
-    \item \texttt{static\_artificial}: dispersed starts, dispersed goals.
-    \item \texttt{static\_campus\_area\_1}: dispersed starts in one campus zone, clustered goals in the other campus zone.
-    \item \texttt{dynamic\_port}: clustered starts, dispersed goals.
-    \item \texttt{dynamic\_campus\_area\_2}: clustered starts in one campus zone, clustered goals in one different campus zone.
-\end{itemize}
-
 \section{Campus Semantics}
 
-For the campus branches, zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, gray regions are non-traversable, and the dynamic campus branch generates dynamic obstacles only inside the zone colors.
+For the campus branches, zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, gray regions are non-traversable, and dynamic campus branches generate dynamic obstacles only inside the zone colors. Static and dynamic variants of the same campus area both use the same campus source image.
 
 \section{Placement Rule}
 
-Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally. Clustered sets are controlled by the global \texttt{compact\_clustering} switch: when it is \texttt{True}, clustered sets are directly adjacent 8-neighbor-connected groups; when it is \texttt{False}, clustered sets stay connected while keeping one empty cell of separation in all 8 directions. The \texttt{single} mode applies only to targets and samples one shared target cell. Start-goal adjacency is allowed, but a start and its assigned goal cannot be the same cell.
+Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally. Clustered sets are controlled by the global \texttt{compact\_clustering} switch: when it is \texttt{True}, clustered sets are directly adjacent 8-neighbor-connected groups; when it is \texttt{False}, clustered sets stay connected while keeping one empty cell of separation in all 8 directions. The \texttt{single} mode applies only to targets and samples one shared target cell from the darker marker cells in the selected campus target zone. Start-goal adjacency is allowed, but a start and its assigned goal cannot be the same cell.
 
 \end{document}

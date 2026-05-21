@@ -46,15 +46,20 @@ The project is therefore not mainly about inventing a new high-level MAPF solver
 
 \section{What Is Being Compared}
 
-The comparison is organized across four branches:
+The comparison is organized across nine map types:
 \begin{enumerate}[leftmargin=2em]
     \item \texttt{static\_artificial},
-    \item \texttt{static\_campus\_area\_1},
+    \item \texttt{static\_port},
     \item \texttt{dynamic\_port},
-    \item \texttt{dynamic\_campus\_area\_2}.
+    \item \texttt{static\_campus\_area\_1},
+    \item \texttt{dynamic\_campus\_area\_1},
+    \item \texttt{static\_campus\_area\_2},
+    \item \texttt{dynamic\_campus\_area\_2},
+    \item \texttt{static\_campus\_area\_3},
+    \item \texttt{dynamic\_campus\_area\_3}.
 \end{enumerate}
 
-The branches differ in how maps are generated or loaded, how starts and goals are positioned, and whether the environment is static or time-varying. The common comparison axis is always:
+The map types differ in how maps are generated or loaded, how starts and goals are positioned, and whether the environment is static or time-varying. The common comparison axis is always:
 \[
 \text{same branch} \quad+\quad \text{same run configuration} \quad+\quad \text{different mapping}.
 \]
@@ -67,7 +72,7 @@ For every \emph{reported} condition, classical and cyclic are compared on the sa
 
 \subsection{Branch-Aware Semantics}
 
-The four branches are not cosmetic labels. They differ in meaningful ways:
+The nine map types are not cosmetic labels. They differ in meaningful ways:
 \begin{itemize}[leftmargin=2em]
     \item static vs.\ dynamic environments,
     \item artificial generation vs.\ image-based input,
@@ -80,9 +85,9 @@ The four branches are not cosmetic labels. They differ in meaningful ways:
 
 Instead of storing only free cells and obstacles, the project stores explicit transition slots between vertices. This allows the mapping type itself to be represented directly in the grid rather than treated as a separate hidden rule.
 
-\subsection{One-to-One Assignment Contract}
+\subsection{Assignment Contract}
 
-All current branches follow the classical one-agent--one-goal MAPF structure. The project no longer uses a shared-goal campus mode. The experiment varies \emph{where} starts and goals are placed, not the underlying assignment cardinality.
+Traditional branches use one-to-one MAPF assignments for dispersed or clustered targets. Campus crowd-simulation branches use a target-only \texttt{single} goal mode, where all agents share one literal target cell in a different campus zone and disappear there after arrival.
 
 \subsection{Disappearing-Agent Interpretation}
 
@@ -110,7 +115,7 @@ The current project implicitly assumes the following classical MAPF conditions u
     \item move-or-wait actions,
     \item offline planning with full knowledge of the dynamic loop,
     \item vertex and edge conflict detection,
-    \item one unique goal per agent,
+    \item one unique goal per agent for dispersed and clustered target modes, or one shared target cell for campus single-target mode,
     \item dispersed sets avoid internal 8-neighbor adjacency, while clustered sets are controlled by the global \texttt{compact\_clustering} switch: compact directly adjacent clusters when \texttt{True}, and connected one-cell-gap clusters when \texttt{False}.
 \end{itemize}
 

@@ -133,264 +133,167 @@ def _assignment_cardinality_description(goal_distribution_mode: str) -> str:
     return "assignments remain one-to-one"
 
 
-def _build_branch_specs() -> dict[str, BranchSpec]:
-    static_cfg = BRANCH_USER_CONFIGS["static_artificial"]
-    static_campus_1_cfg = BRANCH_USER_CONFIGS["static_campus_area_1"]
-    port_cfg = BRANCH_USER_CONFIGS["dynamic_port"]
-    campus_2_cfg = BRANCH_USER_CONFIGS["dynamic_campus_area_2"]
+def _float_or_none(value: Any) -> float | None:
+    return None if value is None else float(value)
 
-    static_range = tuple(static_cfg["agent_number_range"])
-    static_campus_1_range = tuple(static_campus_1_cfg["agent_number_range"])
-    port_range = tuple(port_cfg["agent_number_range"])
-    campus_2_range = tuple(campus_2_cfg["agent_number_range"])
-    static_solver_name, static_enhanced_cbs_enabled, static_solver_suboptimality_factor = _solver_metadata(static_cfg)
-    static_campus_1_solver_name, static_campus_1_enhanced_cbs_enabled, static_campus_1_solver_suboptimality_factor = _solver_metadata(static_campus_1_cfg)
-    port_solver_name, port_enhanced_cbs_enabled, port_solver_suboptimality_factor = _solver_metadata(port_cfg)
-    campus_2_solver_name, campus_2_enhanced_cbs_enabled, campus_2_solver_suboptimality_factor = _solver_metadata(campus_2_cfg)
+
+def _int_or_none(value: Any) -> int | None:
+    return None if value is None else int(value)
+
+
+def _infer_map_type_index(map_type: str) -> int:
+    order = {
+        "static_artificial": 0,
+        "static_port": 1,
+        "dynamic_port": 1,
+        "static_campus_area_1": 2,
+        "dynamic_campus_area_1": 2,
+        "static_campus_area_2": 3,
+        "dynamic_campus_area_2": 3,
+        "static_campus_area_3": 4,
+        "dynamic_campus_area_3": 4,
+    }
+    return order.get(map_type, 99)
+
+
+def _branch_decimal(*, is_dynamic: bool, map_type_index: int) -> str:
+    map_obstacle_index = 1 if is_dynamic else 0
+    return f"{map_obstacle_index}.{map_type_index}"
+
+
+def _is_campus_branch(map_type: str, config: dict[str, Any]) -> bool:
+    return "campus" in map_type or str(config.get("map_family", "")) == "campus_crowd_simulation"
+
+
+def _notes_for_branch(
+    *,
+    map_type: str,
+    config: dict[str, Any],
+    is_dynamic: bool,
+    cluster_description: str,
+) -> str:
+    start_mode = str(config.get("start_distribution_mode", "dispersed"))
+    goal_mode = str(config.get("goal_distribution_mode", "dispersed"))
+    goal_description = _goal_distribution_description(goal_mode, cluster_description)
+    assignment_description = _assignment_cardinality_description(goal_mode)
+
+    if config.get("image_path") is None:
+        return (
+            "Fresh artificial map per run configuration. "
+            f"Starts are sampled as {start_mode}, goals use {goal_description}, and {assignment_description}. "
+            "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
+            "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
+        )
+
+    if _is_campus_branch(map_type, config):
+        dynamic_part = (
+            "Dynamic obstacles are generated only inside campus zone-color cells. "
+            if is_dynamic
+            else "The source-image static layout is used without dynamic obstacles. "
+        )
+        return (
+            "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways "
+            "are traversable but non-spawnable, and gray/black cells are non-traversable. "
+            f"{dynamic_part}Starts are sampled as {start_mode} in one zone, targets use {goal_description} in a different zone, "
+            f"and {assignment_description}. When single target mode is active, the shared target is sampled only from "
+            "dark marker cells inside the selected target zone."
+        )
+
+    dynamic_part = (
+        "Dynamic obstacles are generated from the port image after static-density preprocessing. "
+        if is_dynamic
+        else "The port image is used as a static obstacle map. "
+    )
+    return (
+        f"Image-based port branch. {dynamic_part}Starts are sampled as {start_mode}, goals use {goal_description}, "
+        f"and {assignment_description}. Retained pairs are the run configurations for which both mappings are classified "
+        "as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early "
+        "if the stopping rules trigger."
+    )
+
+
+def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSpec:
+    is_dynamic = bool(config.get("is_dynamic", map_type.startswith("dynamic_")))
+    map_obstacle_type = "dynamic" if is_dynamic else "static"
+    map_obstacle_index = 1 if is_dynamic else 0
+    map_type_index = int(config.get("map_type_index", _infer_map_type_index(map_type)))
+    branch_decimal = str(config.get("branch_decimal", _branch_decimal(is_dynamic=is_dynamic, map_type_index=map_type_index)))
+    agent_number_range = tuple(config["agent_number_range"])
+    solver_name, enhanced_cbs_enabled, solver_suboptimality_factor = _solver_metadata(config)
     clustering_style_name = _clustering_style_name()
     cluster_description = _cluster_description()
+    map_size = config.get("map_size")
+    campus_branch = _is_campus_branch(map_type, config)
 
-    static_goal_mode = str(static_cfg.get("goal_distribution_mode", "dispersed"))
-    static_campus_1_goal_mode = str(static_campus_1_cfg.get("goal_distribution_mode", "dispersed"))
-    port_goal_mode = str(port_cfg.get("goal_distribution_mode", "dispersed"))
-    campus_2_goal_mode = str(campus_2_cfg.get("goal_distribution_mode", "dispersed"))
+    return BranchSpec(
+        map_type=map_type,
+        branch_id=map_type,
+        branch_decimal=branch_decimal,
+        map_obstacle_type=map_obstacle_type,
+        map_obstacle_index=map_obstacle_index,
+        map_type_index=map_type_index,
+        display_name=str(config.get("display_name", map_type.replace("_", " ").title())),
+        target_type_documented=_goal_type(config),
+        target_type_active=_goal_type(config),
+        seed_base=int(config["seed"]),
+        agent_number_range=agent_number_range,
+        agent_numbers=expand_agent_number_range(agent_number_range),
+        runtime_limit_seconds=float(config["time_limit_seconds"]),
+        counted_runs_required=int(config["counted_runs_required"]),
+        num_last_runs_to_visualize_jointly_successful=int(
+            config.get(
+                "num_last_runs_to_visualize_jointly_successful",
+                config.get("num_last_runs_to_visualize", 0),
+            )
+        ),
+        num_last_runs_to_visualize_independently_successful=int(
+            config.get(
+                "num_last_runs_to_visualize_independently_successful",
+                config.get("num_last_runs_to_visualize", 0),
+            )
+        ),
+        path_length_graph_enabled=bool(config.get("path_length_graph_enabled", True)),
+        is_dynamic=is_dynamic,
+        start_distribution_mode=str(config.get("start_distribution_mode", "dispersed")),
+        goal_distribution_mode=str(config.get("goal_distribution_mode", "dispersed")),
+        require_individual_reachability=bool(config.get("require_individual_reachability", False)),
+        zone_relationship_mode=str(config.get("zone_relationship_mode", "none")),
+        compact_clustering=compact_clustering,
+        clustering_style_name=clustering_style_name,
+        base_rows=None if map_size is None else int(map_size[0]),
+        base_cols=None if map_size is None else int(map_size[1]),
+        static_obstacle_density=_float_or_none(config.get("static_obstacle_density")),
+        image_path=None if config.get("image_path") is None else str(config["image_path"]),
+        image_threshold=int(config.get("image_threshold", 127)),
+        image_resize_longest_side=_int_or_none(config.get("image_resize_longest_side")),
+        dynamic_target_static_obstacle_density=_float_or_none(config.get("target_static_obstacle_density")),
+        dynamic_target_dynamic_obstacle_density=_float_or_none(config.get("target_dynamic_obstacle_density")),
+        dynamic_loop_sequence_length=_int_or_none(config.get("loop_sequence_length")),
+        dynamic_group_stay_durations=(
+            None if config.get("group_stay_durations") is None else tuple(config["group_stay_durations"])
+        ),
+        dynamic_generation_cell_mode=str(config.get("dynamic_generation_cell_mode", "all_free")),
+        spawnable_cell_mode=str(config.get("spawnable_cell_mode", "all_free")),
+        solver_name=solver_name,
+        enhanced_cbs_enabled=enhanced_cbs_enabled,
+        solver_suboptimality_factor=solver_suboptimality_factor,
+        true_static_shortest_path_distance=bool(config.get("true_static_shortest_path_distance", False)),
+        tight_time_horizon=bool(config.get("tight_time_horizon", False)),
+        agent_cohesion_enabled=bool(agent_cohesion) if campus_branch else False,
+        cohesion_factor=_campus_cohesion_factor() if campus_branch else 0.0,
+        notes=_notes_for_branch(
+            map_type=map_type,
+            config=config,
+            is_dynamic=is_dynamic,
+            cluster_description=cluster_description,
+        ),
+    )
 
-    static_goal_description = _goal_distribution_description(static_goal_mode, cluster_description)
-    static_campus_1_goal_description = _goal_distribution_description(static_campus_1_goal_mode, cluster_description)
-    port_goal_description = _goal_distribution_description(port_goal_mode, cluster_description)
-    campus_2_goal_description = _goal_distribution_description(campus_2_goal_mode, cluster_description)
 
-    static_assignment_description = _assignment_cardinality_description(static_goal_mode)
-    static_campus_1_assignment_description = _assignment_cardinality_description(static_campus_1_goal_mode)
-    port_assignment_description = _assignment_cardinality_description(port_goal_mode)
-    campus_2_assignment_description = _assignment_cardinality_description(campus_2_goal_mode)
-
+def _build_branch_specs() -> dict[str, BranchSpec]:
     return {
-        "static_artificial": BranchSpec(
-            map_type="static_artificial",
-            branch_id="static_artificial",
-            branch_decimal="0.0",
-            map_obstacle_type="static",
-            map_obstacle_index=0,
-            map_type_index=0,
-            display_name="Static Artificial",
-            target_type_documented=_goal_type(static_cfg),
-            target_type_active=_goal_type(static_cfg),
-            seed_base=int(static_cfg["seed"]),
-            agent_number_range=static_range,
-            agent_numbers=expand_agent_number_range(static_range),
-            runtime_limit_seconds=float(static_cfg["time_limit_seconds"]),
-            counted_runs_required=int(static_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize_jointly_successful=int(
-                static_cfg.get(
-                    "num_last_runs_to_visualize_jointly_successful",
-                    static_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            num_last_runs_to_visualize_independently_successful=int(
-                static_cfg.get(
-                    "num_last_runs_to_visualize_independently_successful",
-                    static_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            path_length_graph_enabled=True,
-            is_dynamic=False,
-            compact_clustering=compact_clustering,
-            clustering_style_name=clustering_style_name,
-            solver_name=static_solver_name,
-            enhanced_cbs_enabled=static_enhanced_cbs_enabled,
-            solver_suboptimality_factor=static_solver_suboptimality_factor,
-            true_static_shortest_path_distance=bool(static_cfg.get("true_static_shortest_path_distance", False)),
-            tight_time_horizon=bool(static_cfg.get("tight_time_horizon", False)),
-            agent_cohesion_enabled=False,
-            cohesion_factor=0.0,
-            start_distribution_mode=str(static_cfg.get("start_distribution_mode", "dispersed")),
-            goal_distribution_mode=str(static_cfg.get("goal_distribution_mode", "dispersed")),
-            require_individual_reachability=bool(static_cfg.get("require_individual_reachability", False)),
-            zone_relationship_mode=str(static_cfg.get("zone_relationship_mode", "none")),
-            base_rows=int(static_cfg["map_size"][0]),
-            base_cols=int(static_cfg["map_size"][1]),
-            static_obstacle_density=float(static_cfg["static_obstacle_density"]),
-            notes=(
-                f"Fresh artificial map per run configuration. Starts are sampled as a dispersed set, goals use {static_goal_description}, "
-                f"and {static_assignment_description}. "
-                "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
-                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
-            ),
-        ),
-        "static_campus_area_1": BranchSpec(
-            map_type="static_campus_area_1",
-            branch_id="static_campus_area_1",
-            branch_decimal="0.1",
-            map_obstacle_type="static",
-            map_obstacle_index=0,
-            map_type_index=1,
-            display_name="Static Campus Area 1",
-            target_type_documented=_goal_type(static_campus_1_cfg),
-            target_type_active=_goal_type(static_campus_1_cfg),
-            seed_base=int(static_campus_1_cfg["seed"]),
-            agent_number_range=static_campus_1_range,
-            agent_numbers=expand_agent_number_range(static_campus_1_range),
-            runtime_limit_seconds=float(static_campus_1_cfg["time_limit_seconds"]),
-            counted_runs_required=int(static_campus_1_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize_jointly_successful=int(
-                static_campus_1_cfg.get(
-                    "num_last_runs_to_visualize_jointly_successful",
-                    static_campus_1_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            num_last_runs_to_visualize_independently_successful=int(
-                static_campus_1_cfg.get(
-                    "num_last_runs_to_visualize_independently_successful",
-                    static_campus_1_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            path_length_graph_enabled=True,
-            is_dynamic=False,
-            compact_clustering=compact_clustering,
-            clustering_style_name=clustering_style_name,
-            solver_name=static_campus_1_solver_name,
-            enhanced_cbs_enabled=static_campus_1_enhanced_cbs_enabled,
-            solver_suboptimality_factor=static_campus_1_solver_suboptimality_factor,
-            true_static_shortest_path_distance=bool(static_campus_1_cfg.get("true_static_shortest_path_distance", False)),
-            tight_time_horizon=bool(static_campus_1_cfg.get("tight_time_horizon", False)),
-            agent_cohesion_enabled=bool(agent_cohesion),
-            cohesion_factor=_campus_cohesion_factor(),
-            start_distribution_mode=str(static_campus_1_cfg.get("start_distribution_mode", "dispersed")),
-            goal_distribution_mode=str(static_campus_1_cfg.get("goal_distribution_mode", "dispersed")),
-            require_individual_reachability=bool(static_campus_1_cfg.get("require_individual_reachability", False)),
-            zone_relationship_mode=str(static_campus_1_cfg.get("zone_relationship_mode", "none")),
-            image_path=str(static_campus_1_cfg["image_path"]),
-            image_threshold=int(static_campus_1_cfg["image_threshold"]),
-            dynamic_generation_cell_mode=str(static_campus_1_cfg.get("dynamic_generation_cell_mode", "zone_colors_only")),
-            spawnable_cell_mode=str(static_campus_1_cfg.get("spawnable_cell_mode", "zone_colors_only")),
-            notes=(
-                f"Static image-based campus branch with explicit zone-color semantics. Starts use {static_campus_1_cfg.get('start_distribution_mode', 'dispersed')} placement in one zone, "
-                f"targets use {static_campus_1_goal_description} in a different zone, and {static_campus_1_assignment_description}. "
-                "Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, and gray is non-traversable. "
-                "When single target mode is active, the shared target is sampled only from dark marker cells inside the target zone."
-            ),
-        ),
-        "dynamic_port": BranchSpec(
-            map_type="dynamic_port",
-            branch_id="dynamic_port",
-            branch_decimal="1.0",
-            map_obstacle_type="dynamic",
-            map_obstacle_index=1,
-            map_type_index=0,
-            display_name="Dynamic Port",
-            target_type_documented=_goal_type(port_cfg),
-            target_type_active=_goal_type(port_cfg),
-            seed_base=int(port_cfg["seed"]),
-            agent_number_range=port_range,
-            agent_numbers=expand_agent_number_range(port_range),
-            runtime_limit_seconds=float(port_cfg["time_limit_seconds"]),
-            counted_runs_required=int(port_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize_jointly_successful=int(
-                port_cfg.get(
-                    "num_last_runs_to_visualize_jointly_successful",
-                    port_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            num_last_runs_to_visualize_independently_successful=int(
-                port_cfg.get(
-                    "num_last_runs_to_visualize_independently_successful",
-                    port_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            path_length_graph_enabled=True,
-            is_dynamic=True,
-            compact_clustering=compact_clustering,
-            clustering_style_name=clustering_style_name,
-            solver_name=port_solver_name,
-            enhanced_cbs_enabled=port_enhanced_cbs_enabled,
-            solver_suboptimality_factor=port_solver_suboptimality_factor,
-            true_static_shortest_path_distance=bool(port_cfg.get("true_static_shortest_path_distance", False)),
-            tight_time_horizon=bool(port_cfg.get("tight_time_horizon", False)),
-            agent_cohesion_enabled=False,
-            cohesion_factor=0.0,
-            start_distribution_mode=str(port_cfg.get("start_distribution_mode", "dispersed")),
-            goal_distribution_mode=str(port_cfg.get("goal_distribution_mode", "dispersed")),
-            require_individual_reachability=bool(port_cfg.get("require_individual_reachability", True)),
-            zone_relationship_mode=str(port_cfg.get("zone_relationship_mode", "none")),
-            image_path=str(port_cfg["image_path"]),
-            image_threshold=int(port_cfg["image_threshold"]),
-            image_resize_longest_side=(
-                None if port_cfg.get("image_resize_longest_side") is None else int(port_cfg["image_resize_longest_side"])
-            ),
-            dynamic_target_static_obstacle_density=float(port_cfg["target_static_obstacle_density"]),
-            dynamic_target_dynamic_obstacle_density=float(port_cfg["target_dynamic_obstacle_density"]),
-            dynamic_loop_sequence_length=int(port_cfg["loop_sequence_length"]),
-            dynamic_group_stay_durations=tuple(port_cfg["group_stay_durations"]),
-            dynamic_generation_cell_mode=str(port_cfg.get("dynamic_generation_cell_mode", "all_free")),
-            spawnable_cell_mode=str(port_cfg.get("spawnable_cell_mode", "all_free")),
-            notes=(
-                f"Image-based dynamic branch with clustered starts sampled as {cluster_description}; goals use {port_goal_description}, "
-                f"and {port_assignment_description}. "
-                "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
-                "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
-            ),
-        ),
-        "dynamic_campus_area_2": BranchSpec(
-            map_type="dynamic_campus_area_2",
-            branch_id="dynamic_campus_area_2",
-            branch_decimal="1.1",
-            map_obstacle_type="dynamic",
-            map_obstacle_index=1,
-            map_type_index=2,
-            display_name="Dynamic Campus Area 2",
-            target_type_documented=_goal_type(campus_2_cfg),
-            target_type_active=_goal_type(campus_2_cfg),
-            seed_base=int(campus_2_cfg["seed"]),
-            agent_number_range=campus_2_range,
-            agent_numbers=expand_agent_number_range(campus_2_range),
-            runtime_limit_seconds=float(campus_2_cfg["time_limit_seconds"]),
-            counted_runs_required=int(campus_2_cfg["counted_runs_required"]),
-            num_last_runs_to_visualize_jointly_successful=int(
-                campus_2_cfg.get(
-                    "num_last_runs_to_visualize_jointly_successful",
-                    campus_2_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            num_last_runs_to_visualize_independently_successful=int(
-                campus_2_cfg.get(
-                    "num_last_runs_to_visualize_independently_successful",
-                    campus_2_cfg.get("num_last_runs_to_visualize", 0),
-                )
-            ),
-            path_length_graph_enabled=True,
-            is_dynamic=True,
-            compact_clustering=compact_clustering,
-            clustering_style_name=clustering_style_name,
-            solver_name=campus_2_solver_name,
-            enhanced_cbs_enabled=campus_2_enhanced_cbs_enabled,
-            solver_suboptimality_factor=campus_2_solver_suboptimality_factor,
-            true_static_shortest_path_distance=bool(campus_2_cfg.get("true_static_shortest_path_distance", False)),
-            tight_time_horizon=bool(campus_2_cfg.get("tight_time_horizon", False)),
-            agent_cohesion_enabled=bool(agent_cohesion),
-            cohesion_factor=_campus_cohesion_factor(),
-            start_distribution_mode=str(campus_2_cfg.get("start_distribution_mode", "dispersed")),
-            goal_distribution_mode=str(campus_2_cfg.get("goal_distribution_mode", "dispersed")),
-            require_individual_reachability=bool(campus_2_cfg.get("require_individual_reachability", True)),
-            zone_relationship_mode=str(campus_2_cfg.get("zone_relationship_mode", "none")),
-            image_path=str(campus_2_cfg["image_path"]),
-            image_threshold=int(campus_2_cfg["image_threshold"]),
-            dynamic_target_static_obstacle_density=(
-                None if campus_2_cfg.get("target_static_obstacle_density") is None else float(campus_2_cfg["target_static_obstacle_density"])
-            ),
-            dynamic_target_dynamic_obstacle_density=float(campus_2_cfg["target_dynamic_obstacle_density"]),
-            dynamic_loop_sequence_length=int(campus_2_cfg["loop_sequence_length"]),
-            dynamic_group_stay_durations=tuple(campus_2_cfg["group_stay_durations"]),
-            dynamic_generation_cell_mode=str(campus_2_cfg.get("dynamic_generation_cell_mode", "all_free")),
-            spawnable_cell_mode=str(campus_2_cfg.get("spawnable_cell_mode", "all_free")),
-            notes=(
-                "Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways "
-                "are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles are generated only inside the "
-                f"zone colors. Starts are sampled as {cluster_description}, targets use {campus_2_goal_description}, "
-                f"{campus_2_assignment_description}, and the start and target selections must come from different campus zones. "
-                "When single target mode is active, the shared target is sampled only from dark marker cells inside the target zone."
-            ),
-        ),
+        map_type: _build_single_branch_spec(map_type, config)
+        for map_type, config in BRANCH_USER_CONFIGS.items()
     }
 
 

@@ -30,7 +30,7 @@ def current_tight_time_horizon_enabled():
 
 
 def current_agent_cohesion_enabled():
-    return bool(agent_cohesion) and MAP_TYPE in {"static_campus_area_1", "dynamic_campus_area_2"}
+    return bool(agent_cohesion) and "campus" in MAP_TYPE
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
