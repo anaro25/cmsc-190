@@ -160,4 +160,7 @@ class SamplingConditionResult:
     selection_batches_attempted: int = 0
     selection_batches_discarded: int = 0
     selection_retry_rule_satisfied: bool = False
+    individual_runtime_filter_attempts: int = 0
+    individual_runtime_filter_discarded_attempts: int = 0
+    individual_runtime_filter_rule_satisfied: bool = False
     discarded_runtime_selection_batches: list[dict[str, Any]] = field(default_factory=list)

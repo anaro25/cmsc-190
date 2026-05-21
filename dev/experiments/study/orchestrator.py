@@ -216,8 +216,19 @@ def _run_jointly_viable_sampling(
     selection_batches_discarded = 0
     discarded_runtime_selection_batches: list[dict[str, Any]] = []
     max_selection_batches = branch_spec.rerun_until_cyclic_faster_max_batches
+    individual_filter_enabled = bool(
+        getattr(branch_spec, "filter_individual_runs_until_cyclic_faster", False)
+    )
+    max_individual_attempts = getattr(
+        branch_spec,
+        "filter_individual_runs_until_cyclic_faster_max_attempts",
+        None,
+    )
+    effective_attempt_limit = INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
+    if individual_filter_enabled and max_individual_attempts is not None:
+        effective_attempt_limit = min(effective_attempt_limit, int(max_individual_attempts))
 
-    while attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD:
+    while attempt_index < effective_attempt_limit:
         selection_batches_attempted += 1
         classical_records: list[MappingRunRecord] = []
         cyclic_records: list[MappingRunRecord] = []
@@ -229,7 +240,14 @@ def _run_jointly_viable_sampling(
         consecutive_failed_paired_sampling_attempts = 0
         cyclic_retry_attempts_remaining = 0
 
-        if branch_spec.rerun_until_cyclic_faster:
+        if individual_filter_enabled:
+            logger.log(
+                "  Runtime individual filter started | "
+                "rule=filter_individual_runs_until_cyclic_faster | "
+                f"target_retained_pairs={branch_spec.counted_runs_required} | "
+                f"discarded_attempts_so_far={len(discarded_runtime_selection_batches)}"
+            )
+        elif branch_spec.rerun_until_cyclic_faster:
             logger.log(
                 "  Runtime selection batch "
                 f"{selection_batches_attempted} started | "
@@ -239,7 +257,7 @@ def _run_jointly_viable_sampling(
 
         while (
             retained_pairs < branch_spec.counted_runs_required
-            and attempt_index < INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD
+            and attempt_index < effective_attempt_limit
         ):
             run_index = attempt_index
             logger.log(
@@ -317,6 +335,38 @@ def _run_jointly_viable_sampling(
 
             both_counted = classical_record.counted_run and cyclic_record.counted_run
             if both_counted:
+                if (
+                    individual_filter_enabled
+                    and cyclic_record.time_computation_halted_seconds
+                    >= classical_record.time_computation_halted_seconds
+                ):
+                    discarded_runtime_selection_batches.append(
+                        {
+                            "selection_kind": "individual_attempt",
+                            "agent_number": agent_number,
+                            "agent_number_index": agent_number_index,
+                            "run_index": run_index,
+                            "run_config_id": prepared_context.run_configuration.run_config_id,
+                            "classical_halted": classical_record.time_computation_halted_seconds,
+                            "cyclic_halted": cyclic_record.time_computation_halted_seconds,
+                            "run_configuration": prepared_context.run_configuration.to_dict(),
+                            "run_records": [
+                                classical_record.to_dict(),
+                                cyclic_record.to_dict(),
+                            ],
+                        }
+                    )
+                    logger.log(
+                        "      Discarded paired sampling attempt because cyclic halted time "
+                        "was not lower than classical | "
+                        f"classical_halted={classical_record.time_computation_halted_seconds} | "
+                        f"cyclic_halted={cyclic_record.time_computation_halted_seconds} | "
+                        f"retained_pairs={retained_pairs}/{branch_spec.counted_runs_required}"
+                    )
+                    logger.log("")
+                    attempt_index += 1
+                    continue
+
                 cyclic_unfinished_would_stop = _cyclic_unfinished_would_make_condition_fail(
                     branch_spec=branch_spec,
                     cyclic_records=cyclic_records,
@@ -369,6 +419,13 @@ def _run_jointly_viable_sampling(
                             selection_batches_attempted=selection_batches_attempted,
                             selection_batches_discarded=selection_batches_discarded,
                             selection_retry_rule_satisfied=False,
+                            individual_runtime_filter_attempts=(
+                                total_paired_sampling_attempts if individual_filter_enabled else 0
+                            ),
+                            individual_runtime_filter_discarded_attempts=(
+                                len(discarded_runtime_selection_batches) if individual_filter_enabled else 0
+                            ),
+                            individual_runtime_filter_rule_satisfied=False,
                             discarded_runtime_selection_batches=discarded_runtime_selection_batches,
                         )
 
@@ -442,14 +499,27 @@ def _run_jointly_viable_sampling(
                         selection_batches_attempted=selection_batches_attempted,
                         selection_batches_discarded=selection_batches_discarded,
                         selection_retry_rule_satisfied=False,
+                        individual_runtime_filter_attempts=(
+                            total_paired_sampling_attempts if individual_filter_enabled else 0
+                        ),
+                        individual_runtime_filter_discarded_attempts=(
+                            len(discarded_runtime_selection_batches) if individual_filter_enabled else 0
+                        ),
+                        individual_runtime_filter_rule_satisfied=False,
                         discarded_runtime_selection_batches=discarded_runtime_selection_batches,
                     )
 
             attempt_index += 1
 
         if retained_pairs < branch_spec.counted_runs_required:
+            stop_reason = (
+                "filter_individual_runs_until_cyclic_faster_max_attempts_exhausted"
+                if individual_filter_enabled and max_individual_attempts is not None
+                and attempt_index >= int(max_individual_attempts)
+                else "internal_attempt_safeguard"
+            )
             stop_message = (
-                "Stop rule triggered by the internal attempt safeguard before the counted-pair quota was reached "
+                "Stop rule triggered before the counted-pair quota was reached "
                 f"({retained_pairs}/{branch_spec.counted_runs_required}) at agent_number={agent_number}. "
                 "The current condition is discarded and the branch stops before higher agent numbers."
             )
@@ -457,7 +527,7 @@ def _run_jointly_viable_sampling(
             return SamplingConditionResult(
                 accepted_for_reporting=False,
                 stop_branch=True,
-                stop_reason="internal_attempt_safeguard",
+                stop_reason=stop_reason,
                 stop_message=stop_message,
                 retained_pairs=retained_pairs,
                 total_paired_sampling_attempts=total_paired_sampling_attempts,
@@ -465,6 +535,13 @@ def _run_jointly_viable_sampling(
                 selection_batches_attempted=selection_batches_attempted,
                 selection_batches_discarded=selection_batches_discarded,
                 selection_retry_rule_satisfied=False,
+                individual_runtime_filter_attempts=(
+                    total_paired_sampling_attempts if individual_filter_enabled else 0
+                ),
+                individual_runtime_filter_discarded_attempts=(
+                    len(discarded_runtime_selection_batches) if individual_filter_enabled else 0
+                ),
+                individual_runtime_filter_rule_satisfied=False,
                 discarded_runtime_selection_batches=discarded_runtime_selection_batches,
             )
 
@@ -493,19 +570,35 @@ def _run_jointly_viable_sampling(
                 selection_batches_attempted=selection_batches_attempted,
                 selection_batches_discarded=selection_batches_discarded,
                 selection_retry_rule_satisfied=False,
+                individual_runtime_filter_attempts=(
+                    total_paired_sampling_attempts if individual_filter_enabled else 0
+                ),
+                individual_runtime_filter_discarded_attempts=(
+                    len(discarded_runtime_selection_batches) if individual_filter_enabled else 0
+                ),
+                individual_runtime_filter_rule_satisfied=False,
                 discarded_runtime_selection_batches=discarded_runtime_selection_batches,
             )
 
-        selection_rule_satisfied = _cyclic_has_better_average_halted_time(
-            classical_records=classical_records,
-            cyclic_records=cyclic_records,
-        )
-        if branch_spec.rerun_until_cyclic_faster and not selection_rule_satisfied:
+        if individual_filter_enabled:
+            selection_rule_satisfied = True
+        else:
+            selection_rule_satisfied = _cyclic_has_better_average_halted_time(
+                classical_records=classical_records,
+                cyclic_records=cyclic_records,
+            )
+
+        if (
+            not individual_filter_enabled
+            and branch_spec.rerun_until_cyclic_faster
+            and not selection_rule_satisfied
+        ):
             selection_batches_discarded += 1
             classical_average = _average_counted_halted_time(classical_records)
             cyclic_average = _average_counted_halted_time(cyclic_records)
             discarded_runtime_selection_batches.append(
                 {
+                    "selection_kind": "batch",
                     "agent_number": agent_number,
                     "agent_number_index": agent_number_index,
                     "selection_batch_number": selection_batches_attempted,
@@ -542,6 +635,9 @@ def _run_jointly_viable_sampling(
                     selection_batches_attempted=selection_batches_attempted,
                     selection_batches_discarded=selection_batches_discarded,
                     selection_retry_rule_satisfied=False,
+                    individual_runtime_filter_attempts=0,
+                    individual_runtime_filter_discarded_attempts=0,
+                    individual_runtime_filter_rule_satisfied=False,
                     discarded_runtime_selection_batches=discarded_runtime_selection_batches,
                 )
             continue
@@ -560,11 +656,18 @@ def _run_jointly_viable_sampling(
             selection_batches_attempted=selection_batches_attempted,
             selection_batches_discarded=selection_batches_discarded,
             selection_retry_rule_satisfied=selection_rule_satisfied,
+            individual_runtime_filter_attempts=(
+                total_paired_sampling_attempts if individual_filter_enabled else 0
+            ),
+            individual_runtime_filter_discarded_attempts=(
+                len(discarded_runtime_selection_batches) if individual_filter_enabled else 0
+            ),
+            individual_runtime_filter_rule_satisfied=individual_filter_enabled,
             discarded_runtime_selection_batches=discarded_runtime_selection_batches,
         )
 
     stop_message = (
-        "Stop rule triggered by the internal attempt safeguard before a reportable runtime-selection batch "
+        "Stop rule triggered by the internal attempt safeguard before a reportable runtime-selection condition "
         f"was found at agent_number={agent_number}. The current condition is discarded and the branch stops "
         "before higher agent numbers."
     )
@@ -580,6 +683,13 @@ def _run_jointly_viable_sampling(
         selection_batches_attempted=selection_batches_attempted,
         selection_batches_discarded=selection_batches_discarded,
         selection_retry_rule_satisfied=False,
+        individual_runtime_filter_attempts=(
+            total_paired_sampling_attempts if individual_filter_enabled else 0
+        ),
+        individual_runtime_filter_discarded_attempts=(
+            len(discarded_runtime_selection_batches) if individual_filter_enabled else 0
+        ),
+        individual_runtime_filter_rule_satisfied=False,
         discarded_runtime_selection_batches=discarded_runtime_selection_batches,
     )
 
@@ -623,6 +733,16 @@ def _compute_raw_branch_data(
         "stopped_before_agent_number": None,
         "reported_agent_numbers": [],
         "planned_agent_numbers": branch_spec.agent_numbers,
+        "filter_individual_runs_until_cyclic_faster": getattr(
+            branch_spec,
+            "filter_individual_runs_until_cyclic_faster",
+            False,
+        ),
+        "filter_individual_runs_until_cyclic_faster_max_attempts": getattr(
+            branch_spec,
+            "filter_individual_runs_until_cyclic_faster_max_attempts",
+            None,
+        ),
         "rerun_until_cyclic_faster": branch_spec.rerun_until_cyclic_faster,
         "rerun_until_cyclic_faster_max_batches": branch_spec.rerun_until_cyclic_faster_max_batches,
         "runtime_selection_by_agent_number": [],
@@ -675,7 +795,14 @@ def _compute_raw_branch_data(
                     len(sampling_result.cyclic_records),
                 ),
             )
-            if branch_spec.rerun_until_cyclic_faster:
+            if getattr(branch_spec, "filter_individual_runs_until_cyclic_faster", False):
+                aggregate.notes = (
+                    f"{aggregate.notes}; filter_individual_runs_until_cyclic_faster; "
+                    f"individual_runtime_filter_attempts={sampling_result.individual_runtime_filter_attempts}; "
+                    f"individual_runtime_filter_discarded_attempts="
+                    f"{sampling_result.individual_runtime_filter_discarded_attempts}"
+                )
+            elif branch_spec.rerun_until_cyclic_faster:
                 aggregate.notes = (
                     f"{aggregate.notes}; rerun_until_cyclic_faster; "
                     f"selection_batches_attempted={sampling_result.selection_batches_attempted}; "
@@ -690,6 +817,13 @@ def _compute_raw_branch_data(
                     "selection_batches_attempted": sampling_result.selection_batches_attempted,
                     "selection_batches_discarded": sampling_result.selection_batches_discarded,
                     "selection_retry_rule_satisfied": sampling_result.selection_retry_rule_satisfied,
+                    "individual_runtime_filter_attempts": sampling_result.individual_runtime_filter_attempts,
+                    "individual_runtime_filter_discarded_attempts": (
+                        sampling_result.individual_runtime_filter_discarded_attempts
+                    ),
+                    "individual_runtime_filter_rule_satisfied": (
+                        sampling_result.individual_runtime_filter_rule_satisfied
+                    ),
                     "total_paired_sampling_attempts": sampling_result.total_paired_sampling_attempts,
                 }
             )
@@ -708,6 +842,13 @@ def _compute_raw_branch_data(
                     "selection_batches_attempted": sampling_result.selection_batches_attempted,
                     "selection_batches_discarded": sampling_result.selection_batches_discarded,
                     "selection_retry_rule_satisfied": sampling_result.selection_retry_rule_satisfied,
+                    "individual_runtime_filter_attempts": sampling_result.individual_runtime_filter_attempts,
+                    "individual_runtime_filter_discarded_attempts": (
+                        sampling_result.individual_runtime_filter_discarded_attempts
+                    ),
+                    "individual_runtime_filter_rule_satisfied": (
+                        sampling_result.individual_runtime_filter_rule_satisfied
+                    ),
                     "total_paired_sampling_attempts": sampling_result.total_paired_sampling_attempts,
                     "stop_reason": sampling_result.stop_reason,
                 }

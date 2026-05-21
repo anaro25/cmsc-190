@@ -21,16 +21,30 @@ def _port_image_path() -> str:
 def _with_shared_runtime(config: dict[str, Any]) -> dict[str, Any]:
     payload = {
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-        "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
+        "counted_runs_required": (
+            TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED
+            if TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER
+            else SHARED_COUNTED_RUNS_REQUIRED
+        ),
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
-        "rerun_until_cyclic_faster": TEMPORARY_RERUN_UNTIL_CYCLIC_FASTER,
-        "rerun_until_cyclic_faster_max_batches": TEMPORARY_RERUN_UNTIL_CYCLIC_FASTER_MAX_BATCHES,
+        "filter_individual_runs_until_cyclic_faster": TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER,
+        "filter_individual_runs_until_cyclic_faster_max_attempts": TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS,
+        "rerun_until_cyclic_faster": False,
+        "rerun_until_cyclic_faster_max_batches": None,
         "num_last_runs_to_visualize_jointly_successful": 3,
         "num_last_runs_to_visualize_independently_successful": 3,
     }
     payload.update(config)
+    if TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER:
+        payload["counted_runs_required"] = TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED
+        payload["filter_individual_runs_until_cyclic_faster"] = True
+        payload["filter_individual_runs_until_cyclic_faster_max_attempts"] = (
+            TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS
+        )
+        payload["rerun_until_cyclic_faster"] = False
+        payload["rerun_until_cyclic_faster_max_batches"] = None
     return payload
 
 
@@ -50,8 +64,9 @@ SHARED_ECBS_SUBOPTIMALITY = 3.0
 SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
 SHARED_TIGHT_TIME_HORIZON = False
 SHARED_COUNTED_RUNS_REQUIRED = 5
-TEMPORARY_RERUN_UNTIL_CYCLIC_FASTER = True
-TEMPORARY_RERUN_UNTIL_CYCLIC_FASTER_MAX_BATCHES = 100
+TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER = True
+TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED = 3
+TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 100
 
 # ===================================
 
