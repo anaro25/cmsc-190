@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 from dev.experiments.branch_specs import BranchSpec
-from dev.experiments.study.constants import CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT
+from dev.experiments.study.constants import (
+    CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT,
+    CYCLIC_TERMINATION_RETRY_ATTEMPTS,
+)
 from dev.experiments.study.io_utils import ExperimentLogger
 from dev.experiments.study.models import ConditionAggregate, DynamicBranchState, MappingRunRecord
 
@@ -48,8 +51,9 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
         f"(first={branch_spec.agent_numbers[0]}, last={branch_spec.agent_numbers[-1]})"
     )
     logger.log(
-        "Early-stop rule 1: discard the current condition and stop when cyclic unfinished runs "
-        "exceed cyclic successful runs within the retained counted pairs."
+        "Early-stop rule 1: when a cyclic unfinished run would make unfinished runs the majority, "
+        "discard that paired attempt and allow "
+        f"{CYCLIC_TERMINATION_RETRY_ATTEMPTS} extra paired attempt(s). Stop if all extra attempts remain unfinished."
     )
     logger.log(
         "Early-stop rule 2: discard the current condition and stop after "

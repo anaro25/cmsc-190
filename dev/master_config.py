@@ -25,7 +25,7 @@ CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
 enhanced_CBS = True
 compact_clustering = True
 SHARED_TIME_LIMIT_SECONDS = 30.0
-SHARED_ECBS_SUBOPTIMALITY = 2.0 # helps so set to 2.0
+SHARED_ECBS_SUBOPTIMALITY = 3.0 # helps so set to 3.0
 SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True # helps so set to True
 SHARED_NARROW_LANES = True # doesn't help so set to True
 SHARED_TIGHT_TIME_HORIZON = False # doesn't help so set to False
@@ -39,10 +39,10 @@ recompute_MAPF = False
 to_generate = "visualization"
 # to_generate = "nothing"
 
-# MAP_TYPE = "static_artificial"
+MAP_TYPE = "static_artificial"
 # MAP_TYPE = "static_campus_area_1"
 # MAP_TYPE = "dynamic_port"
-MAP_TYPE = "dynamic_campus_area_2"
+# MAP_TYPE = "dynamic_campus_area_2"
 
 STATIC_ARTIFICIAL_CONFIG = {
     # common frequently edited constants
@@ -72,8 +72,8 @@ STATIC_CAMPUS_AREA_1_CONFIG = {
     "seed": 205,
     "agent_number_range": (2, 200, 1), # max 29 (seed 205)
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-    "num_last_runs_to_visualize_jointly_successful": 0,
-    "num_last_runs_to_visualize_independently_successful": 20,
+    "num_last_runs_to_visualize_jointly_successful": 3,
+    "num_last_runs_to_visualize_independently_successful": 6,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "narrow_lanes": SHARED_NARROW_LANES,
@@ -132,7 +132,7 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     "agent_number_range": (2, 200, 1), # max 17 (seed 403)
     "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
     "num_last_runs_to_visualize_jointly_successful": 3,
-    "num_last_runs_to_visualize_independently_successful": 20,
+    "num_last_runs_to_visualize_independently_successful": 6,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
     "narrow_lanes": SHARED_NARROW_LANES,

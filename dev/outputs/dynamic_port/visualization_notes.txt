@@ -1,5 +1,0 @@
-
-# dynamic_port
-
-graphs and data: clustered agents + dispersed targets
-visualization: clustered agents + clustered targets

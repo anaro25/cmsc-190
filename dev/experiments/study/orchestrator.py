@@ -7,6 +7,7 @@ from dev.experiments.branch_specs import get_branch_spec
 from dev.experiments.study.aggregation import build_condition_aggregate
 from dev.experiments.study.constants import (
     CONSECUTIVE_FAILED_PAIRED_SAMPLING_STOP_LIMIT,
+    CYCLIC_TERMINATION_RETRY_ATTEMPTS,
     INTERNAL_COUNTED_RUN_ATTEMPT_SAFEGUARD,
 )
 from dev.experiments.study.io_utils import (
@@ -110,6 +111,75 @@ def _execute_mapping(
     )
 
 
+def _count_cyclic_results(cyclic_records: list[MappingRunRecord]) -> tuple[int, int]:
+    successful = sum(record.result_category == "successful" for record in cyclic_records)
+    unfinished = sum(record.result_category == "unfinished" for record in cyclic_records)
+    return successful, unfinished
+
+
+def _cyclic_unfinished_would_make_condition_fail(
+    *,
+    branch_spec,
+    cyclic_records: list[MappingRunRecord],
+    cyclic_record: MappingRunRecord,
+) -> bool:
+    if not cyclic_record.counted_run or cyclic_record.result_category != "unfinished":
+        return False
+
+    _num_cyclic_successful_runs, num_cyclic_unfinished_runs = _count_cyclic_results(
+        cyclic_records
+    )
+    projected_unfinished_runs = num_cyclic_unfinished_runs + 1
+
+    # With n retained runs, cyclic stops once unfinished runs become the majority.
+    # For the usual n=5 setup, this is the third cyclic unfinished run.
+    maximum_possible_successful_runs = (
+        branch_spec.counted_runs_required - projected_unfinished_runs
+    )
+    return projected_unfinished_runs > maximum_possible_successful_runs
+
+
+def _append_reported_pair(
+    *,
+    prepared_context: PreparedRunContext,
+    classical_record: MappingRunRecord,
+    cyclic_record: MappingRunRecord,
+    classical_solver_result: dict[str, Any] | None,
+    cyclic_solver_result: dict[str, Any] | None,
+    classical_records: list[MappingRunRecord],
+    cyclic_records: list[MappingRunRecord],
+    run_configurations: list[dict[str, Any]],
+    run_records: list[dict[str, Any]],
+    visualization_candidates: list[VisualizationCandidate],
+) -> None:
+    prepared_context.run_configuration.paired_source = True
+    run_configurations.append(prepared_context.run_configuration.to_dict())
+    classical_records.append(classical_record)
+    cyclic_records.append(cyclic_record)
+    run_records.append(classical_record.to_dict())
+    run_records.append(cyclic_record.to_dict())
+    if classical_record.solved_run and classical_solver_result is not None:
+        visualization_candidates.append(
+            VisualizationCandidate(
+                mapping_name="classical",
+                run_configuration=prepared_context.run_configuration,
+                agents=prepared_context.agents,
+                solver_result=classical_solver_result,
+                composite_map=prepared_context.classical_map,
+            )
+        )
+    if cyclic_record.solved_run and cyclic_solver_result is not None:
+        visualization_candidates.append(
+            VisualizationCandidate(
+                mapping_name="cyclic",
+                run_configuration=prepared_context.run_configuration,
+                agents=prepared_context.agents,
+                solver_result=cyclic_solver_result,
+                composite_map=prepared_context.cyclic_map,
+            )
+        )
+
+
 def _run_jointly_viable_sampling(
     *,
     branch_spec,
@@ -129,6 +199,7 @@ def _run_jointly_viable_sampling(
     retained_pairs = 0
     total_paired_sampling_attempts = 0
     consecutive_failed_paired_sampling_attempts = 0
+    cyclic_retry_attempts_remaining = 0
 
     while (
         retained_pairs < branch_spec.counted_runs_required
@@ -210,32 +281,73 @@ def _run_jointly_viable_sampling(
 
         both_counted = classical_record.counted_run and cyclic_record.counted_run
         if both_counted:
-            prepared_context.run_configuration.paired_source = True
-            run_configurations.append(prepared_context.run_configuration.to_dict())
-            classical_records.append(classical_record)
-            cyclic_records.append(cyclic_record)
-            run_records.append(classical_record.to_dict())
-            run_records.append(cyclic_record.to_dict())
-            if classical_record.solved_run and classical_solver_result is not None:
-                visualization_candidates.append(
-                    VisualizationCandidate(
-                        mapping_name="classical",
-                        run_configuration=prepared_context.run_configuration,
-                        agents=prepared_context.agents,
-                        solver_result=classical_solver_result,
-                        composite_map=prepared_context.classical_map,
+            cyclic_unfinished_would_stop = _cyclic_unfinished_would_make_condition_fail(
+                branch_spec=branch_spec,
+                cyclic_records=cyclic_records,
+                cyclic_record=cyclic_record,
+            )
+            if cyclic_unfinished_would_stop:
+                if cyclic_retry_attempts_remaining <= 0:
+                    cyclic_retry_attempts_remaining = CYCLIC_TERMINATION_RETRY_ATTEMPTS
+                    logger.log(
+                        "      Discarded paired sampling attempt because cyclic unfinished would "
+                        "trigger the cyclic majority stop rule | "
+                        f"classical={classical_record.result_category} | "
+                        f"cyclic={cyclic_record.result_category} | "
+                        f"extra_attempts_remaining={cyclic_retry_attempts_remaining}"
                     )
+                    logger.log("")
+                    attempt_index += 1
+                    continue
+
+                cyclic_retry_attempts_remaining -= 1
+                logger.log(
+                    "      Discarded extra paired sampling attempt because cyclic remained unfinished "
+                    "while the current condition was on the stop boundary | "
+                    f"classical={classical_record.result_category} | "
+                    f"cyclic={cyclic_record.result_category} | "
+                    f"extra_attempts_remaining={cyclic_retry_attempts_remaining}"
                 )
-            if cyclic_record.solved_run and cyclic_solver_result is not None:
-                visualization_candidates.append(
-                    VisualizationCandidate(
-                        mapping_name="cyclic",
-                        run_configuration=prepared_context.run_configuration,
-                        agents=prepared_context.agents,
-                        solver_result=cyclic_solver_result,
-                        composite_map=prepared_context.cyclic_map,
+                logger.log("")
+                if cyclic_retry_attempts_remaining <= 0:
+                    num_cyclic_successful_runs, num_cyclic_unfinished_runs = _count_cyclic_results(
+                        cyclic_records
                     )
-                )
+                    stop_message = (
+                        "Stop rule triggered: cyclic reached the unfinished-run stop boundary at "
+                        f"agent_number={agent_number}, and the extra paired sampling attempts were "
+                        "also unfinished. The boundary attempts were discarded and the branch stops "
+                        "before higher agent numbers "
+                        f"({num_cyclic_unfinished_runs} retained unfinished, "
+                        f"{num_cyclic_successful_runs} retained successful)."
+                    )
+                    logger.log(f"  {stop_message}")
+                    return SamplingConditionResult(
+                        accepted_for_reporting=False,
+                        stop_branch=True,
+                        stop_reason="cyclic_unfinished_retry_attempts_exhausted",
+                        stop_message=stop_message,
+                        retained_pairs=retained_pairs,
+                        total_paired_sampling_attempts=total_paired_sampling_attempts,
+                        consecutive_failed_paired_sampling_attempts=consecutive_failed_paired_sampling_attempts,
+                    )
+
+                attempt_index += 1
+                continue
+
+            _append_reported_pair(
+                prepared_context=prepared_context,
+                classical_record=classical_record,
+                cyclic_record=cyclic_record,
+                classical_solver_result=classical_solver_result,
+                cyclic_solver_result=cyclic_solver_result,
+                classical_records=classical_records,
+                cyclic_records=cyclic_records,
+                run_configurations=run_configurations,
+                run_records=run_records,
+                visualization_candidates=visualization_candidates,
+            )
+            cyclic_retry_attempts_remaining = 0
             buffered_logger.flush_to(logger)
             log_mapping_record(logger, classical_record)
             log_mapping_record(logger, cyclic_record)
