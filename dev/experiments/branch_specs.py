@@ -36,7 +36,6 @@ class BranchSpec:
     zone_relationship_mode: str = "none"
     compact_clustering: bool = True
     clustering_style_name: str = "compact"
-    narrow_lanes: bool | None = None
     base_rows: int | None = None
     base_cols: int | None = None
     static_obstacle_density: float | None = None
@@ -237,7 +236,6 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             is_dynamic=False,
             compact_clustering=compact_clustering,
             clustering_style_name=clustering_style_name,
-            narrow_lanes=bool(static_campus_1_cfg.get("narrow_lanes", False)),
             solver_name=static_campus_1_solver_name,
             enhanced_cbs_enabled=static_campus_1_enhanced_cbs_enabled,
             solver_suboptimality_factor=static_campus_1_solver_suboptimality_factor,
@@ -252,10 +250,10 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             dynamic_generation_cell_mode=str(static_campus_1_cfg.get("dynamic_generation_cell_mode", "zone_colors_only")),
             spawnable_cell_mode=str(static_campus_1_cfg.get("spawnable_cell_mode", "zone_colors_only")),
             notes=(
-                "Static image-based campus branch with explicit zone-color semantics. Starts are dispersed in one zone, "
+                f"Static image-based campus branch with explicit zone-color semantics. Starts use {static_campus_1_cfg.get('start_distribution_mode', 'dispersed')} placement in one zone, "
                 f"targets use {static_campus_1_goal_description} in a different zone, and {static_campus_1_assignment_description}. "
                 "Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable, and gray is non-traversable. "
-                f"The currently selected campus image variant is {'narrow lanes' if bool(static_campus_1_cfg.get('narrow_lanes', False)) else 'wide lanes'}."
+                "When single target mode is active, the shared target is sampled only from dark marker cells inside the target zone."
             ),
         ),
         "dynamic_port": BranchSpec(
@@ -347,7 +345,6 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
             is_dynamic=True,
             compact_clustering=compact_clustering,
             clustering_style_name=clustering_style_name,
-            narrow_lanes=bool(campus_2_cfg.get("narrow_lanes", False)),
             solver_name=campus_2_solver_name,
             enhanced_cbs_enabled=campus_2_enhanced_cbs_enabled,
             solver_suboptimality_factor=campus_2_solver_suboptimality_factor,
@@ -372,7 +369,7 @@ def _build_branch_specs() -> dict[str, BranchSpec]:
                 "are traversable but non-spawnable, gray is non-traversable, and dynamic obstacles are generated only inside the "
                 f"zone colors. Starts are sampled as {cluster_description}, targets use {campus_2_goal_description}, "
                 f"{campus_2_assignment_description}, and the start and target selections must come from different campus zones. "
-                f"The currently selected campus image variant is {'narrow lanes' if bool(campus_2_cfg.get('narrow_lanes', False)) else 'wide lanes'}."
+                "When single target mode is active, the shared target is sampled only from dark marker cells inside the target zone."
             ),
         ),
     }

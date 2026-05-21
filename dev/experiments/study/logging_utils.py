@@ -82,8 +82,6 @@ def log_dynamic_state(
 
     logger.log("Shared dynamic map prepared:")
     logger.log(f"  Image path: {branch_spec.image_path}")
-    if branch_spec.narrow_lanes is not None:
-        logger.log(f"  Narrow lanes image selected: {branch_spec.narrow_lanes}")
     if branch_spec.image_resize_longest_side is not None:
         logger.log(f"  Resized longest side: {branch_spec.image_resize_longest_side}")
     logger.log(f"  Dimensions: {rows}x{cols}")

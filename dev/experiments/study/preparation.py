@@ -81,6 +81,25 @@ def _filter_zone_vertices_by_assignment_map(
     return filtered
 
 
+def _single_target_vertices_for_goal_mode(
+    *,
+    goal_distribution_mode: str,
+    goal_zone_id: int,
+    zone_vertices_by_id: dict[int, set[tuple[int, int]]],
+    single_target_vertices_by_id: dict[int, set[tuple[int, int]]],
+) -> set[tuple[int, int]]:
+    if goal_distribution_mode != "single":
+        return zone_vertices_by_id[goal_zone_id]
+
+    marker_vertices = single_target_vertices_by_id.get(goal_zone_id, set())
+    if not marker_vertices:
+        raise ValueError(
+            "single target mode requires at least one dark single-target marker "
+            f"inside goal_zone={goal_zone_id}."
+        )
+    return marker_vertices
+
+
 def _binary_matrix_from_spawn_mask(spawn_mask: list[list[bool]]) -> list[list[int]]:
     return [[0 if is_spawnable else 1 for is_spawnable in row] for row in spawn_mask]
 
@@ -151,8 +170,10 @@ def _sample_agents_for_branch(
     rng: random.Random,
     allowed_spawn_vertices: set[tuple[int, int]] | None = None,
     zone_vertices_by_id: dict[int, set[tuple[int, int]]] | None = None,
+    single_target_vertices_by_id: dict[int, set[tuple[int, int]]] | None = None,
 ) -> tuple[list[dict[str, Any]], str]:
     zone_vertices_by_id = zone_vertices_by_id or {}
+    single_target_vertices_by_id = single_target_vertices_by_id or {}
 
     if branch_spec.zone_relationship_mode == "distinct_campus_zones":
         if not zone_vertices_by_id:
@@ -161,13 +182,19 @@ def _sample_agents_for_branch(
         last_error: Exception | None = None
         for start_zone_id, goal_zone_id in _ordered_distinct_zone_pairs(zone_vertices_by_id, rng):
             try:
+                allowed_goal_vertices = _single_target_vertices_for_goal_mode(
+                    goal_distribution_mode=branch_spec.goal_distribution_mode,
+                    goal_zone_id=goal_zone_id,
+                    zone_vertices_by_id=zone_vertices_by_id,
+                    single_target_vertices_by_id=single_target_vertices_by_id,
+                )
                 agents = sample_agent_start_goal_pairs(
                     composite_map=composite_map,
                     num_agents=num_agents,
                     rng=rng,
                     require_individual_reachability=branch_spec.require_individual_reachability,
                     allowed_start_vertices=zone_vertices_by_id[start_zone_id],
-                    allowed_goal_vertices=zone_vertices_by_id[goal_zone_id],
+                    allowed_goal_vertices=allowed_goal_vertices,
                     start_distribution_mode=branch_spec.start_distribution_mode,
                     goal_distribution_mode=branch_spec.goal_distribution_mode,
                 )
@@ -183,12 +210,17 @@ def _sample_agents_for_branch(
             raise last_error
         raise ValueError("Could not sample a valid distinct-zone campus run configuration.")
 
+    marker_goal_vertices: set[tuple[int, int]] | None = None
+    if branch_spec.goal_distribution_mode == "single" and single_target_vertices_by_id:
+        marker_goal_vertices = set().union(*single_target_vertices_by_id.values())
+
     agents = sample_agent_start_goal_pairs(
         composite_map=composite_map,
         num_agents=num_agents,
         rng=rng,
         require_individual_reachability=branch_spec.require_individual_reachability,
-        allowed_spawn_vertices=allowed_spawn_vertices,
+        allowed_start_vertices=allowed_spawn_vertices,
+        allowed_goal_vertices=marker_goal_vertices or allowed_spawn_vertices,
         start_distribution_mode=branch_spec.start_distribution_mode,
         goal_distribution_mode=branch_spec.goal_distribution_mode,
     )
@@ -293,6 +325,7 @@ def prepare_static_run_context(
         )
         allowed_spawn_vertices = None
         zone_vertices_by_id: dict[int, set[tuple[int, int]]] = {}
+        single_target_vertices_by_id: dict[int, set[tuple[int, int]]] = {}
         map_identifier = f"artificial_{branch_spec.base_rows}x{branch_spec.base_cols}_seed_{map_seed}"
         map_note = "Fresh artificial map for this run configuration."
     else:
@@ -311,7 +344,15 @@ def prepare_static_run_context(
                 base_map,
                 _zone_id_matrix_to_composite_positions(campus_semantics["zone_id_matrix"]),
             )
-            map_note = "Static image-based campus map loaded with semantic zone masks."
+            single_target_vertices_by_id = _filter_zone_vertices_by_assignment_map(
+                base_map,
+                _zone_id_matrix_to_composite_positions(campus_semantics["single_target_id_matrix"]),
+            )
+            single_target_cell_count = sum(cell for row in campus_semantics["single_target_mask"] for cell in row)
+            map_note = (
+                "Static image-based campus map loaded with semantic zone masks "
+                f"and single-target marker cells={single_target_cell_count}."
+            )
         else:
             obstacle_matrix = load_port_obstacle_matrix(
                 image_path=branch_spec.image_path,
@@ -321,6 +362,7 @@ def prepare_static_run_context(
             base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix)
             allowed_spawn_vertices = None
             zone_vertices_by_id = {}
+            single_target_vertices_by_id = {}
             map_note = "Static image-based thresholded map loaded for this run configuration."
         map_identifier = f"{branch_spec.map_type}_static_image_seed_{map_seed}"
 
@@ -333,6 +375,7 @@ def prepare_static_run_context(
         rng=random.Random(assignment_seed),
         allowed_spawn_vertices=allowed_spawn_vertices,
         zone_vertices_by_id=zone_vertices_by_id,
+        single_target_vertices_by_id=single_target_vertices_by_id,
     )
     run_config = RunConfiguration(
         branch_id=branch_spec.branch_id,
@@ -379,6 +422,7 @@ def prepare_dynamic_branch_state(
 
     spawn_mask: list[list[bool]] | None = None
     campus_zone_vertices_by_id: dict[int, set[tuple[int, int]]] = {}
+    campus_single_target_vertices_by_id: dict[int, set[tuple[int, int]]] = {}
     visually_free_vertices: set[tuple[int, int]] = set()
     eligible_dynamic_cells: set[tuple[int, int]] | None = None
 
@@ -391,14 +435,16 @@ def prepare_dynamic_branch_state(
         raw_obstacle_matrix = campus_semantics["traversable_matrix"]
         spawn_mask = campus_semantics["zone_spawn_mask"]
         campus_zone_vertices_by_id = _zone_id_matrix_to_composite_positions(campus_semantics["zone_id_matrix"])
+        campus_single_target_vertices_by_id = _zone_id_matrix_to_composite_positions(campus_semantics["single_target_id_matrix"])
         visually_free_vertices = _spawn_mask_to_composite_positions(campus_semantics["gray_mask"])
         eligible_dynamic_cells = _mask_to_matrix_positions(campus_semantics["zone_spawn_mask"])
         zone_cell_count = sum(cell for row in campus_semantics["zone_spawn_mask"] for cell in row)
+        single_target_cell_count = sum(cell for row in campus_semantics["single_target_mask"] for cell in row)
         walkway_cell_count = sum(cell for row in campus_semantics["walkway_mask"] for cell in row)
         gray_cell_count = sum(cell for row in campus_semantics["gray_mask"] for cell in row)
         _log(
             logger,
-            f"  Campus semantic masks loaded | zone_cells={zone_cell_count} | walkway_cells={walkway_cell_count} | gray_cells={gray_cell_count} | zones={len(campus_zone_vertices_by_id)}",
+            f"  Campus semantic masks loaded | zone_cells={zone_cell_count} | single_target_cells={single_target_cell_count} | walkway_cells={walkway_cell_count} | gray_cells={gray_cell_count} | zones={len(campus_zone_vertices_by_id)}",
         )
     else:
         raw_obstacle_matrix = load_port_obstacle_matrix(
@@ -520,9 +566,13 @@ def prepare_dynamic_branch_state(
             assignment_map,
             campus_zone_vertices_by_id,
         )
+        campus_single_target_vertices_by_id = _filter_zone_vertices_by_assignment_map(
+            assignment_map,
+            campus_single_target_vertices_by_id,
+        )
         _log(
             logger,
-            f"  Campus zone spawn mask ready | allowed_spawn_vertices={len(allowed_spawn_vertices or set())} | usable_zones={len(campus_zone_vertices_by_id)}",
+            f"  Campus zone spawn mask ready | allowed_spawn_vertices={len(allowed_spawn_vertices or set())} | usable_zones={len(campus_zone_vertices_by_id)} | usable_single_target_zones={len(campus_single_target_vertices_by_id)}",
         )
 
     _log(logger, "Shared dynamic branch state preparation completed.")
@@ -538,6 +588,7 @@ def prepare_dynamic_branch_state(
         generation_mode=generation_mode,
         allowed_spawn_vertices=allowed_spawn_vertices,
         zone_vertices_by_id=campus_zone_vertices_by_id,
+        single_target_vertices_by_id=campus_single_target_vertices_by_id,
         visually_free_vertices=visually_free_vertices,
     )
 
@@ -560,6 +611,7 @@ def prepare_dynamic_run_context(
         rng=assignment_rng,
         allowed_spawn_vertices=dynamic_state.allowed_spawn_vertices,
         zone_vertices_by_id=dynamic_state.zone_vertices_by_id,
+        single_target_vertices_by_id=dynamic_state.single_target_vertices_by_id,
     )
     run_note = f"Shared dynamic map source; unique initial conditions for this run. {assignment_note}"
 

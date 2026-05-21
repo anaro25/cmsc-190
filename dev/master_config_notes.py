@@ -16,16 +16,19 @@
 #   whose exact internal spacing is controlled globally by compact_clustering
 # - "single": target-only mode where all agents share one literal target cell
 #   and disappear there after arrival. Do not use "single" for start_distribution_mode.
+#   In campus branches, this shared target is sampled only from the darker
+#   single-target marker cells in the selected target zone.
 #
 # compact_clustering
 # - True: clustered sets are compact directly adjacent 8-neighbor-connected groups
 # - False: clustered sets are spaced groups whose members keep one empty cell of
 #   separation in all 8 directions while still forming one connected cluster
 #
-# narrow_lanes
-#   Campus image selector used by static_campus_area_1 and dynamic_campus_area_2.
-#   True  -> use the *_narrow_lanes.png variant
-#   False -> use the *_wide_lanes.png variant
+# Campus input images
+#   static_campus_area_1 uses dev/inputs/static_campus_area_1/campus_area_1.png.
+#   dynamic_campus_area_2 uses dev/inputs/dynamic_campus_area_2/campus_area_2.png.
+#   Dark blue, dark green, and dark red pixels are treated as target-only marker
+#   cells for campus single-target mode while still belonging to their zones.
 #
 # zone_relationship_mode:
 # - "none": starts and goals may be sampled from the same allowed pool

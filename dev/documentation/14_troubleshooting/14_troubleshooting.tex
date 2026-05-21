@@ -36,7 +36,7 @@
 
 \section{Campus Zones Not Detected}
 
-If a campus run reports something that implies zero usable zones, such as a log with \texttt{zone\_cells=0}, check the source image before changing the code. The current campus loader expects the designated zone colors to be present in the actual image asset. Also confirm that the branch/image pairing and the \texttt{narrow\_lanes} settings in \texttt{master\_config.py} still point to the intended lane variant: \texttt{static\_campus\_area\_1} should select one of the \texttt{campus\_area\_1\_*\_lanes.png} files and \texttt{dynamic\_campus\_area\_2} should select one of the \texttt{campus\_area\_2\_*\_lanes.png} files.
+If a campus run reports something that implies zero usable zones, such as a log with \texttt{zone\_cells=0}, check the source image before changing the code. The current campus loader expects the designated zone colors to be present in the actual image asset. Also confirm that the branch/image pairing in \texttt{master\_config.py} still points to \texttt{static\_campus\_area\_1/campus\_area\_1.png} and \texttt{dynamic\_campus\_area\_2/campus\_area\_2.png}.
 
 \section{Clustered Sampling Keeps Failing}
 

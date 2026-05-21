@@ -135,6 +135,7 @@ pathological infinite loops. It remains only a protective implementation detail.
 
 - The project now uses explicit `start_distribution_mode` and `goal_distribution_mode` settings instead of the older shared-goal campus toggle.
 - `goal_distribution_mode` can now be `dispersed`, `clustered`, or `single`. `single` is target-only and means all agents share one literal target cell where they disappear after arrival.
+- In campus branches, `single` targets are sampled only from the dark marker cells inside the selected target zone. The dark blue, dark green, and dark red marker pixels still count as zone cells for traversal and ordinary spawn masks.
 - The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, and gray regions are non-traversable for the solver. During Pillow visualization generation, gray campus cells are reconstructed from the current semantic image and rendered through a temporary render-only free-space override so they appear as ordinary white open cells without changing solver behavior, while already persisted raw MAPF data remains reusable.
 - `static_campus_area_1` now uses campus area 1 as the static branch, with dispersed starts in one zone and clustered goals in the other zone.
 - `dynamic_port` now uses clustered starts and dispersed goals.
@@ -147,4 +148,4 @@ pathological infinite loops. It remains only a protective implementation detail.
 - Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize_jointly_successful` and `num_last_runs_to_visualize_independently_successful` in `master_config.py`, and a visualization-only execution now generates both folder variants automatically under `dev/outputs/<map_type>/visualizations/`.
 - Branch metadata and per-run records now also capture the active solver family (`CBS` or `ECBS`) so output files remain interpretable after solver-toggle changes.
 
-- `static_campus_area_1` and `dynamic_campus_area_2` now each expose a branch-level `narrow_lanes` boolean in `master_config.py`, which switches their campus input between the `*_narrow_lanes.png` and `*_wide_lanes.png` variants.
+- Campus image inputs now use `dev/inputs/static_campus_area_1/campus_area_1.png` and `dev/inputs/dynamic_campus_area_2/campus_area_2.png`.

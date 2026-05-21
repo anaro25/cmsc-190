@@ -64,7 +64,7 @@ This is the single user-editable configuration file. It defines:
     \item the global \texttt{compact\_clustering} toggle,
     \item each branch's editable \texttt{ECBS\_suboptimality} value,
     \item each branch's low-level guidance toggles \texttt{true\_static\_shortest\_path\_distance} and \texttt{tight\_time\_horizon},
-    \item campus-image lane selectors such as \texttt{narrow\_lanes},
+    \item campus image paths and semantic-color settings,
     \item all other branch-specific numeric parameters and toggles.
 \end{itemize}
 
@@ -105,7 +105,7 @@ These modules implement the map representation, mapping overlays, cyclic cleanup
 
 \subsection{\texttt{dev/inputs/}}
 
-Image-based branches depend on this folder. The current dynamic input logic supports both ordinary thresholded port loading and campus semantic-color loading. The campus assets currently referenced by \texttt{master\_config.py} are the lane variants under \texttt{dynamic\_campus\_area\_1/} and \texttt{dynamic\_campus\_area\_2/}, selected through each campus branch's \texttt{narrow\_lanes} toggle.
+Image-based branches depend on this folder. The current dynamic input logic supports both ordinary thresholded port loading and campus semantic-color loading. The campus assets currently referenced by \texttt{master\_config.py} are \texttt{static\_campus\_area\_1/campus\_area\_1.png} and \texttt{dynamic\_campus\_area\_2/campus\_area\_2.png}.
 
 \section{Legacy vs.\ Active Code}
 

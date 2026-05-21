@@ -130,6 +130,7 @@ class DynamicBranchState:
     generation_mode: str
     allowed_spawn_vertices: set[tuple[int, int]] | None = None
     zone_vertices_by_id: dict[int, set[tuple[int, int]]] = field(default_factory=dict)
+    single_target_vertices_by_id: dict[int, set[tuple[int, int]]] = field(default_factory=dict)
     visually_free_vertices: set[tuple[int, int]] = field(default_factory=set)
 
 

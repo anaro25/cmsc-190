@@ -70,7 +70,7 @@ Changing this mapping would change reported metrics and stopping behavior.
 The campus branches depend on semantic colors, not just thresholding. Any update to campus input processing should preserve the meanings of zone colors, white walkways, and gray regions unless the experiment design itself is intentionally changed.
 
 \subsection{Campus Image Variant Contract}
-The campus branches select their source images through branch-level \texttt{narrow\_lanes} toggles in \texttt{master\_config.py}. If lane-variant filenames or selection logic change, update both the config helper and the recorded branch metadata so it remains obvious which campus layout variant was actually run.
+The campus branches select their source images through the fixed campus image path helper in \texttt{master\_config.py}. If filenames or folder names change, update both the config helper and the recorded branch metadata so it remains obvious which campus layout was actually run.
 
 \subsection{Assignment Cardinality Contract}
 Dispersed and clustered goal modes are one-to-one MAPF setups. The \texttt{single} goal mode is the explicit target-only many-to-one setup, where all agents share one literal target cell. Do not use \texttt{single} for start placement, and do not introduce one-to-many assignment semantics under a misleading flag name.

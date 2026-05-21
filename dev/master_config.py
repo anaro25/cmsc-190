@@ -7,13 +7,12 @@ PACKAGE_ROOT = Path(__file__).resolve().parent
 INPUTS_ROOT = PACKAGE_ROOT / "inputs"
 
 
-def _campus_lane_variant_image_path(*, area_number: int, narrow_lanes: bool) -> str:
-    lane_variant = "narrow_lanes" if narrow_lanes else "wide_lanes"
-    return str(
-        INPUTS_ROOT
-        / f"dynamic_campus_area_{area_number}"
-        / f"campus_area_{area_number}_{lane_variant}.png"
-    )
+def _campus_area_image_path(*, area_number: int) -> str:
+    if area_number == 1:
+        return str(INPUTS_ROOT / "static_campus_area_1" / "campus_area_1.png")
+    if area_number == 2:
+        return str(INPUTS_ROOT / "dynamic_campus_area_2" / "campus_area_2.png")
+    raise ValueError(f"Unsupported campus area number: {area_number}")
 
 
 # If the current agent-number condition reaches this many consecutive jointly
@@ -27,7 +26,6 @@ compact_clustering = True
 SHARED_TIME_LIMIT_SECONDS = 30.0
 SHARED_ECBS_SUBOPTIMALITY = 3.0 # helps so set to 3.0
 SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True # helps so set to True
-SHARED_NARROW_LANES = True # doesn't help so set to True
 SHARED_TIGHT_TIME_HORIZON = False # doesn't help so set to False
 SHARED_COUNTED_RUNS_REQUIRED = 5
 
@@ -76,7 +74,6 @@ STATIC_CAMPUS_AREA_1_CONFIG = {
     "num_last_runs_to_visualize_independently_successful": 1,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
-    "narrow_lanes": SHARED_NARROW_LANES,
     "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
 
     # common permanent constants
@@ -92,10 +89,7 @@ STATIC_CAMPUS_AREA_1_CONFIG = {
     "image_path": None,
     "dynamic_generation_cell_mode": "zone_colors_only",
 }
-STATIC_CAMPUS_AREA_1_CONFIG["image_path"] = _campus_lane_variant_image_path(
-    area_number=1,
-    narrow_lanes=bool(STATIC_CAMPUS_AREA_1_CONFIG["narrow_lanes"]),
-)
+STATIC_CAMPUS_AREA_1_CONFIG["image_path"] = _campus_area_image_path(area_number=1)
 
 DYNAMIC_PORT_CONFIG = {
     # common frequently edited constants
@@ -135,7 +129,6 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = {
     "num_last_runs_to_visualize_independently_successful": 6,
     "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
     "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
-    "narrow_lanes": SHARED_NARROW_LANES,
     "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
 
     # common permanent constants
@@ -158,10 +151,7 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = {
 }
 
 
-DYNAMIC_CAMPUS_AREA_2_CONFIG["image_path"] = _campus_lane_variant_image_path(
-    area_number=2,
-    narrow_lanes=bool(DYNAMIC_CAMPUS_AREA_2_CONFIG["narrow_lanes"]),
-)
+DYNAMIC_CAMPUS_AREA_2_CONFIG["image_path"] = _campus_area_image_path(area_number=2)
 
 
 BRANCH_USER_CONFIGS = {
