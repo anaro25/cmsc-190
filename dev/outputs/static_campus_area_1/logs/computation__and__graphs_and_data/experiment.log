@@ -1,0 +1,1659 @@
+========================================================================================
+Branch: Static Campus Area 1 (static_campus_area_1)
+Map obstacle type: static
+Documented target type: single_target
+Active target type: single_target
+Start distribution mode: dispersed
+Goal distribution mode: single
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: True
+Zone relationship mode: distinct_campus_zones
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 3.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Agent cohesion enabled: True
+Cohesion factor: 1.00
+Seed: 401
+Jointly viable counted pairs required (n): 3
+Runtime limit per run: 30.00s
+Agent number range: start=2, end=200, step=1
+Planned agent-number conditions before early stopping: 199 (first=2, last=200)
+Early-stop rule 1: when a cyclic unfinished run would make unfinished runs the majority, discard that paired attempt and allow 3 extra paired attempt(s). Stop if all extra attempts remain unfinished.
+Early-stop rule 2: discard the current condition and stop after 15 consecutive failed paired sampling attempts.
+Notes: Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable for agents/targets, and gray/black cells are non-traversable. The source-image static layout is used without dynamic obstacles. Starts are sampled as dispersed in one zone, targets use one literal shared target cell in a different zone, and assignments are many-to-one. When single target mode is active, the shared target is sampled only from dark marker cells inside the selected target zone.
+========================================================================================
+recompute_MAPF: True
+to_generate: graphs_and_data
+Persisted raw MAPF data root: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/static_campus_area_1
+Persisted raw MAPF manifest path: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/static_campus_area_1/manifest.json
+[Elapsed: 00m 00s] Program stopwatch started.
+
+Recomputing raw MAPF data for the selected branch and replacing the saved copy...
+
+----------------------------------------------------------------------------------------
+Condition 1 | agent_number=2 | condition_id=agent_number[0.2.0]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=2 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.0.0] | map_id=static_campus_area_1_static_image_seed_48822
+    Classical run[0.2.0.0] progress: 0.00s
+    Cyclic run[0.2.0.0] progress: 0.00s
+      Classical | mapping[0.2.0.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=0.00 | avg_path=80.50 | paired=True
+      Cyclic | mapping[0.2.0.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=0.00 | avg_path=97.50 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=2 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.0.1] | map_id=static_campus_area_1_static_image_seed_48854
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.03214919200036093 | cyclic_halted=0.03722915499929513 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=2 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.0.2] | map_id=static_campus_area_1_static_image_seed_48886
+    Classical run[0.2.0.2] progress: 0.00s
+    Cyclic run[0.2.0.2] progress: 0.00s
+      Classical | mapping[0.2.0.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=0.00 | avg_path=74.50 | paired=True
+      Cyclic | mapping[0.2.0.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=0.00 | avg_path=85.50 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=2 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.0.3] | map_id=static_campus_area_1_static_image_seed_48918
+    Classical run[0.2.0.3] progress: 0.00s
+    Cyclic run[0.2.0.3] progress: 0.00s
+      Classical | mapping[0.2.0.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=0.00 | avg_path=67.00 | paired=True
+      Cyclic | mapping[0.2.0.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=0.00 | avg_path=79.00 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.0] | agent_number=2 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.03 | avg_conflicts_at_halt=0.00 | avg_path=74.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=0.00 | avg_path=87.33
+[Elapsed: 00m 01s] Condition 1 completed (agent_number=2).
+
+----------------------------------------------------------------------------------------
+Condition 2 | agent_number=3 | condition_id=agent_number[0.2.1]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=3 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.1.0] | map_id=static_campus_area_1_static_image_seed_48852
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.03974700899925665 | cyclic_halted=0.14107858299939835 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=3 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.1.1] | map_id=static_campus_area_1_static_image_seed_48884
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.034296980000362964 | cyclic_halted=0.03752178000013373 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=3 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.1.2] | map_id=static_campus_area_1_static_image_seed_48916
+    Classical run[0.2.1.2] progress: 0.00s
+    Cyclic run[0.2.1.2] progress: 0.00s
+      Classical | mapping[0.2.1.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.06s | conflicts_at_halt=1.00 | avg_path=89.67 | paired=True
+      Cyclic | mapping[0.2.1.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=0.00 | avg_path=102.00 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 4... | agent_number=3 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.1.3] | map_id=static_campus_area_1_static_image_seed_48948
+    Classical run[0.2.1.3] progress: 0.00s
+    Cyclic run[0.2.1.3] progress: 0.00s
+      Classical | mapping[0.2.1.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=0.00 | avg_path=72.00 | paired=True
+      Cyclic | mapping[0.2.1.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=0.00 | avg_path=76.67 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 5... | agent_number=3 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.1.4] | map_id=static_campus_area_1_static_image_seed_48980
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.032135654999365215 | cyclic_halted=0.03299327600052493 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=3 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.1.5] | map_id=static_campus_area_1_static_image_seed_49012
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.037985811999533325 | cyclic_halted=0.044757890999790106 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=3 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.1.6] | map_id=static_campus_area_1_static_image_seed_49044
+    Classical run[0.2.1.6] progress: 0.00s
+    Cyclic run[0.2.1.6] progress: 0.00s
+      Classical | mapping[0.2.1.6.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=0.00 | avg_path=75.67 | paired=True
+      Cyclic | mapping[0.2.1.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=0.00 | avg_path=89.67 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.1] | agent_number=3 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.05 | avg_conflicts_at_halt=0.33 | avg_path=79.11
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.04 | avg_conflicts_at_halt=0.00 | avg_path=89.44
+[Elapsed: 00m 04s] Condition 2 completed (agent_number=3).
+
+----------------------------------------------------------------------------------------
+Condition 3 | agent_number=4 | condition_id=agent_number[0.2.2]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=4 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.2.0] | map_id=static_campus_area_1_static_image_seed_48882
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.03810511400024552 | cyclic_halted=0.060306131999823265 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=4 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.2.1] | map_id=static_campus_area_1_static_image_seed_48914
+    Classical run[0.2.2.1] progress: 0.00s
+    Cyclic run[0.2.2.1] progress: 0.00s
+      Classical | mapping[0.2.2.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.16s | conflicts_at_halt=1.00 | avg_path=82.25 | paired=True
+      Cyclic | mapping[0.2.2.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.09s | conflicts_at_halt=0.00 | avg_path=85.50 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=4 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.2.2] | map_id=static_campus_area_1_static_image_seed_48946
+    Classical run[0.2.2.2] progress: 0.00s
+    Cyclic run[0.2.2.2] progress: 0.00s
+      Classical | mapping[0.2.2.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=0.00 | avg_path=73.50 | paired=True
+      Cyclic | mapping[0.2.2.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=0.00 | avg_path=85.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=4 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.2.3] | map_id=static_campus_area_1_static_image_seed_48978
+    Classical run[0.2.2.3] progress: 0.00s
+    Cyclic run[0.2.2.3] progress: 0.00s
+      Classical | mapping[0.2.2.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=0.00 | avg_path=67.00 | paired=True
+      Cyclic | mapping[0.2.2.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=0.00 | avg_path=79.00 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.2] | agent_number=4 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=0.33 | avg_path=74.25
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=0.00 | avg_path=83.17
+[Elapsed: 00m 06s] Condition 3 completed (agent_number=4).
+
+----------------------------------------------------------------------------------------
+Condition 4 | agent_number=5 | condition_id=agent_number[0.2.3]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=5 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.3.0] | map_id=static_campus_area_1_static_image_seed_48912
+    Classical run[0.2.3.0] progress: 0.00s
+    Cyclic run[0.2.3.0] progress: 0.00s
+      Classical | mapping[0.2.3.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=1.00 | avg_path=80.80 | paired=True
+      Cyclic | mapping[0.2.3.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=1.00 | avg_path=98.80 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=5 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.3.1] | map_id=static_campus_area_1_static_image_seed_48944
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.047921993999807455 | cyclic_halted=0.056090191000294 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=5 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.3.2] | map_id=static_campus_area_1_static_image_seed_48976
+    Classical run[0.2.3.2] progress: 0.00s
+    Cyclic run[0.2.3.2] progress: 0.00s
+      Classical | mapping[0.2.3.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.06s | conflicts_at_halt=0.00 | avg_path=76.40 | paired=True
+      Cyclic | mapping[0.2.3.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=0.00 | avg_path=93.20 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=5 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.3.3] | map_id=static_campus_area_1_static_image_seed_49008
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.08620916800009581 | cyclic_halted=0.13766989699979604 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=5 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.3.4] | map_id=static_campus_area_1_static_image_seed_49040
+    Classical run[0.2.3.4] progress: 0.00s
+    Cyclic run[0.2.3.4] progress: 0.00s
+      Classical | mapping[0.2.3.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=2.00 | avg_path=73.60 | paired=True
+      Cyclic | mapping[0.2.3.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=0.00 | avg_path=86.20 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.3] | agent_number=5 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=1.00 | avg_path=76.93
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=0.33 | avg_path=92.73
+[Elapsed: 00m 09s] Condition 4 completed (agent_number=5).
+
+----------------------------------------------------------------------------------------
+Condition 5 | agent_number=6 | condition_id=agent_number[0.2.4]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=6 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.4.0] | map_id=static_campus_area_1_static_image_seed_48942
+    Classical run[0.2.4.0] progress: 0.00s
+    Cyclic run[0.2.4.0] progress: 0.00s
+      Classical | mapping[0.2.4.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=1.00 | avg_path=78.33 | paired=True
+      Cyclic | mapping[0.2.4.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.09s | conflicts_at_halt=1.00 | avg_path=91.67 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=6 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.4.1] | map_id=static_campus_area_1_static_image_seed_48974
+    Classical run[0.2.4.1] progress: 0.00s
+    Cyclic run[0.2.4.1] progress: 0.00s
+      Classical | mapping[0.2.4.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.07s | conflicts_at_halt=0.00 | avg_path=72.67 | paired=True
+      Cyclic | mapping[0.2.4.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.07s | conflicts_at_halt=0.00 | avg_path=79.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=6 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.4.2] | map_id=static_campus_area_1_static_image_seed_49006
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.14561257599962119 | cyclic_halted=0.22484103799979493 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 4... | agent_number=6 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.4.3] | map_id=static_campus_area_1_static_image_seed_49038
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.07777889000044524 | cyclic_halted=0.10695694199966965 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=6 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.4.4] | map_id=static_campus_area_1_static_image_seed_49070
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.06561216399950354 | cyclic_halted=0.06566590400052519 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=6 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.4.5] | map_id=static_campus_area_1_static_image_seed_49102
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.11222144800012757 | cyclic_halted=0.11471624000023439 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=6 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.4.6] | map_id=static_campus_area_1_static_image_seed_49134
+    Classical run[0.2.4.6] progress: 0.00s
+    Cyclic run[0.2.4.6] progress: 0.00s
+      Classical | mapping[0.2.4.6.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=0.00 | avg_path=83.50 | paired=True
+      Cyclic | mapping[0.2.4.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.06s | conflicts_at_halt=0.00 | avg_path=101.17 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.4] | agent_number=6 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=0.33 | avg_path=78.17
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=0.33 | avg_path=90.61
+[Elapsed: 00m 12s] Condition 5 completed (agent_number=6).
+
+----------------------------------------------------------------------------------------
+Condition 6 | agent_number=7 | condition_id=agent_number[0.2.5]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=7 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.5.0] | map_id=static_campus_area_1_static_image_seed_48972
+    Classical run[0.2.5.0] progress: 0.00s
+    Cyclic run[0.2.5.0] progress: 0.00s
+      Classical | mapping[0.2.5.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.30s | conflicts_at_halt=9.00 | avg_path=68.43 | paired=True
+      Cyclic | mapping[0.2.5.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.07s | conflicts_at_halt=0.00 | avg_path=88.71 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=7 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.5.1] | map_id=static_campus_area_1_static_image_seed_49004
+    Classical run[0.2.5.1] progress: 0.00s
+    Cyclic run[0.2.5.1] progress: 0.00s
+      Classical | mapping[0.2.5.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=0.00 | avg_path=70.86 | paired=True
+      Cyclic | mapping[0.2.5.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=0.00 | avg_path=84.14 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=7 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.5.2] | map_id=static_campus_area_1_static_image_seed_49036
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.1081450270003188 | cyclic_halted=0.1297623359996578 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 4... | agent_number=7 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.5.3] | map_id=static_campus_area_1_static_image_seed_49068
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.10770376500022394 | cyclic_halted=0.13988537800014456 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=7 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.5.4] | map_id=static_campus_area_1_static_image_seed_49100
+    Classical run[0.2.5.4] progress: 0.00s
+    Cyclic run[0.2.5.4] progress: 0.00s
+      Classical | mapping[0.2.5.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.13s | conflicts_at_halt=1.00 | avg_path=72.00 | paired=True
+      Cyclic | mapping[0.2.5.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.07s | conflicts_at_halt=0.00 | avg_path=78.14 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.5] | agent_number=7 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.17 | avg_conflicts_at_halt=3.33 | avg_path=70.43
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=0.00 | avg_path=83.67
+[Elapsed: 00m 15s] Condition 6 completed (agent_number=7).
+
+----------------------------------------------------------------------------------------
+Condition 7 | agent_number=8 | condition_id=agent_number[0.2.6]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=8 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.6.0] | map_id=static_campus_area_1_static_image_seed_49002
+    Classical run[0.2.6.0] progress: 0.00s
+    Cyclic run[0.2.6.0] progress: 0.00s
+      Classical | mapping[0.2.6.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.24s | conflicts_at_halt=4.00 | avg_path=66.12 | paired=True
+      Cyclic | mapping[0.2.6.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=1.00 | avg_path=88.12 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=8 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.6.1] | map_id=static_campus_area_1_static_image_seed_49034
+    Classical run[0.2.6.1] progress: 0.00s
+    Cyclic run[0.2.6.1] progress: 0.00s
+      Classical | mapping[0.2.6.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.15s | conflicts_at_halt=2.00 | avg_path=74.00 | paired=True
+      Cyclic | mapping[0.2.6.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=0.00 | avg_path=79.25 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=8 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.6.2] | map_id=static_campus_area_1_static_image_seed_49066
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.09235446599996067 | cyclic_halted=0.11523012800080323 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 4... | agent_number=8 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.6.3] | map_id=static_campus_area_1_static_image_seed_49098
+    Classical run[0.2.6.3] progress: 0.00s
+    Cyclic run[0.2.6.3] progress: 0.00s
+      Classical | mapping[0.2.6.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=0.00 | avg_path=80.00 | paired=True
+      Cyclic | mapping[0.2.6.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=0.00 | avg_path=82.75 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.6] | agent_number=8 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.16 | avg_conflicts_at_halt=2.00 | avg_path=73.38
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.09 | avg_conflicts_at_halt=0.33 | avg_path=83.38
+[Elapsed: 00m 18s] Condition 7 completed (agent_number=8).
+
+----------------------------------------------------------------------------------------
+Condition 8 | agent_number=9 | condition_id=agent_number[0.2.7]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=9 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.7.0] | map_id=static_campus_area_1_static_image_seed_49032
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.1590457319998677 | cyclic_halted=0.1943916119998903 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=9 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.7.1] | map_id=static_campus_area_1_static_image_seed_49064
+    Classical run[0.2.7.1] progress: 0.00s
+    Cyclic run[0.2.7.1] progress: 0.00s
+      Classical | mapping[0.2.7.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.14s | conflicts_at_halt=1.00 | avg_path=71.11 | paired=True
+      Cyclic | mapping[0.2.7.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=0.00 | avg_path=89.00 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=9 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.7.2] | map_id=static_campus_area_1_static_image_seed_49096
+    Classical run[0.2.7.2] progress: 0.00s
+    Cyclic run[0.2.7.2] progress: 0.00s
+      Classical | mapping[0.2.7.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.13s | conflicts_at_halt=1.00 | avg_path=74.22 | paired=True
+      Cyclic | mapping[0.2.7.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.11s | conflicts_at_halt=1.00 | avg_path=78.89 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=9 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.7.3] | map_id=static_campus_area_1_static_image_seed_49128
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.3099504669999078 | cyclic_halted=0.5862768199995116 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=9 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.7.4] | map_id=static_campus_area_1_static_image_seed_49160
+    Classical run[0.2.7.4] progress: 0.00s
+    Cyclic run[0.2.7.4] progress: 0.00s
+      Classical | mapping[0.2.7.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.11s | conflicts_at_halt=0.00 | avg_path=67.33 | paired=True
+      Cyclic | mapping[0.2.7.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.09s | conflicts_at_halt=0.00 | avg_path=79.00 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.7] | agent_number=9 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.13 | avg_conflicts_at_halt=0.67 | avg_path=70.89
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.10 | avg_conflicts_at_halt=0.33 | avg_path=82.30
+[Elapsed: 00m 21s] Condition 8 completed (agent_number=9).
+
+----------------------------------------------------------------------------------------
+Condition 9 | agent_number=10 | condition_id=agent_number[0.2.8]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=10 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.8.0] | map_id=static_campus_area_1_static_image_seed_50452
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.11682756899972446 | cyclic_halted=0.12928867000027822 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=10 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.8.1] | map_id=static_campus_area_1_static_image_seed_50485
+    Classical run[0.2.8.1] progress: 0.00s
+    Cyclic run[0.2.8.1] progress: 0.00s
+      Classical | mapping[0.2.8.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.26s | conflicts_at_halt=3.00 | avg_path=76.70 | paired=True
+      Cyclic | mapping[0.2.8.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.14s | conflicts_at_halt=2.00 | avg_path=80.20 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=10 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.8.2] | map_id=static_campus_area_1_static_image_seed_50518
+    Classical run[0.2.8.2] progress: 0.00s
+    Cyclic run[0.2.8.2] progress: 0.00s
+      Classical | mapping[0.2.8.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.23s | conflicts_at_halt=3.00 | avg_path=81.60 | paired=True
+      Cyclic | mapping[0.2.8.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.21s | conflicts_at_halt=4.00 | avg_path=97.80 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=10 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.8.3] | map_id=static_campus_area_1_static_image_seed_50551
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4952203670000017 | cyclic_halted=0.5345197249998819 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=10 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.8.4] | map_id=static_campus_area_1_static_image_seed_50584
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2663522869997905 | cyclic_halted=1.1003062029994908 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=10 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.8.5] | map_id=static_campus_area_1_static_image_seed_50617
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.29736653399959323 | cyclic_halted=2.3149412239999947 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=10 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.8.6] | map_id=static_campus_area_1_static_image_seed_50650
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.206919700999606 | cyclic_halted=0.24732479999966017 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=10 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.8.7] | map_id=static_campus_area_1_static_image_seed_50683
+    Classical run[0.2.8.7] progress: 0.00s
+    Cyclic run[0.2.8.7] progress: 0.00s
+      Classical | mapping[0.2.8.7.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.30s | conflicts_at_halt=5.00 | avg_path=71.60 | paired=True
+      Cyclic | mapping[0.2.8.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.18s | conflicts_at_halt=3.00 | avg_path=81.70 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.8] | agent_number=10 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.26 | avg_conflicts_at_halt=3.67 | avg_path=76.63
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.18 | avg_conflicts_at_halt=3.00 | avg_path=86.57
+[Elapsed: 00m 31s] Condition 9 completed (agent_number=10).
+
+----------------------------------------------------------------------------------------
+Condition 10 | agent_number=11 | condition_id=agent_number[0.2.9]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=11 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.9.0] | map_id=static_campus_area_1_static_image_seed_50483
+    Classical run[0.2.9.0] progress: 0.00s
+    Cyclic run[0.2.9.0] progress: 0.00s
+      Classical | mapping[0.2.9.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.17s | conflicts_at_halt=0.00 | avg_path=78.73 | paired=True
+      Cyclic | mapping[0.2.9.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.17s | conflicts_at_halt=2.00 | avg_path=82.45 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=11 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.9.1] | map_id=static_campus_area_1_static_image_seed_50516
+    Classical run[0.2.9.1] progress: 0.00s
+    Cyclic run[0.2.9.1] progress: 0.00s
+      Classical | mapping[0.2.9.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.69s | conflicts_at_halt=15.00 | avg_path=76.18 | paired=True
+      Cyclic | mapping[0.2.9.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.15s | conflicts_at_halt=1.00 | avg_path=91.55 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=11 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.9.2] | map_id=static_campus_area_1_static_image_seed_50549
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2026930629999697 | cyclic_halted=0.31383584099967266 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 4... | agent_number=11 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.9.3] | map_id=static_campus_area_1_static_image_seed_50582
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2605805560006047 | cyclic_halted=0.41456635699978506 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=11 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.9.4] | map_id=static_campus_area_1_static_image_seed_50615
+    Classical run[0.2.9.4] progress: 0.00s
+    Cyclic run[0.2.9.4] progress: 0.00s
+      Classical | mapping[0.2.9.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.33s | conflicts_at_halt=3.00 | avg_path=74.00 | paired=True
+      Cyclic | mapping[0.2.9.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.32s | conflicts_at_halt=8.00 | avg_path=77.91 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.9] | agent_number=11 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.40 | avg_conflicts_at_halt=6.00 | avg_path=76.30
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.21 | avg_conflicts_at_halt=3.67 | avg_path=83.97
+[Elapsed: 00m 37s] Condition 10 completed (agent_number=11).
+
+----------------------------------------------------------------------------------------
+Condition 11 | agent_number=12 | condition_id=agent_number[0.2.10]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=12 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.10.0] | map_id=static_campus_area_1_static_image_seed_50514
+    Classical run[0.2.10.0] progress: 0.00s
+    Cyclic run[0.2.10.0] progress: 0.00s
+      Classical | mapping[0.2.10.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.45s | conflicts_at_halt=6.00 | avg_path=81.58 | paired=True
+      Cyclic | mapping[0.2.10.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.34s | conflicts_at_halt=4.00 | avg_path=96.08 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=12 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.10.1] | map_id=static_campus_area_1_static_image_seed_50547
+    Classical run[0.2.10.1] progress: 0.00s
+    Cyclic run[0.2.10.1] progress: 0.00s
+      Classical | mapping[0.2.10.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.42s | conflicts_at_halt=8.00 | avg_path=72.67 | paired=True
+      Cyclic | mapping[0.2.10.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.33s | conflicts_at_halt=7.00 | avg_path=86.83 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=12 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.10.2] | map_id=static_campus_area_1_static_image_seed_50580
+    Classical run[0.2.10.2] progress: 0.00s
+    Cyclic run[0.2.10.2] progress: 0.00s
+      Classical | mapping[0.2.10.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.47s | conflicts_at_halt=8.00 | avg_path=70.25 | paired=True
+      Cyclic | mapping[0.2.10.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.15s | conflicts_at_halt=1.00 | avg_path=82.75 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.10] | agent_number=12 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.45 | avg_conflicts_at_halt=7.33 | avg_path=74.83
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.27 | avg_conflicts_at_halt=4.00 | avg_path=88.56
+[Elapsed: 00m 40s] Condition 11 completed (agent_number=12).
+
+----------------------------------------------------------------------------------------
+Condition 12 | agent_number=13 | condition_id=agent_number[0.2.11]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=13 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.11.0] | map_id=static_campus_area_1_static_image_seed_50545
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.270908402000714 | cyclic_halted=0.3041707000002134 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=13 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.11.1] | map_id=static_campus_area_1_static_image_seed_50578
+    Classical run[0.2.11.1] progress: 0.00s
+    Cyclic run[0.2.11.1] progress: 0.00s
+      Classical | mapping[0.2.11.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.65s | conflicts_at_halt=11.00 | avg_path=76.92 | paired=True
+      Cyclic | mapping[0.2.11.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.17s | conflicts_at_halt=1.00 | avg_path=90.46 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=13 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.11.2] | map_id=static_campus_area_1_static_image_seed_50611
+    Classical run[0.2.11.2] progress: 0.00s
+    Cyclic run[0.2.11.2] progress: 0.00s
+      Classical | mapping[0.2.11.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.16s | conflicts_at_halt=0.00 | avg_path=74.15 | paired=True
+      Cyclic | mapping[0.2.11.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.13s | conflicts_at_halt=0.00 | avg_path=80.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=13 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.11.3] | map_id=static_campus_area_1_static_image_seed_50644
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2703500309999072 | cyclic_halted=0.31560149300003104 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=13 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.11.4] | map_id=static_campus_area_1_static_image_seed_50677
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4836702989996411 | cyclic_halted=0.5920494530000724 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=13 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.11.5] | map_id=static_campus_area_1_static_image_seed_50710
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.7971345460000521 | cyclic_halted=1.6016544740004974 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=13 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.11.6] | map_id=static_campus_area_1_static_image_seed_50743
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4534771759999785 | cyclic_halted=0.9204698769999595 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=13 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.11.7] | map_id=static_campus_area_1_static_image_seed_50776
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4499862650000068 | cyclic_halted=0.6218526909997308 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=13 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.11.8] | map_id=static_campus_area_1_static_image_seed_50809
+    Classical run[0.2.11.8] progress: 0.00s
+    Cyclic run[0.2.11.8] progress: 0.00s
+      Classical | mapping[0.2.11.8.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.68s | conflicts_at_halt=11.00 | avg_path=84.00 | paired=True
+      Cyclic | mapping[0.2.11.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.60s | conflicts_at_halt=14.00 | avg_path=99.77 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.11] | agent_number=13 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.50 | avg_conflicts_at_halt=7.33 | avg_path=78.36
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.30 | avg_conflicts_at_halt=5.00 | avg_path=90.08
+[Elapsed: 00m 53s] Condition 12 completed (agent_number=13).
+
+----------------------------------------------------------------------------------------
+Condition 13 | agent_number=14 | condition_id=agent_number[0.2.12]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=14 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.12.0] | map_id=static_campus_area_1_static_image_seed_50576
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.0176735410004767 | cyclic_halted=1.4935971990007602 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=14 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.12.1] | map_id=static_campus_area_1_static_image_seed_50609
+    Classical run[0.2.12.1] progress: 0.00s
+    Cyclic run[0.2.12.1] progress: 0.00s
+      Classical | mapping[0.2.12.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.62s | conflicts_at_halt=8.00 | avg_path=73.50 | paired=True
+      Cyclic | mapping[0.2.12.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.50s | conflicts_at_halt=11.00 | avg_path=89.07 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=14 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.12.2] | map_id=static_campus_area_1_static_image_seed_50642
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4482361119999041 | cyclic_halted=0.8261137690005853 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=14 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.12.3] | map_id=static_campus_area_1_static_image_seed_50675
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.40989483300018037 | cyclic_halted=0.9455946620000759 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=14 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.12.4] | map_id=static_campus_area_1_static_image_seed_50708
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.6011151430002428 | cyclic_halted=1.3003456799997366 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=14 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.12.5] | map_id=static_campus_area_1_static_image_seed_50741
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.22843083899988414 | cyclic_halted=0.4320316509993063 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=14 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.12.6] | map_id=static_campus_area_1_static_image_seed_50774
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2724821290003092 | cyclic_halted=0.2821922610000911 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=14 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.12.7] | map_id=static_campus_area_1_static_image_seed_50807
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.37925774400082446 | cyclic_halted=1.431235162000121 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 9... | agent_number=14 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.12.8] | map_id=static_campus_area_1_static_image_seed_50840
+    Classical run[0.2.12.8] progress: 0.00s
+    Cyclic run[0.2.12.8] progress: 0.00s
+      Classical | mapping[0.2.12.8.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=2.20s | conflicts_at_halt=47.00 | avg_path=85.00 | paired=True
+      Cyclic | mapping[0.2.12.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.38s | conflicts_at_halt=5.00 | avg_path=98.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 10... | agent_number=14 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[0.2.12.9] | map_id=static_campus_area_1_static_image_seed_50873
+    Classical run[0.2.12.9] progress: 0.00s
+    Cyclic run[0.2.12.9] progress: 0.00s
+      Classical | mapping[0.2.12.9.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.55s | conflicts_at_halt=7.00 | avg_path=74.21 | paired=True
+      Cyclic | mapping[0.2.12.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.49s | conflicts_at_halt=9.00 | avg_path=89.64 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.12] | agent_number=14 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.12 | avg_conflicts_at_halt=20.67 | avg_path=77.57
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.46 | avg_conflicts_at_halt=8.33 | avg_path=92.24
+[Elapsed: 01m 11s] Condition 13 completed (agent_number=14).
+
+----------------------------------------------------------------------------------------
+Condition 14 | agent_number=15 | condition_id=agent_number[0.2.13]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=15 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.13.0] | map_id=static_campus_area_1_static_image_seed_50607
+    Classical run[0.2.13.0] progress: 0.00s
+    Cyclic run[0.2.13.0] progress: 0.00s
+      Classical | mapping[0.2.13.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.27s | conflicts_at_halt=67.00 | avg_path=82.80 | paired=True
+      Cyclic | mapping[0.2.13.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.61s | conflicts_at_halt=35.00 | avg_path=94.60 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=15 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.13.1] | map_id=static_campus_area_1_static_image_seed_50640
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4892248460000701 | cyclic_halted=0.5040402319991699 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=15 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.13.2] | map_id=static_campus_area_1_static_image_seed_50673
+    Classical run[0.2.13.2] progress: 0.00s
+    Cyclic run[0.2.13.2] progress: 0.00s
+      Classical | mapping[0.2.13.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.37s | conflicts_at_halt=5.00 | avg_path=73.13 | paired=True
+      Cyclic | mapping[0.2.13.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.29s | conflicts_at_halt=2.00 | avg_path=84.20 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=15 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.13.3] | map_id=static_campus_area_1_static_image_seed_50706
+    Classical run[0.2.13.3] progress: 0.00s
+    Cyclic run[0.2.13.3] progress: 0.00s
+      Classical | mapping[0.2.13.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.64s | conflicts_at_halt=9.00 | avg_path=82.00 | paired=True
+      Cyclic | mapping[0.2.13.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.29s | conflicts_at_halt=3.00 | avg_path=98.20 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.13] | agent_number=15 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.42 | avg_conflicts_at_halt=27.00 | avg_path=79.31
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.73 | avg_conflicts_at_halt=13.33 | avg_path=92.33
+[Elapsed: 01m 20s] Condition 14 completed (agent_number=15).
+
+----------------------------------------------------------------------------------------
+Condition 15 | agent_number=16 | condition_id=agent_number[0.2.14]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=16 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.14.0] | map_id=static_campus_area_1_static_image_seed_50638
+    Classical run[0.2.14.0] progress: 0.00s
+    Cyclic run[0.2.14.0] progress: 0.00s
+      Classical | mapping[0.2.14.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.39s | conflicts_at_halt=22.00 | avg_path=82.12 | paired=True
+      Cyclic | mapping[0.2.14.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.59s | conflicts_at_halt=11.00 | avg_path=95.50 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=16 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.14.1] | map_id=static_campus_area_1_static_image_seed_50671
+    Classical run[0.2.14.1] progress: 0.00s
+    Cyclic run[0.2.14.1] progress: 0.00s
+      Classical | mapping[0.2.14.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.53s | conflicts_at_halt=8.00 | avg_path=74.94 | paired=True
+      Cyclic | mapping[0.2.14.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.51s | conflicts_at_halt=10.00 | avg_path=78.50 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=16 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.14.2] | map_id=static_campus_area_1_static_image_seed_50704
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4159242160003487 | cyclic_halted=0.7833985560000656 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 4... | agent_number=16 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.14.3] | map_id=static_campus_area_1_static_image_seed_50737
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.20917479600029765 | cyclic_halted=1.228647928999635 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=16 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.14.4] | map_id=static_campus_area_1_static_image_seed_50770
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.26068817299983493 | cyclic_halted=0.7133135519998177 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=16 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.14.5] | map_id=static_campus_area_1_static_image_seed_50803
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.6099898430002213 | cyclic_halted=0.8253912640002454 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=16 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.14.6] | map_id=static_campus_area_1_static_image_seed_50836
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4514635690002251 | cyclic_halted=0.9583718949998001 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=16 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.14.7] | map_id=static_campus_area_1_static_image_seed_50869
+    Classical run[0.2.14.7] progress: 0.00s
+    Cyclic run[0.2.14.7] progress: 0.00s
+      Classical | mapping[0.2.14.7.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.87s | conflicts_at_halt=12.00 | avg_path=89.06 | paired=True
+      Cyclic | mapping[0.2.14.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.55s | conflicts_at_halt=9.00 | avg_path=105.00 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.14] | agent_number=16 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.93 | avg_conflicts_at_halt=14.00 | avg_path=82.04
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.55 | avg_conflicts_at_halt=10.00 | avg_path=93.00
+[Elapsed: 01m 35s] Condition 15 completed (agent_number=16).
+
+----------------------------------------------------------------------------------------
+Condition 16 | agent_number=17 | condition_id=agent_number[0.2.15]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=17 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.15.0] | map_id=static_campus_area_1_static_image_seed_50669
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.5258967610006948 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=17 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.15.1] | map_id=static_campus_area_1_static_image_seed_50702
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4711017340005128 | cyclic_halted=0.4766109359998154 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=17 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.15.2] | map_id=static_campus_area_1_static_image_seed_50735
+    Classical run[0.2.15.2] progress: 0.00s
+    Cyclic run[0.2.15.2] progress: 0.00s
+      Classical | mapping[0.2.15.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.04s | conflicts_at_halt=18.00 | avg_path=71.18 | paired=True
+      Cyclic | mapping[0.2.15.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.47s | conflicts_at_halt=5.00 | avg_path=84.53 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 4... | agent_number=17 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.15.3] | map_id=static_campus_area_1_static_image_seed_50768
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2933744870006194 | cyclic_halted=2.1186115450000216 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=17 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.15.4] | map_id=static_campus_area_1_static_image_seed_50801
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.0858184409999012 | cyclic_halted=2.399088128000585 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=17 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.15.5] | map_id=static_campus_area_1_static_image_seed_50834
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.6771540310001001 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=17 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.15.6] | map_id=static_campus_area_1_static_image_seed_50867
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=7.555615103000491 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=17 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.15.7] | map_id=static_campus_area_1_static_image_seed_50900
+    Classical run[0.2.15.7] progress: 0.00s
+    Classical run[0.2.15.7] progress: 5.00s
+    Cyclic run[0.2.15.7] progress: 0.00s
+      Classical | mapping[0.2.15.7.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.12s | conflicts_at_halt=144.00 | avg_path=81.59 | paired=True
+      Cyclic | mapping[0.2.15.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.27s | conflicts_at_halt=25.00 | avg_path=98.18 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 9... | agent_number=17 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.15.8] | map_id=static_campus_area_1_static_image_seed_50933
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.33809459199983394 | cyclic_halted=0.7779076380002152 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=17 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[0.2.15.9] | map_id=static_campus_area_1_static_image_seed_50966
+    Classical run[0.2.15.9] progress: 0.00s
+    Cyclic run[0.2.15.9] progress: 0.00s
+      Classical | mapping[0.2.15.9.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.93s | conflicts_at_halt=14.00 | avg_path=85.24 | paired=True
+      Cyclic | mapping[0.2.15.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.78s | conflicts_at_halt=14.00 | avg_path=99.24 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.15] | agent_number=17 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=3.37 | avg_conflicts_at_halt=58.67 | avg_path=79.33
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.84 | avg_conflicts_at_halt=14.67 | avg_path=93.98
+[Elapsed: 03m 38s] Condition 16 completed (agent_number=17).
+
+----------------------------------------------------------------------------------------
+Condition 17 | agent_number=18 | condition_id=agent_number[0.2.16]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=18 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.16.0] | map_id=static_campus_area_1_static_image_seed_50700
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.40857485300057306 | cyclic_halted=0.6438522030002787 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=18 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.16.1] | map_id=static_campus_area_1_static_image_seed_50733
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.1716415499995492 | cyclic_halted=1.5597464649999893 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=18 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.16.2] | map_id=static_campus_area_1_static_image_seed_50766
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.3842942889996266 | cyclic_halted=1.374631128999681 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=18 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.16.3] | map_id=static_campus_area_1_static_image_seed_50799
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.8455133460001889 | cyclic_halted=1.144902113000171 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 5... | agent_number=18 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.16.4] | map_id=static_campus_area_1_static_image_seed_50832
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.3440578600002482 | cyclic_halted=0.44544551899980434 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 6... | agent_number=18 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.16.5] | map_id=static_campus_area_1_static_image_seed_50865
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.8818372659998204 | cyclic_halted=1.509841877999861 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 7... | agent_number=18 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.16.6] | map_id=static_campus_area_1_static_image_seed_50898
+    Classical run[0.2.16.6] progress: 0.00s
+    Cyclic run[0.2.16.6] progress: 0.00s
+      Classical | mapping[0.2.16.6.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.00s | conflicts_at_halt=16.00 | avg_path=76.56 | paired=True
+      Cyclic | mapping[0.2.16.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.54s | conflicts_at_halt=7.00 | avg_path=85.61 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 8... | agent_number=18 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.16.7] | map_id=static_campus_area_1_static_image_seed_50931
+    Classical run[0.2.16.7] progress: 0.00s
+    Cyclic run[0.2.16.7] progress: 0.00s
+      Classical | mapping[0.2.16.7.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=2.01s | conflicts_at_halt=34.00 | avg_path=78.61 | paired=True
+      Cyclic | mapping[0.2.16.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.94s | conflicts_at_halt=17.00 | avg_path=87.06 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 9... | agent_number=18 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.16.8] | map_id=static_campus_area_1_static_image_seed_50964
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.8979331159998765 | cyclic_halted=1.771082309999656 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=18 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[0.2.16.9] | map_id=static_campus_area_1_static_image_seed_50997
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.4435985049994997 | cyclic_halted=3.9238550370000667 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=18 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[0.2.16.10] | map_id=static_campus_area_1_static_image_seed_52365
+    Classical run[0.2.16.10] progress: 0.00s
+    Cyclic run[0.2.16.10] progress: 0.00s
+      Classical | mapping[0.2.16.10.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.72s | conflicts_at_halt=10.00 | avg_path=80.33 | paired=True
+      Cyclic | mapping[0.2.16.10.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.53s | conflicts_at_halt=5.00 | avg_path=84.44 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.16] | agent_number=18 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.24 | avg_conflicts_at_halt=20.00 | avg_path=78.50
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.67 | avg_conflicts_at_halt=9.67 | avg_path=85.70
+[Elapsed: 04m 08s] Condition 17 completed (agent_number=18).
+
+----------------------------------------------------------------------------------------
+Condition 18 | agent_number=19 | condition_id=agent_number[0.2.17]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=19 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.17.0] | map_id=static_campus_area_1_static_image_seed_50731
+    Classical run[0.2.17.0] progress: 0.00s
+    Cyclic run[0.2.17.0] progress: 0.00s
+      Classical | mapping[0.2.17.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.67s | conflicts_at_halt=10.00 | avg_path=66.58 | paired=True
+      Cyclic | mapping[0.2.17.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.62s | conflicts_at_halt=11.00 | avg_path=86.37 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=19 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.17.1] | map_id=static_campus_area_1_static_image_seed_50764
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.0149410089998128 | cyclic_halted=8.436355142999673 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=19 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.17.2] | map_id=static_campus_area_1_static_image_seed_50797
+    Classical run[0.2.17.2] progress: 0.00s
+    Cyclic run[0.2.17.2] progress: 0.00s
+      Classical | mapping[0.2.17.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.98s | conflicts_at_halt=27.00 | avg_path=85.68 | paired=True
+      Cyclic | mapping[0.2.17.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.44s | conflicts_at_halt=26.00 | avg_path=99.26 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=19 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.17.3] | map_id=static_campus_area_1_static_image_seed_50830
+    Classical run[0.2.17.3] progress: 0.00s
+    Cyclic run[0.2.17.3] progress: 0.00s
+      Classical | mapping[0.2.17.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.67s | conflicts_at_halt=7.00 | avg_path=72.21 | paired=True
+      Cyclic | mapping[0.2.17.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.43s | conflicts_at_halt=6.00 | avg_path=88.26 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.17] | agent_number=19 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.11 | avg_conflicts_at_halt=14.67 | avg_path=74.82
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.83 | avg_conflicts_at_halt=14.33 | avg_path=91.30
+[Elapsed: 04m 25s] Condition 18 completed (agent_number=19).
+
+----------------------------------------------------------------------------------------
+Condition 19 | agent_number=20 | condition_id=agent_number[0.2.18]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=20 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.18.0] | map_id=static_campus_area_1_static_image_seed_50482
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.2006519099995785 | cyclic_halted=1.3808177310002065 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=20 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.18.1] | map_id=static_campus_area_1_static_image_seed_50515
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=3.0351627829995778 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=20 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.18.2] | map_id=static_campus_area_1_static_image_seed_50548
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.3581807609998577 | cyclic_halted=1.4739195610000024 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=20 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.18.3] | map_id=static_campus_area_1_static_image_seed_50581
+    Classical run[0.2.18.3] progress: 0.00s
+    Classical run[0.2.18.3] progress: 5.00s
+    Cyclic run[0.2.18.3] progress: 0.00s
+      Classical | mapping[0.2.18.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.17s | conflicts_at_halt=96.00 | avg_path=81.00 | paired=True
+      Cyclic | mapping[0.2.18.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.17s | conflicts_at_halt=18.00 | avg_path=93.85 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 5... | agent_number=20 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.18.4] | map_id=static_campus_area_1_static_image_seed_50614
+    Classical run[0.2.18.4] progress: 0.00s
+    Cyclic run[0.2.18.4] progress: 0.00s
+      Classical | mapping[0.2.18.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=4.79s | conflicts_at_halt=97.00 | avg_path=60.85 | paired=True
+      Cyclic | mapping[0.2.18.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.33s | conflicts_at_halt=24.00 | avg_path=85.65 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 6... | agent_number=20 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.18.5] | map_id=static_campus_area_1_static_image_seed_50647
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.8800134359998992 | cyclic_halted=3.952582756999618 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=20 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.18.6] | map_id=static_campus_area_1_static_image_seed_50680
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.7575166189999436 | cyclic_halted=2.879409623000356 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=20 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.18.7] | map_id=static_campus_area_1_static_image_seed_50713
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.2818668360005177 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=20 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.18.8] | map_id=static_campus_area_1_static_image_seed_50746
+    Classical run[0.2.18.8] progress: 0.00s
+    Cyclic run[0.2.18.8] progress: 0.00s
+      Classical | mapping[0.2.18.8.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=2.59s | conflicts_at_halt=34.00 | avg_path=86.20 | paired=True
+      Cyclic | mapping[0.2.18.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.40s | conflicts_at_halt=23.00 | avg_path=99.45 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.18] | agent_number=20 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=4.52 | avg_conflicts_at_halt=75.67 | avg_path=76.02
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.30 | avg_conflicts_at_halt=21.67 | avg_path=92.98
+[Elapsed: 06m 07s] Condition 19 completed (agent_number=20).
+
+----------------------------------------------------------------------------------------
+Condition 20 | agent_number=21 | condition_id=agent_number[0.2.19]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=21 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.19.0] | map_id=static_campus_area_1_static_image_seed_50513
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.5277362169999833 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=21 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.19.1] | map_id=static_campus_area_1_static_image_seed_50546
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.7142422629995053 | cyclic_halted=7.6882805590003045 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=21 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.19.2] | map_id=static_campus_area_1_static_image_seed_50579
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.0697710229997028 | cyclic_halted=3.0584851410003466 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=21 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.19.3] | map_id=static_campus_area_1_static_image_seed_50612
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=3.2536425439993764 | cyclic_halted=15.545712373000242 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 5... | agent_number=21 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.19.4] | map_id=static_campus_area_1_static_image_seed_50645
+    Classical run[0.2.19.4] progress: 0.00s
+    Cyclic run[0.2.19.4] progress: 0.00s
+      Classical | mapping[0.2.19.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.12s | conflicts_at_halt=47.00 | avg_path=77.05 | paired=True
+      Cyclic | mapping[0.2.19.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.07s | conflicts_at_halt=58.00 | avg_path=93.62 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 6... | agent_number=21 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.19.5] | map_id=static_campus_area_1_static_image_seed_50678
+    Classical run[0.2.19.5] progress: 0.00s
+    Classical run[0.2.19.5] progress: 5.00s
+    Classical run[0.2.19.5] progress: 10.00s
+    Cyclic run[0.2.19.5] progress: 0.00s
+      Classical | mapping[0.2.19.5.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=12.05s | conflicts_at_halt=194.00 | avg_path=87.62 | paired=True
+      Cyclic | mapping[0.2.19.5.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.16s | conflicts_at_halt=50.00 | avg_path=101.71 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 7... | agent_number=21 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.19.6] | map_id=static_campus_area_1_static_image_seed_50711
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.1201179979998415 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=21 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.19.7] | map_id=static_campus_area_1_static_image_seed_50744
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.1212640000003375 | cyclic_halted=19.81594740700075 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=21 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.19.8] | map_id=static_campus_area_1_static_image_seed_50777
+    Classical run[0.2.19.8] progress: 0.00s
+    Cyclic run[0.2.19.8] progress: 0.00s
+      Classical | mapping[0.2.19.8.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=4.58s | conflicts_at_halt=76.00 | avg_path=79.29 | paired=True
+      Cyclic | mapping[0.2.19.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.81s | conflicts_at_halt=59.00 | avg_path=93.95 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.19] | agent_number=21 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=6.58 | avg_conflicts_at_halt=105.67 | avg_path=81.32
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=3.35 | avg_conflicts_at_halt=55.67 | avg_path=96.43
+[Elapsed: 08m 40s] Condition 20 completed (agent_number=21).
+
+----------------------------------------------------------------------------------------
+Condition 21 | agent_number=22 | condition_id=agent_number[0.2.20]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=22 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.20.0] | map_id=static_campus_area_1_static_image_seed_50544
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.1077748289999363 | cyclic_halted=7.5179017999998905 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=22 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.20.1] | map_id=static_campus_area_1_static_image_seed_50577
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.7522970139998506 | cyclic_halted=0.8213785439993444 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=22 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.20.2] | map_id=static_campus_area_1_static_image_seed_50610
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=3.38488204999976 | cyclic_halted=10.114016135000384 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=22 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.20.3] | map_id=static_campus_area_1_static_image_seed_50643
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 5... | agent_number=22 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.20.4] | map_id=static_campus_area_1_static_image_seed_50676
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.0605863060000047 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 6... | agent_number=22 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.20.5] | map_id=static_campus_area_1_static_image_seed_50709
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.736546288999307 | cyclic_halted=6.984384998000678 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 7... | agent_number=22 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.20.6] | map_id=static_campus_area_1_static_image_seed_50742
+    Classical run[0.2.20.6] progress: 0.00s
+    Cyclic run[0.2.20.6] progress: 0.00s
+      Classical | mapping[0.2.20.6.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.51s | conflicts_at_halt=16.00 | avg_path=81.00 | paired=True
+      Cyclic | mapping[0.2.20.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.38s | conflicts_at_halt=16.00 | avg_path=95.09 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 8... | agent_number=22 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.20.7] | map_id=static_campus_area_1_static_image_seed_50775
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.245491633999336 | cyclic_halted=2.6504791460001798 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 9... | agent_number=22 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.20.8] | map_id=static_campus_area_1_static_image_seed_50808
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.6332335329998386 | cyclic_halted=2.3825159890002396 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 10... | agent_number=22 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[0.2.20.9] | map_id=static_campus_area_1_static_image_seed_50841
+    Classical run[0.2.20.9] progress: 0.00s
+    Classical run[0.2.20.9] progress: 5.00s
+    Classical run[0.2.20.9] progress: 10.00s
+    Cyclic run[0.2.20.9] progress: 0.00s
+    Cyclic run[0.2.20.9] progress: 5.00s
+      Classical | mapping[0.2.20.9.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=10.28s | conflicts_at_halt=158.00 | avg_path=78.50 | paired=True
+      Cyclic | mapping[0.2.20.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.05s | conflicts_at_halt=139.00 | avg_path=92.59 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 11... | agent_number=22 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[0.2.20.10] | map_id=static_campus_area_1_static_image_seed_52209
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.730427827999847 | cyclic_halted=18.964301820999935 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=22 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[0.2.20.11] | map_id=static_campus_area_1_static_image_seed_52243
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.751240813999175 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 13... | agent_number=22 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[0.2.20.12] | map_id=static_campus_area_1_static_image_seed_52277
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.3948387999998886 | cyclic_halted=4.96815599599995 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 14... | agent_number=22 | run_index=13
+  Paired sampling attempt 14 ongoing... | run[0.2.20.13] | map_id=static_campus_area_1_static_image_seed_52311
+    Classical run[0.2.20.13] progress: 0.00s
+    Classical run[0.2.20.13] progress: 5.00s
+    Classical run[0.2.20.13] progress: 10.00s
+    Classical run[0.2.20.13] progress: 15.00s
+    Classical run[0.2.20.13] progress: 20.00s
+    Classical run[0.2.20.13] progress: 25.00s
+    Classical run[0.2.20.13] progress: 30.00s
+    Cyclic run[0.2.20.13] progress: 0.00s
+    Cyclic run[0.2.20.13] progress: 5.00s
+      Classical | mapping[0.2.20.13.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=445.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.20.13.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.47s | conflicts_at_halt=109.00 | avg_path=103.64 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.20] | agent_number=22 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=13.93 | avg_conflicts_at_halt=206.33 | avg_path=79.75
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.30 | avg_conflicts_at_halt=88.00 | avg_path=97.11
+[Elapsed: 13m 01s] Condition 21 completed (agent_number=22).
+
+----------------------------------------------------------------------------------------
+Condition 22 | agent_number=23 | condition_id=agent_number[0.2.21]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=23 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.21.0] | map_id=static_campus_area_1_static_image_seed_50575
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=12.936545868999929 | cyclic_halted=18.654314899000383 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=23 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.21.1] | map_id=static_campus_area_1_static_image_seed_50608
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=23 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.21.2] | map_id=static_campus_area_1_static_image_seed_50641
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=23 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.21.3] | map_id=static_campus_area_1_static_image_seed_50674
+    Classical run[0.2.21.3] progress: 0.00s
+    Classical run[0.2.21.3] progress: 5.00s
+    Classical run[0.2.21.3] progress: 10.00s
+    Classical run[0.2.21.3] progress: 15.00s
+    Classical run[0.2.21.3] progress: 20.00s
+    Classical run[0.2.21.3] progress: 25.00s
+    Classical run[0.2.21.3] progress: 30.00s
+    Cyclic run[0.2.21.3] progress: 0.00s
+    Cyclic run[0.2.21.3] progress: 5.00s
+      Classical | mapping[0.2.21.3.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=423.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.21.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=9.60s | conflicts_at_halt=141.00 | avg_path=105.43 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 5... | agent_number=23 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.21.4] | map_id=static_campus_area_1_static_image_seed_50707
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=14.12911770699975 | cyclic_halted=14.862613448000047 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=23 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.21.5] | map_id=static_campus_area_1_static_image_seed_50740
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=14.103200300000026 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=23 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.21.6] | map_id=static_campus_area_1_static_image_seed_50773
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.543460438999318 | cyclic_halted=14.348630931000116 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=23 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.21.7] | map_id=static_campus_area_1_static_image_seed_50806
+    Classical run[0.2.21.7] progress: 0.00s
+    Classical run[0.2.21.7] progress: 5.00s
+    Classical run[0.2.21.7] progress: 10.00s
+    Cyclic run[0.2.21.7] progress: 0.00s
+      Classical | mapping[0.2.21.7.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=13.59s | conflicts_at_halt=190.00 | avg_path=78.70 | paired=True
+      Cyclic | mapping[0.2.21.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=4.01s | conflicts_at_halt=65.00 | avg_path=96.22 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 9... | agent_number=23 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.21.8] | map_id=static_campus_area_1_static_image_seed_50839
+    Classical run[0.2.21.8] progress: 0.00s
+    Classical run[0.2.21.8] progress: 5.00s
+    Classical run[0.2.21.8] progress: 10.00s
+    Classical run[0.2.21.8] progress: 15.00s
+    Classical run[0.2.21.8] progress: 20.00s
+    Classical run[0.2.21.8] progress: 25.00s
+    Classical run[0.2.21.8] progress: 30.00s
+    Cyclic run[0.2.21.8] progress: 0.00s
+      Classical | mapping[0.2.21.8.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=485.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.21.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=2.61s | conflicts_at_halt=37.00 | avg_path=90.22 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.21] | agent_number=23 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=24.53 | avg_conflicts_at_halt=366.00 | avg_path=78.70
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.41 | avg_conflicts_at_halt=81.00 | avg_path=97.29
+[Elapsed: 18m 39s] Condition 22 completed (agent_number=23).
+
+----------------------------------------------------------------------------------------
+Condition 23 | agent_number=24 | condition_id=agent_number[0.2.22]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=24 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.22.0] | map_id=static_campus_area_1_static_image_seed_50606
+    Classical run[0.2.22.0] progress: 0.00s
+    Classical run[0.2.22.0] progress: 5.00s
+    Classical run[0.2.22.0] progress: 10.00s
+    Classical run[0.2.22.0] progress: 15.00s
+    Classical run[0.2.22.0] progress: 20.00s
+    Classical run[0.2.22.0] progress: 25.00s
+    Classical run[0.2.22.0] progress: 30.00s
+    Cyclic run[0.2.22.0] progress: 0.00s
+    Cyclic run[0.2.22.0] progress: 5.00s
+      Classical | mapping[0.2.22.0.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=397.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.22.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.73s | conflicts_at_halt=126.00 | avg_path=101.67 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=24 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.22.1] | map_id=static_campus_area_1_static_image_seed_50639
+    Classical run[0.2.22.1] progress: 0.00s
+    Classical run[0.2.22.1] progress: 5.00s
+    Classical run[0.2.22.1] progress: 10.00s
+    Classical run[0.2.22.1] progress: 15.00s
+    Classical run[0.2.22.1] progress: 20.00s
+    Classical run[0.2.22.1] progress: 25.00s
+    Classical run[0.2.22.1] progress: 30.00s
+    Cyclic run[0.2.22.1] progress: 0.00s
+    Cyclic run[0.2.22.1] progress: 5.00s
+      Classical | mapping[0.2.22.1.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=461.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.22.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=7.14s | conflicts_at_halt=124.00 | avg_path=92.33 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=24 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.22.2] | map_id=static_campus_area_1_static_image_seed_50672
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.361272736000501 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 4... | agent_number=24 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.22.3] | map_id=static_campus_area_1_static_image_seed_50705
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.621960512999067 | cyclic_halted=4.419762057999833 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=24 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.22.4] | map_id=static_campus_area_1_static_image_seed_50738
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.4524453639987769 | cyclic_halted=1.8433563359994878 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=24 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.22.5] | map_id=static_campus_area_1_static_image_seed_50771
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=24 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.22.6] | map_id=static_campus_area_1_static_image_seed_50804
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.8670871640006226 | cyclic_halted=3.858163869001146 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=24 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.22.7] | map_id=static_campus_area_1_static_image_seed_50837
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.779975094999827 | cyclic_halted=7.20921373300007 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=24 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.22.8] | map_id=static_campus_area_1_static_image_seed_50870
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=5.089334614000109 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=24 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[0.2.22.9] | map_id=static_campus_area_1_static_image_seed_50903
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=24 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[0.2.22.10] | map_id=static_campus_area_1_static_image_seed_52271
+    Classical run[0.2.22.10] progress: 0.00s
+    Classical run[0.2.22.10] progress: 5.00s
+    Classical run[0.2.22.10] progress: 10.00s
+    Classical run[0.2.22.10] progress: 15.00s
+    Classical run[0.2.22.10] progress: 20.00s
+    Classical run[0.2.22.10] progress: 25.00s
+    Classical run[0.2.22.10] progress: 30.00s
+    Cyclic run[0.2.22.10] progress: 0.00s
+    Cyclic run[0.2.22.10] progress: 5.00s
+      Classical | mapping[0.2.22.10.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=430.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.22.10.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=5.13s | conflicts_at_halt=75.00 | avg_path=102.33 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.22] | agent_number=24 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=429.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=7.00 | avg_conflicts_at_halt=108.33 | avg_path=98.78
+[Elapsed: 24m 07s] Condition 23 completed (agent_number=24).
+
+----------------------------------------------------------------------------------------
+Condition 24 | agent_number=25 | condition_id=agent_number[0.2.23]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=25 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.23.0] | map_id=static_campus_area_1_static_image_seed_50637
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.373123499999565 | cyclic_halted=10.09580491700035 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=25 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.23.1] | map_id=static_campus_area_1_static_image_seed_50670
+    Classical run[0.2.23.1] progress: 0.00s
+    Classical run[0.2.23.1] progress: 5.00s
+    Classical run[0.2.23.1] progress: 10.00s
+    Classical run[0.2.23.1] progress: 15.00s
+    Classical run[0.2.23.1] progress: 20.00s
+    Classical run[0.2.23.1] progress: 25.00s
+    Classical run[0.2.23.1] progress: 30.00s
+    Cyclic run[0.2.23.1] progress: 0.00s
+      Classical | mapping[0.2.23.1.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=459.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.23.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.92s | conflicts_at_halt=22.00 | avg_path=90.04 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=25 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.23.2] | map_id=static_campus_area_1_static_image_seed_50703
+    Classical run[0.2.23.2] progress: 0.00s
+    Classical run[0.2.23.2] progress: 5.00s
+    Classical run[0.2.23.2] progress: 10.00s
+    Classical run[0.2.23.2] progress: 15.00s
+    Classical run[0.2.23.2] progress: 20.00s
+    Classical run[0.2.23.2] progress: 25.00s
+    Classical run[0.2.23.2] progress: 30.00s
+    Cyclic run[0.2.23.2] progress: 0.00s
+    Cyclic run[0.2.23.2] progress: 5.00s
+    Cyclic run[0.2.23.2] progress: 10.00s
+      Classical | mapping[0.2.23.2.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=386.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.23.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=10.11s | conflicts_at_halt=155.00 | avg_path=95.84 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=25 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.23.3] | map_id=static_campus_area_1_static_image_seed_50736
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=25 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.23.4] | map_id=static_campus_area_1_static_image_seed_50769
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.6064691610008595 | cyclic_halted=2.2097525659992243 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=25 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.23.5] | map_id=static_campus_area_1_static_image_seed_50802
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=10.531748819001223 | cyclic_halted=12.551830626000083 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=25 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.23.6] | map_id=static_campus_area_1_static_image_seed_50835
+    Classical run[0.2.23.6] progress: 0.00s
+    Classical run[0.2.23.6] progress: 5.00s
+    Cyclic run[0.2.23.6] progress: 0.00s
+      Classical | mapping[0.2.23.6.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.40s | conflicts_at_halt=101.00 | avg_path=71.00 | paired=True
+      Cyclic | mapping[0.2.23.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.80s | conflicts_at_halt=26.00 | avg_path=84.04 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.23] | agent_number=25 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=22.13 | avg_conflicts_at_halt=315.33 | avg_path=71.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=4.61 | avg_conflicts_at_halt=67.67 | avg_path=89.97
+[Elapsed: 27m 12s] Condition 24 completed (agent_number=25).
+
+----------------------------------------------------------------------------------------
+Condition 25 | agent_number=26 | condition_id=agent_number[0.2.24]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=26 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.24.0] | map_id=static_campus_area_1_static_image_seed_50668
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=5.723157708000144 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=26 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.24.1] | map_id=static_campus_area_1_static_image_seed_50701
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.360225481999805 | cyclic_halted=5.146071380999274 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=26 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.24.2] | map_id=static_campus_area_1_static_image_seed_50734
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=26 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.24.3] | map_id=static_campus_area_1_static_image_seed_50767
+    Classical run[0.2.24.3] progress: 0.00s
+    Classical run[0.2.24.3] progress: 5.00s
+    Classical run[0.2.24.3] progress: 10.00s
+    Classical run[0.2.24.3] progress: 15.00s
+    Classical run[0.2.24.3] progress: 20.00s
+    Classical run[0.2.24.3] progress: 25.00s
+    Classical run[0.2.24.3] progress: 30.00s
+    Cyclic run[0.2.24.3] progress: 0.00s
+    Cyclic run[0.2.24.3] progress: 5.00s
+      Classical | mapping[0.2.24.3.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=384.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.24.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.64s | conflicts_at_halt=129.00 | avg_path=96.54 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 5... | agent_number=26 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.24.4] | map_id=static_campus_area_1_static_image_seed_50800
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.4576126760002808 | cyclic_halted=4.275074199998926 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=26 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.24.5] | map_id=static_campus_area_1_static_image_seed_50833
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.382004789000348 | cyclic_halted=3.1024468260002322 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=26 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.24.6] | map_id=static_campus_area_1_static_image_seed_50866
+    Classical run[0.2.24.6] progress: 0.00s
+    Classical run[0.2.24.6] progress: 5.00s
+    Classical run[0.2.24.6] progress: 10.00s
+    Classical run[0.2.24.6] progress: 15.00s
+    Classical run[0.2.24.6] progress: 20.00s
+    Classical run[0.2.24.6] progress: 25.00s
+    Classical run[0.2.24.6] progress: 30.00s
+    Cyclic run[0.2.24.6] progress: 0.00s
+    Cyclic run[0.2.24.6] progress: 5.00s
+    Cyclic run[0.2.24.6] progress: 10.00s
+    Cyclic run[0.2.24.6] progress: 15.00s
+      Classical | mapping[0.2.24.6.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=372.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.24.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=19.33s | conflicts_at_halt=241.00 | avg_path=105.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 8... | agent_number=26 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.24.7] | map_id=static_campus_area_1_static_image_seed_50899
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.1839407770003163 | cyclic_halted=8.754236163000314 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=26 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.24.8] | map_id=static_campus_area_1_static_image_seed_50932
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=19.718818715999078 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=26 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[0.2.24.9] | map_id=static_campus_area_1_static_image_seed_50965
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=26 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[0.2.24.10] | map_id=static_campus_area_1_static_image_seed_52333
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=6.842357626999728 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=26 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[0.2.24.11] | map_id=static_campus_area_1_static_image_seed_52367
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=24.340485101000013 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 13... | agent_number=26 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[0.2.24.12] | map_id=static_campus_area_1_static_image_seed_52401
+    Classical run[0.2.24.12] progress: 0.00s
+    Classical run[0.2.24.12] progress: 5.00s
+    Classical run[0.2.24.12] progress: 10.00s
+    Classical run[0.2.24.12] progress: 15.00s
+    Classical run[0.2.24.12] progress: 20.00s
+    Classical run[0.2.24.12] progress: 25.00s
+    Classical run[0.2.24.12] progress: 30.00s
+    Cyclic run[0.2.24.12] progress: 0.00s
+    Cyclic run[0.2.24.12] progress: 5.00s
+    Cyclic run[0.2.24.12] progress: 10.00s
+    Cyclic run[0.2.24.12] progress: 15.00s
+    Cyclic run[0.2.24.12] progress: 20.00s
+      Classical | mapping[0.2.24.12.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=390.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.24.12.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=20.48s | conflicts_at_halt=261.00 | avg_path=103.77 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.24] | agent_number=26 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=382.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=16.15 | avg_conflicts_at_halt=210.33 | avg_path=101.77
+[Elapsed: 35m 03s] Condition 25 completed (agent_number=26).
+
+----------------------------------------------------------------------------------------
+Condition 26 | agent_number=27 | condition_id=agent_number[0.2.25]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=27 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.25.0] | map_id=static_campus_area_1_static_image_seed_50699
+    Classical run[0.2.25.0] progress: 0.00s
+    Classical run[0.2.25.0] progress: 5.00s
+    Classical run[0.2.25.0] progress: 10.00s
+    Cyclic run[0.2.25.0] progress: 0.00s
+    Cyclic run[0.2.25.0] progress: 5.00s
+      Classical | mapping[0.2.25.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=11.76s | conflicts_at_halt=148.00 | avg_path=84.56 | paired=True
+      Cyclic | mapping[0.2.25.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.91s | conflicts_at_halt=106.00 | avg_path=100.44 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=27 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.25.1] | map_id=static_campus_area_1_static_image_seed_50732
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=27 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.25.2] | map_id=static_campus_area_1_static_image_seed_50765
+    Classical run[0.2.25.2] progress: 0.00s
+    Classical run[0.2.25.2] progress: 5.00s
+    Classical run[0.2.25.2] progress: 10.00s
+    Classical run[0.2.25.2] progress: 15.00s
+    Classical run[0.2.25.2] progress: 20.00s
+    Classical run[0.2.25.2] progress: 25.00s
+    Classical run[0.2.25.2] progress: 30.00s
+    Cyclic run[0.2.25.2] progress: 0.00s
+    Cyclic run[0.2.25.2] progress: 5.00s
+      Classical | mapping[0.2.25.2.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=486.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.25.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=7.51s | conflicts_at_halt=100.00 | avg_path=84.37 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=27 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.25.3] | map_id=static_campus_area_1_static_image_seed_50798
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=2.779367192999416 | cyclic_halted=4.1937837329987815 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=27 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.25.4] | map_id=static_campus_area_1_static_image_seed_50831
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=27 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.25.5] | map_id=static_campus_area_1_static_image_seed_50864
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=27 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.25.6] | map_id=static_campus_area_1_static_image_seed_50897
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=27 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.25.7] | map_id=static_campus_area_1_static_image_seed_50930
+    Classical run[0.2.25.7] progress: 0.00s
+    Classical run[0.2.25.7] progress: 5.00s
+    Cyclic run[0.2.25.7] progress: 0.00s
+      Classical | mapping[0.2.25.7.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=5.35s | conflicts_at_halt=78.00 | avg_path=75.15 | paired=True
+      Cyclic | mapping[0.2.25.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.44s | conflicts_at_halt=45.00 | avg_path=85.63 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[0.2.25] | agent_number=27 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=15.70 | avg_conflicts_at_halt=237.33 | avg_path=79.85
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.95 | avg_conflicts_at_halt=83.67 | avg_path=90.15
+[Elapsed: 40m 19s] Condition 26 completed (agent_number=27).
+
+----------------------------------------------------------------------------------------
+Condition 27 | agent_number=28 | condition_id=agent_number[0.2.26]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=28 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[0.2.26.0] | map_id=static_campus_area_1_static_image_seed_50730
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=28 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[0.2.26.1] | map_id=static_campus_area_1_static_image_seed_50763
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=28 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[0.2.26.2] | map_id=static_campus_area_1_static_image_seed_50796
+    Classical run[0.2.26.2] progress: 0.00s
+    Classical run[0.2.26.2] progress: 5.00s
+    Classical run[0.2.26.2] progress: 10.00s
+    Classical run[0.2.26.2] progress: 15.00s
+    Classical run[0.2.26.2] progress: 20.00s
+    Classical run[0.2.26.2] progress: 25.00s
+    Classical run[0.2.26.2] progress: 30.00s
+    Cyclic run[0.2.26.2] progress: 0.00s
+    Cyclic run[0.2.26.2] progress: 5.00s
+      Classical | mapping[0.2.26.2.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=343.00 | avg_path=null | paired=True
+      Cyclic | mapping[0.2.26.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.11s | conflicts_at_halt=110.00 | avg_path=103.46 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 4... | agent_number=28 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[0.2.26.3] | map_id=static_campus_area_1_static_image_seed_50829
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=28 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[0.2.26.4] | map_id=static_campus_area_1_static_image_seed_50862
+    Classical run[0.2.26.4] progress: 0.00s
+    Classical run[0.2.26.4] progress: 5.00s
+    Classical run[0.2.26.4] progress: 10.00s
+    Classical run[0.2.26.4] progress: 15.00s
+    Classical run[0.2.26.4] progress: 20.00s
+    Cyclic run[0.2.26.4] progress: 0.00s
+    Cyclic run[0.2.26.4] progress: 5.00s
+    Cyclic run[0.2.26.4] progress: 10.00s
+      Classical | mapping[0.2.26.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=23.89s | conflicts_at_halt=340.00 | avg_path=74.86 | paired=True
+      Cyclic | mapping[0.2.26.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=14.20s | conflicts_at_halt=200.00 | avg_path=83.36 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 6... | agent_number=28 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[0.2.26.5] | map_id=static_campus_area_1_static_image_seed_50895
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.583919993001473 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=28 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[0.2.26.6] | map_id=static_campus_area_1_static_image_seed_50928
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=29.571629123000093 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=28 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[0.2.26.7] | map_id=static_campus_area_1_static_image_seed_50961
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=10.738777616999869 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=28 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[0.2.26.8] | map_id=static_campus_area_1_static_image_seed_50994
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=28 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[0.2.26.9] | map_id=static_campus_area_1_static_image_seed_51027
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=28 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[0.2.26.10] | map_id=static_campus_area_1_static_image_seed_52395
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=28 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[0.2.26.11] | map_id=static_campus_area_1_static_image_seed_52429
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=22.7218299569995 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 13... | agent_number=28 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[0.2.26.12] | map_id=static_campus_area_1_static_image_seed_52463
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.5294877379983518 | cyclic_halted=3.7704386669993255 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 14... | agent_number=28 | run_index=13
+  Paired sampling attempt 14 ongoing... | run[0.2.26.13] | map_id=static_campus_area_1_static_image_seed_52497
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=22.49784556800114 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 15... | agent_number=28 | run_index=14
+  Paired sampling attempt 15 ongoing... | run[0.2.26.14] | map_id=static_campus_area_1_static_image_seed_52531
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 16... | agent_number=28 | run_index=15
+  Paired sampling attempt 16 ongoing... | run[0.2.26.15] | map_id=static_campus_area_1_static_image_seed_52565
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.967267723999612 | cyclic_halted=7.007373730999461 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 17... | agent_number=28 | run_index=16
+  Paired sampling attempt 17 ongoing... | run[0.2.26.16] | map_id=static_campus_area_1_static_image_seed_52599
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=12.378612528998929 | cyclic_halted=17.484410930001104 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 18... | agent_number=28 | run_index=17
+  Paired sampling attempt 18 ongoing... | run[0.2.26.17] | map_id=static_campus_area_1_static_image_seed_52633
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.708764035000058 | cyclic_halted=6.079550550000931 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 19... | agent_number=28 | run_index=18
+  Paired sampling attempt 19 ongoing... | run[0.2.26.18] | map_id=static_campus_area_1_static_image_seed_52667
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=6.021256305999486 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 20... | agent_number=28 | run_index=19
+  Paired sampling attempt 20 ongoing... | run[0.2.26.19] | map_id=static_campus_area_1_static_image_seed_52701
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Stop rule triggered before the counted-pair quota was reached (2/3) at agent_number=28. The current condition is discarded and the branch stops before higher agent numbers.
+[Elapsed: 55m 17s] Condition 27 stopped the branch (agent_number=28).
+[Elapsed: 55m 18s] Raw MAPF data recomputed and saved.
+If graphs or visualization are requested in this run, they will be regenerated from the saved raw MAPF data on disk.
+Reloaded the saved raw MAPF data from disk for output generation consistency.
+[Elapsed: 55m 18s] Structured records and summaries regenerated from persisted raw MAPF data.
+[Elapsed: 55m 20s] Graphs regenerated from persisted raw MAPF data.
+
+Final aggregate table:
+    Condition aggregate | agent_number[0.2.0] | agent_number=2 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.03 | avg_conflicts_at_halt=0.00 | avg_path=74.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=0.00 | avg_path=87.33
+    Condition aggregate | agent_number[0.2.1] | agent_number=3 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.05 | avg_conflicts_at_halt=0.33 | avg_path=79.11
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.04 | avg_conflicts_at_halt=0.00 | avg_path=89.44
+    Condition aggregate | agent_number[0.2.2] | agent_number=4 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=0.33 | avg_path=74.25
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=0.00 | avg_path=83.17
+    Condition aggregate | agent_number[0.2.3] | agent_number=5 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=1.00 | avg_path=76.93
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=0.33 | avg_path=92.73
+    Condition aggregate | agent_number[0.2.4] | agent_number=6 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=0.33 | avg_path=78.17
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=0.33 | avg_path=90.61
+    Condition aggregate | agent_number[0.2.5] | agent_number=7 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.17 | avg_conflicts_at_halt=3.33 | avg_path=70.43
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=0.00 | avg_path=83.67
+    Condition aggregate | agent_number[0.2.6] | agent_number=8 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.16 | avg_conflicts_at_halt=2.00 | avg_path=73.38
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.09 | avg_conflicts_at_halt=0.33 | avg_path=83.38
+    Condition aggregate | agent_number[0.2.7] | agent_number=9 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.13 | avg_conflicts_at_halt=0.67 | avg_path=70.89
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.10 | avg_conflicts_at_halt=0.33 | avg_path=82.30
+    Condition aggregate | agent_number[0.2.8] | agent_number=10 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.26 | avg_conflicts_at_halt=3.67 | avg_path=76.63
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.18 | avg_conflicts_at_halt=3.00 | avg_path=86.57
+    Condition aggregate | agent_number[0.2.9] | agent_number=11 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.40 | avg_conflicts_at_halt=6.00 | avg_path=76.30
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.21 | avg_conflicts_at_halt=3.67 | avg_path=83.97
+    Condition aggregate | agent_number[0.2.10] | agent_number=12 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.45 | avg_conflicts_at_halt=7.33 | avg_path=74.83
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.27 | avg_conflicts_at_halt=4.00 | avg_path=88.56
+    Condition aggregate | agent_number[0.2.11] | agent_number=13 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.50 | avg_conflicts_at_halt=7.33 | avg_path=78.36
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.30 | avg_conflicts_at_halt=5.00 | avg_path=90.08
+    Condition aggregate | agent_number[0.2.12] | agent_number=14 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.12 | avg_conflicts_at_halt=20.67 | avg_path=77.57
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.46 | avg_conflicts_at_halt=8.33 | avg_path=92.24
+    Condition aggregate | agent_number[0.2.13] | agent_number=15 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.42 | avg_conflicts_at_halt=27.00 | avg_path=79.31
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.73 | avg_conflicts_at_halt=13.33 | avg_path=92.33
+    Condition aggregate | agent_number[0.2.14] | agent_number=16 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.93 | avg_conflicts_at_halt=14.00 | avg_path=82.04
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.55 | avg_conflicts_at_halt=10.00 | avg_path=93.00
+    Condition aggregate | agent_number[0.2.15] | agent_number=17 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=3.37 | avg_conflicts_at_halt=58.67 | avg_path=79.33
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.84 | avg_conflicts_at_halt=14.67 | avg_path=93.98
+    Condition aggregate | agent_number[0.2.16] | agent_number=18 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.24 | avg_conflicts_at_halt=20.00 | avg_path=78.50
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.67 | avg_conflicts_at_halt=9.67 | avg_path=85.70
+    Condition aggregate | agent_number[0.2.17] | agent_number=19 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.11 | avg_conflicts_at_halt=14.67 | avg_path=74.82
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.83 | avg_conflicts_at_halt=14.33 | avg_path=91.30
+    Condition aggregate | agent_number[0.2.18] | agent_number=20 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=4.52 | avg_conflicts_at_halt=75.67 | avg_path=76.02
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.30 | avg_conflicts_at_halt=21.67 | avg_path=92.98
+    Condition aggregate | agent_number[0.2.19] | agent_number=21 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=6.58 | avg_conflicts_at_halt=105.67 | avg_path=81.32
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=3.35 | avg_conflicts_at_halt=55.67 | avg_path=96.43
+    Condition aggregate | agent_number[0.2.20] | agent_number=22 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=13.93 | avg_conflicts_at_halt=206.33 | avg_path=79.75
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.30 | avg_conflicts_at_halt=88.00 | avg_path=97.11
+    Condition aggregate | agent_number[0.2.21] | agent_number=23 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=24.53 | avg_conflicts_at_halt=366.00 | avg_path=78.70
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.41 | avg_conflicts_at_halt=81.00 | avg_path=97.29
+    Condition aggregate | agent_number[0.2.22] | agent_number=24 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=429.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=7.00 | avg_conflicts_at_halt=108.33 | avg_path=98.78
+    Condition aggregate | agent_number[0.2.23] | agent_number=25 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=22.13 | avg_conflicts_at_halt=315.33 | avg_path=71.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=4.61 | avg_conflicts_at_halt=67.67 | avg_path=89.97
+    Condition aggregate | agent_number[0.2.24] | agent_number=26 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=382.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=16.15 | avg_conflicts_at_halt=210.33 | avg_path=101.77
+    Condition aggregate | agent_number[0.2.25] | agent_number=27 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=15.70 | avg_conflicts_at_halt=237.33 | avg_path=79.85
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.95 | avg_conflicts_at_halt=83.67 | avg_path=90.15
+
+Branch stopped early:
+  Reason: filter_individual_runs_until_cyclic_faster_max_attempts_exhausted
+  Details: Stop rule triggered before the counted-pair quota was reached (2/3) at agent_number=28. The current condition is discarded and the branch stops before higher agent numbers.
+  Reported agent numbers: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+
+Generated graph files:
+  - /workspaces/cmsc-190/dev/outputs/static_campus_area_1/graphs/graphs_and_data/static_campus_area_1_runtime.png
+  - /workspaces/cmsc-190/dev/outputs/static_campus_area_1/graphs/graphs_and_data/static_campus_area_1_conflicts.png
+  - /workspaces/cmsc-190/dev/outputs/static_campus_area_1/graphs/graphs_and_data/static_campus_area_1_path_length.png
+
+[Elapsed: 55m 20s] Experiment finished.

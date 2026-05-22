@@ -1,0 +1,8 @@
+{
+  "map_identifier": "dynamic_campus_area_1_shared_map_seed_90225_group_patch",
+  "schedule_seed": 90225,
+  "generation_mode": "group_patch",
+  "static_rows": 64,
+  "static_cols": 64,
+  "dynamic_loop_length": 250
+}

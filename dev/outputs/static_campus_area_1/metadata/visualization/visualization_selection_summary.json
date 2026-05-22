@@ -1,0 +1,96 @@
+{
+  "selection_config_source": "current_master_config",
+  "visualizations_root": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations",
+  "jointly_successful": {
+    "selection_mode": "jointly_successful_mappings",
+    "num_last_runs_to_visualize": 0,
+    "selected_agent_numbers": [],
+    "selected_agent_numbers_by_mapping": {
+      "classical": [],
+      "cyclic": []
+    },
+    "selected_run_configurations": [],
+    "selected_run_configurations_by_mapping": {
+      "classical": [],
+      "cyclic": []
+    },
+    "visualizations_root": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/jointly_successful",
+    "notes": "Jointly successful visualization generation skipped because num_last_runs_to_visualize_jointly_successful <= 0."
+  },
+  "independently_successful": {
+    "selection_mode": "independently_successful_mappings",
+    "num_last_runs_to_visualize": 1,
+    "selected_agent_numbers": [
+      27,
+      27
+    ],
+    "selected_agent_numbers_by_mapping": {
+      "classical": [
+        27
+      ],
+      "cyclic": [
+        27
+      ]
+    },
+    "selected_run_configurations": [
+      {
+        "mapping_name": "classical",
+        "selection_index": 1,
+        "run_config_id": "run[0.2.25.7]",
+        "agent_number": 27,
+        "run_index": 7,
+        "assignment_seed": 61957,
+        "map_identifier": "static_campus_area_1_static_image_seed_50930",
+        "output_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/classical/selection_01__agent_number_027__run_0.2.25.7",
+        "mapping_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/classical/selection_01__agent_number_027__run_0.2.25.7",
+        "num_frames": 97
+      },
+      {
+        "mapping_name": "cyclic",
+        "selection_index": 1,
+        "run_config_id": "run[0.2.25.7]",
+        "agent_number": 27,
+        "run_index": 7,
+        "assignment_seed": 61957,
+        "map_identifier": "static_campus_area_1_static_image_seed_50930",
+        "output_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/cyclic/selection_01__agent_number_027__run_0.2.25.7",
+        "mapping_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/cyclic/selection_01__agent_number_027__run_0.2.25.7",
+        "num_frames": 109
+      }
+    ],
+    "selected_run_configurations_by_mapping": {
+      "classical": [
+        {
+          "mapping_name": "classical",
+          "selection_index": 1,
+          "run_config_id": "run[0.2.25.7]",
+          "agent_number": 27,
+          "run_index": 7,
+          "assignment_seed": 61957,
+          "map_identifier": "static_campus_area_1_static_image_seed_50930",
+          "output_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/classical/selection_01__agent_number_027__run_0.2.25.7",
+          "mapping_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/classical/selection_01__agent_number_027__run_0.2.25.7",
+          "num_frames": 97
+        }
+      ],
+      "cyclic": [
+        {
+          "mapping_name": "cyclic",
+          "selection_index": 1,
+          "run_config_id": "run[0.2.25.7]",
+          "agent_number": 27,
+          "run_index": 7,
+          "assignment_seed": 61957,
+          "map_identifier": "static_campus_area_1_static_image_seed_50930",
+          "output_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/cyclic/selection_01__agent_number_027__run_0.2.25.7",
+          "mapping_dir": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful/cyclic/selection_01__agent_number_027__run_0.2.25.7",
+          "num_frames": 109
+        }
+      ]
+    },
+    "visualizations_root": "/workspaces/cmsc-190/dev/outputs/static_campus_area_1/visualizations/independently_successful",
+    "notes": "These are the final independently successful runs per mapping from the reported experiment, limited by num_last_runs_to_visualize_independently_successful for each mapping."
+  },
+  "total_selected_run_configurations": 2,
+  "notes": "Both jointly successful and independently successful visualization variants were generated using the current master_config.py selection limits."
+}

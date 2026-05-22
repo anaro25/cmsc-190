@@ -66,7 +66,7 @@ SHARED_TIGHT_TIME_HORIZON = False
 SHARED_COUNTED_RUNS_REQUIRED = 5
 TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER = True
 TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED = 3
-TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 100
+TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20 # 100
 
 # ===================================
 
@@ -78,14 +78,15 @@ to_generate = "graphs_and_data"
 
 # Traditional MAPF
 # MAP_TYPE = "static_artificial"
-# MAP_TYPE = "static_port"
+MAP_TYPE = "static_port"
 # MAP_TYPE = "dynamic_port"
 
 # Campus Crowd Simulation
-MAP_TYPE = "static_campus_area_1"
+# MAP_TYPE = "static_campus_area_1"
 # MAP_TYPE = "dynamic_campus_area_1"
 # MAP_TYPE = "static_campus_area_2"
 # MAP_TYPE = "dynamic_campus_area_2"
+
 # MAP_TYPE = "static_campus_area_3"
 # MAP_TYPE = "dynamic_campus_area_3"
 
@@ -136,7 +137,7 @@ STATIC_PORT_CONFIG = _with_shared_runtime(
     {
         # common frequently edited constants
         "seed": 201,
-        "agent_number_range": (2, 200, 1),
+        "agent_number_range": (2, 70, 1),
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
         "num_last_runs_to_visualize_jointly_successful": 0,
         "num_last_runs_to_visualize_independently_successful": 1,
@@ -303,8 +304,8 @@ STATIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
         "seed": 601,
         "agent_number_range": (2, 200, 1),
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-        "num_last_runs_to_visualize_jointly_successful": 3,
-        "num_last_runs_to_visualize_independently_successful": 3,
+        "num_last_runs_to_visualize_jointly_successful": 0,
+        "num_last_runs_to_visualize_independently_successful": 1,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -325,7 +326,7 @@ STATIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
         # dynamic-map constants
         "target_static_obstacle_density": None,
         "target_dynamic_obstacle_density": None,
-        "loop_sequence_length": 250,
+        "loop_sequence_length": None,
         "group_stay_durations": None,
         "dynamic_generation_cell_mode": "zone_colors_only",
 
@@ -344,8 +345,8 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
         "seed": 701,
         "agent_number_range": (2, 200, 1),
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-        "num_last_runs_to_visualize_jointly_successful": 3,
-        "num_last_runs_to_visualize_independently_successful": 3,
+        "num_last_runs_to_visualize_jointly_successful": 0,
+        "num_last_runs_to_visualize_independently_successful": 1,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,

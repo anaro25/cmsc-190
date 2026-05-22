@@ -1,0 +1,389 @@
+[
+  {
+    "branch_id": "dynamic_campus_area_1",
+    "branch_decimal": "1.2",
+    "map_type": "dynamic_campus_area_1",
+    "map_obstacle_type": "dynamic",
+    "target_type": "single_target",
+    "agent_number": 10,
+    "agent_number_index": 8,
+    "run_index": 2,
+    "run_config_id": "run[1.2.8.2]",
+    "map_identifier": "dynamic_campus_area_1_shared_map_seed_90225_group_patch",
+    "map_seed": 90225,
+    "assignment_seed": 65065,
+    "dynamic_schedule_seed": 90225,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          56,
+          46
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          58,
+          46
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          56,
+          44
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          56,
+          48
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          54,
+          46
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          54,
+          44
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          58,
+          48
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          54,
+          48
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          58,
+          44
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          60,
+          46
+        ],
+        "goal": [
+          90,
+          54
+        ]
+      }
+    ],
+    "notes": "Shared dynamic map source; unique initial conditions for this run. start_zone=1 | goal_zone=2 | start_distribution=clustered | goal_distribution=single"
+  },
+  {
+    "branch_id": "dynamic_campus_area_1",
+    "branch_decimal": "1.2",
+    "map_type": "dynamic_campus_area_1",
+    "map_obstacle_type": "dynamic",
+    "target_type": "single_target",
+    "agent_number": 10,
+    "agent_number_index": 8,
+    "run_index": 3,
+    "run_config_id": "run[1.2.8.3]",
+    "map_identifier": "dynamic_campus_area_1_shared_map_seed_90225_group_patch",
+    "map_seed": 90225,
+    "assignment_seed": 65102,
+    "dynamic_schedule_seed": 90225,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          40,
+          18
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          40,
+          16
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          42,
+          18
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          40,
+          20
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          38,
+          18
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          42,
+          20
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          42,
+          16
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          38,
+          16
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          38,
+          20
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          44,
+          18
+        ],
+        "goal": [
+          104,
+          126
+        ]
+      }
+    ],
+    "notes": "Shared dynamic map source; unique initial conditions for this run. start_zone=1 | goal_zone=2 | start_distribution=clustered | goal_distribution=single"
+  },
+  {
+    "branch_id": "dynamic_campus_area_1",
+    "branch_decimal": "1.2",
+    "map_type": "dynamic_campus_area_1",
+    "map_obstacle_type": "dynamic",
+    "target_type": "single_target",
+    "agent_number": 10,
+    "agent_number_index": 8,
+    "run_index": 4,
+    "run_config_id": "run[1.2.8.4]",
+    "map_identifier": "dynamic_campus_area_1_shared_map_seed_90225_group_patch",
+    "map_seed": 90225,
+    "assignment_seed": 65139,
+    "dynamic_schedule_seed": 90225,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          110,
+          36
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          108,
+          36
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          110,
+          38
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          108,
+          38
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          112,
+          38
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          110,
+          40
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          112,
+          40
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          108,
+          40
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          106,
+          38
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          106,
+          40
+        ],
+        "goal": [
+          36,
+          8
+        ]
+      }
+    ],
+    "notes": "Shared dynamic map source; unique initial conditions for this run. start_zone=2 | goal_zone=1 | start_distribution=clustered | goal_distribution=single"
+  }
+]

@@ -1,0 +1,983 @@
+[
+  {
+    "branch_id": "static_campus_area_2",
+    "branch_decimal": "0.3",
+    "map_type": "static_campus_area_2",
+    "map_obstacle_type": "static",
+    "target_type": "single_target",
+    "agent_number": 28,
+    "agent_number_index": 26,
+    "run_index": 0,
+    "run_config_id": "run[0.3.26.0]",
+    "map_identifier": "static_campus_area_2_static_image_seed_50794",
+    "map_seed": 50794,
+    "assignment_seed": 61803,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          94,
+          64
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          80,
+          10
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          104,
+          32
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          104,
+          66
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          118,
+          70
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          106,
+          16
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          84,
+          2
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          68,
+          50
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          106,
+          42
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          96,
+          40
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          116,
+          44
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          62,
+          2
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          74,
+          58
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          122,
+          66
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          98,
+          2
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          102,
+          52
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          94,
+          46
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          80,
+          76
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          80,
+          14
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          70,
+          56
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          86,
+          18
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          114,
+          20
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          74,
+          8
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          126,
+          64
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          98,
+          14
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          98,
+          60
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          88,
+          58
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          116,
+          62
+        ],
+        "goal": [
+          22,
+          8
+        ]
+      }
+    ],
+    "notes": "Static image-based campus map loaded with semantic zone masks and single-target marker cells=167. start_zone=1 | goal_zone=2 | start_distribution=dispersed | goal_distribution=single"
+  },
+  {
+    "branch_id": "static_campus_area_2",
+    "branch_decimal": "0.3",
+    "map_type": "static_campus_area_2",
+    "map_obstacle_type": "static",
+    "target_type": "single_target",
+    "agent_number": 28,
+    "agent_number_index": 26,
+    "run_index": 1,
+    "run_config_id": "run[0.3.26.1]",
+    "map_identifier": "static_campus_area_2_static_image_seed_50827",
+    "map_seed": 50827,
+    "assignment_seed": 61839,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          112,
+          24
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          58,
+          14
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          98,
+          64
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          88,
+          18
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          66,
+          16
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          116,
+          34
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          74,
+          14
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          108,
+          62
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          72,
+          36
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          82,
+          6
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          64,
+          12
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          74,
+          26
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          98,
+          6
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          114,
+          8
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          108,
+          84
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          84,
+          30
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          112,
+          46
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          126,
+          68
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          108,
+          18
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          68,
+          56
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          106,
+          32
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          68,
+          34
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          90,
+          66
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          120,
+          36
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          120,
+          0
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          82,
+          14
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          62,
+          0
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          76,
+          32
+        ],
+        "goal": [
+          20,
+          4
+        ]
+      }
+    ],
+    "notes": "Static image-based campus map loaded with semantic zone masks and single-target marker cells=167. start_zone=1 | goal_zone=2 | start_distribution=dispersed | goal_distribution=single"
+  },
+  {
+    "branch_id": "static_campus_area_2",
+    "branch_decimal": "0.3",
+    "map_type": "static_campus_area_2",
+    "map_obstacle_type": "static",
+    "target_type": "single_target",
+    "agent_number": 28,
+    "agent_number_index": 26,
+    "run_index": 2,
+    "run_config_id": "run[0.3.26.2]",
+    "map_identifier": "static_campus_area_2_static_image_seed_50860",
+    "map_seed": 50860,
+    "assignment_seed": 61875,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          2,
+          20
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          8,
+          44
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          30,
+          56
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          22,
+          10
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          48,
+          82
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          18,
+          18
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          44,
+          66
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          54,
+          90
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          58,
+          84
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          14,
+          32
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          28,
+          64
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          14,
+          4
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          26,
+          72
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          10,
+          30
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          22,
+          24
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          50,
+          90
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          22,
+          14
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          34,
+          62
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          30,
+          68
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          24,
+          44
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          20,
+          28
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          20,
+          40
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          8,
+          26
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          20,
+          32
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          42,
+          88
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          4,
+          52
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          20,
+          58
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          38,
+          80
+        ],
+        "goal": [
+          126,
+          38
+        ]
+      }
+    ],
+    "notes": "Static image-based campus map loaded with semantic zone masks and single-target marker cells=167. start_zone=2 | goal_zone=1 | start_distribution=dispersed | goal_distribution=single"
+  }
+]

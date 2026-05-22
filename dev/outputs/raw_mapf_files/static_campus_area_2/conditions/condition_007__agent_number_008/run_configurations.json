@@ -1,0 +1,323 @@
+[
+  {
+    "branch_id": "static_campus_area_2",
+    "branch_decimal": "0.3",
+    "map_type": "static_campus_area_2",
+    "map_obstacle_type": "static",
+    "target_type": "single_target",
+    "agent_number": 8,
+    "agent_number_index": 6,
+    "run_index": 0,
+    "run_config_id": "run[0.3.6.0]",
+    "map_identifier": "static_campus_area_2_static_image_seed_49066",
+    "map_seed": 49066,
+    "assignment_seed": 59925,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          98,
+          8
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          104,
+          22
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          106,
+          68
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          116,
+          74
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          96,
+          58
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          70,
+          34
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          60,
+          44
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          88,
+          6
+        ],
+        "goal": [
+          32,
+          126
+        ]
+      }
+    ],
+    "notes": "Static image-based campus map loaded with semantic zone masks and single-target marker cells=167. start_zone=1 | goal_zone=3 | start_distribution=dispersed | goal_distribution=single"
+  },
+  {
+    "branch_id": "static_campus_area_2",
+    "branch_decimal": "0.3",
+    "map_type": "static_campus_area_2",
+    "map_obstacle_type": "static",
+    "target_type": "single_target",
+    "agent_number": 8,
+    "agent_number_index": 6,
+    "run_index": 1,
+    "run_config_id": "run[0.3.6.1]",
+    "map_identifier": "static_campus_area_2_static_image_seed_49098",
+    "map_seed": 49098,
+    "assignment_seed": 59960,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          102,
+          44
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          100,
+          58
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          86,
+          16
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          120,
+          62
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          76,
+          14
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          102,
+          68
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          60,
+          8
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          86,
+          56
+        ],
+        "goal": [
+          22,
+          126
+        ]
+      }
+    ],
+    "notes": "Static image-based campus map loaded with semantic zone masks and single-target marker cells=167. start_zone=1 | goal_zone=3 | start_distribution=dispersed | goal_distribution=single"
+  },
+  {
+    "branch_id": "static_campus_area_2",
+    "branch_decimal": "0.3",
+    "map_type": "static_campus_area_2",
+    "map_obstacle_type": "static",
+    "target_type": "single_target",
+    "agent_number": 8,
+    "agent_number_index": 6,
+    "run_index": 2,
+    "run_config_id": "run[0.3.6.2]",
+    "map_identifier": "static_campus_area_2_static_image_seed_49130",
+    "map_seed": 49130,
+    "assignment_seed": 59995,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          40,
+          114
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          8,
+          72
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          12,
+          70
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          54,
+          118
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          10,
+          114
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          28,
+          88
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          64,
+          120
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          4,
+          96
+        ],
+        "goal": [
+          76,
+          0
+        ]
+      }
+    ],
+    "notes": "Static image-based campus map loaded with semantic zone masks and single-target marker cells=167. start_zone=3 | goal_zone=1 | start_distribution=dispersed | goal_distribution=single"
+  }
+]
