@@ -67,7 +67,7 @@
   "base_rows": null,
   "base_cols": null,
   "static_obstacle_density": 1.0,
-  "image_path": "/workspaces/cmsc-190/dev/inputs/dynamic_port/port_map.png",
+  "image_path": "\\workspaces\\cmsc-190\\dev\\inputs\\dynamic_port\\port_map.png",
   "image_threshold": 127,
   "image_resize_longest_side": 40,
   "dynamic_target_static_obstacle_density": 1.0,

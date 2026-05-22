@@ -1,0 +1,165 @@
+========================================================================================
+Branch: Static Campus Area 2 (static_campus_area_2)
+Map obstacle type: static
+Documented target type: single_target
+Active target type: single_target
+Start distribution mode: dispersed
+Goal distribution mode: single
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: True
+Zone relationship mode: distinct_campus_zones
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 3.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Agent cohesion enabled: True
+Cohesion factor: 1.00
+Seed: 601
+Jointly viable counted pairs required (n): 3
+Runtime limit per run: 30.00s
+Agent number range: start=2, end=200, step=1
+Planned agent-number conditions before early stopping: 199 (first=2, last=200)
+Early-stop rule 1: when a cyclic unfinished run would make unfinished runs the majority, discard that paired attempt and allow 3 extra paired attempt(s). Stop if all extra attempts remain unfinished.
+Early-stop rule 2: discard the current condition and stop after 15 consecutive failed paired sampling attempts.
+Notes: Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable for agents/targets, and gray/black cells are non-traversable. The source-image static layout is used without dynamic obstacles. Starts are sampled as dispersed in one zone, targets use one literal shared target cell in a different zone, and assignments are many-to-one. When single target mode is active, the shared target is sampled only from dark marker cells inside the selected target zone.
+========================================================================================
+recompute_MAPF: False
+to_generate: graphs_and_data
+Persisted raw MAPF data root: D:\projects\cmsc-190\dev\outputs\raw_mapf_files\static_campus_area_2
+Persisted raw MAPF manifest path: D:\projects\cmsc-190\dev\outputs\raw_mapf_files\static_campus_area_2\manifest.json
+[Elapsed: 00m 00s] Program stopwatch started.
+
+recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.
+Loaded the persisted raw MAPF data for output generation.
+[Elapsed: 00m 00s] Structured records and summaries regenerated from persisted raw MAPF data.
+[Elapsed: 00m 02s] Graphs regenerated from persisted raw MAPF data.
+
+Final aggregate table:
+    Condition aggregate | agent_number[0.3.0] | agent_number=2 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=0.33 | avg_path=85.83
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.04 | avg_conflicts_at_halt=0.33 | avg_path=91.17
+    Condition aggregate | agent_number[0.3.1] | agent_number=3 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=0.33 | avg_path=71.78
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.06 | avg_conflicts_at_halt=0.33 | avg_path=75.56
+    Condition aggregate | agent_number[0.3.2] | agent_number=4 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=0.33 | avg_path=75.92
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.05 | avg_conflicts_at_halt=0.00 | avg_path=81.17
+    Condition aggregate | agent_number[0.3.3] | agent_number=5 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.11 | avg_conflicts_at_halt=1.67 | avg_path=72.53
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.05 | avg_conflicts_at_halt=0.00 | avg_path=77.67
+    Condition aggregate | agent_number[0.3.4] | agent_number=6 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.13 | avg_conflicts_at_halt=1.00 | avg_path=98.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=0.00 | avg_path=112.00
+    Condition aggregate | agent_number[0.3.5] | agent_number=7 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.14 | avg_conflicts_at_halt=0.67 | avg_path=88.48
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.10 | avg_conflicts_at_halt=0.33 | avg_path=96.43
+    Condition aggregate | agent_number[0.3.6] | agent_number=8 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.20 | avg_conflicts_at_halt=3.00 | avg_path=103.96
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.11 | avg_conflicts_at_halt=0.33 | avg_path=114.00
+    Condition aggregate | agent_number[0.3.7] | agent_number=9 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.16 | avg_conflicts_at_halt=0.33 | avg_path=94.93
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.11 | avg_conflicts_at_halt=0.00 | avg_path=111.56
+    Condition aggregate | agent_number[0.3.8] | agent_number=10 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.17 | avg_conflicts_at_halt=0.67 | avg_path=75.43
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.12 | avg_conflicts_at_halt=0.33 | avg_path=84.77
+    Condition aggregate | agent_number[0.3.9] | agent_number=11 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.28 | avg_conflicts_at_halt=3.00 | avg_path=94.85
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.19 | avg_conflicts_at_halt=1.67 | avg_path=104.94
+    Condition aggregate | agent_number[0.3.10] | agent_number=12 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.47 | avg_conflicts_at_halt=4.33 | avg_path=116.67
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.40 | avg_conflicts_at_halt=6.00 | avg_path=130.61
+    Condition aggregate | agent_number[0.3.11] | agent_number=13 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.43 | avg_conflicts_at_halt=5.33 | avg_path=93.08
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.31 | avg_conflicts_at_halt=4.67 | avg_path=101.54
+    Condition aggregate | agent_number[0.3.12] | agent_number=14 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.69 | avg_conflicts_at_halt=9.33 | avg_path=97.60
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.47 | avg_conflicts_at_halt=7.33 | avg_path=110.29
+    Condition aggregate | agent_number[0.3.13] | agent_number=15 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.53 | avg_conflicts_at_halt=240.00 | avg_path=96.70
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.51 | avg_conflicts_at_halt=34.67 | avg_path=107.73
+    Condition aggregate | agent_number[0.3.14] | agent_number=16 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=3.13 | avg_conflicts_at_halt=54.67 | avg_path=97.56
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.04 | avg_conflicts_at_halt=16.00 | avg_path=106.08
+    Condition aggregate | agent_number[0.3.15] | agent_number=17 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.56 | avg_conflicts_at_halt=6.67 | avg_path=78.06
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.24 | avg_conflicts_at_halt=1.33 | avg_path=84.12
+    Condition aggregate | agent_number[0.3.16] | agent_number=18 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=2.22 | avg_conflicts_at_halt=26.33 | avg_path=123.43
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.80 | avg_conflicts_at_halt=9.00 | avg_path=135.07
+    Condition aggregate | agent_number[0.3.17] | agent_number=19 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=5.21 | avg_conflicts_at_halt=84.33 | avg_path=90.72
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.43 | avg_conflicts_at_halt=41.33 | avg_path=96.95
+    Condition aggregate | agent_number[0.3.18] | agent_number=20 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.41 | avg_conflicts_at_halt=166.67 | avg_path=94.22
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.23 | avg_conflicts_at_halt=21.00 | avg_path=98.12
+    Condition aggregate | agent_number[0.3.19] | agent_number=21 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=11.16 | avg_conflicts_at_halt=164.67 | avg_path=79.14
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.98 | avg_conflicts_at_halt=15.67 | avg_path=101.02
+    Condition aggregate | agent_number[0.3.20] | agent_number=22 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.59 | avg_conflicts_at_halt=175.67 | avg_path=64.61
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.86 | avg_conflicts_at_halt=13.67 | avg_path=81.94
+    Condition aggregate | agent_number[0.3.21] | agent_number=23 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=10.15 | avg_conflicts_at_halt=145.67 | avg_path=65.36
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.48 | avg_conflicts_at_halt=41.67 | avg_path=70.54
+    Condition aggregate | agent_number[0.3.22] | agent_number=24 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=12.61 | avg_conflicts_at_halt=173.33 | avg_path=86.67
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.93 | avg_conflicts_at_halt=50.00 | avg_path=93.47
+    Condition aggregate | agent_number[0.3.23] | agent_number=25 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.70 | avg_conflicts_at_halt=181.33 | avg_path=67.62
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.57 | avg_conflicts_at_halt=6.33 | avg_path=77.85
+    Condition aggregate | agent_number[0.3.24] | agent_number=26 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=5.87 | avg_conflicts_at_halt=84.33 | avg_path=79.72
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=3.10 | avg_conflicts_at_halt=48.00 | avg_path=85.60
+    Condition aggregate | agent_number[0.3.25] | agent_number=27 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.61 | avg_conflicts_at_halt=355.00 | avg_path=81.15
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.68 | avg_conflicts_at_halt=29.00 | avg_path=82.89
+    Condition aggregate | agent_number[0.3.26] | agent_number=28 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.40 | avg_conflicts_at_halt=282.67 | avg_path=74.86
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.99 | avg_conflicts_at_halt=47.67 | avg_path=88.32
+    Condition aggregate | agent_number[0.3.27] | agent_number=29 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=13.10 | avg_conflicts_at_halt=191.67 | avg_path=81.53
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.22 | avg_conflicts_at_halt=84.67 | avg_path=87.11
+    Condition aggregate | agent_number[0.3.28] | agent_number=30 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=358.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=3.82 | avg_conflicts_at_halt=48.00 | avg_path=104.93
+    Condition aggregate | agent_number[0.3.29] | agent_number=31 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=1.92 | avg_conflicts_at_halt=24.00 | avg_path=64.94
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.03 | avg_conflicts_at_halt=15.00 | avg_path=70.68
+    Condition aggregate | agent_number[0.3.30] | agent_number=32 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.65 | avg_conflicts_at_halt=226.33 | avg_path=69.38
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=9.98 | avg_conflicts_at_halt=128.67 | avg_path=89.80
+    Condition aggregate | agent_number[0.3.31] | agent_number=33 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=23.74 | avg_conflicts_at_halt=242.33 | avg_path=67.70
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=6.23 | avg_conflicts_at_halt=71.33 | avg_path=98.89
+    Condition aggregate | agent_number[0.3.32] | agent_number=34 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=11.30 | avg_conflicts_at_halt=147.33 | avg_path=60.66
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.67 | avg_conflicts_at_halt=44.00 | avg_path=71.01
+    Condition aggregate | agent_number[0.3.33] | agent_number=35 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.49 | avg_conflicts_at_halt=206.33 | avg_path=56.54
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.49 | avg_conflicts_at_halt=26.00 | avg_path=90.53
+    Condition aggregate | agent_number[0.3.34] | agent_number=36 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.76 | avg_conflicts_at_halt=168.33 | avg_path=58.58
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.07 | avg_conflicts_at_halt=16.67 | avg_path=102.75
+    Condition aggregate | agent_number[0.3.35] | agent_number=37 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=21.63 | avg_conflicts_at_halt=179.00 | avg_path=48.32
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=9.24 | avg_conflicts_at_halt=96.67 | avg_path=92.68
+    Condition aggregate | agent_number[0.3.36] | agent_number=38 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.45 | avg_conflicts_at_halt=199.67 | avg_path=57.05
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=7.10 | avg_conflicts_at_halt=77.00 | avg_path=80.89
+    Condition aggregate | agent_number[0.3.37] | agent_number=39 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=4.37 | avg_conflicts_at_halt=51.00 | avg_path=63.50
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.85 | avg_conflicts_at_halt=23.00 | avg_path=68.74
+
+Branch stopped early:
+  Reason: filter_individual_runs_until_cyclic_faster_max_attempts_exhausted
+  Details: Stop rule triggered before the counted-pair quota was reached (2/3) at agent_number=40. The current condition is discarded and the branch stops before higher agent numbers.
+  Reported agent numbers: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39]
+
+Generated graph files:
+  - D:\projects\cmsc-190\dev\outputs\static_campus_area_2\graphs\graphs_and_data\static_campus_area_2_runtime.png
+  - D:\projects\cmsc-190\dev\outputs\static_campus_area_2\graphs\graphs_and_data\static_campus_area_2_conflicts.png
+  - D:\projects\cmsc-190\dev\outputs\static_campus_area_2\graphs\graphs_and_data\static_campus_area_2_path_length.png
+
+[Elapsed: 00m 02s] Experiment finished.

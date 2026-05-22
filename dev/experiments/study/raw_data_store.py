@@ -4,6 +4,7 @@ import json
 import pickle
 import re
 import shutil
+from dataclasses import fields
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -313,6 +314,17 @@ class BranchRawDataStore:
                 branch_spec_payload["num_last_runs_to_visualize_independently_successful"] = int(
                     legacy_visualization_limit
                 )
+
+        # Older persisted branch_spec.json files may contain metadata fields that
+        # no longer exist in the current BranchSpec dataclass. Ignore those
+        # legacy extras so saved raw MAPF data can still be reused when
+        # recompute_MAPF is False.
+        valid_branch_spec_keys = {field.name for field in fields(BranchSpec)}
+        branch_spec_payload = {
+            key: value
+            for key, value in branch_spec_payload.items()
+            if key in valid_branch_spec_keys
+        }
 
         return BranchSpec(**branch_spec_payload)
 

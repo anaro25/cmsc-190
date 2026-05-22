@@ -1,0 +1,96 @@
+========================================================================================
+Branch: Dynamic Campus Area 1 (dynamic_campus_area_1)
+Map obstacle type: dynamic
+Documented target type: single_target
+Active target type: single_target
+Start distribution mode: clustered
+Goal distribution mode: single
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: True
+Zone relationship mode: distinct_campus_zones
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 3.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Agent cohesion enabled: True
+Cohesion factor: 1.00
+Seed: 501
+Jointly viable counted pairs required (n): 3
+Runtime limit per run: 30.00s
+Agent number range: start=2, end=200, step=1
+Planned agent-number conditions before early stopping: 199 (first=2, last=200)
+Early-stop rule 1: when a cyclic unfinished run would make unfinished runs the majority, discard that paired attempt and allow 3 extra paired attempt(s). Stop if all extra attempts remain unfinished.
+Early-stop rule 2: discard the current condition and stop after 15 consecutive failed paired sampling attempts.
+Notes: Campus branch with explicit zone-color semantics. Zone colors are traversable and spawnable, white walkways are traversable but non-spawnable for agents/targets, and gray/black cells are non-traversable. Dynamic obstacles are generated on all campus traversable cells, including zone colors and white walkways. Starts are sampled as clustered in one zone, targets use one literal shared target cell in a different zone, and assignments are many-to-one. When single target mode is active, the shared target is sampled only from dark marker cells inside the selected target zone.
+========================================================================================
+recompute_MAPF: False
+to_generate: graphs_and_data
+Persisted raw MAPF data root: D:\projects\cmsc-190\dev\outputs\raw_mapf_files\dynamic_campus_area_1
+Persisted raw MAPF manifest path: D:\projects\cmsc-190\dev\outputs\raw_mapf_files\dynamic_campus_area_1\manifest.json
+[Elapsed: 00m 00s] Program stopwatch started.
+
+recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.
+Loaded the persisted raw MAPF data for output generation.
+[Elapsed: 00m 00s] Structured records and summaries regenerated from persisted raw MAPF data.
+[Elapsed: 00m 01s] Graphs regenerated from persisted raw MAPF data.
+
+Final aggregate table:
+    Condition aggregate | agent_number[1.2.0] | agent_number=2 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.94 | avg_conflicts_at_halt=0.00 | avg_path=73.17
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.86 | avg_conflicts_at_halt=0.00 | avg_path=86.50
+    Condition aggregate | agent_number[1.2.1] | agent_number=3 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=0.33 | avg_path=77.33
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=0.00 | avg_path=86.56
+    Condition aggregate | agent_number[1.2.2] | agent_number=4 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.05 | avg_conflicts_at_halt=1.67 | avg_path=75.42
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=1.00 | avg_path=86.50
+    Condition aggregate | agent_number[1.2.3] | agent_number=5 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.05 | avg_conflicts_at_halt=983.67 | avg_path=69.50
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.08 | avg_conflicts_at_halt=4.67 | avg_path=79.13
+    Condition aggregate | agent_number[1.2.4] | agent_number=6 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.11 | avg_conflicts_at_halt=254.33 | avg_path=69.50
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.12 | avg_conflicts_at_halt=8.33 | avg_path=85.06
+    Condition aggregate | agent_number[1.2.5] | agent_number=7 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.06 | avg_conflicts_at_halt=1136.00 | avg_path=68.57
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.26 | avg_conflicts_at_halt=12.00 | avg_path=89.81
+    Condition aggregate | agent_number[1.2.6] | agent_number=8 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=707.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.82 | avg_conflicts_at_halt=37.00 | avg_path=102.96
+    Condition aggregate | agent_number[1.2.7] | agent_number=9 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.14 | avg_conflicts_at_halt=460.00 | avg_path=75.56
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.56 | avg_conflicts_at_halt=27.00 | avg_path=91.81
+    Condition aggregate | agent_number[1.2.8] | agent_number=10 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1460.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.83 | avg_conflicts_at_halt=64.00 | avg_path=99.20
+    Condition aggregate | agent_number[1.2.9] | agent_number=11 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=769.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.91 | avg_conflicts_at_halt=39.00 | avg_path=83.36
+    Condition aggregate | agent_number[1.2.10] | agent_number=12 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=666.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.93 | avg_conflicts_at_halt=32.67 | avg_path=89.39
+    Condition aggregate | agent_number[1.2.11] | agent_number=13 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=588.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.44 | avg_conflicts_at_halt=149.00 | avg_path=100.85
+    Condition aggregate | agent_number[1.2.12] | agent_number=14 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=566.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=3.26 | avg_conflicts_at_halt=87.33 | avg_path=95.88
+    Condition aggregate | agent_number[1.2.13] | agent_number=15 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=833.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=7.95 | avg_conflicts_at_halt=198.33 | avg_path=98.71
+    Condition aggregate | agent_number[1.2.14] | agent_number=16 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=392.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=17.40 | avg_conflicts_at_halt=431.00 | avg_path=101.94
+
+Branch stopped early:
+  Reason: filter_individual_runs_until_cyclic_faster_max_attempts_exhausted
+  Details: Stop rule triggered before the counted-pair quota was reached (2/3) at agent_number=17. The current condition is discarded and the branch stops before higher agent numbers.
+  Reported agent numbers: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+Generated graph files:
+  - D:\projects\cmsc-190\dev\outputs\dynamic_campus_area_1\graphs\graphs_and_data\dynamic_campus_area_1_runtime.png
+  - D:\projects\cmsc-190\dev\outputs\dynamic_campus_area_1\graphs\graphs_and_data\dynamic_campus_area_1_conflicts.png
+  - D:\projects\cmsc-190\dev\outputs\dynamic_campus_area_1\graphs\graphs_and_data\dynamic_campus_area_1_path_length.png
+
+[Elapsed: 00m 01s] Experiment finished.

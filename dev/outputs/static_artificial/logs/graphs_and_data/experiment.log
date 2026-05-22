@@ -11,28 +11,30 @@ Require individual reachability: False
 Zone relationship mode: none
 Solver: ECBS
 Enhanced CBS enabled: True
-Solver suboptimality factor: 1.50
+Solver suboptimality factor: 3.00
 True static shortest-path heuristic: True
 Tight time horizon: False
+Agent cohesion enabled: False
+Cohesion factor: 0.00
 Seed: 101
-Jointly viable counted pairs required (n): 5
+Jointly viable counted pairs required (n): 3
 Runtime limit per run: 30.00s
 Agent number range: start=4, end=300, step=4
 Planned agent-number conditions before early stopping: 75 (first=4, last=300)
-Early-stop rule 1: discard the current condition and stop when cyclic unfinished runs exceed cyclic successful runs within the retained counted pairs.
+Early-stop rule 1: when a cyclic unfinished run would make unfinished runs the majority, discard that paired attempt and allow 3 extra paired attempt(s). Stop if all extra attempts remain unfinished.
 Early-stop rule 2: discard the current condition and stop after 15 consecutive failed paired sampling attempts.
-Notes: Fresh artificial map per run configuration. Starts and goals are both dispersed one-to-one sets. Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger.
+Notes: Fresh artificial map per run configuration. Starts are sampled as dispersed, goals use dispersed one-to-one targets, and assignments remain one-to-one. Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger.
 ========================================================================================
 recompute_MAPF: False
 to_generate: graphs_and_data
-Persisted raw MAPF data root: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/static_artificial
-Persisted raw MAPF manifest path: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/static_artificial/manifest.json
+Persisted raw MAPF data root: D:\projects\cmsc-190\dev\outputs\raw_mapf_files\static_artificial
+Persisted raw MAPF manifest path: D:\projects\cmsc-190\dev\outputs\raw_mapf_files\static_artificial\manifest.json
 [Elapsed: 00m 00s] Program stopwatch started.
 
 recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.
 Loaded the persisted raw MAPF data for output generation.
 [Elapsed: 00m 00s] Structured records and summaries regenerated from persisted raw MAPF data.
-[Elapsed: 00m 02s] Graphs regenerated from persisted raw MAPF data.
+[Elapsed: 00m 01s] Graphs regenerated from persisted raw MAPF data.
 
 Final aggregate table:
     Condition aggregate | agent_number[0.0.0] | agent_number=4 | retained_pairs=5/5
@@ -117,8 +119,8 @@ Branch stopped early:
   Reported agent numbers: [4, 8, 12, 16, 20, 24, 28, 32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, 76, 80, 84, 88, 92, 96, 100]
 
 Generated graph files:
-  - /workspaces/cmsc-190/dev/outputs/static_artificial/graphs/graphs_and_data/static_artificial_runtime.png
-  - /workspaces/cmsc-190/dev/outputs/static_artificial/graphs/graphs_and_data/static_artificial_conflicts.png
-  - /workspaces/cmsc-190/dev/outputs/static_artificial/graphs/graphs_and_data/static_artificial_path_length.png
+  - D:\projects\cmsc-190\dev\outputs\static_artificial\graphs\graphs_and_data\static_artificial_runtime.png
+  - D:\projects\cmsc-190\dev\outputs\static_artificial\graphs\graphs_and_data\static_artificial_conflicts.png
+  - D:\projects\cmsc-190\dev\outputs\static_artificial\graphs\graphs_and_data\static_artificial_path_length.png
 
-[Elapsed: 00m 02s] Experiment finished.
+[Elapsed: 00m 01s] Experiment finished.

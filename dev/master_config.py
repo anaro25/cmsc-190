@@ -82,15 +82,15 @@ to_generate = "graphs_and_data"
 # to_generate = "nothing"
 
 # Traditional MAPF
-# MAP_TYPE = "static_artificial"
-# MAP_TYPE = "static_port"
-MAP_TYPE = "dynamic_port"
+# MAP_TYPE = "static_artificial" # //
+# MAP_TYPE = "static_port" # //
+# MAP_TYPE = "dynamic_port" # //
 
 # Campus Crowd Simulation
-# MAP_TYPE = "static_campus_area_1"
-# MAP_TYPE = "dynamic_campus_area_1"
-# MAP_TYPE = "static_campus_area_2"
-# MAP_TYPE = "dynamic_campus_area_2"
+# MAP_TYPE = "static_campus_area_1" # //
+# MAP_TYPE = "dynamic_campus_area_1" # //
+# MAP_TYPE = "static_campus_area_2" # //
+MAP_TYPE = "dynamic_campus_area_2"
 
 # MAP_TYPE = "static_campus_area_3"
 # MAP_TYPE = "dynamic_campus_area_3"
