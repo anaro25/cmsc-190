@@ -1,0 +1,1812 @@
+========================================================================================
+Branch: Dynamic Port (dynamic_port)
+Map obstacle type: dynamic
+Documented target type: clustered_targets
+Active target type: clustered_targets
+Start distribution mode: clustered
+Goal distribution mode: clustered
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: True
+Zone relationship mode: none
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 3.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Agent cohesion enabled: True
+Cohesion factor: 1.00
+Seed: 301
+Jointly viable counted pairs required (n): 3
+Runtime limit per run: 30.00s
+Agent number range: start=2, end=35, step=1
+Planned agent-number conditions before early stopping: 34 (first=2, last=35)
+Early-stop rule 1: when a cyclic unfinished run would make unfinished runs the majority, discard that paired attempt and allow 3 extra paired attempt(s). Stop if all extra attempts remain unfinished.
+Early-stop rule 2: discard the current condition and stop after 15 consecutive failed paired sampling attempts.
+Notes: Image-based port branch. Dynamic obstacles are generated while preserving the original port static-obstacle layout. Starts are sampled as clustered, goals use targets sampled as one compact directly adjacent 8-neighbor-connected group, and assignments remain one-to-one. Clustered start and goal sets must be at least 20 movement steps apart. Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger.
+========================================================================================
+recompute_MAPF: True
+to_generate: graphs_and_data
+Persisted raw MAPF data root: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/dynamic_port
+Persisted raw MAPF manifest path: /workspaces/cmsc-190/dev/outputs/raw_mapf_files/dynamic_port/manifest.json
+[Elapsed: 00m 00s] Program stopwatch started.
+
+Recomputing raw MAPF data for the selected branch and replacing the saved copy...
+Preparing shared dynamic map state before iterating agent-number conditions...
+Preparing shared dynamic branch state | schedule_seed=57210 | image_path=/workspaces/cmsc-190/dev/inputs/dynamic_port/port_map.png
+  Loading obstacle matrix | threshold=127 | resize_longest_side=40
+  Obstacle matrix loaded | dimensions=40x40
+  Traversable-space diagnostic | free_cells=1113 | connected_components=1
+  Using all thresholded non-black cells for grouped dynamic-obstacle generation and connectivity checks.
+  Preserving source-image static obstacle layout (no static-density preprocessing).
+  Building shared dynamic loop with grouped obstacle patches...
+Dynamic loop generation started | grid=40x40 | dynamic_density=0.03 | target_dynamic_cells=40 | loop_length=250
+Dynamic loop group split | group_count=3 | group_sizes=[14, 13, 13] | stay_durations=(11, 17, 29)
+Dynamic patch-bank center candidates prepared: 1110 usable centers.
+Building dynamic patch bank for group 1/3 | target_patch_size=14 | required_entries=90
+  Patch bank group 1/3 progress | entries=1/90 | center_attempts=1
+  Patch bank group 1/3 progress | entries=10/90 | center_attempts=10
+  Patch bank group 1/3 progress | entries=20/90 | center_attempts=20
+  Patch bank group 1/3 progress | entries=30/90 | center_attempts=30
+  Patch bank group 1/3 progress | entries=40/90 | center_attempts=40
+  Patch bank group 1/3 progress | entries=50/90 | center_attempts=50
+  Patch bank group 1/3 progress | entries=60/90 | center_attempts=60
+  Patch bank group 1/3 progress | entries=70/90 | center_attempts=70
+  Patch bank group 1/3 progress | entries=80/90 | center_attempts=80
+  Patch bank group 1/3 progress | entries=90/90 | center_attempts=90
+Completed dynamic patch bank for group 1/3 | entries=90/90 | center_attempts=90
+Building dynamic patch bank for group 2/3 | target_patch_size=13 | required_entries=90
+  Patch bank group 2/3 progress | entries=1/90 | center_attempts=1
+  Patch bank group 2/3 progress | entries=10/90 | center_attempts=10
+  Patch bank group 2/3 progress | entries=20/90 | center_attempts=20
+  Patch bank group 2/3 progress | entries=30/90 | center_attempts=30
+  Patch bank group 2/3 progress | entries=40/90 | center_attempts=40
+  Patch bank group 2/3 progress | entries=50/90 | center_attempts=50
+  Patch bank group 2/3 progress | entries=60/90 | center_attempts=60
+  Patch bank group 2/3 progress | entries=70/90 | center_attempts=70
+  Patch bank group 2/3 progress | entries=80/90 | center_attempts=80
+  Patch bank group 2/3 progress | entries=90/90 | center_attempts=90
+Completed dynamic patch bank for group 2/3 | entries=90/90 | center_attempts=90
+Building dynamic patch bank for group 3/3 | target_patch_size=13 | required_entries=90
+  Patch bank group 3/3 progress | entries=1/90 | center_attempts=1
+  Patch bank group 3/3 progress | entries=9/90 | center_attempts=10 | last_patch_size=0/13
+  Patch bank group 3/3 progress | entries=10/90 | center_attempts=11
+  Patch bank group 3/3 progress | entries=20/90 | center_attempts=21
+  Patch bank group 3/3 progress | entries=30/90 | center_attempts=31
+  Patch bank group 3/3 progress | entries=40/90 | center_attempts=41
+  Patch bank group 3/3 progress | entries=50/90 | center_attempts=51
+  Patch bank group 3/3 progress | entries=60/90 | center_attempts=61
+  Patch bank group 3/3 progress | entries=70/90 | center_attempts=71
+  Patch bank group 3/3 progress | entries=80/90 | center_attempts=81
+  Patch bank group 3/3 progress | entries=90/90 | center_attempts=91
+Completed dynamic patch bank for group 3/3 | entries=90/90 | center_attempts=91
+Dynamic loop frame progress | frame=1/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=5/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=10/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=15/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=20/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=25/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=30/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=35/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=40/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=45/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=50/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=55/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=60/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=65/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=70/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=75/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=80/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=85/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=90/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=95/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=100/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=105/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=110/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=115/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=120/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=125/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=130/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=135/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=140/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=145/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=150/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=155/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=160/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=165/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=170/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=175/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=180/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=185/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=190/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=195/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=200/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=205/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=210/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=215/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=220/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=225/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=230/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=235/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=240/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=245/250 | dynamic_cells=40
+Dynamic loop frame progress | frame=250/250 | dynamic_cells=40
+Dynamic loop generation completed successfully.
+  Building mapped loop representations for classical and cyclic mappings...
+  Shared mapped loop representations completed.
+  Building shared assignment map from the classical loop...
+  Shared assignment map ready.
+Shared dynamic branch state preparation completed.
+Shared dynamic map prepared:
+  Image path: /workspaces/cmsc-190/dev/inputs/dynamic_port/port_map.png
+  Resized longest side: 40
+  Dimensions: 40x40
+  Raw static density: 0.30
+  Target static density: 1.00 / preserved from source image
+  Dynamic density target: 0.03
+  Static obstacle cells per frame: 487
+  Dynamic obstacle cells per frame: 40
+  Loop length: 250
+  Shared schedule seed: 57210
+  Dynamic generation mode: group_patch
+  Dynamic generation cell mode: all_free
+  Spawnable cell mode: all_free
+[Elapsed: 01m 18s] Shared dynamic map preparation completed.
+
+----------------------------------------------------------------------------------------
+Condition 1 | agent_number=2 | condition_id=agent_number[1.1.0]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=2 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.0.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.0.0] progress: 0.00s
+    Cyclic run[1.1.0.0] progress: 0.00s
+      Classical | mapping[1.1.0.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=2.15s | conflicts_at_halt=0.00 | avg_path=49.00 | paired=True
+      Cyclic | mapping[1.1.0.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.57s | conflicts_at_halt=0.00 | avg_path=57.00 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=2 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.0.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.003291304999947897 | cyclic_halted=0.27472818400019605 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=2 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.0.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.004460588999791071 | cyclic_halted=0.20195951400091872 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=2 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.0.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.0.3] progress: 0.00s
+    Cyclic run[1.1.0.3] progress: 0.00s
+      Classical | mapping[1.1.0.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.00s | conflicts_at_halt=0.00 | avg_path=32.00 | paired=True
+      Cyclic | mapping[1.1.0.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.00s | conflicts_at_halt=0.00 | avg_path=36.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 5... | agent_number=2 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.0.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.004120744999454473 | cyclic_halted=0.005163521998838405 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=2 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.0.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.0030198280001059175 | cyclic_halted=0.18141830899912748 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=2 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.0.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.0036535630006255815 | cyclic_halted=0.005543901999772061 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=2 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.0.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.0.7] progress: 0.00s
+    Cyclic run[1.1.0.7] progress: 0.00s
+      Classical | mapping[1.1.0.7.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.00s | conflicts_at_halt=0.00 | avg_path=21.00 | paired=True
+      Cyclic | mapping[1.1.0.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.00s | conflicts_at_halt=0.00 | avg_path=26.00 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.0] | agent_number=2 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.72 | avg_conflicts_at_halt=0.00 | avg_path=34.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.53 | avg_conflicts_at_halt=0.00 | avg_path=39.67
+[Elapsed: 01m 23s] Condition 1 completed (agent_number=2).
+
+----------------------------------------------------------------------------------------
+Condition 2 | agent_number=3 | condition_id=agent_number[1.1.1]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=3 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.1.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.0056219779999082675 | cyclic_halted=0.007386802999462816 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=3 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.1.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.006594544000108726 | cyclic_halted=0.00670942900069349 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=3 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.1.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.008456269999442156 | cyclic_halted=0.01210695700137876 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=3 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.1.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.1.3] progress: 0.00s
+    Cyclic run[1.1.1.3] progress: 0.00s
+      Classical | mapping[1.1.1.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=22.00 | paired=True
+      Cyclic | mapping[1.1.1.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=24.67 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 5... | agent_number=3 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.1.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.1.4] progress: 0.00s
+    Cyclic run[1.1.1.4] progress: 0.00s
+      Classical | mapping[1.1.1.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=43.33 | paired=True
+      Cyclic | mapping[1.1.1.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=50.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 6... | agent_number=3 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.1.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.009046541999850888 | cyclic_halted=0.30829012200047146 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=3 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.1.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.0048465489999216516 | cyclic_halted=0.15045747600015602 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=3 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.1.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.014984891999120009 | cyclic_halted=0.13836453499970958 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=3 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.1.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.013458180001180153 | cyclic_halted=0.028301336000367883 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=3 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.1.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.047103885999604245 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=3 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.1.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.01005086700024549 | cyclic_halted=0.012056382998707704 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=3 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[1.1.1.11] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.1.11] progress: 0.00s
+    Cyclic run[1.1.1.11] progress: 0.00s
+      Classical | mapping[1.1.1.11.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=1.00 | avg_path=44.00 | paired=True
+      Cyclic | mapping[1.1.1.11.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=78.67 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.1] | agent_number=3 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=0.33 | avg_path=36.44
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=0.00 | avg_path=51.11
+[Elapsed: 01m 55s] Condition 2 completed (agent_number=3).
+
+----------------------------------------------------------------------------------------
+Condition 3 | agent_number=4 | condition_id=agent_number[1.1.2]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=4 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.2.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.03293359900089854 | cyclic_halted=1.1395453259992792 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=4 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.2.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.2.1] progress: 0.00s
+    Cyclic run[1.1.2.1] progress: 0.00s
+      Classical | mapping[1.1.2.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=0.00 | avg_path=28.75 | paired=True
+      Cyclic | mapping[1.1.2.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=33.00 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=4 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.2.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.2.2] progress: 0.00s
+    Cyclic run[1.1.2.2] progress: 0.00s
+      Classical | mapping[1.1.2.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=2.00 | avg_path=25.50 | paired=True
+      Cyclic | mapping[1.1.2.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=0.00 | avg_path=32.50 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=4 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.2.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.2.3] progress: 0.00s
+    Cyclic run[1.1.2.3] progress: 0.00s
+      Classical | mapping[1.1.2.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=42.75 | paired=True
+      Cyclic | mapping[1.1.2.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=64.75 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.2] | agent_number=4 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=0.67 | avg_path=32.33
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=0.00 | avg_path=43.42
+[Elapsed: 01m 57s] Condition 3 completed (agent_number=4).
+
+----------------------------------------------------------------------------------------
+Condition 4 | agent_number=5 | condition_id=agent_number[1.1.3]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=5 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.3.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.3.0] progress: 0.00s
+    Cyclic run[1.1.3.0] progress: 0.00s
+      Classical | mapping[1.1.3.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=2.00 | avg_path=26.00 | paired=True
+      Cyclic | mapping[1.1.3.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=2.00 | avg_path=36.60 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=5 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.3.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.3.1] progress: 0.00s
+    Cyclic run[1.1.3.1] progress: 0.00s
+      Classical | mapping[1.1.3.1.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=4.00 | avg_path=31.60 | paired=True
+      Cyclic | mapping[1.1.3.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=3.00 | avg_path=37.00 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=5 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.3.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.3.2] progress: 0.00s
+    Cyclic run[1.1.3.2] progress: 0.00s
+      Classical | mapping[1.1.3.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=40.00 | paired=True
+      Cyclic | mapping[1.1.3.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=48.80 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.3] | agent_number=5 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=2.00 | avg_path=32.53
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=1.67 | avg_path=40.80
+[Elapsed: 01m 57s] Condition 4 completed (agent_number=5).
+
+----------------------------------------------------------------------------------------
+Condition 5 | agent_number=6 | condition_id=agent_number[1.1.4]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=6 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.4.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.048116325999217224 | cyclic_halted=0.17918865499996173 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=6 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.4.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.04731787199852988 | cyclic_halted=1.975832153999363 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=6 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.4.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.4.2] progress: 0.00s
+    Cyclic run[1.1.4.2] progress: 0.00s
+      Classical | mapping[1.1.4.2.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.06s | conflicts_at_halt=7.00 | avg_path=32.83 | paired=True
+      Cyclic | mapping[1.1.4.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=3.00 | avg_path=37.83 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 4... | agent_number=6 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.4.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.4.3] progress: 0.00s
+    Cyclic run[1.1.4.3] progress: 0.00s
+      Classical | mapping[1.1.4.3.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=6.00 | avg_path=51.33 | paired=True
+      Cyclic | mapping[1.1.4.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.05s | conflicts_at_halt=1.00 | avg_path=60.33 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 5... | agent_number=6 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.4.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.4.4] progress: 0.00s
+    Cyclic run[1.1.4.4] progress: 0.00s
+      Classical | mapping[1.1.4.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.04s | conflicts_at_halt=2.00 | avg_path=42.33 | paired=True
+      Cyclic | mapping[1.1.4.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=1.00 | avg_path=45.17 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.4] | agent_number=6 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=5.00 | avg_path=42.17
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.03 | avg_conflicts_at_halt=1.67 | avg_path=47.78
+[Elapsed: 02m 01s] Condition 5 completed (agent_number=6).
+
+----------------------------------------------------------------------------------------
+Condition 6 | agent_number=7 | condition_id=agent_number[1.1.5]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=7 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.5.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.5.0] progress: 0.00s
+    Cyclic run[1.1.5.0] progress: 0.00s
+      Classical | mapping[1.1.5.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.12s | conflicts_at_halt=5.00 | avg_path=26.71 | paired=True
+      Cyclic | mapping[1.1.5.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.12s | conflicts_at_halt=13.00 | avg_path=36.29 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=7 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.5.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.04052341500027978 | cyclic_halted=0.1004231080005411 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=7 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.5.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.054570295000303304 | cyclic_halted=1.9635634349997417 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=7 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.5.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.036690881999675184 | cyclic_halted=0.18318830600037472 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=7 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.5.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.5.4] progress: 0.00s
+    Cyclic run[1.1.5.4] progress: 0.00s
+      Classical | mapping[1.1.5.4.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.11s | conflicts_at_halt=15.00 | avg_path=26.71 | paired=True
+      Cyclic | mapping[1.1.5.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.03s | conflicts_at_halt=3.00 | avg_path=34.29 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 6... | agent_number=7 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.5.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.04124555999987933 | cyclic_halted=0.058002726998893195 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=7 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.5.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.08480116000100679 | cyclic_halted=1.9894193319996702 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=7 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.5.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.07172121400071774 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=7 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.5.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=7 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.5.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.5.9] progress: 0.00s
+    Cyclic run[1.1.5.9] progress: 0.00s
+      Classical | mapping[1.1.5.9.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.02s | conflicts_at_halt=1.00 | avg_path=30.57 | paired=True
+      Cyclic | mapping[1.1.5.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.01s | conflicts_at_halt=0.00 | avg_path=33.86 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.5] | agent_number=7 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.09 | avg_conflicts_at_halt=7.00 | avg_path=28.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.05 | avg_conflicts_at_halt=5.33 | avg_path=34.81
+[Elapsed: 03m 39s] Condition 6 completed (agent_number=7).
+
+----------------------------------------------------------------------------------------
+Condition 7 | agent_number=8 | condition_id=agent_number[1.1.6]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=8 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.6.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.6.0] progress: 0.00s
+    Classical run[1.1.6.0] progress: 5.00s
+    Classical run[1.1.6.0] progress: 10.00s
+    Classical run[1.1.6.0] progress: 15.00s
+    Classical run[1.1.6.0] progress: 20.00s
+    Classical run[1.1.6.0] progress: 25.00s
+    Classical run[1.1.6.0] progress: 30.00s
+    Cyclic run[1.1.6.0] progress: 0.00s
+      Classical | mapping[1.1.6.0.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1201.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.6.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.13s | conflicts_at_halt=8.00 | avg_path=49.50 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=8 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.6.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.11378180899919244 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=8 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.6.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.16266245299993898 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=8 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.6.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.09728692199860234 | cyclic_halted=0.4930113349983003 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=8 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.6.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.117065005000768 | cyclic_halted=0.19655743700059247 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=8 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.6.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.6.5] progress: 0.00s
+    Cyclic run[1.1.6.5] progress: 0.00s
+      Classical | mapping[1.1.6.5.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.19s | conflicts_at_halt=18.00 | avg_path=32.62 | paired=True
+      Cyclic | mapping[1.1.6.5.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.14s | conflicts_at_halt=19.00 | avg_path=36.88 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 7... | agent_number=8 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.6.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.07014251600048738 | cyclic_halted=6.145881134001684 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=8 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.6.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.0966156679969572 | cyclic_halted=0.16978046000076574 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=8 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.6.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.025270466998335905 | cyclic_halted=0.1240872650014353 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=8 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.6.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.20128890500200214 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=8 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.6.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.17313753599955817 | cyclic_halted=0.46687745899907895 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=8 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[1.1.6.11] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 13... | agent_number=8 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[1.1.6.12] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.045271006998518715 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 14... | agent_number=8 | run_index=13
+  Paired sampling attempt 14 ongoing... | run[1.1.6.13] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.6.13] progress: 0.00s
+    Cyclic run[1.1.6.13] progress: 0.00s
+      Classical | mapping[1.1.6.13.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.19s | conflicts_at_halt=16.00 | avg_path=42.25 | paired=True
+      Cyclic | mapping[1.1.6.13.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=7.00 | avg_path=51.38 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.6] | agent_number=8 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.13 | avg_conflicts_at_halt=411.67 | avg_path=37.44
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.11 | avg_conflicts_at_halt=11.33 | avg_path=45.92
+[Elapsed: 07m 25s] Condition 7 completed (agent_number=8).
+
+----------------------------------------------------------------------------------------
+Condition 8 | agent_number=9 | condition_id=agent_number[1.1.7]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=9 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.7.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.20458335999865085 | cyclic_halted=4.016985690999718 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=9 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.7.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.7.1] progress: 0.00s
+    Classical run[1.1.7.1] progress: 5.00s
+    Classical run[1.1.7.1] progress: 10.00s
+    Classical run[1.1.7.1] progress: 15.00s
+    Classical run[1.1.7.1] progress: 20.00s
+    Classical run[1.1.7.1] progress: 25.00s
+    Classical run[1.1.7.1] progress: 30.00s
+    Cyclic run[1.1.7.1] progress: 0.00s
+      Classical | mapping[1.1.7.1.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1186.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.7.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.10s | conflicts_at_halt=8.00 | avg_path=49.00 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=9 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.7.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.025805973000387894 | cyclic_halted=0.09151578499950119 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=9 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.7.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2575623099983204 | cyclic_halted=24.502876069000195 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=9 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.7.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.17808253999828594 | cyclic_halted=0.33241245599856484 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=9 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.7.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.7.5] progress: 0.00s
+    Cyclic run[1.1.7.5] progress: 0.00s
+      Classical | mapping[1.1.7.5.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.91s | conflicts_at_halt=68.00 | avg_path=42.22 | paired=True
+      Cyclic | mapping[1.1.7.5.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=6.00 | avg_path=49.56 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 7... | agent_number=9 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.7.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.7.6] progress: 0.00s
+    Classical run[1.1.7.6] progress: 5.00s
+    Classical run[1.1.7.6] progress: 10.00s
+    Classical run[1.1.7.6] progress: 15.00s
+    Classical run[1.1.7.6] progress: 20.00s
+    Classical run[1.1.7.6] progress: 25.00s
+    Classical run[1.1.7.6] progress: 30.00s
+    Cyclic run[1.1.7.6] progress: 0.00s
+      Classical | mapping[1.1.7.6.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1173.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.7.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.34s | conflicts_at_halt=22.00 | avg_path=62.22 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.7] | agent_number=9 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.30 | avg_conflicts_at_halt=809.00 | avg_path=42.22
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.17 | avg_conflicts_at_halt=12.00 | avg_path=53.59
+[Elapsed: 09m 00s] Condition 8 completed (agent_number=9).
+
+----------------------------------------------------------------------------------------
+Condition 9 | agent_number=10 | condition_id=agent_number[1.1.8]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=10 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.8.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.8.0] progress: 0.00s
+    Classical run[1.1.8.0] progress: 5.00s
+    Classical run[1.1.8.0] progress: 10.00s
+    Classical run[1.1.8.0] progress: 15.00s
+    Classical run[1.1.8.0] progress: 20.00s
+    Classical run[1.1.8.0] progress: 25.00s
+    Classical run[1.1.8.0] progress: 30.00s
+    Cyclic run[1.1.8.0] progress: 0.00s
+      Classical | mapping[1.1.8.0.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=874.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.8.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.86s | conflicts_at_halt=43.00 | avg_path=70.90 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=10 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.8.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.8.1] progress: 0.00s
+    Classical run[1.1.8.1] progress: 5.00s
+    Classical run[1.1.8.1] progress: 10.00s
+    Classical run[1.1.8.1] progress: 15.00s
+    Classical run[1.1.8.1] progress: 20.00s
+    Classical run[1.1.8.1] progress: 25.00s
+    Classical run[1.1.8.1] progress: 30.00s
+    Cyclic run[1.1.8.1] progress: 0.00s
+      Classical | mapping[1.1.8.1.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=874.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.8.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.14s | conflicts_at_halt=5.00 | avg_path=64.80 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 3... | agent_number=10 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.8.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.41078355300123803 | cyclic_halted=0.4636828570000944 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 4... | agent_number=10 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.8.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.8.3] progress: 0.00s
+    Classical run[1.1.8.3] progress: 5.00s
+    Classical run[1.1.8.3] progress: 10.00s
+    Classical run[1.1.8.3] progress: 15.00s
+    Classical run[1.1.8.3] progress: 20.00s
+    Classical run[1.1.8.3] progress: 25.00s
+    Classical run[1.1.8.3] progress: 30.00s
+    Cyclic run[1.1.8.3] progress: 0.00s
+      Classical | mapping[1.1.8.3.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1239.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.8.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.17s | conflicts_at_halt=18.00 | avg_path=36.40 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.8] | agent_number=10 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=995.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.72 | avg_conflicts_at_halt=22.00 | avg_path=57.37
+[Elapsed: 10m 35s] Condition 9 completed (agent_number=10).
+
+----------------------------------------------------------------------------------------
+Condition 10 | agent_number=11 | condition_id=agent_number[1.1.9]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=11 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.9.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.31942871199862566 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=11 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.9.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.9.1] progress: 0.00s
+    Classical run[1.1.9.1] progress: 5.00s
+    Classical run[1.1.9.1] progress: 10.00s
+    Classical run[1.1.9.1] progress: 15.00s
+    Classical run[1.1.9.1] progress: 20.00s
+    Classical run[1.1.9.1] progress: 25.00s
+    Classical run[1.1.9.1] progress: 30.00s
+    Cyclic run[1.1.9.1] progress: 0.00s
+      Classical | mapping[1.1.9.1.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4665.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.9.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.81s | conflicts_at_halt=35.00 | avg_path=42.91 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=11 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.9.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.3648862529989856 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=11 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.9.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=11 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.9.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.21349929899952258 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=11 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.9.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=11 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.9.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.11242330199820572 | cyclic_halted=0.3344313689995033 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=11 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.9.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.9.7] progress: 0.00s
+    Classical run[1.1.9.7] progress: 5.00s
+    Classical run[1.1.9.7] progress: 10.00s
+    Classical run[1.1.9.7] progress: 15.00s
+    Classical run[1.1.9.7] progress: 20.00s
+    Classical run[1.1.9.7] progress: 25.00s
+    Classical run[1.1.9.7] progress: 30.00s
+    Cyclic run[1.1.9.7] progress: 0.00s
+    Cyclic run[1.1.9.7] progress: 5.00s
+    Cyclic run[1.1.9.7] progress: 10.00s
+      Classical | mapping[1.1.9.7.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=837.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.9.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=14.56s | conflicts_at_halt=103.00 | avg_path=84.18 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 9... | agent_number=11 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.9.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=11 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.9.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=11 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.9.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.9.10] progress: 0.00s
+    Classical run[1.1.9.10] progress: 5.00s
+    Classical run[1.1.9.10] progress: 10.00s
+    Classical run[1.1.9.10] progress: 15.00s
+    Classical run[1.1.9.10] progress: 20.00s
+    Classical run[1.1.9.10] progress: 25.00s
+    Classical run[1.1.9.10] progress: 30.00s
+    Cyclic run[1.1.9.10] progress: 0.00s
+      Classical | mapping[1.1.9.10.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1264.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.9.10.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.38s | conflicts_at_halt=9.00 | avg_path=45.27 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.9] | agent_number=11 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=2255.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.25 | avg_conflicts_at_halt=49.00 | avg_path=57.45
+[Elapsed: 18m 02s] Condition 10 completed (agent_number=11).
+
+----------------------------------------------------------------------------------------
+Condition 11 | agent_number=12 | condition_id=agent_number[1.1.10]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=12 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.10.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=12 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.10.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.10.1] progress: 0.00s
+    Classical run[1.1.10.1] progress: 5.00s
+    Classical run[1.1.10.1] progress: 10.00s
+    Classical run[1.1.10.1] progress: 15.00s
+    Classical run[1.1.10.1] progress: 20.00s
+    Classical run[1.1.10.1] progress: 25.00s
+    Classical run[1.1.10.1] progress: 30.00s
+    Cyclic run[1.1.10.1] progress: 0.00s
+      Classical | mapping[1.1.10.1.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=845.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.10.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.08s | conflicts_at_halt=2.00 | avg_path=64.58 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=12 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.10.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.10.2] progress: 0.00s
+    Classical run[1.1.10.2] progress: 5.00s
+    Classical run[1.1.10.2] progress: 10.00s
+    Classical run[1.1.10.2] progress: 15.00s
+    Classical run[1.1.10.2] progress: 20.00s
+    Classical run[1.1.10.2] progress: 25.00s
+    Classical run[1.1.10.2] progress: 30.00s
+    Cyclic run[1.1.10.2] progress: 0.00s
+      Classical | mapping[1.1.10.2.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1303.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.10.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.66s | conflicts_at_halt=65.00 | avg_path=70.33 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=12 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.10.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=12 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.10.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=12 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.10.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.2250862379987666 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=12 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.10.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.21411643500323407 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=12 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.10.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.17765650400178856 | cyclic_halted=5.395978276999813 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=12 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.10.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.20214236500032712 | cyclic_halted=17.455243428001268 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=12 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.10.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.10.9] progress: 0.00s
+    Classical run[1.1.10.9] progress: 5.00s
+    Classical run[1.1.10.9] progress: 10.00s
+    Classical run[1.1.10.9] progress: 15.00s
+    Classical run[1.1.10.9] progress: 20.00s
+    Classical run[1.1.10.9] progress: 25.00s
+    Classical run[1.1.10.9] progress: 30.00s
+    Cyclic run[1.1.10.9] progress: 0.00s
+      Classical | mapping[1.1.10.9.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=480.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.10.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.52s | conflicts_at_halt=34.00 | avg_path=82.25 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.10] | agent_number=12 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=876.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.09 | avg_conflicts_at_halt=33.67 | avg_path=72.39
+[Elapsed: 24m 07s] Condition 11 completed (agent_number=12).
+
+----------------------------------------------------------------------------------------
+Condition 12 | agent_number=13 | condition_id=agent_number[1.1.11]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=13 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.11.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.11.0] progress: 0.00s
+    Cyclic run[1.1.11.0] progress: 0.00s
+      Classical | mapping[1.1.11.0.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.54s | conflicts_at_halt=37.00 | avg_path=35.15 | paired=True
+      Cyclic | mapping[1.1.11.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.50s | conflicts_at_halt=38.00 | avg_path=40.15 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=13 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.11.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.24768968499847688 | cyclic_halted=0.8738174720019742 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=13 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.11.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.11.2] progress: 0.00s
+    Classical run[1.1.11.2] progress: 5.00s
+    Classical run[1.1.11.2] progress: 10.00s
+    Classical run[1.1.11.2] progress: 15.00s
+    Classical run[1.1.11.2] progress: 20.00s
+    Classical run[1.1.11.2] progress: 25.00s
+    Classical run[1.1.11.2] progress: 30.00s
+    Cyclic run[1.1.11.2] progress: 0.00s
+    Cyclic run[1.1.11.2] progress: 5.00s
+      Classical | mapping[1.1.11.2.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1183.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.11.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=7.67s | conflicts_at_halt=87.00 | avg_path=49.15 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 4... | agent_number=13 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.11.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 5... | agent_number=13 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.11.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 6... | agent_number=13 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.11.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 7... | agent_number=13 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.11.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.1995895450017997 | cyclic_halted=0.7375708709987521 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=13 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.11.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.1970796120003797 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=13 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.11.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.11.8] progress: 0.00s
+    Classical run[1.1.11.8] progress: 5.00s
+    Classical run[1.1.11.8] progress: 10.00s
+    Classical run[1.1.11.8] progress: 15.00s
+    Classical run[1.1.11.8] progress: 20.00s
+    Classical run[1.1.11.8] progress: 25.00s
+    Classical run[1.1.11.8] progress: 30.00s
+    Cyclic run[1.1.11.8] progress: 0.00s
+      Classical | mapping[1.1.11.8.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=858.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.11.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.22s | conflicts_at_halt=68.00 | avg_path=70.23 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.11] | agent_number=13 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.18 | avg_conflicts_at_halt=692.67 | avg_path=35.15
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=3.13 | avg_conflicts_at_halt=64.33 | avg_path=53.18
+[Elapsed: 28m 59s] Condition 12 completed (agent_number=13).
+
+----------------------------------------------------------------------------------------
+Condition 13 | agent_number=14 | condition_id=agent_number[1.1.12]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=14 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.12.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.7346935360001225 | cyclic_halted=1.4510242939977616 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=14 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.12.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.33014394900237676 | cyclic_halted=0.9966365479995147 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=14 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.12.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=14 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.12.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.32926125100129866 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 5... | agent_number=14 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.12.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.12.4] progress: 0.00s
+    Classical run[1.1.12.4] progress: 5.00s
+    Classical run[1.1.12.4] progress: 10.00s
+    Classical run[1.1.12.4] progress: 15.00s
+    Classical run[1.1.12.4] progress: 20.00s
+    Classical run[1.1.12.4] progress: 25.00s
+    Classical run[1.1.12.4] progress: 30.00s
+    Cyclic run[1.1.12.4] progress: 0.00s
+      Classical | mapping[1.1.12.4.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=903.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.12.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.18s | conflicts_at_halt=34.00 | avg_path=56.00 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 6... | agent_number=14 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.12.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=14 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.12.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=14 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.12.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.12.7] progress: 0.00s
+    Classical run[1.1.12.7] progress: 5.00s
+    Classical run[1.1.12.7] progress: 10.00s
+    Classical run[1.1.12.7] progress: 15.00s
+    Classical run[1.1.12.7] progress: 20.00s
+    Classical run[1.1.12.7] progress: 25.00s
+    Classical run[1.1.12.7] progress: 30.00s
+    Cyclic run[1.1.12.7] progress: 0.00s
+      Classical | mapping[1.1.12.7.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1317.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.12.7.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.21s | conflicts_at_halt=8.00 | avg_path=49.64 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 9... | agent_number=14 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.12.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=14 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.12.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.12.9] progress: 0.00s
+    Classical run[1.1.12.9] progress: 5.00s
+    Classical run[1.1.12.9] progress: 10.00s
+    Classical run[1.1.12.9] progress: 15.00s
+    Classical run[1.1.12.9] progress: 20.00s
+    Classical run[1.1.12.9] progress: 25.00s
+    Classical run[1.1.12.9] progress: 30.00s
+    Cyclic run[1.1.12.9] progress: 0.00s
+    Cyclic run[1.1.12.9] progress: 5.00s
+      Classical | mapping[1.1.12.9.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=735.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.12.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=5.32s | conflicts_at_halt=165.00 | avg_path=64.93 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.12] | agent_number=14 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=985.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.24 | avg_conflicts_at_halt=69.00 | avg_path=56.86
+[Elapsed: 35m 22s] Condition 13 completed (agent_number=14).
+
+----------------------------------------------------------------------------------------
+Condition 14 | agent_number=15 | condition_id=agent_number[1.1.13]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=15 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.13.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.34168633299850626 | cyclic_halted=2.4746581290019094 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=15 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.13.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=15 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.13.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.13.2] progress: 0.00s
+    Classical run[1.1.13.2] progress: 5.00s
+    Classical run[1.1.13.2] progress: 10.00s
+    Classical run[1.1.13.2] progress: 15.00s
+    Classical run[1.1.13.2] progress: 20.00s
+    Classical run[1.1.13.2] progress: 25.00s
+    Classical run[1.1.13.2] progress: 30.00s
+    Cyclic run[1.1.13.2] progress: 0.00s
+      Classical | mapping[1.1.13.2.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=896.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.13.2.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.36s | conflicts_at_halt=8.00 | avg_path=101.60 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 4... | agent_number=15 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.13.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=15 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.13.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=15 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.13.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.13.5] progress: 0.00s
+    Classical run[1.1.13.5] progress: 5.00s
+    Classical run[1.1.13.5] progress: 10.00s
+    Classical run[1.1.13.5] progress: 15.00s
+    Classical run[1.1.13.5] progress: 20.00s
+    Classical run[1.1.13.5] progress: 25.00s
+    Classical run[1.1.13.5] progress: 30.00s
+    Cyclic run[1.1.13.5] progress: 0.00s
+      Classical | mapping[1.1.13.5.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4069.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.13.5.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.83s | conflicts_at_halt=18.00 | avg_path=107.20 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 7... | agent_number=15 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.13.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.13.6] progress: 0.00s
+    Classical run[1.1.13.6] progress: 5.00s
+    Classical run[1.1.13.6] progress: 10.00s
+    Classical run[1.1.13.6] progress: 15.00s
+    Classical run[1.1.13.6] progress: 20.00s
+    Classical run[1.1.13.6] progress: 25.00s
+    Classical run[1.1.13.6] progress: 30.00s
+    Cyclic run[1.1.13.6] progress: 0.00s
+    Cyclic run[1.1.13.6] progress: 5.00s
+    Cyclic run[1.1.13.6] progress: 10.00s
+    Cyclic run[1.1.13.6] progress: 15.00s
+    Cyclic run[1.1.13.6] progress: 20.00s
+      Classical | mapping[1.1.13.6.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=869.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.13.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=22.84s | conflicts_at_halt=40.00 | avg_path=87.13 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.13] | agent_number=15 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1944.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=8.01 | avg_conflicts_at_halt=22.00 | avg_path=98.64
+[Elapsed: 40m 29s] Condition 14 completed (agent_number=15).
+
+----------------------------------------------------------------------------------------
+Condition 15 | agent_number=16 | condition_id=agent_number[1.1.14]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=16 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.14.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.14.0] progress: 0.00s
+    Classical run[1.1.14.0] progress: 5.00s
+    Classical run[1.1.14.0] progress: 10.00s
+    Classical run[1.1.14.0] progress: 15.00s
+    Classical run[1.1.14.0] progress: 20.00s
+    Classical run[1.1.14.0] progress: 25.00s
+    Classical run[1.1.14.0] progress: 30.00s
+    Cyclic run[1.1.14.0] progress: 0.00s
+      Classical | mapping[1.1.14.0.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=983.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.14.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.17s | conflicts_at_halt=36.00 | avg_path=51.12 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=16 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.14.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=16 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.14.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=16 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.14.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.6640991290005331 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=16 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.14.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=16 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.14.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=16 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.14.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.5193307990011817 | cyclic_halted=1.9083606629974383 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=16 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.14.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 9... | agent_number=16 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.14.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 10... | agent_number=16 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.14.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.3024751809971349 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 11... | agent_number=16 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.14.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 12... | agent_number=16 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[1.1.14.11] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 13... | agent_number=16 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[1.1.14.12] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 14... | agent_number=16 | run_index=13
+  Paired sampling attempt 14 ongoing... | run[1.1.14.13] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.7659600160004629 | cyclic_halted=6.893449536000844 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 15... | agent_number=16 | run_index=14
+  Paired sampling attempt 15 ongoing... | run[1.1.14.14] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 16... | agent_number=16 | run_index=15
+  Paired sampling attempt 16 ongoing... | run[1.1.14.15] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 17... | agent_number=16 | run_index=16
+  Paired sampling attempt 17 ongoing... | run[1.1.14.16] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.14.16] progress: 0.00s
+    Classical run[1.1.14.16] progress: 5.00s
+    Classical run[1.1.14.16] progress: 10.00s
+    Classical run[1.1.14.16] progress: 15.00s
+    Classical run[1.1.14.16] progress: 20.00s
+    Classical run[1.1.14.16] progress: 25.00s
+    Classical run[1.1.14.16] progress: 30.00s
+    Cyclic run[1.1.14.16] progress: 0.00s
+    Cyclic run[1.1.14.16] progress: 5.00s
+    Cyclic run[1.1.14.16] progress: 10.00s
+      Classical | mapping[1.1.14.16.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1174.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.14.16.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=10.19s | conflicts_at_halt=302.00 | avg_path=65.38 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 18... | agent_number=16 | run_index=17
+  Paired sampling attempt 18 ongoing... | run[1.1.14.17] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 19... | agent_number=16 | run_index=18
+  Paired sampling attempt 19 ongoing... | run[1.1.14.18] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.14.18] progress: 0.00s
+    Classical run[1.1.14.18] progress: 5.00s
+    Classical run[1.1.14.18] progress: 10.00s
+    Classical run[1.1.14.18] progress: 15.00s
+    Classical run[1.1.14.18] progress: 20.00s
+    Classical run[1.1.14.18] progress: 25.00s
+    Classical run[1.1.14.18] progress: 30.00s
+    Cyclic run[1.1.14.18] progress: 0.00s
+    Cyclic run[1.1.14.18] progress: 5.00s
+    Cyclic run[1.1.14.18] progress: 10.00s
+    Cyclic run[1.1.14.18] progress: 15.00s
+    Cyclic run[1.1.14.18] progress: 20.00s
+    Cyclic run[1.1.14.18] progress: 25.00s
+      Classical | mapping[1.1.14.18.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=860.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.14.18.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=25.85s | conflicts_at_halt=190.00 | avg_path=72.25 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.14] | agent_number=16 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1005.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=12.40 | avg_conflicts_at_halt=176.00 | avg_path=62.92
+[Elapsed: 56m 21s] Condition 15 completed (agent_number=16).
+
+----------------------------------------------------------------------------------------
+Condition 16 | agent_number=17 | condition_id=agent_number[1.1.15]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=17 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.15.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=17 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.15.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.49038152800130774 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=17 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.15.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=17 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.15.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.556353025000135 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 5... | agent_number=17 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.15.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 6... | agent_number=17 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.15.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 7... | agent_number=17 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.15.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 8... | agent_number=17 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.15.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 9... | agent_number=17 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.15.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.15.8] progress: 0.00s
+    Classical run[1.1.15.8] progress: 5.00s
+    Classical run[1.1.15.8] progress: 10.00s
+    Classical run[1.1.15.8] progress: 15.00s
+    Classical run[1.1.15.8] progress: 20.00s
+    Classical run[1.1.15.8] progress: 25.00s
+    Classical run[1.1.15.8] progress: 30.00s
+    Cyclic run[1.1.15.8] progress: 0.00s
+    Cyclic run[1.1.15.8] progress: 5.00s
+      Classical | mapping[1.1.15.8.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1306.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.15.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=5.11s | conflicts_at_halt=179.00 | avg_path=55.24 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 10... | agent_number=17 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.15.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.15.9] progress: 0.00s
+    Classical run[1.1.15.9] progress: 5.00s
+    Classical run[1.1.15.9] progress: 10.00s
+    Classical run[1.1.15.9] progress: 15.00s
+    Classical run[1.1.15.9] progress: 20.00s
+    Classical run[1.1.15.9] progress: 25.00s
+    Classical run[1.1.15.9] progress: 30.00s
+    Cyclic run[1.1.15.9] progress: 0.00s
+    Cyclic run[1.1.15.9] progress: 5.00s
+      Classical | mapping[1.1.15.9.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=942.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.15.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.46s | conflicts_at_halt=482.00 | avg_path=40.47 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 11... | agent_number=17 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.15.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=17 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[1.1.15.11] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.5903208520030603 | cyclic_halted=2.173425414999656 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 13... | agent_number=17 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[1.1.15.12] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.15.12] progress: 0.00s
+    Classical run[1.1.15.12] progress: 5.00s
+    Classical run[1.1.15.12] progress: 10.00s
+    Classical run[1.1.15.12] progress: 15.00s
+    Classical run[1.1.15.12] progress: 20.00s
+    Classical run[1.1.15.12] progress: 25.00s
+    Classical run[1.1.15.12] progress: 30.00s
+    Cyclic run[1.1.15.12] progress: 0.00s
+      Classical | mapping[1.1.15.12.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1242.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.15.12.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.97s | conflicts_at_halt=128.00 | avg_path=43.00 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.15] | agent_number=17 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1163.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.18 | avg_conflicts_at_halt=263.00 | avg_path=46.24
+[Elapsed: 66m 35s] Condition 16 completed (agent_number=17).
+
+----------------------------------------------------------------------------------------
+Condition 17 | agent_number=18 | condition_id=agent_number[1.1.16]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=18 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.16.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=18 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.16.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=18 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.16.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.4274954520005849 | cyclic_halted=0.5020521300029941 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=18 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.16.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 5... | agent_number=18 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.16.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 6... | agent_number=18 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.16.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.16.5] progress: 0.00s
+    Classical run[1.1.16.5] progress: 5.00s
+    Classical run[1.1.16.5] progress: 10.00s
+    Classical run[1.1.16.5] progress: 15.00s
+    Classical run[1.1.16.5] progress: 20.00s
+    Classical run[1.1.16.5] progress: 25.00s
+    Classical run[1.1.16.5] progress: 30.00s
+    Cyclic run[1.1.16.5] progress: 0.00s
+    Cyclic run[1.1.16.5] progress: 5.00s
+    Cyclic run[1.1.16.5] progress: 10.00s
+    Cyclic run[1.1.16.5] progress: 15.00s
+      Classical | mapping[1.1.16.5.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=630.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.16.5.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=15.79s | conflicts_at_halt=349.00 | avg_path=79.56 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 7... | agent_number=18 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.16.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.16.6] progress: 0.00s
+    Classical run[1.1.16.6] progress: 5.00s
+    Classical run[1.1.16.6] progress: 10.00s
+    Classical run[1.1.16.6] progress: 15.00s
+    Classical run[1.1.16.6] progress: 20.00s
+    Classical run[1.1.16.6] progress: 25.00s
+    Classical run[1.1.16.6] progress: 30.00s
+    Cyclic run[1.1.16.6] progress: 0.00s
+    Cyclic run[1.1.16.6] progress: 5.00s
+    Cyclic run[1.1.16.6] progress: 10.00s
+      Classical | mapping[1.1.16.6.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=3801.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.16.6.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=12.67s | conflicts_at_halt=682.00 | avg_path=38.94 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 8... | agent_number=18 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.16.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=18 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.16.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=18 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.16.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.16.9] progress: 0.00s
+    Classical run[1.1.16.9] progress: 5.00s
+    Classical run[1.1.16.9] progress: 10.00s
+    Classical run[1.1.16.9] progress: 15.00s
+    Classical run[1.1.16.9] progress: 20.00s
+    Classical run[1.1.16.9] progress: 25.00s
+    Classical run[1.1.16.9] progress: 30.00s
+    Cyclic run[1.1.16.9] progress: 0.00s
+    Cyclic run[1.1.16.9] progress: 5.00s
+    Cyclic run[1.1.16.9] progress: 10.00s
+      Classical | mapping[1.1.16.9.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=687.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.16.9.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=14.48s | conflicts_at_halt=328.00 | avg_path=85.22 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.16] | agent_number=18 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1706.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=14.31 | avg_conflicts_at_halt=453.00 | avg_path=67.91
+[Elapsed: 75m 08s] Condition 17 completed (agent_number=18).
+
+----------------------------------------------------------------------------------------
+Condition 18 | agent_number=19 | condition_id=agent_number[1.1.17]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=19 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.17.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=19 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.17.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 3... | agent_number=19 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.17.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 4... | agent_number=19 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.17.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 5... | agent_number=19 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.17.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.17.4] progress: 0.00s
+    Classical run[1.1.17.4] progress: 5.00s
+    Classical run[1.1.17.4] progress: 10.00s
+    Classical run[1.1.17.4] progress: 15.00s
+    Classical run[1.1.17.4] progress: 20.00s
+    Classical run[1.1.17.4] progress: 25.00s
+    Classical run[1.1.17.4] progress: 30.00s
+    Cyclic run[1.1.17.4] progress: 0.00s
+    Cyclic run[1.1.17.4] progress: 5.00s
+    Cyclic run[1.1.17.4] progress: 10.00s
+    Cyclic run[1.1.17.4] progress: 15.00s
+    Cyclic run[1.1.17.4] progress: 20.00s
+      Classical | mapping[1.1.17.4.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=832.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.17.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=23.19s | conflicts_at_halt=501.00 | avg_path=66.74 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 6... | agent_number=19 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.17.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.17.5] progress: 0.00s
+    Classical run[1.1.17.5] progress: 5.00s
+    Classical run[1.1.17.5] progress: 10.00s
+    Classical run[1.1.17.5] progress: 15.00s
+    Classical run[1.1.17.5] progress: 20.00s
+    Classical run[1.1.17.5] progress: 25.00s
+    Classical run[1.1.17.5] progress: 30.00s
+    Cyclic run[1.1.17.5] progress: 0.00s
+    Cyclic run[1.1.17.5] progress: 5.00s
+      Classical | mapping[1.1.17.5.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=993.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.17.5.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=7.53s | conflicts_at_halt=313.00 | avg_path=48.32 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 7... | agent_number=19 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.17.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.46310170499782544 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 8... | agent_number=19 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.17.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 9... | agent_number=19 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.17.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 10... | agent_number=19 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.17.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.1700964629999362 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=19 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.17.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=19 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[1.1.17.11] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 13... | agent_number=19 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[1.1.17.12] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 14... | agent_number=19 | run_index=13
+  Paired sampling attempt 14 ongoing... | run[1.1.17.13] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 15... | agent_number=19 | run_index=14
+  Paired sampling attempt 15 ongoing... | run[1.1.17.14] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.17.14] progress: 0.00s
+    Classical run[1.1.17.14] progress: 5.00s
+    Classical run[1.1.17.14] progress: 10.00s
+    Classical run[1.1.17.14] progress: 15.00s
+    Classical run[1.1.17.14] progress: 20.00s
+    Classical run[1.1.17.14] progress: 25.00s
+    Classical run[1.1.17.14] progress: 30.00s
+    Cyclic run[1.1.17.14] progress: 0.00s
+      Classical | mapping[1.1.17.14.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=2903.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.17.14.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.26s | conflicts_at_halt=10.00 | avg_path=71.68 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.17] | agent_number=19 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1576.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=10.33 | avg_conflicts_at_halt=274.67 | avg_path=62.25
+[Elapsed: 88m 46s] Condition 18 completed (agent_number=19).
+
+----------------------------------------------------------------------------------------
+Condition 19 | agent_number=20 | condition_id=agent_number[1.1.18]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=20 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.18.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.18.0] progress: 0.00s
+    Classical run[1.1.18.0] progress: 5.00s
+    Classical run[1.1.18.0] progress: 10.00s
+    Classical run[1.1.18.0] progress: 15.00s
+    Classical run[1.1.18.0] progress: 20.00s
+    Classical run[1.1.18.0] progress: 25.00s
+    Classical run[1.1.18.0] progress: 30.00s
+    Cyclic run[1.1.18.0] progress: 0.00s
+    Cyclic run[1.1.18.0] progress: 5.00s
+    Cyclic run[1.1.18.0] progress: 10.00s
+    Cyclic run[1.1.18.0] progress: 15.00s
+      Classical | mapping[1.1.18.0.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=821.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.18.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=16.94s | conflicts_at_halt=395.00 | avg_path=67.35 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=20 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.18.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.6701374210024369 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=20 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.18.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.0530431719998887 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=20 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.18.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.18.3] progress: 0.00s
+    Classical run[1.1.18.3] progress: 5.00s
+    Classical run[1.1.18.3] progress: 10.00s
+    Classical run[1.1.18.3] progress: 15.00s
+    Classical run[1.1.18.3] progress: 20.00s
+    Classical run[1.1.18.3] progress: 25.00s
+    Classical run[1.1.18.3] progress: 30.00s
+    Cyclic run[1.1.18.3] progress: 0.00s
+    Cyclic run[1.1.18.3] progress: 5.00s
+      Classical | mapping[1.1.18.3.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1409.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.18.3.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=7.77s | conflicts_at_halt=300.00 | avg_path=48.40 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 5... | agent_number=20 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.18.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.18.4] progress: 0.00s
+    Classical run[1.1.18.4] progress: 5.00s
+    Classical run[1.1.18.4] progress: 10.00s
+    Classical run[1.1.18.4] progress: 15.00s
+    Classical run[1.1.18.4] progress: 20.00s
+    Classical run[1.1.18.4] progress: 25.00s
+    Classical run[1.1.18.4] progress: 30.00s
+    Cyclic run[1.1.18.4] progress: 0.00s
+    Cyclic run[1.1.18.4] progress: 5.00s
+      Classical | mapping[1.1.18.4.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=890.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.18.4.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=5.52s | conflicts_at_halt=231.00 | avg_path=49.55 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.18] | agent_number=20 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1040.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=10.08 | avg_conflicts_at_halt=308.67 | avg_path=55.10
+[Elapsed: 92m 00s] Condition 19 completed (agent_number=20).
+
+----------------------------------------------------------------------------------------
+Condition 20 | agent_number=21 | condition_id=agent_number[1.1.19]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=21 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.19.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.19.0] progress: 0.00s
+    Classical run[1.1.19.0] progress: 5.00s
+    Classical run[1.1.19.0] progress: 10.00s
+    Classical run[1.1.19.0] progress: 15.00s
+    Classical run[1.1.19.0] progress: 20.00s
+    Classical run[1.1.19.0] progress: 25.00s
+    Classical run[1.1.19.0] progress: 30.00s
+    Cyclic run[1.1.19.0] progress: 0.00s
+    Cyclic run[1.1.19.0] progress: 5.00s
+    Cyclic run[1.1.19.0] progress: 10.00s
+    Cyclic run[1.1.19.0] progress: 15.00s
+    Cyclic run[1.1.19.0] progress: 20.00s
+    Cyclic run[1.1.19.0] progress: 25.00s
+      Classical | mapping[1.1.19.0.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=767.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.19.0.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=25.89s | conflicts_at_halt=693.00 | avg_path=47.38 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 2... | agent_number=21 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.19.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 3... | agent_number=21 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.19.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=21 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.19.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=21 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.19.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=21 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.19.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=21 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.19.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=21 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.19.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 9... | agent_number=21 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.19.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 10... | agent_number=21 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.19.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 11... | agent_number=21 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.19.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 12... | agent_number=21 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[1.1.19.11] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 13... | agent_number=21 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[1.1.19.12] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 14... | agent_number=21 | run_index=13
+  Paired sampling attempt 14 ongoing... | run[1.1.19.13] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 15... | agent_number=21 | run_index=14
+  Paired sampling attempt 15 ongoing... | run[1.1.19.14] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 16... | agent_number=21 | run_index=15
+  Paired sampling attempt 16 ongoing... | run[1.1.19.15] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.19.15] progress: 0.00s
+    Classical run[1.1.19.15] progress: 5.00s
+    Classical run[1.1.19.15] progress: 10.00s
+    Classical run[1.1.19.15] progress: 15.00s
+    Classical run[1.1.19.15] progress: 20.00s
+    Classical run[1.1.19.15] progress: 25.00s
+    Classical run[1.1.19.15] progress: 30.00s
+    Cyclic run[1.1.19.15] progress: 0.00s
+      Classical | mapping[1.1.19.15.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=1467.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.19.15.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.05s | conflicts_at_halt=85.00 | avg_path=73.29 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 17... | agent_number=21 | run_index=16
+  Paired sampling attempt 17 ongoing... | run[1.1.19.16] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.2362301299981482 | cyclic_halted=11.695577394002612 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 18... | agent_number=21 | run_index=17
+  Paired sampling attempt 18 ongoing... | run[1.1.19.17] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.8612818080000579 | cyclic_halted=7.349500509997597 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 19... | agent_number=21 | run_index=18
+  Paired sampling attempt 19 ongoing... | run[1.1.19.18] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.19.18] progress: 0.00s
+    Classical run[1.1.19.18] progress: 5.00s
+    Classical run[1.1.19.18] progress: 10.00s
+    Classical run[1.1.19.18] progress: 15.00s
+    Classical run[1.1.19.18] progress: 20.00s
+    Classical run[1.1.19.18] progress: 25.00s
+    Classical run[1.1.19.18] progress: 30.00s
+    Cyclic run[1.1.19.18] progress: 0.00s
+    Cyclic run[1.1.19.18] progress: 5.00s
+    Cyclic run[1.1.19.18] progress: 10.00s
+    Cyclic run[1.1.19.18] progress: 15.00s
+      Classical | mapping[1.1.19.18.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=791.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.19.18.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=16.91s | conflicts_at_halt=516.00 | avg_path=54.90 | paired=True
+      Jointly viable counted pairs: 3/3
+
+    Condition aggregate | agent_number[1.1.19] | agent_number=21 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1008.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=15.28 | avg_conflicts_at_halt=431.33 | avg_path=58.52
+[Elapsed: 109m 31s] Condition 20 completed (agent_number=21).
+
+----------------------------------------------------------------------------------------
+Condition 21 | agent_number=22 | condition_id=agent_number[1.1.20]
+----------------------------------------------------------------------------------------
+  Runtime individual filter started | rule=filter_individual_runs_until_cyclic_faster | target_retained_pairs=3 | discarded_attempts_so_far=0
+  Preparing paired sampling attempt 1... | agent_number=22 | run_index=0
+  Paired sampling attempt 1 ongoing... | run[1.1.20.0] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=0/3
+
+  Preparing paired sampling attempt 2... | agent_number=22 | run_index=1
+  Paired sampling attempt 2 ongoing... | run[1.1.20.1] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.20.1] progress: 0.00s
+    Classical run[1.1.20.1] progress: 5.00s
+    Classical run[1.1.20.1] progress: 10.00s
+    Classical run[1.1.20.1] progress: 15.00s
+    Classical run[1.1.20.1] progress: 20.00s
+    Classical run[1.1.20.1] progress: 25.00s
+    Classical run[1.1.20.1] progress: 30.00s
+    Cyclic run[1.1.20.1] progress: 0.00s
+    Cyclic run[1.1.20.1] progress: 5.00s
+      Classical | mapping[1.1.20.1.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=926.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.20.1.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.15s | conflicts_at_halt=151.00 | avg_path=52.64 | paired=True
+      Jointly viable counted pairs: 1/3
+
+  Preparing paired sampling attempt 3... | agent_number=22 | run_index=2
+  Paired sampling attempt 3 ongoing... | run[1.1.20.2] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 4... | agent_number=22 | run_index=3
+  Paired sampling attempt 4 ongoing... | run[1.1.20.3] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 5... | agent_number=22 | run_index=4
+  Paired sampling attempt 5 ongoing... | run[1.1.20.4] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.0838360640009341 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 6... | agent_number=22 | run_index=5
+  Paired sampling attempt 6 ongoing... | run[1.1.20.5] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 7... | agent_number=22 | run_index=6
+  Paired sampling attempt 7 ongoing... | run[1.1.20.6] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 8... | agent_number=22 | run_index=7
+  Paired sampling attempt 8 ongoing... | run[1.1.20.7] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=1.2584937750034442 | cyclic_halted=30.0 | retained_pairs=1/3
+
+  Preparing paired sampling attempt 9... | agent_number=22 | run_index=8
+  Paired sampling attempt 9 ongoing... | run[1.1.20.8] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+    Classical run[1.1.20.8] progress: 0.00s
+    Classical run[1.1.20.8] progress: 5.00s
+    Classical run[1.1.20.8] progress: 10.00s
+    Classical run[1.1.20.8] progress: 15.00s
+    Classical run[1.1.20.8] progress: 20.00s
+    Classical run[1.1.20.8] progress: 25.00s
+    Classical run[1.1.20.8] progress: 30.00s
+    Cyclic run[1.1.20.8] progress: 0.00s
+    Cyclic run[1.1.20.8] progress: 5.00s
+      Classical | mapping[1.1.20.8.0] | solver=ECBS | result=unfinished | solver_status=bad_setup_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=851.00 | avg_path=null | paired=True
+      Cyclic | mapping[1.1.20.8.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=5.96s | conflicts_at_halt=155.00 | avg_path=48.68 | paired=True
+      Jointly viable counted pairs: 2/3
+
+  Preparing paired sampling attempt 10... | agent_number=22 | run_index=9
+  Paired sampling attempt 10 ongoing... | run[1.1.20.9] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 11... | agent_number=22 | run_index=10
+  Paired sampling attempt 11 ongoing... | run[1.1.20.10] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 12... | agent_number=22 | run_index=11
+  Paired sampling attempt 12 ongoing... | run[1.1.20.11] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=4.63189503600006 | cyclic_halted=17.433914604000165 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 13... | agent_number=22 | run_index=12
+  Paired sampling attempt 13 ongoing... | run[1.1.20.12] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 14... | agent_number=22 | run_index=13
+  Paired sampling attempt 14 ongoing... | run[1.1.20.13] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 15... | agent_number=22 | run_index=14
+  Paired sampling attempt 15 ongoing... | run[1.1.20.14] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 16... | agent_number=22 | run_index=15
+  Paired sampling attempt 16 ongoing... | run[1.1.20.15] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=0.7105717410013312 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 17... | agent_number=22 | run_index=16
+  Paired sampling attempt 17 ongoing... | run[1.1.20.16] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 18... | agent_number=22 | run_index=17
+  Paired sampling attempt 18 ongoing... | run[1.1.20.17] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 19... | agent_number=22 | run_index=18
+  Paired sampling attempt 19 ongoing... | run[1.1.20.18] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Preparing paired sampling attempt 20... | agent_number=22 | run_index=19
+  Paired sampling attempt 20 ongoing... | run[1.1.20.19] | map_id=dynamic_port_shared_map_seed_57210_group_patch
+      Discarded paired sampling attempt because cyclic halted time was not lower than classical | classical_halted=30.0 | cyclic_halted=30.0 | retained_pairs=2/3
+
+  Stop rule triggered before the counted-pair quota was reached (2/3) at agent_number=22. The current condition is discarded and the branch stops before higher agent numbers.
+[Elapsed: 127m 45s] Condition 21 stopped the branch (agent_number=22).
+[Elapsed: 127m 45s] Raw MAPF data recomputed and saved.
+If graphs or visualization are requested in this run, they will be regenerated from the saved raw MAPF data on disk.
+Reloaded the saved raw MAPF data from disk for output generation consistency.
+[Elapsed: 127m 45s] Structured records and summaries regenerated from persisted raw MAPF data.
+[Elapsed: 127m 46s] Graphs regenerated from persisted raw MAPF data.
+
+Final aggregate table:
+    Condition aggregate | agent_number[1.1.0] | agent_number=2 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.72 | avg_conflicts_at_halt=0.00 | avg_path=34.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.53 | avg_conflicts_at_halt=0.00 | avg_path=39.67
+    Condition aggregate | agent_number[1.1.1] | agent_number=3 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=0.33 | avg_path=36.44
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.01 | avg_conflicts_at_halt=0.00 | avg_path=51.11
+    Condition aggregate | agent_number[1.1.2] | agent_number=4 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=0.67 | avg_path=32.33
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=0.00 | avg_path=43.42
+    Condition aggregate | agent_number[1.1.3] | agent_number=5 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=2.00 | avg_path=32.53
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.02 | avg_conflicts_at_halt=1.67 | avg_path=40.80
+    Condition aggregate | agent_number[1.1.4] | agent_number=6 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.07 | avg_conflicts_at_halt=5.00 | avg_path=42.17
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.03 | avg_conflicts_at_halt=1.67 | avg_path=47.78
+    Condition aggregate | agent_number[1.1.5] | agent_number=7 | retained_pairs=3/3
+      Classical | successful=3 | unfinished=0 | avg_time_halted=0.09 | avg_conflicts_at_halt=7.00 | avg_path=28.00
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.05 | avg_conflicts_at_halt=5.33 | avg_path=34.81
+    Condition aggregate | agent_number[1.1.6] | agent_number=8 | retained_pairs=3/3
+      Classical | successful=2 | unfinished=1 | avg_time_halted=10.13 | avg_conflicts_at_halt=411.67 | avg_path=37.44
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.11 | avg_conflicts_at_halt=11.33 | avg_path=45.92
+    Condition aggregate | agent_number[1.1.7] | agent_number=9 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.30 | avg_conflicts_at_halt=809.00 | avg_path=42.22
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.17 | avg_conflicts_at_halt=12.00 | avg_path=53.59
+    Condition aggregate | agent_number[1.1.8] | agent_number=10 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=995.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=0.72 | avg_conflicts_at_halt=22.00 | avg_path=57.37
+    Condition aggregate | agent_number[1.1.9] | agent_number=11 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=2255.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.25 | avg_conflicts_at_halt=49.00 | avg_path=57.45
+    Condition aggregate | agent_number[1.1.10] | agent_number=12 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=876.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=1.09 | avg_conflicts_at_halt=33.67 | avg_path=72.39
+    Condition aggregate | agent_number[1.1.11] | agent_number=13 | retained_pairs=3/3
+      Classical | successful=1 | unfinished=2 | avg_time_halted=20.18 | avg_conflicts_at_halt=692.67 | avg_path=35.15
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=3.13 | avg_conflicts_at_halt=64.33 | avg_path=53.18
+    Condition aggregate | agent_number[1.1.12] | agent_number=14 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=985.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=2.24 | avg_conflicts_at_halt=69.00 | avg_path=56.86
+    Condition aggregate | agent_number[1.1.13] | agent_number=15 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1944.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=8.01 | avg_conflicts_at_halt=22.00 | avg_path=98.64
+    Condition aggregate | agent_number[1.1.14] | agent_number=16 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1005.67 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=12.40 | avg_conflicts_at_halt=176.00 | avg_path=62.92
+    Condition aggregate | agent_number[1.1.15] | agent_number=17 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1163.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=5.18 | avg_conflicts_at_halt=263.00 | avg_path=46.24
+    Condition aggregate | agent_number[1.1.16] | agent_number=18 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1706.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=14.31 | avg_conflicts_at_halt=453.00 | avg_path=67.91
+    Condition aggregate | agent_number[1.1.17] | agent_number=19 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1576.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=10.33 | avg_conflicts_at_halt=274.67 | avg_path=62.25
+    Condition aggregate | agent_number[1.1.18] | agent_number=20 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1040.00 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=10.08 | avg_conflicts_at_halt=308.67 | avg_path=55.10
+    Condition aggregate | agent_number[1.1.19] | agent_number=21 | retained_pairs=3/3
+      Classical | successful=0 | unfinished=3 | avg_time_halted=30.00 | avg_conflicts_at_halt=1008.33 | avg_path=null
+      Cyclic | successful=3 | unfinished=0 | avg_time_halted=15.28 | avg_conflicts_at_halt=431.33 | avg_path=58.52
+
+Branch stopped early:
+  Reason: filter_individual_runs_until_cyclic_faster_max_attempts_exhausted
+  Details: Stop rule triggered before the counted-pair quota was reached (2/3) at agent_number=22. The current condition is discarded and the branch stops before higher agent numbers.
+  Reported agent numbers: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+
+Generated graph files:
+  - /workspaces/cmsc-190/dev/outputs/dynamic_port/graphs/graphs_and_data/dynamic_port_runtime.png
+  - /workspaces/cmsc-190/dev/outputs/dynamic_port/graphs/graphs_and_data/dynamic_port_conflicts.png
+  - /workspaces/cmsc-190/dev/outputs/dynamic_port/graphs/graphs_and_data/dynamic_port_path_length.png
+
+[Elapsed: 127m 46s] Experiment finished.

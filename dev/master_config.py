@@ -75,7 +75,7 @@ TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20 # 20
 
 # ===================================
 
-recompute_MAPF = True
+recompute_MAPF = False
 
 to_generate = "graphs_and_data"
 # to_generate = "visualization"

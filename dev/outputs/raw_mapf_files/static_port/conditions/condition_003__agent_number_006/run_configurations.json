@@ -1,0 +1,257 @@
+[
+  {
+    "branch_id": "static_port",
+    "branch_decimal": "0.1",
+    "map_type": "static_port",
+    "map_obstacle_type": "static",
+    "target_type": "clustered_targets",
+    "agent_number": 6,
+    "agent_number_index": 2,
+    "run_index": 0,
+    "run_config_id": "run[0.1.2.0]",
+    "map_identifier": "static_port_static_image_seed_25899",
+    "map_seed": 25899,
+    "assignment_seed": 33809,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          42,
+          10
+        ],
+        "goal": [
+          48,
+          54
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          16,
+          20
+        ],
+        "goal": [
+          46,
+          58
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          64,
+          16
+        ],
+        "goal": [
+          46,
+          56
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          34,
+          46
+        ],
+        "goal": [
+          48,
+          56
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          58,
+          32
+        ],
+        "goal": [
+          46,
+          54
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          24,
+          12
+        ],
+        "goal": [
+          50,
+          54
+        ]
+      }
+    ],
+    "notes": "Static image-based thresholded map loaded for this run configuration. start_distribution=dispersed | goal_distribution=clustered"
+  },
+  {
+    "branch_id": "static_port",
+    "branch_decimal": "0.1",
+    "map_type": "static_port",
+    "map_obstacle_type": "static",
+    "target_type": "clustered_targets",
+    "agent_number": 6,
+    "agent_number_index": 2,
+    "run_index": 1,
+    "run_config_id": "run[0.1.2.1]",
+    "map_identifier": "static_port_static_image_seed_25922",
+    "map_seed": 25922,
+    "assignment_seed": 33835,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          60,
+          36
+        ],
+        "goal": [
+          32,
+          78
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          68,
+          28
+        ],
+        "goal": [
+          30,
+          76
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          10,
+          40
+        ],
+        "goal": [
+          32,
+          76
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          16,
+          36
+        ],
+        "goal": [
+          28,
+          76
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          20,
+          60
+        ],
+        "goal": [
+          30,
+          74
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          68,
+          24
+        ],
+        "goal": [
+          30,
+          78
+        ]
+      }
+    ],
+    "notes": "Static image-based thresholded map loaded for this run configuration. start_distribution=dispersed | goal_distribution=clustered"
+  },
+  {
+    "branch_id": "static_port",
+    "branch_decimal": "0.1",
+    "map_type": "static_port",
+    "map_obstacle_type": "static",
+    "target_type": "clustered_targets",
+    "agent_number": 6,
+    "agent_number_index": 2,
+    "run_index": 2,
+    "run_config_id": "run[0.1.2.2]",
+    "map_identifier": "static_port_static_image_seed_25945",
+    "map_seed": 25945,
+    "assignment_seed": 33861,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          22,
+          64
+        ],
+        "goal": [
+          68,
+          30
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          78,
+          48
+        ],
+        "goal": [
+          66,
+          32
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          12,
+          46
+        ],
+        "goal": [
+          68,
+          34
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          44,
+          62
+        ],
+        "goal": [
+          70,
+          32
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          64,
+          26
+        ],
+        "goal": [
+          70,
+          34
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          70,
+          28
+        ],
+        "goal": [
+          68,
+          32
+        ]
+      }
+    ],
+    "notes": "Static image-based thresholded map loaded for this run configuration. start_distribution=dispersed | goal_distribution=clustered"
+  }
+]

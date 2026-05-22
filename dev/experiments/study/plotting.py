@@ -13,7 +13,10 @@ from dev.experiments.branch_specs import BranchSpec
 from dev.experiments.study.models import ConditionAggregate
 
 
-MARKER_SIZE = 8
+MARKER_SIZE = 90
+CONNECTOR_LINE_WIDTH = 3.8
+CONNECTOR_ENDPOINT_GAP_POINTS = 9
+REFERENCE_LINE_WIDTH = 2.0
 CLASSICAL_LABEL_OFFSET = (6, 6)
 CYCLIC_LABEL_OFFSET = (6, -10)
 BASE_FIGURE_WIDTH = 10
@@ -22,6 +25,12 @@ FIGURE_HEIGHT = 6.5
 TICK_FONT_SIZE_DEFAULT = 10
 TICK_FONT_SIZE_DENSE = 8
 TICK_FONT_SIZE_VERY_DENSE = 6
+CLASSICAL_COLOR = "#1f77b4"
+CYCLIC_COLOR = "#ff7f0e"
+CYCLIC_BETTER_CONNECTOR_COLOR = "#7ED957"
+CYCLIC_WORSE_CONNECTOR_COLOR = "#FF6B6B"
+CYCLIC_EQUAL_CONNECTOR_COLOR = "gray"
+RUNTIME_LIMIT_SECONDS = 30.0
 
 
 def _annotate_series(
@@ -67,6 +76,24 @@ def _tick_font_size(num_ticks: int) -> int:
     return TICK_FONT_SIZE_DEFAULT
 
 
+def _connector_color(classical_value: float, cyclic_value: float) -> str:
+    if math.isnan(classical_value) or math.isnan(cyclic_value):
+        return CYCLIC_EQUAL_CONNECTOR_COLOR
+    if cyclic_value < classical_value:
+        return CYCLIC_BETTER_CONNECTOR_COLOR
+    if cyclic_value > classical_value:
+        return CYCLIC_WORSE_CONNECTOR_COLOR
+    return CYCLIC_EQUAL_CONNECTOR_COLOR
+
+
+def _connector_linestyle(classical_value: float, cyclic_value: float) -> str:
+    if math.isnan(classical_value) or math.isnan(cyclic_value):
+        return "-"
+    if cyclic_value > classical_value:
+        return "--"
+    return "-"
+
+
 def plot_metric_graph(
     *,
     branch_spec: BranchSpec,
@@ -76,6 +103,8 @@ def plot_metric_graph(
     output_path: Path,
     y_label: str,
     title: str,
+    reference_y_value: float | None = None,
+    reference_y_label: str | None = None,
 ) -> None:
     x_values = [aggregate.agent_number for aggregate in aggregates]
     classical_values = [
@@ -90,20 +119,59 @@ def plot_metric_graph(
     display_x_ticks = _resolve_display_x_ticks(x_values)
     figure = plt.figure(figsize=(_resolve_figure_width(len(display_x_ticks)), FIGURE_HEIGHT))
     axes = figure.add_subplot(111)
-    axes.plot(
+    for x_value, classical_value, cyclic_value in zip(
+        x_values, classical_values, cyclic_values
+    ):
+        if math.isnan(classical_value) or math.isnan(cyclic_value):
+            continue
+        axes.annotate(
+            "",
+            xy=(x_value, cyclic_value),
+            xytext=(x_value, classical_value),
+            arrowprops={
+                "arrowstyle": "-",
+                "color": _connector_color(classical_value, cyclic_value),
+                "linestyle": _connector_linestyle(classical_value, cyclic_value),
+                "linewidth": CONNECTOR_LINE_WIDTH,
+                "alpha": 0.95,
+                "shrinkA": CONNECTOR_ENDPOINT_GAP_POINTS,
+                "shrinkB": CONNECTOR_ENDPOINT_GAP_POINTS,
+            },
+            zorder=1,
+        )
+
+    axes.scatter(
         x_values,
         classical_values,
         marker="s",
-        markersize=MARKER_SIZE,
+        s=MARKER_SIZE,
+        color=CLASSICAL_COLOR,
+        edgecolors="black",
+        linewidths=0.8,
         label="Classical",
+        zorder=3,
     )
-    axes.plot(
+    axes.scatter(
         x_values,
         cyclic_values,
         marker="o",
-        markersize=MARKER_SIZE,
+        s=MARKER_SIZE,
+        color=CYCLIC_COLOR,
+        edgecolors="black",
+        linewidths=0.8,
         label="Cyclic",
+        zorder=3,
     )
+
+    if reference_y_value is not None:
+        axes.axhline(
+            reference_y_value,
+            color="red",
+            linestyle="--",
+            linewidth=REFERENCE_LINE_WIDTH,
+            alpha=0.85,
+            zorder=0,
+        )
     _annotate_series(axes, x_values, classical_values, offset=CLASSICAL_LABEL_OFFSET)
     _annotate_series(axes, x_values, cyclic_values, offset=CYCLIC_LABEL_OFFSET)
     axes.set_xlabel("Agent number")
@@ -141,6 +209,8 @@ def generate_graphs(
         output_path=runtime_path,
         y_label="Average time computation halted (seconds)",
         title=f"{branch_spec.display_name}: Time Computation Halted vs Agent Number",
+        reference_y_value=RUNTIME_LIMIT_SECONDS,
+        reference_y_label="30-second limit",
     )
     generated_paths.append(runtime_path)
 

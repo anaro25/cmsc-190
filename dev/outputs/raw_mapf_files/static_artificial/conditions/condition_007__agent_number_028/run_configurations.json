@@ -1,0 +1,1637 @@
+[
+  {
+    "branch_id": "static_artificial",
+    "branch_decimal": "0.0",
+    "map_type": "static_artificial",
+    "map_obstacle_type": "static",
+    "target_type": "dispersed_targets",
+    "agent_number": 28,
+    "agent_number_index": 6,
+    "run_index": 0,
+    "run_config_id": "run[0.0.6.0]",
+    "map_identifier": "artificial_32x32_seed_42634",
+    "map_seed": 42634,
+    "assignment_seed": 52662,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          32,
+          42
+        ],
+        "goal": [
+          52,
+          56
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          16,
+          56
+        ],
+        "goal": [
+          20,
+          28
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          40,
+          44
+        ],
+        "goal": [
+          46,
+          60
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          32,
+          32
+        ],
+        "goal": [
+          40,
+          22
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          20,
+          32
+        ],
+        "goal": [
+          34,
+          20
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          10,
+          38
+        ],
+        "goal": [
+          32,
+          28
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          8,
+          32
+        ],
+        "goal": [
+          2,
+          38
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          14,
+          24
+        ],
+        "goal": [
+          4,
+          52
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          30,
+          26
+        ],
+        "goal": [
+          12,
+          18
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          52,
+          28
+        ],
+        "goal": [
+          12,
+          36
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          14,
+          38
+        ],
+        "goal": [
+          4,
+          32
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          34,
+          50
+        ],
+        "goal": [
+          46,
+          52
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          22,
+          40
+        ],
+        "goal": [
+          32,
+          50
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          44,
+          28
+        ],
+        "goal": [
+          28,
+          54
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          30,
+          52
+        ],
+        "goal": [
+          18,
+          18
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          46,
+          42
+        ],
+        "goal": [
+          36,
+          48
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          24,
+          44
+        ],
+        "goal": [
+          14,
+          40
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          20,
+          44
+        ],
+        "goal": [
+          20,
+          54
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          16,
+          12
+        ],
+        "goal": [
+          28,
+          32
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          14,
+          34
+        ],
+        "goal": [
+          12,
+          44
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          46,
+          54
+        ],
+        "goal": [
+          6,
+          56
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          52,
+          44
+        ],
+        "goal": [
+          28,
+          38
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          42,
+          38
+        ],
+        "goal": [
+          24,
+          42
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          10,
+          44
+        ],
+        "goal": [
+          34,
+          34
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          14,
+          62
+        ],
+        "goal": [
+          10,
+          60
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          40,
+          62
+        ],
+        "goal": [
+          36,
+          44
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          56,
+          32
+        ],
+        "goal": [
+          26,
+          18
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          48,
+          50
+        ],
+        "goal": [
+          48,
+          32
+        ]
+      }
+    ],
+    "notes": "Fresh artificial map for this run configuration. start_distribution=dispersed | goal_distribution=dispersed"
+  },
+  {
+    "branch_id": "static_artificial",
+    "branch_decimal": "0.0",
+    "map_type": "static_artificial",
+    "map_obstacle_type": "static",
+    "target_type": "dispersed_targets",
+    "agent_number": 28,
+    "agent_number_index": 6,
+    "run_index": 1,
+    "run_config_id": "run[0.0.6.1]",
+    "map_identifier": "artificial_32x32_seed_42664",
+    "map_seed": 42664,
+    "assignment_seed": 52695,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          36,
+          24
+        ],
+        "goal": [
+          16,
+          30
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          36,
+          4
+        ],
+        "goal": [
+          16,
+          8
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          32,
+          18
+        ],
+        "goal": [
+          48,
+          22
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          16,
+          18
+        ],
+        "goal": [
+          24,
+          54
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          4,
+          24
+        ],
+        "goal": [
+          4,
+          28
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          2,
+          50
+        ],
+        "goal": [
+          12,
+          46
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          2,
+          32
+        ],
+        "goal": [
+          42,
+          26
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          30,
+          12
+        ],
+        "goal": [
+          12,
+          58
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          38,
+          12
+        ],
+        "goal": [
+          12,
+          6
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          20,
+          46
+        ],
+        "goal": [
+          24,
+          2
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          28,
+          8
+        ],
+        "goal": [
+          56,
+          16
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          8,
+          12
+        ],
+        "goal": [
+          32,
+          12
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          22,
+          20
+        ],
+        "goal": [
+          40,
+          16
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          42,
+          18
+        ],
+        "goal": [
+          34,
+          26
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          20,
+          28
+        ],
+        "goal": [
+          22,
+          24
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          26,
+          14
+        ],
+        "goal": [
+          20,
+          32
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          30,
+          22
+        ],
+        "goal": [
+          2,
+          44
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          52,
+          14
+        ],
+        "goal": [
+          26,
+          10
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          6,
+          16
+        ],
+        "goal": [
+          48,
+          6
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          22,
+          32
+        ],
+        "goal": [
+          28,
+          38
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          20,
+          2
+        ],
+        "goal": [
+          48,
+          12
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          32,
+          36
+        ],
+        "goal": [
+          42,
+          20
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          10,
+          56
+        ],
+        "goal": [
+          16,
+          0
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          22,
+          42
+        ],
+        "goal": [
+          4,
+          4
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          40,
+          22
+        ],
+        "goal": [
+          14,
+          16
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          6,
+          4
+        ],
+        "goal": [
+          34,
+          30
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          52,
+          0
+        ],
+        "goal": [
+          18,
+          16
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          50,
+          22
+        ],
+        "goal": [
+          18,
+          20
+        ]
+      }
+    ],
+    "notes": "Fresh artificial map for this run configuration. start_distribution=dispersed | goal_distribution=dispersed"
+  },
+  {
+    "branch_id": "static_artificial",
+    "branch_decimal": "0.0",
+    "map_type": "static_artificial",
+    "map_obstacle_type": "static",
+    "target_type": "dispersed_targets",
+    "agent_number": 28,
+    "agent_number_index": 6,
+    "run_index": 2,
+    "run_config_id": "run[0.0.6.2]",
+    "map_identifier": "artificial_32x32_seed_42694",
+    "map_seed": 42694,
+    "assignment_seed": 52728,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          16,
+          22
+        ],
+        "goal": [
+          52,
+          34
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          54,
+          42
+        ],
+        "goal": [
+          36,
+          44
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          24,
+          38
+        ],
+        "goal": [
+          24,
+          32
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          52,
+          36
+        ],
+        "goal": [
+          28,
+          46
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          40,
+          32
+        ],
+        "goal": [
+          38,
+          40
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          38,
+          18
+        ],
+        "goal": [
+          30,
+          30
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          56,
+          20
+        ],
+        "goal": [
+          40,
+          36
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          48,
+          36
+        ],
+        "goal": [
+          46,
+          42
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          38,
+          28
+        ],
+        "goal": [
+          58,
+          22
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          18,
+          36
+        ],
+        "goal": [
+          24,
+          42
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          26,
+          42
+        ],
+        "goal": [
+          62,
+          48
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          60,
+          30
+        ],
+        "goal": [
+          24,
+          24
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          60,
+          16
+        ],
+        "goal": [
+          44,
+          26
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          22,
+          62
+        ],
+        "goal": [
+          50,
+          54
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          36,
+          42
+        ],
+        "goal": [
+          52,
+          12
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          22,
+          28
+        ],
+        "goal": [
+          52,
+          38
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          42,
+          12
+        ],
+        "goal": [
+          28,
+          52
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          26,
+          32
+        ],
+        "goal": [
+          58,
+          42
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          36,
+          10
+        ],
+        "goal": [
+          34,
+          24
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          54,
+          10
+        ],
+        "goal": [
+          28,
+          18
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          30,
+          62
+        ],
+        "goal": [
+          14,
+          48
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          56,
+          34
+        ],
+        "goal": [
+          54,
+          18
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          46,
+          44
+        ],
+        "goal": [
+          12,
+          34
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          26,
+          18
+        ],
+        "goal": [
+          32,
+          18
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          12,
+          50
+        ],
+        "goal": [
+          62,
+          54
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          30,
+          38
+        ],
+        "goal": [
+          50,
+          44
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          50,
+          40
+        ],
+        "goal": [
+          46,
+          30
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          40,
+          54
+        ],
+        "goal": [
+          62,
+          16
+        ]
+      }
+    ],
+    "notes": "Fresh artificial map for this run configuration. start_distribution=dispersed | goal_distribution=dispersed"
+  },
+  {
+    "branch_id": "static_artificial",
+    "branch_decimal": "0.0",
+    "map_type": "static_artificial",
+    "map_obstacle_type": "static",
+    "target_type": "dispersed_targets",
+    "agent_number": 28,
+    "agent_number_index": 6,
+    "run_index": 3,
+    "run_config_id": "run[0.0.6.3]",
+    "map_identifier": "artificial_32x32_seed_42724",
+    "map_seed": 42724,
+    "assignment_seed": 52761,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          24,
+          32
+        ],
+        "goal": [
+          22,
+          42
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          42,
+          56
+        ],
+        "goal": [
+          62,
+          52
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          30,
+          48
+        ],
+        "goal": [
+          48,
+          14
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          60,
+          18
+        ],
+        "goal": [
+          58,
+          42
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          38,
+          18
+        ],
+        "goal": [
+          48,
+          28
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          18,
+          46
+        ],
+        "goal": [
+          28,
+          38
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          34,
+          54
+        ],
+        "goal": [
+          0,
+          52
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          32,
+          12
+        ],
+        "goal": [
+          22,
+          38
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          48,
+          62
+        ],
+        "goal": [
+          54,
+          56
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          58,
+          34
+        ],
+        "goal": [
+          58,
+          52
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          44,
+          52
+        ],
+        "goal": [
+          44,
+          14
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          60,
+          58
+        ],
+        "goal": [
+          16,
+          40
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          14,
+          42
+        ],
+        "goal": [
+          56,
+          26
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          6,
+          40
+        ],
+        "goal": [
+          20,
+          56
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          54,
+          38
+        ],
+        "goal": [
+          50,
+          48
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          58,
+          44
+        ],
+        "goal": [
+          56,
+          60
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          46,
+          26
+        ],
+        "goal": [
+          60,
+          24
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          58,
+          50
+        ],
+        "goal": [
+          42,
+          54
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          6,
+          48
+        ],
+        "goal": [
+          24,
+          52
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          32,
+          60
+        ],
+        "goal": [
+          52,
+          34
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          16,
+          52
+        ],
+        "goal": [
+          58,
+          32
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          18,
+          42
+        ],
+        "goal": [
+          42,
+          30
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          56,
+          54
+        ],
+        "goal": [
+          42,
+          18
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          56,
+          20
+        ],
+        "goal": [
+          50,
+          60
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          36,
+          24
+        ],
+        "goal": [
+          14,
+          62
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          42,
+          36
+        ],
+        "goal": [
+          16,
+          58
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          58,
+          8
+        ],
+        "goal": [
+          32,
+          30
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          52,
+          22
+        ],
+        "goal": [
+          38,
+          14
+        ]
+      }
+    ],
+    "notes": "Fresh artificial map for this run configuration. start_distribution=dispersed | goal_distribution=dispersed"
+  },
+  {
+    "branch_id": "static_artificial",
+    "branch_decimal": "0.0",
+    "map_type": "static_artificial",
+    "map_obstacle_type": "static",
+    "target_type": "dispersed_targets",
+    "agent_number": 28,
+    "agent_number_index": 6,
+    "run_index": 4,
+    "run_config_id": "run[0.0.6.4]",
+    "map_identifier": "artificial_32x32_seed_42754",
+    "map_seed": 42754,
+    "assignment_seed": 52794,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          16,
+          6
+        ],
+        "goal": [
+          24,
+          36
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          32,
+          2
+        ],
+        "goal": [
+          48,
+          28
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          20,
+          16
+        ],
+        "goal": [
+          36,
+          32
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          60,
+          38
+        ],
+        "goal": [
+          44,
+          0
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          58,
+          28
+        ],
+        "goal": [
+          28,
+          52
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          30,
+          40
+        ],
+        "goal": [
+          40,
+          10
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          44,
+          42
+        ],
+        "goal": [
+          36,
+          46
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          52,
+          36
+        ],
+        "goal": [
+          60,
+          30
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          26,
+          34
+        ],
+        "goal": [
+          12,
+          24
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          12,
+          8
+        ],
+        "goal": [
+          34,
+          36
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          22,
+          44
+        ],
+        "goal": [
+          20,
+          2
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          18,
+          28
+        ],
+        "goal": [
+          62,
+          0
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          52,
+          14
+        ],
+        "goal": [
+          32,
+          44
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          48,
+          26
+        ],
+        "goal": [
+          8,
+          6
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          52,
+          30
+        ],
+        "goal": [
+          30,
+          36
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          16,
+          32
+        ],
+        "goal": [
+          18,
+          12
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          62,
+          20
+        ],
+        "goal": [
+          30,
+          32
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          26,
+          38
+        ],
+        "goal": [
+          36,
+          52
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          34,
+          18
+        ],
+        "goal": [
+          48,
+          14
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          18,
+          38
+        ],
+        "goal": [
+          14,
+          0
+        ]
+      },
+      {
+        "agent_id": 20,
+        "start": [
+          26,
+          26
+        ],
+        "goal": [
+          46,
+          36
+        ]
+      },
+      {
+        "agent_id": 21,
+        "start": [
+          40,
+          40
+        ],
+        "goal": [
+          46,
+          22
+        ]
+      },
+      {
+        "agent_id": 22,
+        "start": [
+          44,
+          10
+        ],
+        "goal": [
+          20,
+          38
+        ]
+      },
+      {
+        "agent_id": 23,
+        "start": [
+          42,
+          34
+        ],
+        "goal": [
+          28,
+          48
+        ]
+      },
+      {
+        "agent_id": 24,
+        "start": [
+          54,
+          8
+        ],
+        "goal": [
+          58,
+          16
+        ]
+      },
+      {
+        "agent_id": 25,
+        "start": [
+          14,
+          40
+        ],
+        "goal": [
+          40,
+          48
+        ]
+      },
+      {
+        "agent_id": 26,
+        "start": [
+          30,
+          18
+        ],
+        "goal": [
+          58,
+          40
+        ]
+      },
+      {
+        "agent_id": 27,
+        "start": [
+          54,
+          4
+        ],
+        "goal": [
+          22,
+          16
+        ]
+      }
+    ],
+    "notes": "Fresh artificial map for this run configuration. start_distribution=dispersed | goal_distribution=dispersed"
+  }
+]

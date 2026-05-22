@@ -1,0 +1,26 @@
+[
+  {
+    "candidate_index": 1,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[1.1.16.5]",
+    "agent_number": 18,
+    "run_index": 5,
+    "relative_path": "conditions/condition_017__agent_number_018/visualization_candidates/0001__cyclic__run_1.1.16.5.pkl"
+  },
+  {
+    "candidate_index": 2,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[1.1.16.6]",
+    "agent_number": 18,
+    "run_index": 6,
+    "relative_path": "conditions/condition_017__agent_number_018/visualization_candidates/0002__cyclic__run_1.1.16.6.pkl"
+  },
+  {
+    "candidate_index": 3,
+    "mapping_name": "cyclic",
+    "run_config_id": "run[1.1.16.9]",
+    "agent_number": 18,
+    "run_index": 9,
+    "relative_path": "conditions/condition_017__agent_number_018/visualization_candidates/0003__cyclic__run_1.1.16.9.pkl"
+  }
+]

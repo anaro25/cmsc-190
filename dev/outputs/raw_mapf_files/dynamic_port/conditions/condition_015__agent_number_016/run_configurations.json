@@ -1,0 +1,587 @@
+[
+  {
+    "branch_id": "dynamic_port",
+    "branch_decimal": "1.1",
+    "map_type": "dynamic_port",
+    "map_obstacle_type": "dynamic",
+    "target_type": "clustered_targets",
+    "agent_number": 16,
+    "agent_number_index": 14,
+    "run_index": 0,
+    "run_config_id": "run[1.1.14.0]",
+    "map_identifier": "dynamic_port_shared_map_seed_57210_group_patch",
+    "map_seed": 57210,
+    "assignment_seed": 37919,
+    "dynamic_schedule_seed": 57210,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          66,
+          8
+        ],
+        "goal": [
+          76,
+          60
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          68,
+          8
+        ],
+        "goal": [
+          74,
+          64
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          66,
+          6
+        ],
+        "goal": [
+          76,
+          56
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          64,
+          8
+        ],
+        "goal": [
+          74,
+          60
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          68,
+          6
+        ],
+        "goal": [
+          78,
+          60
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          64,
+          6
+        ],
+        "goal": [
+          74,
+          58
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          64,
+          10
+        ],
+        "goal": [
+          78,
+          62
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          62,
+          8
+        ],
+        "goal": [
+          74,
+          56
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          66,
+          4
+        ],
+        "goal": [
+          78,
+          56
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          70,
+          8
+        ],
+        "goal": [
+          76,
+          58
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          66,
+          12
+        ],
+        "goal": [
+          74,
+          62
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          64,
+          4
+        ],
+        "goal": [
+          76,
+          62
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          62,
+          6
+        ],
+        "goal": [
+          76,
+          64
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          62,
+          10
+        ],
+        "goal": [
+          78,
+          64
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          64,
+          12
+        ],
+        "goal": [
+          74,
+          54
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          68,
+          4
+        ],
+        "goal": [
+          78,
+          58
+        ]
+      }
+    ],
+    "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+  },
+  {
+    "branch_id": "dynamic_port",
+    "branch_decimal": "1.1",
+    "map_type": "dynamic_port",
+    "map_obstacle_type": "dynamic",
+    "target_type": "clustered_targets",
+    "agent_number": 16,
+    "agent_number_index": 14,
+    "run_index": 16,
+    "run_config_id": "run[1.1.14.16]",
+    "map_identifier": "dynamic_port_shared_map_seed_57210_group_patch",
+    "map_seed": 57210,
+    "assignment_seed": 39513,
+    "dynamic_schedule_seed": 57210,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          68,
+          76
+        ],
+        "goal": [
+          40,
+          42
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          68,
+          74
+        ],
+        "goal": [
+          42,
+          44
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          70,
+          76
+        ],
+        "goal": [
+          48,
+          44
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          68,
+          78
+        ],
+        "goal": [
+          42,
+          46
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          66,
+          76
+        ],
+        "goal": [
+          48,
+          42
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          66,
+          78
+        ],
+        "goal": [
+          46,
+          46
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          70,
+          78
+        ],
+        "goal": [
+          40,
+          46
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          70,
+          74
+        ],
+        "goal": [
+          42,
+          42
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          66,
+          74
+        ],
+        "goal": [
+          44,
+          42
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          64,
+          76
+        ],
+        "goal": [
+          46,
+          44
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          68,
+          72
+        ],
+        "goal": [
+          44,
+          48
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          72,
+          76
+        ],
+        "goal": [
+          46,
+          42
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          70,
+          72
+        ],
+        "goal": [
+          44,
+          44
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          72,
+          74
+        ],
+        "goal": [
+          40,
+          44
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          66,
+          72
+        ],
+        "goal": [
+          48,
+          46
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          64,
+          74
+        ],
+        "goal": [
+          44,
+          46
+        ]
+      }
+    ],
+    "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+  },
+  {
+    "branch_id": "dynamic_port",
+    "branch_decimal": "1.1",
+    "map_type": "dynamic_port",
+    "map_obstacle_type": "dynamic",
+    "target_type": "clustered_targets",
+    "agent_number": 16,
+    "agent_number_index": 14,
+    "run_index": 18,
+    "run_config_id": "run[1.1.14.18]",
+    "map_identifier": "dynamic_port_shared_map_seed_57210_group_patch",
+    "map_seed": 57210,
+    "assignment_seed": 39571,
+    "dynamic_schedule_seed": 57210,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          20,
+          34
+        ],
+        "goal": [
+          76,
+          56
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          18,
+          34
+        ],
+        "goal": [
+          78,
+          48
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          20,
+          32
+        ],
+        "goal": [
+          76,
+          54
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          20,
+          36
+        ],
+        "goal": [
+          74,
+          52
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          22,
+          34
+        ],
+        "goal": [
+          74,
+          54
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          18,
+          32
+        ],
+        "goal": [
+          72,
+          52
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          18,
+          36
+        ],
+        "goal": [
+          78,
+          52
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          22,
+          36
+        ],
+        "goal": [
+          78,
+          56
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          22,
+          32
+        ],
+        "goal": [
+          76,
+          48
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          16,
+          34
+        ],
+        "goal": [
+          76,
+          58
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          24,
+          34
+        ],
+        "goal": [
+          78,
+          54
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          20,
+          30
+        ],
+        "goal": [
+          74,
+          48
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          20,
+          38
+        ],
+        "goal": [
+          76,
+          52
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          24,
+          32
+        ],
+        "goal": [
+          72,
+          50
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          22,
+          30
+        ],
+        "goal": [
+          74,
+          56
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          18,
+          30
+        ],
+        "goal": [
+          78,
+          58
+        ]
+      }
+    ],
+    "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+  }
+]

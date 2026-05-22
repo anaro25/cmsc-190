@@ -1,0 +1,719 @@
+[
+  {
+    "branch_id": "static_port",
+    "branch_decimal": "0.1",
+    "map_type": "static_port",
+    "map_obstacle_type": "static",
+    "target_type": "clustered_targets",
+    "agent_number": 20,
+    "agent_number_index": 9,
+    "run_index": 0,
+    "run_config_id": "run[0.1.9.0]",
+    "map_identifier": "static_port_static_image_seed_27043",
+    "map_seed": 27043,
+    "assignment_seed": 35085,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          62,
+          14
+        ],
+        "goal": [
+          44,
+          32
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          62,
+          32
+        ],
+        "goal": [
+          38,
+          34
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          18,
+          34
+        ],
+        "goal": [
+          42,
+          38
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          2,
+          52
+        ],
+        "goal": [
+          38,
+          40
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          34,
+          76
+        ],
+        "goal": [
+          40,
+          34
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          62,
+          6
+        ],
+        "goal": [
+          44,
+          34
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          20,
+          76
+        ],
+        "goal": [
+          44,
+          38
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          38,
+          44
+        ],
+        "goal": [
+          40,
+          32
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          32,
+          44
+        ],
+        "goal": [
+          40,
+          36
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          38,
+          4
+        ],
+        "goal": [
+          36,
+          36
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          32,
+          72
+        ],
+        "goal": [
+          42,
+          32
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          72,
+          14
+        ],
+        "goal": [
+          44,
+          36
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          74,
+          52
+        ],
+        "goal": [
+          38,
+          36
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          32,
+          24
+        ],
+        "goal": [
+          42,
+          30
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          14,
+          40
+        ],
+        "goal": [
+          38,
+          32
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          78,
+          56
+        ],
+        "goal": [
+          40,
+          38
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          62,
+          52
+        ],
+        "goal": [
+          38,
+          38
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          68,
+          22
+        ],
+        "goal": [
+          42,
+          34
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          68,
+          44
+        ],
+        "goal": [
+          42,
+          36
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          26,
+          76
+        ],
+        "goal": [
+          40,
+          30
+        ]
+      }
+    ],
+    "notes": "Static image-based thresholded map loaded for this run configuration. start_distribution=dispersed | goal_distribution=clustered"
+  },
+  {
+    "branch_id": "static_port",
+    "branch_decimal": "0.1",
+    "map_type": "static_port",
+    "map_obstacle_type": "static",
+    "target_type": "clustered_targets",
+    "agent_number": 20,
+    "agent_number_index": 9,
+    "run_index": 2,
+    "run_config_id": "run[0.1.9.2]",
+    "map_identifier": "static_port_static_image_seed_27091",
+    "map_seed": 27091,
+    "assignment_seed": 35139,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          50,
+          14
+        ],
+        "goal": [
+          54,
+          22
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          76,
+          54
+        ],
+        "goal": [
+          58,
+          24
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          4,
+          14
+        ],
+        "goal": [
+          56,
+          22
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          56,
+          76
+        ],
+        "goal": [
+          56,
+          16
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          76,
+          48
+        ],
+        "goal": [
+          62,
+          22
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          74,
+          60
+        ],
+        "goal": [
+          62,
+          20
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          36,
+          72
+        ],
+        "goal": [
+          60,
+          22
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          34,
+          14
+        ],
+        "goal": [
+          56,
+          18
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          32,
+          30
+        ],
+        "goal": [
+          60,
+          18
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          64,
+          22
+        ],
+        "goal": [
+          58,
+          22
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          38,
+          64
+        ],
+        "goal": [
+          60,
+          16
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          8,
+          76
+        ],
+        "goal": [
+          62,
+          18
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          34,
+          78
+        ],
+        "goal": [
+          54,
+          18
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          54,
+          28
+        ],
+        "goal": [
+          58,
+          20
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          14,
+          32
+        ],
+        "goal": [
+          56,
+          20
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          62,
+          12
+        ],
+        "goal": [
+          54,
+          20
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          26,
+          26
+        ],
+        "goal": [
+          58,
+          18
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          44,
+          44
+        ],
+        "goal": [
+          60,
+          20
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          52,
+          78
+        ],
+        "goal": [
+          58,
+          16
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          42,
+          68
+        ],
+        "goal": [
+          60,
+          24
+        ]
+      }
+    ],
+    "notes": "Static image-based thresholded map loaded for this run configuration. start_distribution=dispersed | goal_distribution=clustered"
+  },
+  {
+    "branch_id": "static_port",
+    "branch_decimal": "0.1",
+    "map_type": "static_port",
+    "map_obstacle_type": "static",
+    "target_type": "clustered_targets",
+    "agent_number": 20,
+    "agent_number_index": 9,
+    "run_index": 4,
+    "run_config_id": "run[0.1.9.4]",
+    "map_identifier": "static_port_static_image_seed_27139",
+    "map_seed": 27139,
+    "assignment_seed": 35193,
+    "dynamic_schedule_seed": null,
+    "paired_source": true,
+    "starts_and_goals": [
+      {
+        "agent_id": 0,
+        "start": [
+          4,
+          14
+        ],
+        "goal": [
+          42,
+          48
+        ]
+      },
+      {
+        "agent_id": 1,
+        "start": [
+          66,
+          76
+        ],
+        "goal": [
+          40,
+          46
+        ]
+      },
+      {
+        "agent_id": 2,
+        "start": [
+          60,
+          72
+        ],
+        "goal": [
+          38,
+          50
+        ]
+      },
+      {
+        "agent_id": 3,
+        "start": [
+          46,
+          66
+        ],
+        "goal": [
+          42,
+          46
+        ]
+      },
+      {
+        "agent_id": 4,
+        "start": [
+          20,
+          2
+        ],
+        "goal": [
+          46,
+          50
+        ]
+      },
+      {
+        "agent_id": 5,
+        "start": [
+          38,
+          78
+        ],
+        "goal": [
+          38,
+          48
+        ]
+      },
+      {
+        "agent_id": 6,
+        "start": [
+          54,
+          2
+        ],
+        "goal": [
+          40,
+          48
+        ]
+      },
+      {
+        "agent_id": 7,
+        "start": [
+          2,
+          2
+        ],
+        "goal": [
+          40,
+          52
+        ]
+      },
+      {
+        "agent_id": 8,
+        "start": [
+          46,
+          20
+        ],
+        "goal": [
+          42,
+          52
+        ]
+      },
+      {
+        "agent_id": 9,
+        "start": [
+          68,
+          34
+        ],
+        "goal": [
+          40,
+          50
+        ]
+      },
+      {
+        "agent_id": 10,
+        "start": [
+          44,
+          30
+        ],
+        "goal": [
+          42,
+          50
+        ]
+      },
+      {
+        "agent_id": 11,
+        "start": [
+          72,
+          0
+        ],
+        "goal": [
+          44,
+          48
+        ]
+      },
+      {
+        "agent_id": 12,
+        "start": [
+          10,
+          14
+        ],
+        "goal": [
+          44,
+          50
+        ]
+      },
+      {
+        "agent_id": 13,
+        "start": [
+          34,
+          18
+        ],
+        "goal": [
+          46,
+          52
+        ]
+      },
+      {
+        "agent_id": 14,
+        "start": [
+          72,
+          4
+        ],
+        "goal": [
+          44,
+          52
+        ]
+      },
+      {
+        "agent_id": 15,
+        "start": [
+          14,
+          14
+        ],
+        "goal": [
+          46,
+          48
+        ]
+      },
+      {
+        "agent_id": 16,
+        "start": [
+          76,
+          18
+        ],
+        "goal": [
+          40,
+          54
+        ]
+      },
+      {
+        "agent_id": 17,
+        "start": [
+          16,
+          0
+        ],
+        "goal": [
+          38,
+          52
+        ]
+      },
+      {
+        "agent_id": 18,
+        "start": [
+          18,
+          44
+        ],
+        "goal": [
+          42,
+          54
+        ]
+      },
+      {
+        "agent_id": 19,
+        "start": [
+          32,
+          2
+        ],
+        "goal": [
+          44,
+          46
+        ]
+      }
+    ],
+    "notes": "Static image-based thresholded map loaded for this run configuration. start_distribution=dispersed | goal_distribution=clustered"
+  }
+]
