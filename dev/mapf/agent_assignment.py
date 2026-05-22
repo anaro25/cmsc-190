@@ -82,6 +82,22 @@ def _vertices_are_cluster_neighbors(vertex_a, vertex_b):
     return _vertices_are_gap_one_neighbors(vertex_a, vertex_b)
 
 
+def _vertex_manhattan_distance_steps(vertex_a, vertex_b):
+    row_steps = abs(vertex_a[0] - vertex_b[0]) // 2
+    col_steps = abs(vertex_a[1] - vertex_b[1]) // 2
+    return row_steps + col_steps
+
+
+def _cluster_sets_respect_minimum_distance(starts, goals, minimum_distance):
+    if minimum_distance is None or minimum_distance <= 0:
+        return True
+    return all(
+        _vertex_manhattan_distance_steps(start, goal) >= minimum_distance
+        for start in starts
+        for goal in goals
+    )
+
+
 def _subset_respects_clearance(vertices):
     for index, vertex in enumerate(vertices):
         for other in vertices[index + 1 :]:
@@ -281,6 +297,7 @@ def sample_agent_start_goal_pairs(
     shared_goal=False,
     start_distribution_mode="dispersed",
     goal_distribution_mode="dispersed",
+    clustered_start_goal_min_distance=None,
 ):
     """
     Randomly assigns start and goal vertices for each agent.
@@ -295,6 +312,7 @@ def sample_agent_start_goal_pairs(
         * when require_individual_reachability=True, each assigned start-goal pair must be reachable
         * dispersed sets respect 8-neighbor clearance internally
         * clustered sets form one connected cluster whose spacing is controlled by compact_clustering
+        * when both starts and goals are clustered, clustered_start_goal_min_distance can keep the two clusters apart
         * "single" is valid only for goal_distribution_mode, not start_distribution_mode
     """
     if rng is None:
@@ -319,6 +337,9 @@ def sample_agent_start_goal_pairs(
             f"Unsupported goal_distribution_mode '{goal_distribution_mode}'. "
             f"Valid goal modes are: {sorted(GOAL_DISTRIBUTION_MODES)}."
         )
+
+    if clustered_start_goal_min_distance is not None:
+        clustered_start_goal_min_distance = int(clustered_start_goal_min_distance)
 
     labels = _build_label_info(num_agents)
     start_vertices = _filter_allowed_vertices(composite_map, allowed_start_vertices)
@@ -360,6 +381,14 @@ def sample_agent_start_goal_pairs(
             continue
         if goal_distribution_mode == "clustered" and not _subset_is_connected_cluster(goals):
             continue
+        if (
+            start_distribution_mode == "clustered"
+            and goal_distribution_mode == "clustered"
+            and not _cluster_sets_respect_minimum_distance(
+                starts, goals, clustered_start_goal_min_distance
+            )
+        ):
+            continue
 
         paired_goals = _pair_starts_and_goals(
             composite_map=composite_map,
@@ -376,4 +405,9 @@ def sample_agent_start_goal_pairs(
     raise ValueError(
         f"Could not sample valid start-goal pairs for {num_agents} agents with start_distribution_mode={start_distribution_mode} "
         f"and goal_distribution_mode={goal_distribution_mode}."
+        + (
+            f" Required clustered start-goal minimum distance: {clustered_start_goal_min_distance}."
+            if clustered_start_goal_min_distance
+            else ""
+        )
     )

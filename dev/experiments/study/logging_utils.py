@@ -88,8 +88,11 @@ def log_dynamic_state(
         logger.log(f"  Resized longest side: {branch_spec.image_resize_longest_side}")
     logger.log(f"  Dimensions: {rows}x{cols}")
     logger.log(f"  Raw static density: {raw_static_count / total_cells:.2f}")
-    if branch_spec.dynamic_target_static_obstacle_density is None:
-        logger.log("  Target static density: preserved from source image")
+    if (
+        branch_spec.dynamic_target_static_obstacle_density is None
+        or branch_spec.dynamic_target_static_obstacle_density >= 1.0
+    ):
+        logger.log("  Target static density: 1.00 / preserved from source image")
     else:
         logger.log(f"  Target static density: {branch_spec.dynamic_target_static_obstacle_density:.2f}")
     logger.log(

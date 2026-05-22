@@ -197,6 +197,7 @@ def _sample_agents_for_branch(
                     allowed_goal_vertices=allowed_goal_vertices,
                     start_distribution_mode=branch_spec.start_distribution_mode,
                     goal_distribution_mode=branch_spec.goal_distribution_mode,
+                    clustered_start_goal_min_distance=branch_spec.clustered_start_goal_min_distance,
                 )
                 return (
                     agents,
@@ -223,10 +224,18 @@ def _sample_agents_for_branch(
         allowed_goal_vertices=marker_goal_vertices or allowed_spawn_vertices,
         start_distribution_mode=branch_spec.start_distribution_mode,
         goal_distribution_mode=branch_spec.goal_distribution_mode,
+        clustered_start_goal_min_distance=branch_spec.clustered_start_goal_min_distance,
+    )
+    distance_note = (
+        f" | clustered_start_goal_min_distance={branch_spec.clustered_start_goal_min_distance}"
+        if branch_spec.clustered_start_goal_min_distance
+        and branch_spec.start_distribution_mode == "clustered"
+        and branch_spec.goal_distribution_mode == "clustered"
+        else ""
     )
     return (
         agents,
-        f"start_distribution={branch_spec.start_distribution_mode} | goal_distribution={branch_spec.goal_distribution_mode}",
+        f"start_distribution={branch_spec.start_distribution_mode} | goal_distribution={branch_spec.goal_distribution_mode}{distance_note}",
     )
 
 
@@ -502,7 +511,10 @@ def prepare_dynamic_branch_state(
         else:
             _log(logger, "  Using all thresholded non-black cells for grouped dynamic-obstacle generation and connectivity checks.")
 
-    if branch_spec.dynamic_target_static_obstacle_density is None:
+    if (
+        branch_spec.dynamic_target_static_obstacle_density is None
+        or branch_spec.dynamic_target_static_obstacle_density >= 1.0
+    ):
         _log(logger, "  Preserving source-image static obstacle layout (no static-density preprocessing).")
         static_matrix = [row[:] for row in generation_source_matrix]
     else:

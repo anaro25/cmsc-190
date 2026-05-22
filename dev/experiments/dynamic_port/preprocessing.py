@@ -97,10 +97,13 @@ def try_remove_static_obstacle(matrix, rng):
 
 
 def preprocess_static_obstacle_density(obstacle_matrix, target_density, seed=42):
-    rng = random.Random(seed)
     matrix = [row[:] for row in obstacle_matrix]
+    if target_density is None or float(target_density) >= 1.0:
+        return matrix
+
+    rng = random.Random(seed)
     total_cells = len(matrix) * len(matrix[0])
-    target_obstacles = int(round(target_density * total_cells))
+    target_obstacles = int(round(float(target_density) * total_cells))
 
     while count_obstacles(matrix) < target_obstacles:
         if not try_add_static_obstacle(matrix, rng):

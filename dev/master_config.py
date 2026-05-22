@@ -56,7 +56,12 @@ CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
 # shared constants
 enhanced_CBS = True
 compact_clustering = True
+# Minimum Manhattan movement-step distance enforced between a clustered start set
+# and a clustered goal set. Set to None or 0 to disable the separation rule.
+PORT_CLUSTERED_START_GOAL_MIN_DISTANCE = 10
 
+# Agent cohesion is enabled for campus branches and Dynamic Port only.
+# Static Port remains a normal MAPF port branch without cohesion.
 agent_cohesion: bool = True
 cohesion_factor: float = 1.0
 SHARED_TIME_LIMIT_SECONDS = 30.0
@@ -108,6 +113,7 @@ STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": False,
         "zone_relationship_mode": "none",
         "spawnable_cell_mode": "all_free",
@@ -149,6 +155,7 @@ STATIC_PORT_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "clustered",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": True,
         "zone_relationship_mode": "none",
         "spawnable_cell_mode": "all_free",
@@ -159,7 +166,7 @@ STATIC_PORT_CONFIG = _with_shared_runtime(
         "image_resize_longest_side": 40,
 
         # dynamic-map constants
-        "target_static_obstacle_density": None,
+        "target_static_obstacle_density": 1.0,
         "target_dynamic_obstacle_density": None,
         "loop_sequence_length": None,
         "group_stay_durations": None,
@@ -167,7 +174,7 @@ STATIC_PORT_CONFIG = _with_shared_runtime(
 
         # branch-specific constants
         "map_size": None,
-        "static_obstacle_density": None,
+        "static_obstacle_density": 1.0,
         "is_dynamic": False,
         "display_name": "Static Port",
         "map_family": "traditional_mapf",
@@ -190,6 +197,7 @@ DYNAMIC_PORT_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "clustered",
         "goal_distribution_mode": "clustered",
+        "clustered_start_goal_min_distance": PORT_CLUSTERED_START_GOAL_MIN_DISTANCE,
         "require_individual_reachability": True,
         "zone_relationship_mode": "none",
         "spawnable_cell_mode": "all_free",
@@ -200,7 +208,7 @@ DYNAMIC_PORT_CONFIG = _with_shared_runtime(
         "image_resize_longest_side": 40,
 
         # dynamic-map constants
-        "target_static_obstacle_density": 0.15,
+        "target_static_obstacle_density": 1.0,
         "target_dynamic_obstacle_density": 0.030,
         "loop_sequence_length": 250,
         "group_stay_durations": (7, 9, 11),
@@ -208,7 +216,7 @@ DYNAMIC_PORT_CONFIG = _with_shared_runtime(
 
         # branch-specific constants
         "map_size": None,
-        "static_obstacle_density": None,
+        "static_obstacle_density": 1.0,
         "is_dynamic": True,
         "display_name": "Dynamic Port",
         "map_family": "traditional_mapf",
@@ -232,6 +240,7 @@ STATIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "single",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": True,
         "zone_relationship_mode": "distinct_campus_zones",
         "spawnable_cell_mode": "zone_colors_only",
@@ -273,6 +282,7 @@ DYNAMIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "clustered",
         "goal_distribution_mode": "single",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": True,
         "zone_relationship_mode": "distinct_campus_zones",
         "spawnable_cell_mode": "zone_colors_only",
@@ -314,6 +324,7 @@ STATIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "single",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": True,
         "zone_relationship_mode": "distinct_campus_zones",
         "spawnable_cell_mode": "zone_colors_only",
@@ -355,6 +366,7 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "clustered",
         "goal_distribution_mode": "single",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": True,
         "zone_relationship_mode": "distinct_campus_zones",
         "spawnable_cell_mode": "zone_colors_only",
@@ -396,6 +408,7 @@ STATIC_CAMPUS_AREA_3_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "single",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": True,
         "zone_relationship_mode": "distinct_campus_zones",
         "spawnable_cell_mode": "zone_colors_only",
@@ -437,6 +450,7 @@ DYNAMIC_CAMPUS_AREA_3_CONFIG = _with_shared_runtime(
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "start_distribution_mode": "clustered",
         "goal_distribution_mode": "single",
+        "clustered_start_goal_min_distance": None,
         "require_individual_reachability": True,
         "zone_relationship_mode": "distinct_campus_zones",
         "spawnable_cell_mode": "zone_colors_only",

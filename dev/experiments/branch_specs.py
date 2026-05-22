@@ -32,6 +32,7 @@ class BranchSpec:
     is_dynamic: bool
     start_distribution_mode: str = "dispersed"
     goal_distribution_mode: str = "dispersed"
+    clustered_start_goal_min_distance: int | None = None
     require_individual_reachability: bool = False
     zone_relationship_mode: str = "none"
     compact_clustering: bool = True
@@ -108,7 +109,11 @@ def _clustering_style_name() -> str:
     return "compact" if compact_clustering else "spaced"
 
 
-def _campus_cohesion_factor() -> float:
+def _branch_supports_agent_cohesion(map_type: str, config: dict[str, Any]) -> bool:
+    return _is_campus_branch(map_type, config) or map_type == "dynamic_port"
+
+
+def _resolved_cohesion_factor() -> float:
     if not agent_cohesion:
         return 0.0
     try:
@@ -203,14 +208,22 @@ def _notes_for_branch(
             "dark marker cells inside the selected target zone."
         )
 
-    dynamic_part = (
-        "Dynamic obstacles are generated from the port image after static-density preprocessing. "
-        if is_dynamic
-        else "The port image is used as a static obstacle map. "
+    if is_dynamic:
+        if config.get("target_static_obstacle_density") is None or float(config.get("target_static_obstacle_density", 0.0)) >= 1.0:
+            dynamic_part = "Dynamic obstacles are generated while preserving the original port static-obstacle layout. "
+        else:
+            dynamic_part = "Dynamic obstacles are generated from the port image after static-density preprocessing. "
+    else:
+        dynamic_part = "The port image is used as a static obstacle map. "
+    min_distance = config.get("clustered_start_goal_min_distance")
+    distance_part = (
+        f" Clustered start and goal sets must be at least {min_distance} movement steps apart."
+        if min_distance and start_mode == "clustered" and goal_mode == "clustered"
+        else ""
     )
     return (
         f"Image-based port branch. {dynamic_part}Starts are sampled as {start_mode}, goals use {goal_description}, "
-        f"and {assignment_description}. Retained pairs are the run configurations for which both mappings are classified "
+        f"and {assignment_description}.{distance_part} Retained pairs are the run configurations for which both mappings are classified "
         "as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early "
         "if the stopping rules trigger."
     )
@@ -260,6 +273,7 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         is_dynamic=is_dynamic,
         start_distribution_mode=str(config.get("start_distribution_mode", "dispersed")),
         goal_distribution_mode=str(config.get("goal_distribution_mode", "dispersed")),
+        clustered_start_goal_min_distance=_int_or_none(config.get("clustered_start_goal_min_distance")),
         require_individual_reachability=bool(config.get("require_individual_reachability", False)),
         zone_relationship_mode=str(config.get("zone_relationship_mode", "none")),
         compact_clustering=compact_clustering,
@@ -283,8 +297,8 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         solver_suboptimality_factor=solver_suboptimality_factor,
         true_static_shortest_path_distance=bool(config.get("true_static_shortest_path_distance", False)),
         tight_time_horizon=bool(config.get("tight_time_horizon", False)),
-        agent_cohesion_enabled=bool(agent_cohesion) if campus_branch else False,
-        cohesion_factor=_campus_cohesion_factor() if campus_branch else 0.0,
+        agent_cohesion_enabled=bool(agent_cohesion) if _branch_supports_agent_cohesion(map_type, config) else False,
+        cohesion_factor=_resolved_cohesion_factor() if _branch_supports_agent_cohesion(map_type, config) else 0.0,
         filter_individual_runs_until_cyclic_faster=bool(
             config.get("filter_individual_runs_until_cyclic_faster", False)
         ),
