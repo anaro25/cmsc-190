@@ -58,7 +58,7 @@ enhanced_CBS = True
 compact_clustering = True
 # Minimum Manhattan movement-step distance enforced between a clustered start set
 # and a clustered goal set. Set to None or 0 to disable the separation rule.
-PORT_CLUSTERED_START_GOAL_MIN_DISTANCE = 10
+PORT_CLUSTERED_START_GOAL_MIN_DISTANCE = 20
 
 # Agent cohesion is enabled for campus branches and Dynamic Port only.
 # Static Port remains a normal MAPF port branch without cohesion.
@@ -71,7 +71,7 @@ SHARED_TIGHT_TIME_HORIZON = False
 SHARED_COUNTED_RUNS_REQUIRED = 5
 TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER = True
 TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED = 3
-TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20 # 100
+TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20 # 20
 
 # ===================================
 
@@ -83,8 +83,8 @@ to_generate = "graphs_and_data"
 
 # Traditional MAPF
 # MAP_TYPE = "static_artificial"
-MAP_TYPE = "static_port"
-# MAP_TYPE = "dynamic_port"
+# MAP_TYPE = "static_port"
+MAP_TYPE = "dynamic_port"
 
 # Campus Crowd Simulation
 # MAP_TYPE = "static_campus_area_1"
@@ -143,7 +143,7 @@ STATIC_PORT_CONFIG = _with_shared_runtime(
     {
         # common frequently edited constants
         "seed": 201,
-        "agent_number_range": (2, 70, 1),
+        "agent_number_range": (2, 70, 2),
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
         "num_last_runs_to_visualize_jointly_successful": 0,
         "num_last_runs_to_visualize_independently_successful": 1,
@@ -185,10 +185,10 @@ DYNAMIC_PORT_CONFIG = _with_shared_runtime(
     {
         # common frequently edited constants
         "seed": 301,
-        "agent_number_range": (2, 200, 1),
+        "agent_number_range": (2, 35, 1),
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-        "num_last_runs_to_visualize_jointly_successful": 3,
-        "num_last_runs_to_visualize_independently_successful": 3,
+        "num_last_runs_to_visualize_jointly_successful": 0,
+        "num_last_runs_to_visualize_independently_successful": 1,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -209,14 +209,14 @@ DYNAMIC_PORT_CONFIG = _with_shared_runtime(
 
         # dynamic-map constants
         "target_static_obstacle_density": 1.0,
-        "target_dynamic_obstacle_density": 0.030,
+        "target_dynamic_obstacle_density": 0.025,
         "loop_sequence_length": 250,
-        "group_stay_durations": (7, 9, 11),
+        "group_stay_durations": (11, 17, 29),
         "dynamic_generation_cell_mode": "all_free",
 
         # branch-specific constants
         "map_size": None,
-        "static_obstacle_density": 1.0,
+        "static_obstacle_density": 0.8,
         "is_dynamic": True,
         "display_name": "Dynamic Port",
         "map_family": "traditional_mapf",
