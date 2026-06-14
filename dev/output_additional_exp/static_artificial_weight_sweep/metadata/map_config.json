@@ -1,0 +1,16 @@
+{
+  "map_type": "static_artificial_weight_sweep",
+  "display_name": "Static Artificial",
+  "seed": 1201,
+  "agent_count": 100,
+  "map_size": [
+    32,
+    32
+  ],
+  "static_obstacle_density": 0.4,
+  "image_path": null,
+  "image_threshold": 127,
+  "image_resize_longest_side": null,
+  "require_individual_reachability": false,
+  "map_selection_key": "artificial_map"
+}

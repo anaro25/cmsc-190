@@ -50,4 +50,14 @@ For the campus branches, zone colors are traversable and spawnable for agents an
 
 Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor separation internally. Clustered sets are controlled by the global \texttt{compact\_clustering} switch: when it is \texttt{True}, clustered sets are directly adjacent 8-neighbor-connected groups; when it is \texttt{False}, clustered sets stay connected while keeping one empty cell of separation in all 8 directions. The \texttt{single} mode applies only to targets and samples one shared target cell from the darker marker cells in the selected campus target zone. Start-goal adjacency is allowed, but a start and its assigned goal cannot be the same cell.
 
+
+
+\section{Additional Weight-Sweep Experiment}
+
+In addition to the main agent-scaling experiment, the project includes a separate ECBS weight-sweep experiment. This additional experiment keeps the agent number fixed for the selected map and varies the ECBS suboptimality factor from 1.0 to the configured upper bound in increments of 0.1 by default.
+
+The additional experiment compares ECBS with classical mapping against ECBS with cyclic mapping. It uses dispersed agents and dispersed targets for all tested maps. The plotted metrics are computation time halted and number of conflicts detected at halt. Average path length is still recorded in the raw outputs, but it is not plotted for this additional experiment.
+
+This experiment is controlled by \texttt{dev/master\_config\_additional\_experiment.py} and selected from \texttt{dev/main.py} by choosing \texttt{additional\_experiment}. Within the additional experiment config, exactly one map is selected through \texttt{MAP\_TYPE\_ADDITIONAL\_EXP}, using the same comment/uncomment style as the main experiment map selection. Its outputs are written to \texttt{dev/output\_additional\_exp/}. Graphs are line graphs using the same basic color design as the main experiment graphs.
+
 \end{document}

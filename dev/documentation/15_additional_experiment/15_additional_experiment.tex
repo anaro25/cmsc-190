@@ -1,0 +1,135 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    columns=fullflexible,
+    keepspaces=true,
+    frame=single
+}
+
+\title{Additional Experiment: ECBS Weight Sweep}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Purpose}
+
+The additional experiment is a separate weight-sweep study. It compares \textbf{ECBS + classical mapping} and \textbf{ECBS + cyclic mapping} while varying the ECBS suboptimality factor. This is separate from the main experiment, where the agent number changes and the suboptimality factor is fixed.
+
+The main experiment remains controlled by \texttt{dev/master\_config.py}. The additional experiment is controlled by \texttt{dev/master\_config\_additional\_experiment.py}.
+
+\section{How to Select the Experiment}
+
+The top-level entry point remains \texttt{dev/main.py}. The user selects the workflow by uncommenting one of these lines:
+
+\begin{lstlisting}
+chosen_experiment = "main_experiment"
+# chosen_experiment = "additional_experiment"
+\end{lstlisting}
+
+When \texttt{main\_experiment} is selected, the existing generalized study runner is used. When \texttt{additional\_experiment} is selected, the weight-sweep runner under \texttt{dev/experiments/additional\_experiment/} is used.
+
+\section{Configuration}
+
+The additional experiment uses the following main controls:
+
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{MAP\_TYPE\_ADDITIONAL\_EXP}: selects exactly one additional-experiment map for the current execution.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_WEIGHT\_LOWER\_BOUND}: lowest ECBS weight to include.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_WEIGHT\_UPPER\_BOUND}: highest ECBS weight to include and the first weight executed.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_WEIGHT\_STEP}: difference between tested weights.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_WEIGHTS}: generated descending list of ECBS weights based on the bounds and step.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_RUNS\_PER\_WEIGHT}: number of valid paired runs required for each weight.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_TIME\_LIMIT\_SECONDS}: runtime limit per mapping run.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_USE\_TEMPORARY\_TESTING}: enables or disables the temporary retry rule.
+    \item \texttt{ADDITIONAL\_EXPERIMENT\_MAP\_CONFIGS}: editable map definitions and fixed agent counts.
+\end{itemize}
+
+Agent counts are intentionally config values. They are not hardcoded inside the runner. The user changes the weight range by editing the upper bound rather than changing the number of generated list elements. The generated weight list is descending, so the experiment starts at the upper bound and works downward to the lower bound.
+
+\begin{lstlisting}
+ADDITIONAL_EXPERIMENT_WEIGHT_LOWER_BOUND = 1.0
+ADDITIONAL_EXPERIMENT_WEIGHT_UPPER_BOUND = 2.3
+ADDITIONAL_EXPERIMENT_WEIGHT_STEP = 0.1
+\end{lstlisting}
+
+The execution order for the default bounds is:
+
+\begin{lstlisting}
+[2.3, 2.2, 2.1, 2.0, 1.9, 1.8, 1.7,
+ 1.6, 1.5, 1.4, 1.3, 1.2, 1.1, 1.0]
+\end{lstlisting}
+
+\section{Maps}
+
+The experiment currently supports three maps:
+
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{reference\_map}: loads \texttt{reference\_rahman\_32x32} from \texttt{dev/inputs/reference\_map/reference\_map.png}.
+    \item \texttt{artificial\_map}: uses \texttt{static\_artificial\_weight\_sweep}, a 32x32 artificial static map.
+    \item \texttt{port\_map}: uses \texttt{static\_port\_weight\_sweep}, the existing static port image map.
+\end{itemize}
+
+Only one map is selected for a run. The selection style mirrors the main experiment config:
+
+\begin{lstlisting}
+# MAP_TYPE_ADDITIONAL_EXP = "reference_map"
+# MAP_TYPE_ADDITIONAL_EXP = "artificial_map"
+MAP_TYPE_ADDITIONAL_EXP = "port_map"
+\end{lstlisting}
+
+All setups use dispersed agents and dispersed targets. This follows a traditional MAPF-style setup.
+
+\section{Fairness Rule}
+
+The same deterministic initial-condition index is reused across weights. For a given map and \texttt{run\_index}, the generated map, start positions, and target positions are the same regardless of the ECBS weight.
+
+In the normal version, each weight uses the same first five run indices. In the temporary testing version, extra attempts use later deterministic run indices if cyclic is on the verge of the unfinished-run stopping boundary.
+
+\section{Temporary Testing Rule}
+
+The temporary testing version follows the same idea as the main experiment's retry rule. If a cyclic run is unfinished and that unfinished run would become the third cyclic unfinished run in the current 5-run batch, the paired attempt is discarded. Both the classical result and the cyclic result for that initial condition are not recorded.
+
+The runner then gives cyclic up to three extra paired attempts using new deterministic initial conditions. If an extra attempt succeeds, the pair is recorded and the retry counter resets. If all extra attempts fail, the experiment stops with an error so that the setup can be debugged. The additional experiment is required to have five valid paired runs for each map-weight condition.
+
+\section{Recorded and Plotted Metrics}
+
+The runner records computation time halted, number of conflicts detected at halt, and average path length. However, only two metrics are plotted:
+
+\begin{itemize}[leftmargin=2em]
+    \item computation time halted,
+    \item number of conflicts detected at halt.
+\end{itemize}
+
+Average path length is kept in the raw records and aggregate summaries but is not plotted for this additional experiment.
+
+\section{Graph Design}
+
+The additional experiment uses \textbf{line graphs}, not barbell charts. The graph colors and visual identity follow the existing plotting style: classical mapping uses the same blue color, cyclic mapping uses the same orange color, and the runtime graph keeps the red dashed 30-second reference line.
+
+The x-axis is the ECBS suboptimality factor. The y-axis is either average computation time halted or average conflicts detected at halt.
+
+\section{Output Folder}
+
+All additional experiment outputs are written under:
+
+\begin{lstlisting}
+dev/output_additional_exp/
+\end{lstlisting}
+
+Each map has its own subfolder containing metadata, records, aggregates, graphs, and logs.
+
+\end{document}

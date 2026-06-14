@@ -143,6 +143,7 @@ def run_static_mapping(
     true_static_shortest_path_distance: bool = False,
     tight_time_horizon: bool = False,
     agent_cohesion_enabled: bool = False,
+    use_ecbs: bool | None = None,
 ) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
@@ -151,7 +152,7 @@ def run_static_mapping(
             agents=agents,
             max_runtime_seconds=runtime_limit_seconds,
             progress_callback=build_progress_callback(logger, label),
-            use_ecbs=bool(enhanced_CBS),
+            use_ecbs=bool(enhanced_CBS) if use_ecbs is None else bool(use_ecbs),
             ecbs_suboptimality_factor=solver_suboptimality_factor,
             true_static_shortest_path_distance=true_static_shortest_path_distance,
             tight_time_horizon=tight_time_horizon,
@@ -175,6 +176,7 @@ def run_dynamic_mapping(
     true_static_shortest_path_distance: bool = False,
     tight_time_horizon: bool = False,
     agent_cohesion_enabled: bool = False,
+    use_ecbs: bool | None = None,
 ) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
@@ -183,7 +185,7 @@ def run_dynamic_mapping(
             agents=agents,
             max_runtime_seconds=runtime_limit_seconds,
             progress_callback=build_progress_callback(logger, label),
-            use_ecbs=bool(enhanced_CBS),
+            use_ecbs=bool(enhanced_CBS) if use_ecbs is None else bool(use_ecbs),
             ecbs_suboptimality_factor=solver_suboptimality_factor,
             true_static_shortest_path_distance=true_static_shortest_path_distance,
             tight_time_horizon=tight_time_horizon,

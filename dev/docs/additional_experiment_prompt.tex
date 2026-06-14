@@ -1,0 +1,411 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0.7em}
+
+\title{\textbf{Documentation for Additional Experiment: Weight-Based Evaluation of Classical and Cyclic Mapping}}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section*{Purpose of this Document}
+
+This document describes a new additional experiment to be added to the existing MAPF experimental framework. It is intended both as informal documentation and as a context prompt for implementing the update in the codebase.
+
+This update should not replace or modify the main experiment. The main experiment remains as it is. The goal of this additional experiment is to provide another way of showcasing the benefit of cyclic mapping, this time by testing across different suboptimality factors instead of across different agent numbers.
+
+\section*{Background}
+
+The main experiment compares the performance of two transition mapping approaches:
+
+\begin{center}
+\textbf{ECBS + classical mapping}
+\quad versus \quad
+\textbf{ECBS + cyclic mapping}
+\end{center}
+
+In the main experiment, the suboptimality factor is fixed, while the number of agents is increased. The x-axis is the agent number, and the y-axis is one of the main performance metrics. The main metrics are computation time, number of conflicts, and average path length.
+
+The main claim being tested is that cyclic mapping can further improve the runtime performance of an already suboptimal solver. Since ECBS already allows bounded suboptimality, cyclic mapping is expected to push this tradeoff further by reducing the search burden and improving computation time, while possibly increasing path length.
+
+\section*{Motivation for the Additional Experiment}
+
+The additional experiment is motivated by the suggestion to test the performance of classical and cyclic mapping across different suboptimality factors, also called weights.
+
+This is different from the main experiment. In the main experiment, the agent number changes while the weight remains fixed. In this additional experiment, the agent number remains fixed while the weight changes.
+
+The purpose is to observe whether cyclic mapping still provides a runtime advantage across different ECBS weights. This is especially relevant because the related literature suggests that increasing the suboptimality factor can eventually produce diminishing returns. In other words, after a certain point, increasing the weight may no longer meaningfully reduce computation time.
+
+This additional experiment will use Rahman et al. (2022), titled \textit{An Adaptive Agent-Specific Sub-Optimal Bounding Approach}, as a reference study. That paper is already cited in the review of related literature and is useful because it discusses performance across different weights. In their setup, the weight is used as the x-axis, while the measured outputs include computation time and number of nodes or conflicts.
+
+\section*{General Description of the Additional Experiment}
+
+The additional experiment compares:
+
+\begin{center}
+\textbf{ECBS + classical mapping}
+\quad versus \quad
+\textbf{ECBS + cyclic mapping}
+\end{center}
+
+However, instead of increasing the number of agents, the experiment increases the ECBS suboptimality factor.
+
+The fixed agent number depends on the map. The selected agent numbers are tentative and must be editable through the additional experiment configuration file. They should not be hardcoded as fixed logic inside the runner.
+
+\section*{Experiment Configuration}
+
+\subsection*{Compared Methods}
+
+The following two methods will be compared:
+
+\begin{itemize}[leftmargin=2em]
+    \item ECBS with classical mapping
+    \item ECBS with cyclic mapping
+\end{itemize}
+
+The solver remains ECBS. The only difference between the two compared methods is the transition mapping used by the graph.
+
+\subsection*{Metrics}
+
+The additional experiment will use two plotted metrics:
+
+\begin{itemize}[leftmargin=2em]
+    \item Computation time halted
+    \item Number of conflicts
+\end{itemize}
+
+Average path length should still be recorded in the raw data if it is already returned by the solver or aggregation pipeline. However, it should not be plotted as one of the main graphs for this additional experiment. The presented graphs should focus on computation time halted and number of conflicts.
+
+For unfinished runs, computation time halted should be recorded as 30 seconds. The number of conflicts detected before timeout should also be recorded and included in the average. Therefore, unfinished runs are still represented in both plotted metrics.
+
+\subsection*{Axes}
+
+The graphs for this additional experiment will use the following axes:
+
+\begin{itemize}[leftmargin=2em]
+    \item x-axis: ECBS suboptimality factor or weight
+    \item y-axis: one of the two plotted metrics
+\end{itemize}
+
+The weight range is controlled through lower-bound, upper-bound, and step values in the additional experiment config. The experiment starts from the upper bound and works downward to the lower bound. The default range is:
+
+\begin{center}
+\textbf{2.3 down to 1.0, decremented by 0.1}
+\end{center}
+
+The upper bound should be edited directly instead of changing the number of generated list elements. For example, the config exposes values such as:
+
+\begin{verbatim}
+ADDITIONAL_EXPERIMENT_WEIGHT_LOWER_BOUND = 1.0
+ADDITIONAL_EXPERIMENT_WEIGHT_UPPER_BOUND = 2.3
+ADDITIONAL_EXPERIMENT_WEIGHT_STEP = 0.1
+\end{verbatim}
+
+This means the tested weights are executed in this order:
+
+\begin{center}
+2.3, 2.2, 2.1, 2.0, 1.9, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3, 1.2, 1.1, 1.0
+\end{center}
+
+The value 1.0 should be included exactly, even if ECBS with weight 1.0 behaves similarly to an optimal version of CBS.
+
+Each run has a time limit of 30 seconds.
+
+\subsection*{Maps}
+
+The additional experiment will use three maps:
+
+\begin{itemize}[leftmargin=2em]
+    \item 32x32 reference map from Rahman et al. (2022)
+    \item Static Artificial map from the main experiment
+    \item Static Port map from the main experiment
+\end{itemize}
+
+The 32x32 reference map will be provided inside the project at:
+
+\begin{center}
+\texttt{dev/inputs/reference\_map/reference\_map.png}
+\end{center}
+
+This file is a 32x32 PNG image using pure black and pure white pixels. The implementation should read this image as a grid map. The exact interpretation should follow the existing project convention for image-based maps, where one pixel type represents obstacles and the other represents free cells.
+
+The Static Artificial and Static Port maps are reused from the existing main experiment.
+
+Only one of these maps is selected for a given execution. The selected map is controlled in \texttt{master\_config\_additional\_experiment.py} by uncommenting one of the following lines:
+
+\begin{verbatim}
+# MAP_TYPE_ADDITIONAL_EXP = "reference_map"
+# MAP_TYPE_ADDITIONAL_EXP = "artificial_map"
+MAP_TYPE_ADDITIONAL_EXP = "port_map"
+\end{verbatim}
+
+This mirrors the map-selection style used in the main experiment. The selected map key points to the corresponding map configuration and fixed agent count.
+
+\subsection*{Tentative Agent Numbers}
+
+The assigned agent numbers are tentative and must be configurable:
+
+\begin{itemize}[leftmargin=2em]
+    \item 32x32 reference map from Rahman et al. (2022): 100 agents
+    \item Static Artificial: 50 agents
+    \item Static Port: 50 agents
+\end{itemize}
+
+These values are currently arbitrary starting points. They should be adjusted if they are too easy, too difficult, or unable to produce meaningful variation across weights. Since these values are expected to change through trial and error, they should be placed in \texttt{master\_config\_additional\_experiment.py}.
+
+\subsection*{Agent and Target Arrangement}
+
+All setups in this additional experiment use:
+
+\begin{center}
+\textbf{dispersed agents and dispersed targets}
+\end{center}
+
+This follows a traditional MAPF-style setup. No clustered arrangement or single-target arrangement is used in this additional experiment.
+
+\section*{Run Collection Procedure}
+
+For each map, the program should generate the same five initial conditions and reuse them across all tested weights. This means that the same five agent-target arrangements are used for weight 1.0, weight 1.1, weight 1.2, and so on until weight 2.3.
+
+This rule is important for fairness. The goal is to make the weight the main changing variable. If every weight used a different set of initial conditions, then changes in the graph could be caused by different starting layouts instead of the suboptimality factor.
+
+For each map, weight, and initial condition, the program performs paired runs for classical and cyclic mapping. A paired run means that both mappings use the same agent positions and target positions. The only thing that changes is the transition mapping used by the solver.
+
+For each map-weight pair, the program must collect 5 valid paired runs.
+
+A run is considered successful if the solver finds a solution within the 30-second time limit. If the solver does not find a solution within 30 seconds, the run is marked as unfinished.
+
+The computation time halted metric records the time at which the solver stops. If the solver reaches the time limit, the halted time is 30 seconds. The number of conflicts detected before timeout should also be recorded and averaged.
+
+After the 5 valid recorded runs are completed for one weight, the program proceeds to the next weight. Since the weight range is finite, the experiment does not need the same indefinite stopping rule used by the main agent-scaling experiment.
+
+\section*{Temporary Testing Version}
+
+A temporary testing version should also be supported for this additional experiment. It should be selectable through a configuration switch in the additional experiment config file.
+
+The purpose of the temporary testing version is to reduce the effect of unlucky initial configurations and allow the experiment to collect more useful paired data. This is especially useful when cyclic mapping is close to failing too often for a particular map-weight setup.
+
+In the temporary testing version, the program still uses paired initial conditions. If a cyclic run fails and that failure would become the third unfinished cyclic run in the current 5-run batch, the paired attempt is discarded. This means that both the cyclic result and the corresponding classical result are not recorded.
+
+After discarding that paired attempt, the program gives cyclic mapping up to 3 extra attempts using new initial conditions. These attempts are still paired with classical mapping, but they are recorded only if the cyclic run succeeds.
+
+If one of the extra attempts succeeds, that successful paired run is recorded and the experiment continues. The retry counter then resets. Therefore, if cyclic mapping later reaches the verge of another third unfinished run, it is again given up to 3 extra attempts.
+
+If all 3 extra attempts fail, the program should stop the additional experiment at that point. It should not continue to the next weight or the next map. This is because the additional experiment is expected to collect 5 valid runs for each map-weight setup. If the program cannot collect those valid runs, that point should be treated as a debugging point rather than as a partial-data case.
+
+The failed extra attempts are not recorded, including the final failed attempt.
+
+In simple terms, the temporary testing version records only valid paired runs, but gives cyclic mapping a few additional chances when it is about to fail too often. If the additional attempts still fail, the experiment stops so the setup can be inspected and debugged.
+
+\section*{Expected Output}
+
+The additional experiment should produce graphs for each map and plotted metric.
+
+For each map, there should be one graph for computation time halted and one graph for number of conflicts. Each graph should compare classical and cyclic mapping across weights.
+
+The expected graph structure is:
+
+\begin{itemize}[leftmargin=2em]
+    \item graph type: line graph
+    \item x-axis: ECBS weight
+    \item y-axis: computation time halted or number of conflicts
+    \item one line for ECBS + classical mapping
+    \item one line for ECBS + cyclic mapping
+\end{itemize}
+
+The additional experiment should use a line graph instead of a barbell chart. It should still use the same coloring and visual design style as the existing result graphs as much as possible. Only the graph type should change. In other words, the visual identity should remain consistent, but the data should be shown as a weight-based line graph rather than as a paired-dot or barbell-style comparison.
+
+The output should make it easy to observe whether cyclic mapping continues to reduce computation time and conflicts across different suboptimality factors.
+
+The output folder should be separate from the main experiment output folder. The additional experiment should write its files to:
+
+\begin{center}
+\texttt{dev/output\_additional\_exp}
+\end{center}
+
+This prevents the additional experiment results from mixing with the main experiment results.
+
+\section*{Implementation Notes}
+
+The main experiment should remain untouched as much as possible. This additional experiment should be implemented as a separate experimental mode, but it should still be selectable from the main entry point.
+
+The main entry point should allow choosing between the main experiment and the additional experiment by uncommenting one of the following lines in \texttt{main.py}:
+
+\begin{verbatim}
+chosen_experiment = "main_experiment"
+chosen_experiment = "additional_experiment"
+\end{verbatim}
+
+Only one of these should be active at a time.
+
+A new configuration module should be created:
+
+\begin{center}
+\texttt{master\_config\_additional\_experiment.py}
+\end{center}
+
+This is meant to avoid interfering with the existing \texttt{master\_config.py}, which is used for the main experiment.
+
+The editing workflow should be similar to the existing master configuration workflow. In other words, the additional experiment should still be controlled mainly through a master config file, but that config file should be separate from the main experiment.
+
+The rest of the program should be reused as much as possible. Since this update mainly changes the experimental setup, the solver, mapping generation, run execution, data collection, and plotting utilities should be reused wherever appropriate.
+
+\section*{Suggested Configuration Variables}
+
+The new configuration module may include variables similar to the following:
+
+\begin{verbatim}
+ADDITIONAL_EXPERIMENT_MODE = "main"
+# possible values:
+# "main"
+# "temporary_testing"
+
+ADDITIONAL_EXPERIMENT_USE_TEMPORARY_TESTING = False
+
+ADDITIONAL_EXPERIMENT_WEIGHT_LOWER_BOUND = 1.0
+ADDITIONAL_EXPERIMENT_WEIGHT_UPPER_BOUND = 2.3
+ADDITIONAL_EXPERIMENT_WEIGHT_STEP = 0.1
+
+ADDITIONAL_EXPERIMENT_WEIGHTS = _build_weight_range(
+    lower_bound=ADDITIONAL_EXPERIMENT_WEIGHT_LOWER_BOUND,
+    upper_bound=ADDITIONAL_EXPERIMENT_WEIGHT_UPPER_BOUND,
+    step=ADDITIONAL_EXPERIMENT_WEIGHT_STEP,
+)
+# The generated list is descending, so execution starts at the upper bound.
+
+ADDITIONAL_EXPERIMENT_RUNS_PER_WEIGHT = 5
+ADDITIONAL_EXPERIMENT_TIME_LIMIT = 30
+
+ADDITIONAL_EXPERIMENT_METRICS_TO_PLOT = [
+    "computation_time_halted",
+    "num_conflicts"
+]
+
+ADDITIONAL_EXPERIMENT_RECORD_AVERAGE_PATH_LENGTH = True
+
+ADDITIONAL_EXPERIMENT_OUTPUT_DIR = "dev/output_additional_exp"
+
+ADDITIONAL_EXPERIMENT_REFERENCE_MAP_PATH = (
+    "dev/inputs/reference_map/reference_map.png"
+)
+
+ADDITIONAL_EXPERIMENT_REUSE_INITIAL_CONDITIONS_ACROSS_WEIGHTS = True
+
+# Choose exactly one map by uncommenting one line.
+# MAP_TYPE_ADDITIONAL_EXP = "reference_map"
+# MAP_TYPE_ADDITIONAL_EXP = "artificial_map"
+MAP_TYPE_ADDITIONAL_EXP = "port_map"
+
+ADDITIONAL_EXPERIMENT_MAP_CONFIGS = {
+    "reference_map": {
+        "name": "rahman_32x32",
+        "map_path": ADDITIONAL_EXPERIMENT_REFERENCE_MAP_PATH,
+        "agent_count": 100,
+        "agent_arrangement": "dispersed",
+        "target_arrangement": "dispersed"
+    },
+    "artificial_map": {
+        "name": "static_artificial",
+        "agent_count": 50,
+        "agent_arrangement": "dispersed",
+        "target_arrangement": "dispersed"
+    },
+    "port_map": {
+        "name": "static_port",
+        "agent_count": 50,
+        "agent_arrangement": "dispersed",
+        "target_arrangement": "dispersed"
+    }
+}
+
+ADDITIONAL_EXPERIMENT_TEMPORARY_EXTRA_ATTEMPTS = 3
+ADDITIONAL_EXPERIMENT_STOP_IF_TEMPORARY_TESTING_FAILS = True
+
+ADDITIONAL_EXPERIMENT_GRAPH_TYPE = "line"
+ADDITIONAL_EXPERIMENT_USE_EXISTING_GRAPH_STYLE = True
+\end{verbatim}
+
+These names are only suggested. The final implementation may use different names if they fit the existing project structure better.
+
+\section*{Important Implementation Requirements}
+
+The implementation should follow these requirements:
+
+\begin{itemize}[leftmargin=2em]
+    \item Do not modify the main experiment behavior.
+    \item Do not replace the existing \texttt{master\_config.py}.
+    \item Create a separate configuration module for the additional experiment.
+    \item Select the experiment in \texttt{main.py} using \texttt{chosen\_experiment}.
+    \item Reuse the existing ECBS solver.
+    \item Reuse the existing classical and cyclic mapping logic.
+    \item Reuse the existing paired-run fairness rule.
+    \item Reuse the same 5 initial conditions across all weights for a given map.
+    \item Keep the agent and target arrangement fixed as dispersed-to-dispersed.
+    \item Select one additional-experiment map through \texttt{MAP\_TYPE\_ADDITIONAL\_EXP}.
+    \item Use a fixed, configurable agent count per map.
+    \item Include weight 1.0 exactly.
+    \item Increment the ECBS weight from 1.0 to the configured upper bound by 0.1 by default.
+    \item Edit the weight upper bound directly instead of changing the number of generated list elements.
+    \item Record computation time halted and number of conflicts.
+    \item Record average path length in the raw data, but do not plot it.
+    \item For unfinished runs, record 30 seconds for time and record the conflict count detected before timeout.
+    \item Support both the normal version and the temporary testing version.
+    \item In temporary testing mode, stop the whole additional experiment if 5 valid paired runs cannot be collected for a map-weight setup.
+    \item Read the 32x32 reference map from \texttt{dev/inputs/reference\_map/reference\_map.png}.
+    \item Save outputs in \texttt{dev/output\_additional\_exp}.
+    \item Generate output graphs where the x-axis is the weight.
+    \item Use line graphs, not barbell charts.
+    \item Keep the same coloring and graph design style as the existing graphs, changing only the graph type.
+\end{itemize}
+
+\section*{Summary}
+
+This additional experiment extends the study by testing cyclic mapping across different ECBS suboptimality factors. While the main experiment studies scalability by increasing the number of agents, this experiment studies performance behavior by increasing the weight.
+
+The main purpose is to show whether cyclic mapping still provides a benefit even when ECBS is already allowed to be more suboptimal. If cyclic mapping continues to reduce computation time and conflicts across weights, it strengthens the argument that cyclic mapping is useful as an environment-level preprocessing approach for improving MAPF scalability.
+
+
+
+\section*{Implemented Project Structure}
+
+The update is implemented as a separate workflow instead of being merged into the existing agent-scaling runner. The main entry point remains \texttt{dev/main.py}, but the selected workflow is controlled by uncommenting one of the following lines:
+
+\begin{verbatim}
+chosen_experiment = "main_experiment"
+# chosen_experiment = "additional_experiment"
+\end{verbatim}
+
+The additional experiment is controlled by \texttt{dev/master\_config\_additional\_experiment.py}. This keeps the original \texttt{dev/master\_config.py} available for the main experiment.
+
+The additional experiment writes outputs to:
+
+\begin{verbatim}
+dev/output_additional_exp/
+\end{verbatim}
+
+This prevents the weight-sweep results from mixing with the original output folder used by the main experiment.
+
+The runner code is located under:
+
+\begin{verbatim}
+dev/experiments/additional_experiment/
+\end{verbatim}
+
+The reference map is expected at:
+
+\begin{verbatim}
+dev/inputs/reference_map/reference_map.png
+\end{verbatim}
+
+It is treated as a 32x32 black-and-white image map. Dark pixels are interpreted as obstacles and light pixels are interpreted as free cells using the configured image threshold.
+
+\end{document}

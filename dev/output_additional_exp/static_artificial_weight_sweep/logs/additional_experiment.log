@@ -1,0 +1,358 @@
+========================================================================================
+Additional experiment map: Static Artificial (static_artificial_weight_sweep)
+========================================================================================
+recompute_MAPF: True
+to_generate: graphs_and_data
+output_root: D:\projects\cmsc-190\dev\output_additional_exp\static_artificial_weight_sweep
+agent_count: 100
+selected_map_key: artificial_map
+weight_lower_bound: 1.1
+weight_upper_bound: 2.3
+weight_step: 0.1
+weights: [2.3, 2.2, 2.1, 2.0, 1.9, 1.8, 1.7, 1.6, 1.5, 1.4, 1.3, 1.2, 1.1]
+runs_per_weight: 5
+temporary_testing: True
+[Elapsed: 00m 01s] Program stopwatch started.
+
+----------------------------------------------------------------------------------------
+Weight condition 1 | w=2.3 | agent_count=100
+----------------------------------------------------------------------------------------
+    Preparing deterministic initial condition run_index=0...
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=2.3 progress: 0.00s
+    Cyclic run[additional.0.0] | w=2.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.913s, conflicts=125 | cyclic=successful, t=0.896s, conflicts=116 | retained=1/5
+    Preparing deterministic initial condition run_index=1...
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=2.3 progress: 0.00s
+    Cyclic run[additional.0.1] | w=2.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.509s, conflicts=234 | cyclic=successful, t=0.865s, conflicts=127 | retained=2/5
+    Preparing deterministic initial condition run_index=2...
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=2.3 progress: 0.00s
+    Cyclic run[additional.0.2] | w=2.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.244s, conflicts=187 | cyclic=successful, t=0.674s, conflicts=87 | retained=3/5
+    Preparing deterministic initial condition run_index=3...
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=2.3 progress: 0.00s
+    Cyclic run[additional.0.3] | w=2.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.182s, conflicts=168 | cyclic=successful, t=0.940s, conflicts=126 | retained=4/5
+    Preparing deterministic initial condition run_index=4...
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=2.3 progress: 0.00s
+    Cyclic run[additional.0.4] | w=2.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.779s, conflicts=115 | cyclic=successful, t=0.662s, conflicts=86 | retained=5/5
+  Weight aggregate | w=2.3 | classical_avg_time=1.1253057199995964 | cyclic_avg_time=0.8074392199865542 | classical_avg_conflicts=165.8 | cyclic_avg_conflicts=108.4
+
+----------------------------------------------------------------------------------------
+Weight condition 2 | w=2.2 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=2.2 progress: 0.00s
+    Cyclic run[additional.0.0] | w=2.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.984s, conflicts=125 | cyclic=successful, t=0.951s, conflicts=116 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=2.2 progress: 0.00s
+    Cyclic run[additional.0.1] | w=2.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.580s, conflicts=234 | cyclic=successful, t=0.886s, conflicts=127 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=2.2 progress: 0.00s
+    Cyclic run[additional.0.2] | w=2.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.275s, conflicts=187 | cyclic=successful, t=0.677s, conflicts=87 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=2.2 progress: 0.00s
+    Cyclic run[additional.0.3] | w=2.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.207s, conflicts=168 | cyclic=successful, t=0.960s, conflicts=126 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=2.2 progress: 0.00s
+    Cyclic run[additional.0.4] | w=2.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.778s, conflicts=115 | cyclic=successful, t=0.643s, conflicts=86 | retained=5/5
+  Weight aggregate | w=2.2 | classical_avg_time=1.1651441000169143 | cyclic_avg_time=0.8234550800058059 | classical_avg_conflicts=165.8 | cyclic_avg_conflicts=108.4
+
+----------------------------------------------------------------------------------------
+Weight condition 3 | w=2.1 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=2.1 progress: 0.00s
+    Cyclic run[additional.0.0] | w=2.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.927s, conflicts=125 | cyclic=successful, t=0.945s, conflicts=116 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=2.1 progress: 0.00s
+    Cyclic run[additional.0.1] | w=2.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.624s, conflicts=234 | cyclic=successful, t=0.891s, conflicts=127 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=2.1 progress: 0.00s
+    Cyclic run[additional.0.2] | w=2.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.340s, conflicts=187 | cyclic=successful, t=0.684s, conflicts=87 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=2.1 progress: 0.00s
+    Cyclic run[additional.0.3] | w=2.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.278s, conflicts=168 | cyclic=successful, t=0.977s, conflicts=126 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=2.1 progress: 0.00s
+    Cyclic run[additional.0.4] | w=2.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.770s, conflicts=115 | cyclic=successful, t=0.635s, conflicts=86 | retained=5/5
+  Weight aggregate | w=2.1 | classical_avg_time=1.1877053800038992 | cyclic_avg_time=0.8262939600157552 | classical_avg_conflicts=165.8 | cyclic_avg_conflicts=108.4
+
+----------------------------------------------------------------------------------------
+Weight condition 4 | w=2.0 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=2.0 progress: 0.00s
+    Cyclic run[additional.0.0] | w=2.0 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.947s, conflicts=125 | cyclic=successful, t=0.932s, conflicts=116 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=2.0 progress: 0.00s
+    Cyclic run[additional.0.1] | w=2.0 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.602s, conflicts=234 | cyclic=successful, t=0.920s, conflicts=127 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=2.0 progress: 0.00s
+    Cyclic run[additional.0.2] | w=2.0 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.313s, conflicts=187 | cyclic=successful, t=0.667s, conflicts=87 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=2.0 progress: 0.00s
+    Cyclic run[additional.0.3] | w=2.0 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.224s, conflicts=168 | cyclic=successful, t=0.955s, conflicts=126 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=2.0 progress: 0.00s
+    Cyclic run[additional.0.4] | w=2.0 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.814s, conflicts=115 | cyclic=successful, t=0.677s, conflicts=86 | retained=5/5
+  Weight aggregate | w=2.0 | classical_avg_time=1.179922159994021 | cyclic_avg_time=0.8300782599952072 | classical_avg_conflicts=165.8 | cyclic_avg_conflicts=108.4
+
+----------------------------------------------------------------------------------------
+Weight condition 5 | w=1.9 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.9 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.9 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.077s, conflicts=145 | cyclic=successful, t=2.808s, conflicts=407 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.9 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.9 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.385s, conflicts=198 | cyclic=successful, t=0.985s, conflicts=142 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.9 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.9 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.378s, conflicts=188 | cyclic=successful, t=0.756s, conflicts=96 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.9 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.9 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.298s, conflicts=176 | cyclic=successful, t=0.970s, conflicts=126 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.9 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.9 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.857s, conflicts=123 | cyclic=successful, t=0.624s, conflicts=80 | retained=5/5
+  Weight aggregate | w=1.9 | classical_avg_time=1.198999919986818 | cyclic_avg_time=1.2285373800201342 | classical_avg_conflicts=166.0 | cyclic_avg_conflicts=170.2
+
+----------------------------------------------------------------------------------------
+Weight condition 6 | w=1.8 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.8 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.8 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.095s, conflicts=145 | cyclic=successful, t=2.823s, conflicts=407 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.8 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.8 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.408s, conflicts=198 | cyclic=successful, t=1.041s, conflicts=142 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.8 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.8 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.375s, conflicts=188 | cyclic=successful, t=0.777s, conflicts=96 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.8 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.8 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.365s, conflicts=176 | cyclic=successful, t=1.033s, conflicts=126 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.8 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.8 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.830s, conflicts=123 | cyclic=successful, t=0.626s, conflicts=80 | retained=5/5
+  Weight aggregate | w=1.8 | classical_avg_time=1.2145004799822345 | cyclic_avg_time=1.2598484600079245 | classical_avg_conflicts=166.0 | cyclic_avg_conflicts=170.2
+
+----------------------------------------------------------------------------------------
+Weight condition 7 | w=1.7 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.7 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.7 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.138s, conflicts=145 | cyclic=successful, t=2.886s, conflicts=407 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.7 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.7 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.458s, conflicts=198 | cyclic=successful, t=1.084s, conflicts=142 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.7 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.7 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.398s, conflicts=188 | cyclic=successful, t=0.795s, conflicts=96 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.7 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.7 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.323s, conflicts=174 | cyclic=successful, t=1.018s, conflicts=126 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.7 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.7 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.885s, conflicts=123 | cyclic=successful, t=0.666s, conflicts=80 | retained=5/5
+  Weight aggregate | w=1.7 | classical_avg_time=1.2403385799843818 | cyclic_avg_time=1.2898342999978922 | classical_avg_conflicts=165.6 | cyclic_avg_conflicts=170.2
+
+----------------------------------------------------------------------------------------
+Weight condition 8 | w=1.6 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.6 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.6 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.166s, conflicts=146 | cyclic=successful, t=2.967s, conflicts=407 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.6 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.6 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.475s, conflicts=201 | cyclic=successful, t=1.081s, conflicts=142 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.6 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.6 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.352s, conflicts=188 | cyclic=successful, t=0.784s, conflicts=96 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.6 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.6 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.392s, conflicts=180 | cyclic=successful, t=1.024s, conflicts=129 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.6 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.6 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.858s, conflicts=126 | cyclic=successful, t=0.645s, conflicts=79 | retained=5/5
+  Weight aggregate | w=1.6 | classical_avg_time=1.2484856199938803 | cyclic_avg_time=1.3001315000117757 | classical_avg_conflicts=168.2 | cyclic_avg_conflicts=170.6
+
+----------------------------------------------------------------------------------------
+Weight condition 9 | w=1.5 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.5 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.5 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.117s, conflicts=146 | cyclic=successful, t=2.940s, conflicts=407 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.5 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.5 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.595s, conflicts=216 | cyclic=successful, t=1.039s, conflicts=142 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.5 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.5 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.416s, conflicts=206 | cyclic=successful, t=0.761s, conflicts=93 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.5 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.5 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.344s, conflicts=179 | cyclic=successful, t=1.062s, conflicts=129 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.5 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.5 progress: 0.00s
+    Recorded paired run | classical=successful, t=0.904s, conflicts=126 | cyclic=successful, t=0.640s, conflicts=78 | retained=5/5
+  Weight aggregate | w=1.5 | classical_avg_time=1.2753540999954567 | cyclic_avg_time=1.2886094000074082 | classical_avg_conflicts=174.6 | cyclic_avg_conflicts=169.8
+
+----------------------------------------------------------------------------------------
+Weight condition 10 | w=1.4 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.4 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.4 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.200s, conflicts=149 | cyclic=successful, t=1.076s, conflicts=125 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.4 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.4 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.350s, conflicts=188 | cyclic=successful, t=0.669s, conflicts=78 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.4 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.4 progress: 0.00s
+    Recorded paired run | classical=successful, t=2.788s, conflicts=399 | cyclic=successful, t=0.796s, conflicts=100 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.4 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.4 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.460s, conflicts=189 | cyclic=successful, t=1.301s, conflicts=158 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.4 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.4 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.160s, conflicts=175 | cyclic=successful, t=1.318s, conflicts=181 | retained=5/5
+  Weight aggregate | w=1.4 | classical_avg_time=1.5916809000074863 | cyclic_avg_time=1.0322802399867215 | classical_avg_conflicts=220.0 | cyclic_avg_conflicts=128.4
+
+----------------------------------------------------------------------------------------
+Weight condition 11 | w=1.3 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.3 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.151s, conflicts=147 | cyclic=successful, t=1.172s, conflicts=138 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.3 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.221s, conflicts=162 | cyclic=successful, t=0.729s, conflicts=89 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.3 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.728s, conflicts=244 | cyclic=successful, t=0.776s, conflicts=99 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.3 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.652s, conflicts=218 | cyclic=successful, t=1.364s, conflicts=175 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.3 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.3 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.365s, conflicts=210 | cyclic=successful, t=0.923s, conflicts=123 | retained=5/5
+  Weight aggregate | w=1.3 | classical_avg_time=1.4232649800018407 | cyclic_avg_time=0.9928315199911595 | classical_avg_conflicts=196.2 | cyclic_avg_conflicts=124.8
+
+----------------------------------------------------------------------------------------
+Weight condition 12 | w=1.2 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.2 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.286s, conflicts=159 | cyclic=successful, t=1.171s, conflicts=139 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.2 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.187s, conflicts=161 | cyclic=successful, t=0.911s, conflicts=111 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.2 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.659s, conflicts=234 | cyclic=successful, t=0.733s, conflicts=98 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.2 progress: 0.00s
+    Cyclic run[additional.0.3] | w=1.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=3.842s, conflicts=513 | cyclic=successful, t=1.201s, conflicts=157 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.2 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.2 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.556s, conflicts=240 | cyclic=successful, t=1.102s, conflicts=156 | retained=5/5
+  Weight aggregate | w=1.2 | classical_avg_time=1.90573488001246 | cyclic_avg_time=1.023694879980758 | classical_avg_conflicts=261.4 | cyclic_avg_conflicts=132.2
+
+----------------------------------------------------------------------------------------
+Weight condition 13 | w=1.1 | agent_count=100
+----------------------------------------------------------------------------------------
+  Paired attempt 1 | run_index=0 | retained=0/5
+    Classical run[additional.0.0] | w=1.1 progress: 0.00s
+    Cyclic run[additional.0.0] | w=1.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.836s, conflicts=249 | cyclic=successful, t=1.509s, conflicts=190 | retained=1/5
+  Paired attempt 2 | run_index=1 | retained=1/5
+    Classical run[additional.0.1] | w=1.1 progress: 0.00s
+    Cyclic run[additional.0.1] | w=1.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=1.269s, conflicts=165 | cyclic=successful, t=0.963s, conflicts=128 | retained=2/5
+  Paired attempt 3 | run_index=2 | retained=2/5
+    Classical run[additional.0.2] | w=1.1 progress: 0.00s
+    Cyclic run[additional.0.2] | w=1.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=2.383s, conflicts=357 | cyclic=successful, t=0.813s, conflicts=107 | retained=3/5
+  Paired attempt 4 | run_index=3 | retained=3/5
+    Classical run[additional.0.3] | w=1.1 progress: 0.00s
+    Classical run[additional.0.3] | w=1.1 progress: 5.00s
+    Classical run[additional.0.3] | w=1.1 progress: 10.00s
+    Classical run[additional.0.3] | w=1.1 progress: 15.00s
+    Classical run[additional.0.3] | w=1.1 progress: 20.00s
+    Classical run[additional.0.3] | w=1.1 progress: 25.00s
+    Classical run[additional.0.3] | w=1.1 progress: 30.00s
+    Cyclic run[additional.0.3] | w=1.1 progress: 0.00s
+    Recorded paired run | classical=unfinished, t=30.000s, conflicts=3931 | cyclic=successful, t=2.158s, conflicts=291 | retained=4/5
+  Paired attempt 5 | run_index=4 | retained=4/5
+    Classical run[additional.0.4] | w=1.1 progress: 0.00s
+    Cyclic run[additional.0.4] | w=1.1 progress: 0.00s
+    Recorded paired run | classical=successful, t=3.587s, conflicts=537 | cyclic=successful, t=2.399s, conflicts=336 | retained=5/5
+  Weight aggregate | w=1.1 | classical_avg_time=7.8150049999938345 | cyclic_avg_time=1.5682796000037342 | classical_avg_conflicts=1047.8 | cyclic_avg_conflicts=210.4
+[Elapsed: 03m 12s] Raw additional-experiment MAPF data recomputed.
+[Elapsed: 03m 12s] Additional-experiment graphs and data outputs generated.
+
+Generated graph files:
+  - D:\projects\cmsc-190\dev\output_additional_exp\static_artificial_weight_sweep\graphs\static_artificial_weight_sweep_runtime_by_weight.png
+  - D:\projects\cmsc-190\dev\output_additional_exp\static_artificial_weight_sweep\graphs\static_artificial_weight_sweep_conflicts_by_weight.png
+[Elapsed: 03m 12s] Additional experiment map finished.
