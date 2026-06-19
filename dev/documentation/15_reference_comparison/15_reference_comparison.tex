@@ -52,13 +52,16 @@ dev/master_config_ref_comparison.py
 
 This keeps the main \texttt{master\_config.py} untouched.
 
-The reference configuration also includes a local toggle for the final cyclic-map cleanup step:
+The reference configuration also includes local toggles for optional cyclic-map transition-processing steps:
 
 \begin{lstlisting}
-REMOVE_EXTRA_TRANSITIONS = True
+REMOVE_EXTRA_TRANSITIONS = False
+ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
 \end{lstlisting}
 
-When this value is \texttt{True}, cyclic mapping uses the same full transition-reduction behavior as the main experiment. When this value is \texttt{False}, cyclic mapping skips only the redundant-transition elimination step while still preserving required connectivity restoration. This makes it possible to test a less radically reduced cyclic map only in the reference comparison.
+When \texttt{REMOVE\_EXTRA\_TRANSITIONS} is \texttt{True}, cyclic mapping uses the same full transition-reduction behavior as the main experiment. When this value is \texttt{False}, cyclic mapping skips only the redundant-transition elimination step while still preserving required connectivity restoration. This makes it possible to test a less radically reduced cyclic map only in the reference comparison.
+
+When \texttt{ADD\_TRANSITIONS\_BETWEEN\_FREE\_SPACES} is \texttt{True}, the reference workflow applies one more final step after the cyclic-mapping cleanup steps: it scans the entire map, finds every adjacent pair of free cells, and places a bidirectional transition between them. This option is useful for testing an even less restrictive mapping when the reduced cyclic map produces impractical routes. This option is also reference-comparison-only and does not affect the main experiment.
 
 \section{Reference Workflow}
 

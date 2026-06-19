@@ -34,6 +34,13 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 # connectivity restoration is still applied so generated maps remain usable.
 REMOVE_EXTRA_TRANSITIONS = False
 
+# Optional final cyclic-map step only for the reference comparison.
+# True forces every adjacent pair of free cells to have a bidirectional
+# transition after the normal cyclic-mapping cleanup steps. This can be used
+# to test a much less restrictive version of the cyclic map when the standard
+# transition reduction produces impractical routes.
+ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
+
 # For this supplementary reference comparison, the temporary setup means only
 # the individual cyclic-faster filter. It does not use the older retry-on-third-
 # cyclic-failure rule.

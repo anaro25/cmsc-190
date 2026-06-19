@@ -183,12 +183,13 @@ SELECTED_PORT_EXPERIMENT = "single_agent_x20"
 # SELECTED_PORT_EXPERIMENT = "multi_agent_x100"
 ```
 
-The reference-comparison cyclic map has a local toggle for the final extra-transition cleanup step:
+The reference-comparison cyclic map has local toggles for optional final transition-processing steps:
 
 ```python
-REMOVE_EXTRA_TRANSITIONS = True
+REMOVE_EXTRA_TRANSITIONS = False
+ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
 ```
 
-Set it to `False` to skip only the redundant-transition elimination step while still preserving required connectivity restoration. This toggle is only used by the reference-comparison workflow; the main experiment keeps its existing cyclic-mapping behavior.
+Set `REMOVE_EXTRA_TRANSITIONS` to `False` to skip only the redundant-transition elimination step while still preserving required connectivity restoration. Set `ADD_TRANSITIONS_BETWEEN_FREE_SPACES` to `True` to add a bidirectional transition between every adjacent pair of free cells after the cyclic-mapping cleanup steps. These toggles are only used by the reference-comparison workflow; the main experiment keeps its existing cyclic-mapping behavior.
 
 Reference outputs are written under `dev/outputs_ref_comparison/<case_id>/`, with persisted raw data under `dev/outputs_ref_comparison/raw_mapf_files/<case_id>/`. The single-agent cases compare A* + classical versus A* + cyclic. The multi-agent cases compare ECBS + classical versus ECBS + cyclic with 15 released/spawning agents and the deliberate temporary individual cyclic-faster filter.

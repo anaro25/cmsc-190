@@ -75,6 +75,7 @@ def build_reference_maps(case_spec: RefCaseSpec) -> dict[str, Any]:
     cyclic_map = apply_cyclic_mapping(
         {"map": base_map},
         remove_extra_transitions=case_spec.remove_extra_transitions,
+        add_transitions_between_free_spaces=case_spec.add_transitions_between_free_spaces,
     )["map"]
 
     lower_left = _composite_vertex_for_cell(rows - 1, 0)
@@ -96,6 +97,7 @@ def build_reference_maps(case_spec: RefCaseSpec) -> dict[str, Any]:
         "classical_map": classical_map,
         "cyclic_map": cyclic_map,
         "remove_extra_transitions": case_spec.remove_extra_transitions,
+        "add_transitions_between_free_spaces": case_spec.add_transitions_between_free_spaces,
         "rows": rows,
         "cols": cols,
         "lower_left_start": lower_left,

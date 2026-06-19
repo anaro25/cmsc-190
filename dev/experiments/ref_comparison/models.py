@@ -20,6 +20,7 @@ class RefCaseSpec:
     true_static_shortest_path_distance: bool
     tight_time_horizon: bool
     remove_extra_transitions: bool
+    add_transitions_between_free_spaces: bool
     agent_cohesion_enabled: bool
     cohesion_factor: float
     filter_individual_runs_until_cyclic_faster: bool

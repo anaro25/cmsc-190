@@ -56,6 +56,31 @@ def restore_connectivity_without_removing_extras(cyclic_grid):
     return processed_grid
 
 
+
+
+def add_bidirectional_transitions_between_adjacent_free_vertices(cyclic_grid):
+    """
+    Final optional reference-comparison post-processing step.
+
+    Visit every transition slot whose two endpoint vertices are both free
+    spaces and force that slot to become bidirectional. This deliberately
+    restores all adjacent free-cell movements after the cyclic-mapping and
+    obstacle-cleanup stages. It is disabled by default and is intended only
+    for reference-comparison experiments where a less restrictive mapping is
+    being tested.
+    """
+    processed_grid = [row[:] for row in cyclic_grid]
+
+    for i in range(len(processed_grid)):
+        for j in range(len(processed_grid[i])):
+            if not is_transition_slot(i, j):
+                continue
+            vertex_a, vertex_b = get_adjacent_vertices(i, j)
+            if endpoints_are_free_vertices(processed_grid, vertex_a, vertex_b):
+                processed_grid[i][j] = get_bidirectional_transition_for_slot(i, j)
+
+    return processed_grid
+
 def remove_redundant_bidirectionals(grid):
     bidirectional_positions = collect_bidirectional_positions(grid)
 

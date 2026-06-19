@@ -59,13 +59,14 @@ The reference comparison uses the binary port maps in \texttt{dev/inputs/referen
 
 The reference workflow mirrors the main experiment workflow: \texttt{recompute\_MAPF} controls whether raw solver data is recomputed, while \texttt{to\_generate} controls whether graphs/data, visualizations, or nothing are generated from saved raw data.
 
-The reference workflow also has its own cyclic-map cleanup toggle:
+The reference workflow also has its own cyclic-map transition-processing toggles:
 
 \begin{lstlisting}
-REMOVE_EXTRA_TRANSITIONS = True
+REMOVE_EXTRA_TRANSITIONS = False
+ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
 \end{lstlisting}
 
-When this is \texttt{True}, cyclic mapping keeps the full final cleanup step that removes redundant bidirectional transitions. When this is \texttt{False}, the reference comparison skips only the redundant-transition elimination step while still preserving required connectivity restoration. This toggle only affects the reference comparison and does not change the main experiment.
+When \texttt{REMOVE\_EXTRA\_TRANSITIONS} is \texttt{True}, cyclic mapping keeps the full final cleanup step that removes redundant bidirectional transitions. When this is \texttt{False}, the reference comparison skips only the redundant-transition elimination step while still preserving required connectivity restoration. When \texttt{ADD\_TRANSITIONS\_BETWEEN\_FREE\_SPACES} is \texttt{True}, a bidirectional transition is added between every adjacent pair of free cells after the cyclic-mapping cleanup steps. These toggles only affect the reference comparison and do not change the main experiment.
 
 The selectable reference cases are:
 

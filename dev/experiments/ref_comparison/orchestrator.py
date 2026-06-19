@@ -28,6 +28,7 @@ from dev.experiments.ref_comparison.runtime import (
 )
 from dev.experiments.ref_comparison.visualization import render_reference_visualizations
 from dev.master_config_ref_comparison import (
+    ADD_TRANSITIONS_BETWEEN_FREE_SPACES,
     REFERENCE_COMPARISON_CASES,
     REMOVE_EXTRA_TRANSITIONS,
     SELECTED_PORT_EXPERIMENT,
@@ -71,6 +72,7 @@ def _build_case_spec(case_id: str) -> RefCaseSpec:
         true_static_shortest_path_distance=bool(SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE),
         tight_time_horizon=bool(SHARED_TIGHT_TIME_HORIZON),
         remove_extra_transitions=bool(REMOVE_EXTRA_TRANSITIONS),
+        add_transitions_between_free_spaces=bool(ADD_TRANSITIONS_BETWEEN_FREE_SPACES),
         agent_cohesion_enabled=bool(agent_cohesion) if experiment_mode == "multi_agent" else False,
         cohesion_factor=float(cohesion_factor),
         filter_individual_runs_until_cyclic_faster=bool(config.get("filter_individual_runs_until_cyclic_faster", False)),
@@ -118,6 +120,7 @@ def _log_case_header(logger: RefExperimentLogger, case_spec: RefCaseSpec) -> Non
     logger.log(f"runtime_limit_seconds: {case_spec.runtime_limit_seconds}")
     logger.log(f"true_static_shortest_path_distance: {case_spec.true_static_shortest_path_distance}")
     logger.log(f"remove_extra_transitions: {case_spec.remove_extra_transitions}")
+    logger.log(f"add_transitions_between_free_spaces: {case_spec.add_transitions_between_free_spaces}")
     logger.log(f"filter_individual_runs_until_cyclic_faster: {case_spec.filter_individual_runs_until_cyclic_faster}")
     logger.log(f"image_path: {case_spec.image_path}")
     logger.log("=" * 88)
