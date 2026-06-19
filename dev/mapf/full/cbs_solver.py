@@ -36,14 +36,23 @@ def get_path_position(path, time_step):
 
 
 
-def compute_solution_cost(paths_by_agent):
-    """
-    The cost of one CBS node is the total length of all its current paths.
+def _path_movement_cost(path):
+    """Count actual movement-time cost while ignoring pre-spawn inactive slots.
 
-    Since a path with 4 positions has 3 moves, each path contributes
-    len(path) - 1 to the total cost.
+    Reference-comparison runs may prefix a path with ``None`` before an
+    agent's release/spawn time. Those inactive positions should not count as
+    path length. For ordinary paths without ``None`` prefixes, this remains
+    the usual ``len(path) - 1`` cost.
     """
-    return sum(len(path) - 1 for path in paths_by_agent.values())
+    active_positions = [position for position in path if position is not None]
+    if not active_positions:
+        return 0
+    return max(0, len(active_positions) - 1)
+
+
+def compute_solution_cost(paths_by_agent):
+    """The cost of one CBS node is the total actual path length."""
+    return sum(_path_movement_cost(path) for path in paths_by_agent.values())
 
 
 
@@ -317,6 +326,7 @@ def _replan_static_agent(
         start=agent["start"],
         goal=agent["goal"],
         constraints=constraints,
+        spawn_time=int(agent.get("spawn_time", 0) or 0),
         heuristic_weight=heuristic_weight,
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,

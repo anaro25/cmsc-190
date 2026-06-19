@@ -60,22 +60,31 @@ def violates_edge_constraint(agent_constraints, from_position, to_position, time
     return False
 
 
-def get_latest_constraint_time(agent_constraints):
+def get_latest_constraint_time(agent_constraints, *, spawn_time=0):
     """
     The disappearing-agent model lets the agent disappear after reaching its goal.
     However, it should not disappear before its own later constraints matter.
+
+    Reference-comparison runs may release an agent after t=0. Constraints before
+    the release time are irrelevant because the agent is not yet on the map.
     """
-    if not agent_constraints:
-        return 0
-    return max(constraint["time"] for constraint in agent_constraints)
+    relevant_constraint_times = [
+        int(constraint["time"])
+        for constraint in agent_constraints
+        if int(constraint["time"]) >= int(spawn_time)
+    ]
+    if not relevant_constraint_times:
+        return int(spawn_time)
+    return max([int(spawn_time)] + relevant_constraint_times)
 
 
-def reconstruct_path(parent_of_node, target_node):
+def reconstruct_path(parent_of_node, target_node, *, spawn_time=0):
     """
     Rebuild the path by walking backward from the target node to the start node.
 
-    In the small A* hand solution, the path may look like the selected nodes.
-    In the code, the safer rule is to follow the recorded parent links.
+    If ``spawn_time`` is greater than zero, prefix the path with ``None`` so
+    list indices remain global timesteps. Conflict detection already treats
+    ``None`` as no occupying agent.
     """
     path = []
     current_node = target_node
@@ -86,6 +95,8 @@ def reconstruct_path(parent_of_node, target_node):
         current_node = parent_of_node[current_node]
 
     path.reverse()
+    if spawn_time > 0:
+        return [None for _ in range(int(spawn_time))] + path
     return path
 
 
@@ -194,6 +205,7 @@ def find_path_for_agent(
     tight_time_horizon=False,
     agent_cohesion_enabled=False,
     cohesion_reference_paths: Mapping[int, list[tuple[int, int]]] | None = None,
+    spawn_time: int = 0,
 ):
     """
     Find one agent's path using A* while respecting CBS constraints.
@@ -207,13 +219,14 @@ def find_path_for_agent(
         f_value       = g(n) + h(n), or g(n) + weight * h(n)
     """
     heuristic_weight = max(1.0, float(heuristic_weight))
+    spawn_time = max(0, int(spawn_time or 0))
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
-    # If the start itself is forbidden at time 0, no path is possible.
-    if violates_vertex_constraint(agent_constraints, start, 0):
+    # If the start itself is forbidden at the release/spawn time, no path is possible.
+    if violates_vertex_constraint(agent_constraints, start, spawn_time):
         return None
 
-    latest_constraint_time = get_latest_constraint_time(agent_constraints)
+    latest_constraint_time = get_latest_constraint_time(agent_constraints, spawn_time=spawn_time)
 
     # Some experiment settings use a precomputed true distance table.
     static_distance_lookup = {}
@@ -238,7 +251,7 @@ def find_path_for_agent(
     CLOSED = set()
     insertion_counter = itertools.count()
 
-    start_node = (start, 0)
+    start_node = (start, spawn_time)
     parent_of_node = {start_node: None}
     g_score = {start_node: 0}
 
@@ -288,7 +301,7 @@ def find_path_for_agent(
         # In A*, we check whether the selected node is the target node.
         # We stop only when the target is selected from OPEN, not merely seen.
         if selected_position == goal and selected_time >= latest_constraint_time:
-            return reconstruct_path(parent_of_node, selected_node)
+            return reconstruct_path(parent_of_node, selected_node, spawn_time=spawn_time)
 
         # Do not keep expanding forever in time.
         if selected_time >= max_time_horizon:

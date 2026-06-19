@@ -159,3 +159,36 @@ pathological infinite loops. It remains only a protective implementation detail.
 - Branch metadata and per-run records now also capture the active solver family (`CBS` or `ECBS`) so output files remain interpretable after solver-toggle changes.
 
 - Image inputs now use `dev/inputs/dynamic_port/port_map.png`, `dev/inputs/campus_area_1.png`, `dev/inputs/campus_area_2.png`, and `dev/inputs/campus_area_3.png`.
+
+
+## Supplementary reference comparison
+
+A separate Tang-inspired reference-comparison workflow has been added without changing the main experiment workflow. To use it, edit `dev/main.py` and select the reference experiment family:
+
+```python
+# SELECTED_EXPERIMENT = "ref_comparision"
+SELECTED_EXPERIMENT = "main_experiment"
+```
+
+Both `ref_comparision` and `ref_comparison` are accepted. The reference workflow is configured in `dev/master_config_ref_comparison.py`, not in the main `master_config.py`.
+
+The available reference selectors are:
+
+```python
+SELECTED_PORT_EXPERIMENT = "single_agent_x20"
+# SELECTED_PORT_EXPERIMENT = "single_agent_x50"
+# SELECTED_PORT_EXPERIMENT = "single_agent_x100"
+# SELECTED_PORT_EXPERIMENT = "multi_agent_x20"
+# SELECTED_PORT_EXPERIMENT = "multi_agent_x50"
+# SELECTED_PORT_EXPERIMENT = "multi_agent_x100"
+```
+
+The reference-comparison cyclic map has a local toggle for the final extra-transition cleanup step:
+
+```python
+REMOVE_EXTRA_TRANSITIONS = True
+```
+
+Set it to `False` to skip only the redundant-transition elimination step while still preserving required connectivity restoration. This toggle is only used by the reference-comparison workflow; the main experiment keeps its existing cyclic-mapping behavior.
+
+Reference outputs are written under `dev/outputs_ref_comparison/<case_id>/`, with persisted raw data under `dev/outputs_ref_comparison/raw_mapf_files/<case_id>/`. The single-agent cases compare A* + classical versus A* + cyclic. The multi-agent cases compare ECBS + classical versus ECBS + cyclic with 15 released/spawning agents and the deliberate temporary individual cyclic-faster filter.

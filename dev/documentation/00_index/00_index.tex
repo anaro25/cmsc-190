@@ -55,7 +55,8 @@ A few global facts are worth knowing before reading the rest:
 \begin{itemize}[leftmargin=2em]
     \item The current top-level entry point is \texttt{python -m dev.main}.
     \item The active experiment driver is the generalized study runner under \texttt{dev/experiments/study/}.
-    \item \texttt{dev/master\_config.py} is the single intended user-editable configuration file.
+    \item \texttt{dev/master\_config.py} is the intended user-editable configuration file for the main experiment.
+    \item \texttt{dev/master\_config\_ref\_comparison.py} is the separate user-editable configuration file for the supplementary reference comparison.
     \item Dynamic branches prepare one shared dynamic map state for the whole branch execution.
     \item The experiment compares \textbf{classical mapping} and \textbf{cyclic mapping}, not two different planning algorithms.
 \end{itemize}

@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 
 dev/outputs/
+dev/outputs_ref_comparison

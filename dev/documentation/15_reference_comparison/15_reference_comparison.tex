@@ -1,0 +1,200 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{listings}
+
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+
+\lstset{basicstyle=\ttfamily\small,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
+
+\title{Reference Comparison Experiment}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Purpose}
+
+The reference comparison is a supplementary experiment added to connect the project to the Tang (2021) Geometric A* reference study. It does not replace the main experiment and it does not modify the main experiment protocol. The main experiment remains the seven-map comparison between ECBS with classical mapping and ECBS with cyclic mapping.
+
+The reference comparison uses the Tang-inspired port maps already stored in the project:
+
+\begin{lstlisting}
+dev/inputs/reference_port_maps/port_map_x20.png
+dev/inputs/reference_port_maps/port_map_x50.png
+dev/inputs/reference_port_maps/port_map_x100.png
+\end{lstlisting}
+
+These reference images are binary maps: pure black pixels are obstacles and pure white pixels are free spaces.
+
+\section{Experiment Selector}
+
+The project now has a top-level selector in \texttt{dev/main.py}. Exactly one experiment family should be active:
+
+\begin{lstlisting}
+# SELECTED_EXPERIMENT = "ref_comparision"
+SELECTED_EXPERIMENT = "main_experiment"
+\end{lstlisting}
+
+The spelling \texttt{ref\_comparision} is accepted for compatibility with the working prompt. The correctly spelled value \texttt{ref\_comparison} is also accepted by the code.
+
+The reference-comparison configuration is separated from the main experiment configuration:
+
+\begin{lstlisting}
+dev/master_config_ref_comparison.py
+\end{lstlisting}
+
+This keeps the main \texttt{master\_config.py} untouched.
+
+The reference configuration also includes a local toggle for the final cyclic-map cleanup step:
+
+\begin{lstlisting}
+REMOVE_EXTRA_TRANSITIONS = True
+\end{lstlisting}
+
+When this value is \texttt{True}, cyclic mapping uses the same full transition-reduction behavior as the main experiment. When this value is \texttt{False}, cyclic mapping skips only the redundant-transition elimination step while still preserving required connectivity restoration. This makes it possible to test a less radically reduced cyclic map only in the reference comparison.
+
+\section{Reference Workflow}
+
+The reference workflow intentionally mirrors the main experiment workflow. The raw solver execution phase is separated from graph/data generation and visualization generation.
+
+\begin{lstlisting}
+recompute_MAPF = False
+
+to_generate = "graphs_and_data"
+# to_generate = "visualization"
+# to_generate = "nothing"
+\end{lstlisting}
+
+If \texttt{recompute\_MAPF = True}, the selected reference case is executed and raw data is saved. If \texttt{recompute\_MAPF = False}, existing raw data is reused. The output-generation target then decides whether the program writes graphs/data, visualizations, or nothing.
+
+\section{Selectable Reference Cases}
+
+The reference-comparison selector is:
+
+\begin{lstlisting}
+SELECTED_PORT_EXPERIMENT = "single_agent_x20"
+# SELECTED_PORT_EXPERIMENT = "single_agent_x50"
+# SELECTED_PORT_EXPERIMENT = "single_agent_x100"
+# SELECTED_PORT_EXPERIMENT = "multi_agent_x20"
+# SELECTED_PORT_EXPERIMENT = "multi_agent_x50"
+# SELECTED_PORT_EXPERIMENT = "multi_agent_x100"
+\end{lstlisting}
+
+The single-agent and multi-agent options both execute one map size at a time. The different map sizes are deliberately not combined into one graph. Each case has its own independent output folder and its own one-point graphs.
+
+\section{Single-Agent Reference Case}
+
+The single-agent reference case compares:
+
+\begin{lstlisting}
+A* + classical mapping
+A* + cyclic mapping
+\end{lstlisting}
+
+The agent starts at the lower-left-most free cell and targets the upper-right-most free cell. There is only one possible start-target configuration, so each single-agent case records one paired run.
+
+The single-agent case records:
+
+\begin{itemize}[leftmargin=2em]
+    \item time computation halted,
+    \item total path length,
+    \item total turns.
+\end{itemize}
+
+The individual cyclic-faster filter is disabled for the single-agent case because cyclic mapping is not expected to help single-agent pathfinding. This case is included to show that cyclic mapping is not proposed as a general single-agent shortcut.
+
+\section{Multi-Agent Reference Case}
+
+The multi-agent reference case compares:
+
+\begin{lstlisting}
+ECBS + classical mapping
+ECBS + cyclic mapping
+\end{lstlisting}
+
+Each multi-agent case uses 15 agents. All agents share the same upper-right target cell and disappear after reaching it. Agents are released through two spawn cells: the upper neighbor and the right neighbor of the lower-left start cell. The solver supports explicit per-agent \texttt{spawn\_time}. Before an agent's spawn time, it does not occupy the map. At its spawn time, it appears at its assigned spawn cell.
+
+The multi-agent case records:
+
+\begin{itemize}[leftmargin=2em]
+    \item time computation halted,
+    \item number of conflicts detected,
+    \item total path length,
+    \item total turns.
+\end{itemize}
+
+The multi-agent case deliberately uses the temporary individual cyclic-faster filter. It retains only paired attempts where cyclic mapping halts faster than classical mapping. The retained quota follows the existing temporary-filter behavior: three retained paired runs are required. The maximum number of attempts is controlled by:
+
+\begin{lstlisting}
+TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20
+\end{lstlisting}
+
+This filtered setup is intentional and should be treated as a supplementary stress/reference comparison, not as the main unbiased performance evidence.
+
+\section{Heuristic and Solver Settings}
+
+The reference comparison keeps the project's current true static shortest-path distance heuristic instead of using Manhattan distance. The Tang reference is therefore used mainly for the map sizes and lower-left to upper-right setup, not for continuous movement, interpolation, smoothing, or Manhattan-only heuristic behavior.
+
+Shared reference settings include:
+
+\begin{lstlisting}
+SHARED_TIME_LIMIT_SECONDS = 30.0
+SHARED_ECBS_SUBOPTIMALITY = 3.0
+SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
+SHARED_TIGHT_TIME_HORIZON = False
+agent_cohesion = True
+cohesion_factor = 1.0
+\end{lstlisting}
+
+Agent cohesion applies to the multi-agent reference case. It is inactive for the single-agent case.
+
+\section{Output Layout}
+
+Reference-comparison outputs are separate from the main experiment outputs. The root is:
+
+\begin{lstlisting}
+dev/outputs_ref_comparison/
+\end{lstlisting}
+
+Each case has its own independent folder:
+
+\begin{lstlisting}
+dev/outputs_ref_comparison/single_agent_x20/
+dev/outputs_ref_comparison/single_agent_x50/
+dev/outputs_ref_comparison/single_agent_x100/
+dev/outputs_ref_comparison/multi_agent_x20/
+dev/outputs_ref_comparison/multi_agent_x50/
+dev/outputs_ref_comparison/multi_agent_x100/
+\end{lstlisting}
+
+Inside each case folder, the structure follows the same general idea as the main experiment:
+
+\begin{lstlisting}
+aggregates/
+graphs/
+logs/
+metadata/
+records/
+visualizations/
+\end{lstlisting}
+
+Persisted raw reference data is stored under:
+
+\begin{lstlisting}
+dev/outputs_ref_comparison/raw_mapf_files/<case_id>/
+\end{lstlisting}
+
+\section{Important Interpretation Notes}
+
+The reference comparison is supplementary. It should not be merged with the main seven-map results. In particular, the multi-agent reference case uses a deliberately filtered collection rule, so its graphs should be interpreted as a favorable reference showcase rather than a neutral average over all possible attempts.
+
+The main experiment remains the primary evidence for cyclic mapping's overall behavior.
+
+\end{document}

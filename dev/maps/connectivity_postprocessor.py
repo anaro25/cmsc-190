@@ -42,6 +42,20 @@ def reduce_excess_bidirectionals_and_restore_connectivity(cyclic_grid):
     return processed_grid
 
 
+def restore_connectivity_without_removing_extras(cyclic_grid):
+    """
+    Keep all bidirectional transitions produced by obstacle/cycle repair, then
+    add only the bidirectional transitions needed to preserve reachability.
+
+    This is useful for reference-comparison experiments where the aggressive
+    redundant-transition elimination step should be disabled without making the
+    resulting cyclic map accidentally disconnected.
+    """
+    processed_grid = [row[:] for row in cyclic_grid]
+    restore_required_connectivity(processed_grid)
+    return processed_grid
+
+
 def remove_redundant_bidirectionals(grid):
     bidirectional_positions = collect_bidirectional_positions(grid)
 
