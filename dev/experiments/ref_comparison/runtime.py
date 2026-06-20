@@ -342,7 +342,7 @@ def _single_agent_solver_result(
         return {
             "status": "no_solution",
             "paths_by_agent": None,
-            "num_conflicts_detected": None,
+            "num_conflicts_detected": 0,
             "num_high_level_nodes_expanded": None,
             "solver_name": "A*",
             "solver_suboptimality_factor": None,
@@ -351,7 +351,7 @@ def _single_agent_solver_result(
     return {
         "status": "solved",
         "paths_by_agent": {agent["id"]: path},
-        "num_conflicts_detected": None,
+        "num_conflicts_detected": 0,
         "num_high_level_nodes_expanded": None,
         "solver_name": "A*",
         "solver_suboptimality_factor": None,
@@ -409,7 +409,7 @@ def build_mapping_record(
     conflicts = None
     high_level_nodes = None
     solver_name = "A*" if case_spec.experiment_mode == "single_agent" else ("ECBS" if case_spec.use_ecbs else "CBS")
-    suboptimality = None if solver_name in {"A*", "CBS"} else case_spec.ecbs_suboptimality
+    suboptimality = case_spec.ecbs_suboptimality if solver_name == "ECBS" else None
 
     if solver_result is not None:
         resolved_status = solver_result.get("status", resolved_status)
@@ -437,7 +437,7 @@ def build_mapping_record(
         mapping_index=mapping_index,
         comparison_case="reference_comparison_paired",
         solver_name=solver_name,
-        enhanced_cbs_enabled=bool(case_spec.use_ecbs) if solver_name != "A*" else False,
+        enhanced_cbs_enabled=(solver_name == "ECBS"),
         solver_suboptimality_factor=suboptimality,
         paired_run=True,
         solver_status=resolved_status,
@@ -453,7 +453,7 @@ def build_mapping_record(
         map_identifier=run_configuration.map_identifier,
         initial_condition_spec=run_configuration.agents,
         notes=(
-            "single-agent A* reference case"
+            f"single-agent traditional A* on {mapping_name} mapping"
             if case_spec.experiment_mode == "single_agent"
             else "multi-agent ECBS reference case with release/spawn times"
         ),

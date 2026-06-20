@@ -23,26 +23,25 @@
 
 The reference comparison is a supplementary experiment added to connect the project to the Tang (2021) Geometric A* reference study. It does not replace the main experiment and it does not modify the main experiment protocol. The main experiment remains the seven-map comparison between ECBS with classical mapping and ECBS with cyclic mapping.
 
-The reference comparison uses the Tang-inspired port maps already stored in the project:
+The reference comparison now uses only the 20x20 and 50x50 Tang-inspired port maps stored in the project:
 
 \begin{lstlisting}
 dev/inputs/reference_port_maps/port_map_x20.png
 dev/inputs/reference_port_maps/port_map_x50.png
-dev/inputs/reference_port_maps/port_map_x100.png
 \end{lstlisting}
 
 These reference images are binary maps: pure black pixels are obstacles and pure white pixels are free spaces.
 
+The input directory may still contain sibling images with manually colored path markings, but those images are kept only as archived inputs. The reference-comparison program does not read those markings and does not import any manually traced path.
+
 \section{Experiment Selector}
 
-The project now has a top-level selector in \texttt{dev/main.py}. Exactly one experiment family should be active:
+The project has a top-level selector in \texttt{dev/main.py}. Exactly one experiment family should be active:
 
 \begin{lstlisting}
-# SELECTED_EXPERIMENT = "ref_comparision"
-SELECTED_EXPERIMENT = "main_experiment"
+SELECTED_EXPERIMENT = "ref_comparison"
+# SELECTED_EXPERIMENT = "main_experiment"
 \end{lstlisting}
-
-The spelling \texttt{ref\_comparision} is accepted for compatibility with the working prompt. The correctly spelled value \texttt{ref\_comparison} is also accepted by the code.
 
 The reference-comparison configuration is separated from the main experiment configuration:
 
@@ -84,10 +83,8 @@ The reference-comparison selector is:
 \begin{lstlisting}
 SELECTED_PORT_EXPERIMENT = "single_agent_x20"
 # SELECTED_PORT_EXPERIMENT = "single_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "single_agent_x100"
 # SELECTED_PORT_EXPERIMENT = "multi_agent_x20"
 # SELECTED_PORT_EXPERIMENT = "multi_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "multi_agent_x100"
 \end{lstlisting}
 
 The single-agent and multi-agent options both execute one map size at a time. The different map sizes are deliberately not combined into one graph. Each case has its own independent output folder and its own one-point graphs.
@@ -97,11 +94,11 @@ The single-agent and multi-agent options both execute one map size at a time. Th
 The single-agent reference case compares:
 
 \begin{lstlisting}
-A* + classical mapping
-A* + cyclic mapping
+Traditional A* + classical mapping
+Traditional A* + cyclic mapping
 \end{lstlisting}
 
-The agent starts at the lower-left-most free cell and targets the upper-right-most free cell. There is only one possible start-target configuration, so each single-agent case records one paired run.
+Both single-agent sides are computed by the project using traditional A*. The classical side runs traditional A* on the classical map, while the cyclic side runs traditional A* on the cyclic map. Both use the same lower-left start cell and upper-right target cell.
 
 The single-agent case records:
 
@@ -110,6 +107,8 @@ The single-agent case records:
     \item total path length,
     \item total turns.
 \end{itemize}
+
+When graph/data outputs are generated, the single-agent case also creates a matplotlib-formatted comparison table in the same graphs folder. In this table, Running time/s uses the time computation halted value, Number of nodes uses the stored conflicts-detected metric, Number of turns uses the total turns value, and Total distance uses the path length value.
 
 The individual cyclic-faster filter is disabled for the single-agent case because cyclic mapping is not expected to help single-agent pathfinding. This case is included to show that cyclic mapping is not proposed as a general single-agent shortcut.
 
@@ -143,7 +142,7 @@ This filtered setup is intentional and should be treated as a supplementary stre
 
 \section{Heuristic and Solver Settings}
 
-The reference comparison keeps the project's current true static shortest-path distance heuristic instead of using Manhattan distance. The Tang reference is therefore used mainly for the map sizes and lower-left to upper-right setup, not for continuous movement, interpolation, smoothing, or Manhattan-only heuristic behavior.
+For the single-agent A* cases and for the multi-agent ECBS cases, the reference comparison keeps the project's current true static shortest-path distance heuristic instead of using Manhattan distance. The Tang reference is therefore used mainly for the map sizes and the lower-left to upper-right setup, not for continuous movement, interpolation, smoothing, or Manhattan-only heuristic behavior.
 
 Shared reference settings include:
 
@@ -171,10 +170,8 @@ Each case has its own independent folder:
 \begin{lstlisting}
 dev/outputs_ref_comparison/single_agent_x20/
 dev/outputs_ref_comparison/single_agent_x50/
-dev/outputs_ref_comparison/single_agent_x100/
 dev/outputs_ref_comparison/multi_agent_x20/
 dev/outputs_ref_comparison/multi_agent_x50/
-dev/outputs_ref_comparison/multi_agent_x100/
 \end{lstlisting}
 
 Inside each case folder, the structure follows the same general idea as the main experiment:

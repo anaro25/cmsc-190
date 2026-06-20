@@ -54,20 +54,18 @@ TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20
 
 recompute_MAPF = True
 
-# to_generate = "graphs_and_data"
-to_generate = "visualization"
+to_generate = "graphs_and_data"
+# to_generate = "visualization"
 # to_generate = "nothing"
 
 # Select exactly one reference-comparison execution target.
 # SELECTED_PORT_EXPERIMENT = "single_agent_x20"
 SELECTED_PORT_EXPERIMENT = "single_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "single_agent_x100"
 # SELECTED_PORT_EXPERIMENT = "multi_agent_x20"
 # SELECTED_PORT_EXPERIMENT = "multi_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "multi_agent_x100"
 
 # Visualization can be regenerated from saved raw data. Keeping this small
-# avoids generating unnecessarily large frame sets for x100 runs.
+# avoids generating unnecessarily large frame sets.
 NUM_LAST_SUCCESSFUL_RUNS_TO_VISUALIZE_PER_MAPPING = 1
 
 
@@ -94,17 +92,6 @@ REFERENCE_COMPARISON_CASES: dict[str, dict[str, Any]] = {
         "filter_individual_runs_until_cyclic_faster": False,
         "image_path": _reference_port_image_path("x50"),
     },
-    "single_agent_x100": {
-        "case_id": "single_agent_x100",
-        "experiment_mode": "single_agent",
-        "display_name": "Reference Comparison: Single Agent x100",
-        "size_label": "x100",
-        "map_size": 100,
-        "agent_number": 1,
-        "counted_runs_required": 1,
-        "filter_individual_runs_until_cyclic_faster": False,
-        "image_path": _reference_port_image_path("x100"),
-    },
     "multi_agent_x20": {
         "case_id": "multi_agent_x20",
         "experiment_mode": "multi_agent",
@@ -127,25 +114,12 @@ REFERENCE_COMPARISON_CASES: dict[str, dict[str, Any]] = {
         "filter_individual_runs_until_cyclic_faster": TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER,
         "image_path": _reference_port_image_path("x50"),
     },
-    "multi_agent_x100": {
-        "case_id": "multi_agent_x100",
-        "experiment_mode": "multi_agent",
-        "display_name": "Reference Comparison: Multi Agent x100",
-        "size_label": "x100",
-        "map_size": 100,
-        "agent_number": 15,
-        "counted_runs_required": TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED,
-        "filter_individual_runs_until_cyclic_faster": TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER,
-        "image_path": _reference_port_image_path("x100"),
-    },
 }
 
 
 SELECTED_PORT_EXPERIMENT_CASES: dict[str, list[str]] = {
     "single_agent_x20": ["single_agent_x20"],
     "single_agent_x50": ["single_agent_x50"],
-    "single_agent_x100": ["single_agent_x100"],
     "multi_agent_x20": ["multi_agent_x20"],
     "multi_agent_x50": ["multi_agent_x50"],
-    "multi_agent_x100": ["multi_agent_x100"],
 }

@@ -53,9 +53,9 @@ Within a sampled run configuration, \texttt{dispersed} sets keep 8-neighbor sepa
 
 \section{Supplementary Reference Comparison}
 
-A separate supplementary workflow is available for the Tang-inspired reference comparison. This workflow is controlled from \texttt{dev/master\_config\_ref\_comparison.py} and is selected from \texttt{dev/main.py} by choosing \texttt{SELECTED\_EXPERIMENT = "ref\_comparision"} or \texttt{SELECTED\_EXPERIMENT = "ref\_comparison"}. The main experiment remains controlled by \texttt{dev/master\_config.py}.
+A separate supplementary workflow is available for the Tang-inspired reference comparison. This workflow is controlled from \texttt{dev/master\_config\_ref\_comparison.py} and is selected from \texttt{dev/main.py} by choosing \texttt{SELECTED\_EXPERIMENT = "ref\_comparison"}. The main experiment remains controlled by \texttt{dev/master\_config.py}.
 
-The reference comparison uses the binary port maps in \texttt{dev/inputs/reference\_port\_maps/}. Pure black pixels are obstacles and pure white pixels are free spaces. The start location is the lower-left-most free cell and the target location is the upper-right-most free cell.
+The reference comparison uses only the 20x20 and 50x50 binary port maps in \texttt{dev/inputs/reference\_port\_maps/}. Pure black pixels are obstacles and pure white pixels are free spaces. The start location is the lower-left-most free cell and the target location is the upper-right-most free cell. Any sibling images containing manually colored path markings are left in the input directory for record-keeping but are not used by the program.
 
 The reference workflow mirrors the main experiment workflow: \texttt{recompute\_MAPF} controls whether raw solver data is recomputed, while \texttt{to\_generate} controls whether graphs/data, visualizations, or nothing are generated from saved raw data.
 
@@ -73,14 +73,15 @@ The selectable reference cases are:
 \begin{lstlisting}
 SELECTED_PORT_EXPERIMENT = "single_agent_x20"
 # SELECTED_PORT_EXPERIMENT = "single_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "single_agent_x100"
 # SELECTED_PORT_EXPERIMENT = "multi_agent_x20"
 # SELECTED_PORT_EXPERIMENT = "multi_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "multi_agent_x100"
 \end{lstlisting}
 
-The single-agent cases compare A* with classical mapping against A* with cyclic mapping. They are selected one map size at a time. They record one paired run per selected map size and do not use the cyclic-faster filter. The multi-agent cases compare ECBS with classical mapping against ECBS with cyclic mapping using 15 agents, shared upper-right target, and explicit per-agent release/spawn times from the two neighbors of the lower-left start cell. Multi-agent reference cases deliberately use the individual cyclic-faster filter and retain three paired runs where cyclic halts faster than classical.
+The single-agent cases compare traditional A* on classical mapping against traditional A* on cyclic mapping. They are selected one map size at a time, record one paired run per selected map size, and do not use the cyclic-faster filter. The multi-agent cases compare ECBS with classical mapping against ECBS with cyclic mapping using 15 agents, shared upper-right target, and explicit per-agent release/spawn times from the two neighbors of the lower-left start cell. Multi-agent reference cases deliberately use the individual cyclic-faster filter and retain three paired runs where cyclic halts faster than classical.
 
-Reference outputs are stored separately from the main experiment under \texttt{dev/outputs\_ref\_comparison/}. Each case has an independent output folder such as \texttt{single\_agent\_x20} or \texttt{multi\_agent\_x100}. The different map sizes are not combined into one map-size-axis graph; each case produces its own one-point graphs using agent number as the x-axis.
+Reference outputs are stored separately from the main experiment under \texttt{dev/outputs\_ref\_comparison/}. Each case has an independent output folder such as \texttt{single\_agent\_x20} or \texttt{multi\_agent\_x50}. The different map sizes are not combined into one map-size-axis graph; each case produces its own one-point graphs using agent number as the x-axis.
 
 \end{document}
+
+
+Single-agent reference graph/data generation also writes a matplotlib-formatted summary table beside the graphs.

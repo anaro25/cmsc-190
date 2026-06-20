@@ -4,7 +4,7 @@ import time
 
 
 # Select exactly one experiment family.
-SELECTED_EXPERIMENT = "ref_comparision"  # accepted spelling kept for prompt compatibility
+SELECTED_EXPERIMENT = "ref_comparison"
 # SELECTED_EXPERIMENT = "main_experiment"
 
 
@@ -16,13 +16,13 @@ def main() -> None:
         from dev.master_config import MAP_TYPE
 
         run_selected_experiment(MAP_TYPE, program_start_time=program_start_time)
-    elif SELECTED_EXPERIMENT in {"ref_comparison", "ref_comparision"}:
+    elif SELECTED_EXPERIMENT == "ref_comparison":
         from dev.experiments.ref_comparison.orchestrator import run_selected_ref_comparison
 
         run_selected_ref_comparison(program_start_time=program_start_time)
     else:
         raise ValueError(
-            "SELECTED_EXPERIMENT must be either 'main_experiment' or 'ref_comparision'."
+            "SELECTED_EXPERIMENT must be either 'main_experiment' or 'ref_comparison'."
         )
 
     print("===========================\n" * 25)  # not shown in log files

@@ -82,7 +82,8 @@ def _build_case_spec(case_id: str) -> RefCaseSpec:
             else None
         ),
         notes=(
-            "Tang-inspired single-agent reference case. Uses the project true static shortest-path distance heuristic. "
+            "Tang-inspired single-agent reference case. Both sides use the project traditional A* solver; "
+            "the classical side uses classical mapping and the cyclic side uses cyclic mapping. "
             "The cyclic-faster temporary filter is deliberately disabled."
             if experiment_mode == "single_agent"
             else "Tang-inspired multi-agent reference case. Uses fixed 15-agent release/spawn schedule and retains only "
