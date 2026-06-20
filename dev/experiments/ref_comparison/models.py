@@ -12,7 +12,9 @@ class RefCaseSpec:
     size_label: str
     map_size: int
     image_path: str
+    map_image_paths: list[str]
     agent_number: int
+    map_agent_numbers: dict[int, int]
     counted_runs_required: int
     runtime_limit_seconds: float
     use_ecbs: bool
@@ -25,6 +27,8 @@ class RefCaseSpec:
     cohesion_factor: float
     filter_individual_runs_until_cyclic_faster: bool
     filter_individual_runs_until_cyclic_faster_max_attempts: int | None
+    single_agent_timing_repetitions: int = 1
+    multi_agent_timing_repetitions: int = 1
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -43,6 +47,9 @@ class RefRunConfiguration:
     map_identifier: str
     paired_source: bool
     agents: list[dict[str, Any]]
+    map_index: int | None = None
+    map_number: int | None = None
+    map_label: str = ""
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -77,7 +84,12 @@ class RefMappingRunRecord:
     runtime_limit_seconds: float
     map_identifier: str
     initial_condition_spec: list[dict[str, Any]]
+    map_index: int | None = None
+    map_number: int | None = None
+    map_label: str = ""
     notes: str = ""
+    timing_repetitions: int = 1
+    timing_elapsed_samples_seconds: list[float] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -108,6 +120,11 @@ class RefConditionAggregate:
     cyclic_avg_total_path_length: float | None
     classical_avg_total_turns: float | None
     cyclic_avg_total_turns: float | None
+    classical_avg_search_nodes_expanded: float | None = None
+    cyclic_avg_search_nodes_expanded: float | None = None
+    map_index: int | None = None
+    map_number: int | None = None
+    map_label: str = ""
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -122,6 +139,7 @@ class RefVisualizationCandidate:
     agents: list[dict[str, Any]]
     solver_result: dict[str, Any]
     composite_map: list[list[Any]]
+    visually_free_vertex_positions: set[tuple[int, int]] | None = None
 
 
 @dataclass
@@ -130,6 +148,7 @@ class RefComputationPayload:
     run_configurations: list[dict[str, Any]] = field(default_factory=list)
     run_records: list[dict[str, Any]] = field(default_factory=list)
     aggregate: dict[str, Any] | None = None
+    map_aggregates: list[dict[str, Any]] = field(default_factory=list)
     discarded_attempts: list[dict[str, Any]] = field(default_factory=list)
     visualization_candidates: list[RefVisualizationCandidate] = field(default_factory=list)
     stop_summary: dict[str, Any] = field(default_factory=dict)

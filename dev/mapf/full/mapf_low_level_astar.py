@@ -206,6 +206,7 @@ def find_path_for_agent(
     agent_cohesion_enabled=False,
     cohesion_reference_paths: Mapping[int, list[tuple[int, int]]] | None = None,
     spawn_time: int = 0,
+    return_diagnostics: bool = False,
 ):
     """
     Find one agent's path using A* while respecting CBS constraints.
@@ -223,8 +224,12 @@ def find_path_for_agent(
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
     # If the start itself is forbidden at the release/spawn time, no path is possible.
+    # If the start itself is forbidden at the release/spawn time, no path is possible.
     if violates_vertex_constraint(agent_constraints, start, spawn_time):
+        if return_diagnostics:
+            return {"path": None, "num_expanded_nodes": 0}
         return None
+
 
     latest_constraint_time = get_latest_constraint_time(agent_constraints, spawn_time=spawn_time)
 
@@ -234,6 +239,8 @@ def find_path_for_agent(
         static_distance_lookup = _static_distance_lookup(cyclic_map, goal)
         start_goal_distance = static_distance_lookup.get(start)
         if start_goal_distance is None:
+            if return_diagnostics:
+                return {"path": None, "num_expanded_nodes": 0}
             return None
     else:
         start_goal_distance = manhattan_vertex_distance(start, goal)
@@ -262,6 +269,8 @@ def find_path_for_agent(
         static_distance_lookup=static_distance_lookup,
     )
     if start_h == float("inf"):
+        if return_diagnostics:
+            return {"path": None, "num_expanded_nodes": 0}
         return None
 
     _add_node_to_OPEN(
@@ -301,7 +310,10 @@ def find_path_for_agent(
         # In A*, we check whether the selected node is the target node.
         # We stop only when the target is selected from OPEN, not merely seen.
         if selected_position == goal and selected_time >= latest_constraint_time:
-            return reconstruct_path(parent_of_node, selected_node, spawn_time=spawn_time)
+            final_path = reconstruct_path(parent_of_node, selected_node, spawn_time=spawn_time)
+            if return_diagnostics:
+                return {"path": final_path, "num_expanded_nodes": len(CLOSED)}
+            return final_path
 
         # Do not keep expanding forever in time.
         if selected_time >= max_time_horizon:
@@ -376,4 +388,6 @@ def find_path_for_agent(
             )
 
     # OPEN became empty, so all reachable possibilities were exhausted.
+    if return_diagnostics:
+        return {"path": None, "num_expanded_nodes": len(CLOSED)}
     return None

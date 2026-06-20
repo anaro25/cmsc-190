@@ -23,14 +23,15 @@
 
 The reference comparison is a supplementary experiment added to connect the project to the Tang (2021) Geometric A* reference study. It does not replace the main experiment and it does not modify the main experiment protocol. The main experiment remains the seven-map comparison between ECBS with classical mapping and ECBS with cyclic mapping.
 
-The reference comparison now uses only the 20x20 and 50x50 Tang-inspired port maps stored in the project:
+The reference comparison now uses three separate 50x50 Tang-inspired port maps stored in the project:
 
 \begin{lstlisting}
-dev/inputs/reference_port_maps/port_map_x20.png
-dev/inputs/reference_port_maps/port_map_x50.png
+dev/inputs/reference_port_maps/port_map_1.png
+dev/inputs/reference_port_maps/port_map_2.png
+dev/inputs/reference_port_maps/port_map_3.png
 \end{lstlisting}
 
-These reference images are binary maps: pure black pixels are obstacles and pure white pixels are free spaces.
+These reference images use three cell colors: pure black pixels are normal obstacles, pure white pixels are free spaces, and light-red pixels (\texttt{\#e8787a}) are invisible obstacles. Invisible obstacles are handled as blocked cells during path planning and solving, but they are rendered as ordinary free space in MAPF visualizations. The transition visualizations are unchanged. The older orientation-based variants are no longer generated. The program now treats the three input files as the three map cases directly.
 
 The input directory may still contain sibling images with manually colored path markings, but those images are kept only as archived inputs. The reference-comparison program does not read those markings and does not import any manually traced path.
 
@@ -67,7 +68,7 @@ When \texttt{ADD\_TRANSITIONS\_BETWEEN\_FREE\_SPACES} is \texttt{True}, the refe
 The reference workflow intentionally mirrors the main experiment workflow. The raw solver execution phase is separated from graph/data generation and visualization generation.
 
 \begin{lstlisting}
-recompute_MAPF = False
+recompute_MAPF = True
 
 to_generate = "graphs_and_data"
 # to_generate = "visualization"
@@ -76,18 +77,30 @@ to_generate = "graphs_and_data"
 
 If \texttt{recompute\_MAPF = True}, the selected reference case is executed and raw data is saved. If \texttt{recompute\_MAPF = False}, existing raw data is reused. The output-generation target then decides whether the program writes graphs/data, visualizations, or nothing.
 
+When \texttt{to\_generate = "visualization"}, visualization candidates are selected independently for each map number and mapping. Therefore, if solved candidates are available for all three port maps, the visualizer writes one visualization set per map type instead of keeping only the final successful map overall. The visualization phase also logs candidate selection, the current map and mapping being rendered, frame-writing stages, and final frame counts.
+
 \section{Selectable Reference Cases}
 
 The reference-comparison selector is:
 
 \begin{lstlisting}
-SELECTED_PORT_EXPERIMENT = "single_agent_x20"
-# SELECTED_PORT_EXPERIMENT = "single_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "multi_agent_x20"
-# SELECTED_PORT_EXPERIMENT = "multi_agent_x50"
+# SELECTED_PORT_EXPERIMENT = "single_agent"
+SELECTED_PORT_EXPERIMENT = "multi_agent"
 \end{lstlisting}
 
-The single-agent and multi-agent options both execute one map size at a time. The different map sizes are deliberately not combined into one graph. Each case has its own independent output folder and its own one-point graphs.
+Both selectable cases use the same three 50x50 maps. The single-agent case runs the three maps with one agent. The multi-agent case runs the three maps with a configurable agent count for each map. Older selector names such as \texttt{single\_agent\_x50} and \texttt{multi\_agent\_x50} are kept only as backward-compatible aliases.
+
+The per-map multi-agent counts are selected in \texttt{dev/master\_config\_ref\_comparison.py}:
+
+\begin{lstlisting}
+MULTI_AGENT_REFERENCE_PORT_MAP_AGENT_NUMBERS = {
+    1: 10,
+    2: 10,
+    3: 10,
+}
+\end{lstlisting}
+
+The keys correspond to \texttt{port\_map\_1.png}, \texttt{port\_map\_2.png}, and \texttt{port\_map\_3.png}.
 
 \section{Single-Agent Reference Case}
 
@@ -98,17 +111,18 @@ Traditional A* + classical mapping
 Traditional A* + cyclic mapping
 \end{lstlisting}
 
-Both single-agent sides are computed by the project using traditional A*. The classical side runs traditional A* on the classical map, while the cyclic side runs traditional A* on the cyclic map. Both use the same lower-left start cell and upper-right target cell.
+Both single-agent sides are computed by the project using traditional A*. The classical side runs traditional A* on the classical map, while the cyclic side runs traditional A* on the cyclic map. Both use the same lower-left start cell and upper-right target cell on each of the three input maps. Each map and mapping is timed using five identical A* executions, controlled by \texttt{SINGLE\_AGENT\_TIMING\_REPETITIONS = 5}. The stored runtime is the average of those five timing samples.
 
 The single-agent case records:
 
 \begin{itemize}[leftmargin=2em]
-    \item time computation halted,
+    \item averaged time computation halted,
+    \item A* nodes expanded,
     \item total path length,
     \item total turns.
 \end{itemize}
 
-When graph/data outputs are generated, the single-agent case also creates a matplotlib-formatted comparison table in the same graphs folder. In this table, Running time/s uses the time computation halted value, Number of nodes uses the stored conflicts-detected metric, Number of turns uses the total turns value, and Total distance uses the path length value.
+When graph/data outputs are generated, the single-agent case also creates a matplotlib-formatted comparison table in the same graphs folder. In this table, Running time/s uses the averaged time computation halted value, Number of nodes uses the A* expanded-node count, Number of turns uses the total turns value, and Total distance uses the path length value. The first column is Map number, with sections for maps 1, 2, and 3. The raw run record also stores the individual timing samples used to compute the average.
 
 The individual cyclic-faster filter is disabled for the single-agent case because cyclic mapping is not expected to help single-agent pathfinding. This case is included to show that cyclic mapping is not proposed as a general single-agent shortcut.
 
@@ -121,33 +135,29 @@ ECBS + classical mapping
 ECBS + cyclic mapping
 \end{lstlisting}
 
-Each multi-agent case uses 15 agents. All agents share the same upper-right target cell and disappear after reaching it. Agents are released through two spawn cells: the upper neighbor and the right neighbor of the lower-left start cell. The solver supports explicit per-agent \texttt{spawn\_time}. Before an agent's spawn time, it does not occupy the map. At its spawn time, it appears at its assigned spawn cell.
+The multi-agent case uses the configured agent count for each port map. By default, maps 1, 2, and 3 each use 10 agents, but these values can be edited independently through \texttt{MULTI\_AGENT\_REFERENCE\_PORT\_MAP\_AGENT\_NUMBERS}. All agents share the same upper-right target cell and disappear after reaching it. Agents are released through two spawn cells: the upper neighbor and the right neighbor of the lower-left start cell. The solver supports explicit per-agent \texttt{spawn\_time}. Before an agent's spawn time, it does not occupy the map. At its spawn time, it appears at its assigned spawn cell.
+
+Each map and mapping is timed using three identical ECBS executions, controlled by \texttt{MULTI\_AGENT\_TIMING\_REPETITIONS = 3}. The stored runtime is the average of those three timing samples. The path-related values come from the representative deterministic solution.
 
 The multi-agent case records:
 
 \begin{itemize}[leftmargin=2em]
-    \item time computation halted,
+    \item averaged time computation halted,
     \item number of conflicts detected,
     \item total path length,
     \item total turns.
 \end{itemize}
 
-The multi-agent case deliberately uses the temporary individual cyclic-faster filter. It retains only paired attempts where cyclic mapping halts faster than classical mapping. The retained quota follows the existing temporary-filter behavior: three retained paired runs are required. The maximum number of attempts is controlled by:
-
-\begin{lstlisting}
-TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20
-\end{lstlisting}
-
-This filtered setup is intentional and should be treated as a supplementary stress/reference comparison, not as the main unbiased performance evidence.
+When graph/data outputs are generated, the multi-agent table uses Map number as the first column. The reported path parameters are Running time/s, Average number of conflicts, Average number of turns, and Average total distance. The temporary individual cyclic-faster filter is disabled for the multi-agent reference case.
 
 \section{Heuristic and Solver Settings}
 
-For the single-agent A* cases and for the multi-agent ECBS cases, the reference comparison keeps the project's current true static shortest-path distance heuristic instead of using Manhattan distance. The Tang reference is therefore used mainly for the map sizes and the lower-left to upper-right setup, not for continuous movement, interpolation, smoothing, or Manhattan-only heuristic behavior.
+For the single-agent A* cases and for the multi-agent ECBS cases, the reference comparison keeps the project's current true static shortest-path distance heuristic instead of using Manhattan distance. The Tang reference is therefore used mainly for the map style and the lower-left to upper-right setup, not for continuous movement, interpolation, smoothing, or Manhattan-only heuristic behavior.
 
 Shared reference settings include:
 
 \begin{lstlisting}
-SHARED_TIME_LIMIT_SECONDS = 30.0
+SHARED_TIME_LIMIT_SECONDS = 120.0
 SHARED_ECBS_SUBOPTIMALITY = 3.0
 SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
 SHARED_TIGHT_TIME_HORIZON = False
@@ -168,10 +178,8 @@ dev/outputs_ref_comparison/
 Each case has its own independent folder:
 
 \begin{lstlisting}
-dev/outputs_ref_comparison/single_agent_x20/
-dev/outputs_ref_comparison/single_agent_x50/
-dev/outputs_ref_comparison/multi_agent_x20/
-dev/outputs_ref_comparison/multi_agent_x50/
+dev/outputs_ref_comparison/single_agent/
+dev/outputs_ref_comparison/multi_agent/
 \end{lstlisting}
 
 Inside each case folder, the structure follows the same general idea as the main experiment:
@@ -193,7 +201,7 @@ dev/outputs_ref_comparison/raw_mapf_files/<case_id>/
 
 \section{Important Interpretation Notes}
 
-The reference comparison is supplementary. It should not be merged with the main seven-map results. In particular, the multi-agent reference case uses a deliberately filtered collection rule, so its graphs should be interpreted as a favorable reference showcase rather than a neutral average over all possible attempts.
+The reference comparison is supplementary. It should not be merged with the main seven-map results. It is intended as a focused reference check using three 50x50 port maps, fixed lower-left to upper-right movement, and repeated timing samples to reduce fluke timing effects.
 
 The main experiment remains the primary evidence for cyclic mapping's overall behavior.
 

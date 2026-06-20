@@ -71,17 +71,12 @@ When \texttt{REMOVE\_EXTRA\_TRANSITIONS} is \texttt{True}, cyclic mapping keeps 
 The selectable reference cases are:
 
 \begin{lstlisting}
-SELECTED_PORT_EXPERIMENT = "single_agent_x20"
-# SELECTED_PORT_EXPERIMENT = "single_agent_x50"
-# SELECTED_PORT_EXPERIMENT = "multi_agent_x20"
-# SELECTED_PORT_EXPERIMENT = "multi_agent_x50"
+# SELECTED_PORT_EXPERIMENT = "single_agent"
+SELECTED_PORT_EXPERIMENT = "multi_agent"
 \end{lstlisting}
 
-The single-agent cases compare traditional A* on classical mapping against traditional A* on cyclic mapping. They are selected one map size at a time, record one paired run per selected map size, and do not use the cyclic-faster filter. The multi-agent cases compare ECBS with classical mapping against ECBS with cyclic mapping using 15 agents, shared upper-right target, and explicit per-agent release/spawn times from the two neighbors of the lower-left start cell. Multi-agent reference cases deliberately use the individual cyclic-faster filter and retain three paired runs where cyclic halts faster than classical.
+The single-agent reference case compares traditional A* on classical mapping against traditional A* on cyclic mapping across three separate 50x50 port maps: \texttt{port\_map\_1.png}, \texttt{port\_map\_2.png}, and \texttt{port\_map\_3.png}. The older orientation-based variants are no longer generated. For each map, the start remains the lower-left-most free cell and the goal remains the upper-right-most free cell. For each single-agent map and mapping, \texttt{SINGLE\_AGENT\_TIMING\_REPETITIONS = 5} repeats the same deterministic A* setup five times and stores the average runtime. The path, node, turn, and distance values are still produced from the same unchanged setup. The multi-agent reference case uses the same three-map structure with ECBS on classical mapping against ECBS on cyclic mapping. Each port map has its own configurable agent count through \texttt{MULTI\_AGENT\_REFERENCE\_PORT\_MAP\_AGENT\_NUMBERS}. For each multi-agent map and mapping, \texttt{MULTI\_AGENT\_TIMING\_REPETITIONS = 3} repeats the same deterministic release/spawn setup three times and stores the average runtime. The temporary individual cyclic-faster filter is disabled.
 
-Reference outputs are stored separately from the main experiment under \texttt{dev/outputs\_ref\_comparison/}. Each case has an independent output folder such as \texttt{single\_agent\_x20} or \texttt{multi\_agent\_x50}. The different map sizes are not combined into one map-size-axis graph; each case produces its own one-point graphs using agent number as the x-axis.
+Reference outputs are stored separately from the main experiment under \texttt{dev/outputs\_ref\_comparison/}. Each case has an independent output folder such as \texttt{single\_agent} or \texttt{multi\_agent}. Reference graph/data generation writes a matplotlib-formatted summary table beside the graphs, with separate sections for map numbers 1, 2, and 3. Single-agent tables report nodes, turns, and total distance; multi-agent tables replace nodes with conflicts and label the path-related values as averages across agents. When \texttt{to\_generate = "visualization"}, reference visualization selection is performed independently for each map number and mapping, so all three port map types are represented when solved candidates exist. The visualization phase logs the candidate selection, each map/mapping being rendered, frame-writing stages, and final frame counts.
 
 \end{document}
-
-
-Single-agent reference graph/data generation also writes a matplotlib-formatted summary table beside the graphs.

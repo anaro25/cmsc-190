@@ -141,6 +141,7 @@ class RefRawDataStore:
                 "experiment_mode": self.case_spec.experiment_mode,
                 "map_size": self.case_spec.map_size,
                 "agent_number": self.case_spec.agent_number,
+                "map_agent_numbers": {str(key): value for key, value in sorted(self.case_spec.map_agent_numbers.items())},
                 "run_configurations_count": len(payload.get("run_configurations", [])),
                 "run_records_count": len(payload.get("run_records", [])),
                 "discarded_attempts_count": len(payload.get("discarded_attempts", [])),
