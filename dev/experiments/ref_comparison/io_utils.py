@@ -45,12 +45,9 @@ def _reset_dir(path: Path) -> None:
 
 
 def _execution_stage_name(*, recompute_mapf: bool, generation_target: str) -> str:
-    stages: list[str] = []
     if recompute_mapf:
-        stages.append("computation")
-    if generation_target != "nothing":
-        stages.append(generation_target)
-    return "__and__".join(stages) if stages else "no_generation"
+        return "raw_data"
+    return str(generation_target)
 
 
 class RefCaseOutputManager:
@@ -63,18 +60,18 @@ class RefCaseOutputManager:
             recompute_mapf=recompute_mapf,
             generation_target=generation_target,
         )
-        self.aggregates_dir = self.case_root / "aggregates" / "graphs_and_data"
-        self.graphs_dir = self.case_root / "graphs" / "graphs_and_data"
+        self.aggregates_dir = self.case_root / "aggregates" / "graphs"
+        self.graphs_dir = self.case_root / "graphs" / "graphs"
         self.logs_dir = self.case_root / "logs" / self.execution_stage_name
         self.metadata_dir = self.case_root / "metadata" / generation_target
-        self.records_dir = self.case_root / "records" / "graphs_and_data"
+        self.records_dir = self.case_root / "records" / "graphs"
         self.visualizations_dir = self.case_root / "visualizations"
 
     def prepare_log_output(self) -> Path:
         _reset_dir(self.logs_dir)
         return self.logs_dir / "reference_comparison.log"
 
-    def clear_graphs_and_data_outputs(self) -> None:
+    def clear_graphs_outputs(self) -> None:
         _reset_dir(self.aggregates_dir)
         _reset_dir(self.graphs_dir)
         _reset_dir(self.metadata_dir)
@@ -172,7 +169,7 @@ class RefRawDataStore:
         if not self.manifest_path.exists() or not self.payload_path.exists():
             raise FileNotFoundError(
                 "No persisted reference-comparison raw data exists for "
-                f"case '{self.case_spec.case_id}'. Set recompute_MAPF = True first."
+                f"case '{self.case_spec.case_id}'. Set to_generate = \"raw_data\" first."
             )
         with self.payload_path.open("rb") as handle:
             return pickle.load(handle)

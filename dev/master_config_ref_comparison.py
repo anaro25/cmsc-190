@@ -68,11 +68,10 @@ TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20
 # Program workflow, intentionally parallel to the main experiment.
 # ---------------------------------------------------------------------------
 
-recompute_MAPF = False
-
-to_generate = "graphs_and_data"
-# to_generate = "visualization"
-# to_generate = "nothing"
+# Select exactly one program mode.
+# to_generate = "raw_data"       # recompute and save raw reference-comparison data
+to_generate = "graphs"          # regenerate graphs/data from saved raw data
+# to_generate = "visualization"  # regenerate visualizations from saved raw data
 
 # Select exactly one reference-comparison execution target.
 # SELECTED_PORT_EXPERIMENT = "single_agent"

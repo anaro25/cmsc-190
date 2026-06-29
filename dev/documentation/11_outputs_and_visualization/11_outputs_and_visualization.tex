@@ -42,7 +42,7 @@ The project now distinguishes between:
     \item \textbf{presentation outputs} under \texttt{dev/outputs/<map\_type>/}.
 \end{itemize}
 
-The raw MAPF store is branch-local and survives across later runs. It is replaced only when \texttt{recompute\_MAPF=True}. The presentation outputs can then be regenerated from that saved raw data without rerunning the expensive solver stage. Older branch-local roots that still live under \texttt{dev/raw\_mapf\_data/<map\_type>/} or \texttt{dev/raw\_mapf\_files/<map\_type>/} are migrated automatically into the new \texttt{outputs/raw\_mapf\_files} location when the branch is loaded.
+The raw MAPF store is branch-local and survives across later runs. It is replaced only when \texttt{to\_generate="raw\_data"}. The presentation outputs can then be regenerated from that saved raw data without rerunning the expensive solver stage. Older branch-local roots that still live under \texttt{dev/raw\_mapf\_data/<map\_type>/} or \texttt{dev/raw\_mapf\_files/<map\_type>/} are migrated automatically into the new \texttt{outputs/raw\_mapf\_files} location when the branch is loaded.
 
 The persisted raw-data tree is intentionally split rather than packed into one giant pickle. Each branch root now contains a manifest and metadata files at the top level, plus one condition subfolder per reported agent number. Inside each condition folder, the aggregate summary, retained run configurations, retained run records, and successful visualization candidates are stored separately. This keeps larger experiment ranges much easier to inspect and replace.
 
@@ -59,16 +59,14 @@ However, the presentation-output tree is now \emph{latest-only}. Each purpose ke
 \begin{lstlisting}
 dev/outputs/<map_type>/
     logs/
-        computation/
+        raw_data/
             experiment.log
-        graphs_and_data/
+        graphs/
             experiment.log
         visualization/
             experiment.log
-        computation__and__graphs_and_data/   # only when both happen together
-            experiment.log
     metadata/
-        graphs_and_data/
+        graphs/
             branch_spec.json
             graph_generation_branch_spec.json
             branch_stop_summary.json
@@ -76,17 +74,17 @@ dev/outputs/<map_type>/
         visualization/
             visualization_selection_summary.json
     records/
-        graphs_and_data/
+        graphs/
             run_configurations.json
             run_configurations.csv
             run_records.json
             run_records.csv
     aggregates/
-        graphs_and_data/
+        graphs/
             condition_summary.json
             condition_summary.csv
     graphs/
-        graphs_and_data/
+        graphs/
             ...
     visualizations/
         jointly_successful/
@@ -119,14 +117,14 @@ The condition folders contain only the retained reported data for that agent num
 
 \section{Structured Files}
 
-When \texttt{to\_generate="graphs\_and\_data"}, the most important regenerated structured outputs inside the current \texttt{graphs\_and\_data/} folders are:
+When \texttt{to\_generate="graphs"}, the most important regenerated structured outputs inside the current \texttt{graphs/} folders are:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{metadata/graphs\_and\_data/branch\_spec.json},
-    \item \texttt{metadata/graphs\_and\_data/branch\_stop\_summary.json},
-    \item \texttt{metadata/graphs\_and\_data/shared\_dynamic\_state.json} for dynamic branches,
-    \item \texttt{records/graphs\_and\_data/run\_configurations.json} and \texttt{.csv},
-    \item \texttt{records/graphs\_and\_data/run\_records.json} and \texttt{.csv},
-    \item \texttt{aggregates/graphs\_and\_data/condition\_summary.json} and \texttt{.csv}.
+    \item \texttt{metadata/graphs/branch\_spec.json},
+    \item \texttt{metadata/graphs/branch\_stop\_summary.json},
+    \item \texttt{metadata/graphs/shared\_dynamic\_state.json} for dynamic branches,
+    \item \texttt{records/graphs/run\_configurations.json} and \texttt{.csv},
+    \item \texttt{records/graphs/run\_records.json} and \texttt{.csv},
+    \item \texttt{aggregates/graphs/condition\_summary.json} and \texttt{.csv}.
 \end{itemize}
 
 The solver update makes two of those files more informative:
@@ -144,9 +142,9 @@ The experiment logger writes each line both to the stage-specific log file and t
 
 The top-level manual control now has three modes:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{to\_generate="graphs\_and\_data"}: regenerate structured files and metric graphs from the saved raw payload,
-    \item \texttt{to\_generate="visualization"}: regenerate Pillow visualization frames only,
-    \item \texttt{to\_generate="nothing"}: do not regenerate presentation artifacts in that run.
+    \item \texttt{to\_generate="raw\_data"}: recompute and save the raw MAPF solver payload only,
+    \item \texttt{to\_generate="graphs"}: regenerate structured files and metric graphs from the saved raw payload,
+    \item \texttt{to\_generate="visualization"}: regenerate Pillow visualization frames only.
 \end{itemize}
 
 Because the project now treats graphs/data and Pillow frames as separate artifact families, one family may intentionally remain older than the other until the user chooses to regenerate it.
@@ -155,7 +153,7 @@ Because the project now treats graphs/data and Pillow frames as separate artifac
 
 \subsection{Graph X-Axis Domain}
 
-When \texttt{to\_generate="graphs\_and\_data"} is run against already-saved raw MAPF data, the plotted metric values and the x-axis tick labels are both derived from the agent numbers that are actually present in the persisted branch records being graphed. The graphing layer still forces every such x-value to be labeled explicitly, so Matplotlib does not silently skip labels such as showing only \(2,4,6,\dots\).
+When \texttt{to\_generate="graphs"} is run against already-saved raw MAPF data, the plotted metric values and the x-axis tick labels are both derived from the agent numbers that are actually present in the persisted branch records being graphed. The graphing layer still forces every such x-value to be labeled explicitly, so Matplotlib does not silently skip labels such as showing only \(2,4,6,\dots\).
 
 This keeps regenerated graphs compact: if the current branch domain in \texttt{master\_config.py} extends far beyond the previously computed results, the x-axis no longer stretches across that unused range. Backward compatibility is preserved because older saved raw data remains readable without needing to recompute it under the newer domain.
 

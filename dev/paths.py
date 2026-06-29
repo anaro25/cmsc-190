@@ -15,16 +15,6 @@ LEGACY_RAW_MAPF_DATA_ROOTS = [
 STATIC_ARTIFICIAL_DIR = OUTPUTS_ROOT / "static_artificial"
 DYNAMIC_PORT_DIR = OUTPUTS_ROOT / "dynamic_port"
 
-for _path in [
-    OUTPUTS_ROOT,
-    OUTPUTS_REF_COMPARISON_ROOT,
-    RAW_MAPF_DATA_ROOT,
-    RAW_REF_COMPARISON_DATA_ROOT,
-    STATIC_ARTIFICIAL_DIR,
-    DYNAMIC_PORT_DIR,
-]:
-    _path.mkdir(parents=True, exist_ok=True)
-
 
 def get_context_output_dir(context_name):
     output_dir = OUTPUTS_ROOT / context_name

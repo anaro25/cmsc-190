@@ -75,11 +75,10 @@ TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 15 # 20
 
 # ===================================
 
-recompute_MAPF = False
-
-to_generate = "graphs_and_data"
-# to_generate = "visualization"
-# to_generate = "nothing"
+# Select exactly one program mode.
+# to_generate = "raw_data"       # recompute and save raw MAPF solver data
+to_generate = "graphs"          # regenerate graphs/data from saved raw data
+# to_generate = "visualization"  # regenerate visualizations from saved raw data
 
 # Traditional MAPF
 MAP_TYPE = "static_artificial"

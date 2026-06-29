@@ -68,14 +68,12 @@ When \texttt{ADD\_TRANSITIONS\_BETWEEN\_FREE\_SPACES} is \texttt{True}, the refe
 The reference workflow intentionally mirrors the main experiment workflow. The raw solver execution phase is separated from graph/data generation and visualization generation.
 
 \begin{lstlisting}
-recompute_MAPF = True
-
-to_generate = "graphs_and_data"
+# to_generate = "raw_data"
+to_generate = "graphs"
 # to_generate = "visualization"
-# to_generate = "nothing"
 \end{lstlisting}
 
-If \texttt{recompute\_MAPF = True}, the selected reference case is executed and raw data is saved. If \texttt{recompute\_MAPF = False}, existing raw data is reused. The output-generation target then decides whether the program writes graphs/data, visualizations, or nothing.
+If \texttt{to\_generate = "raw\_data"}, the selected reference case is executed and raw data is saved. If \texttt{to\_generate = "graphs"} or \texttt{to\_generate = "visualization"}, existing raw data is reused.
 
 When \texttt{to\_generate = "visualization"}, visualization candidates are selected independently for each map number and mapping. Therefore, if solved candidates are available for all three port maps, the visualizer writes one visualization set per map type instead of keeping only the final successful map overall. The visualization phase also logs candidate selection, the current map and mapping being rendered, frame-writing stages, and final frame counts.
 

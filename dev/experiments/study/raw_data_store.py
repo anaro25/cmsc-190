@@ -188,7 +188,7 @@ class BranchRawDataStore:
             if backup_root.exists():
                 shutil.rmtree(backup_root)
 
-    def load_graphs_and_data_payload(self) -> dict[str, Any]:
+    def load_graphs_payload(self) -> dict[str, Any]:
         manifest = self._load_manifest()
         branch_spec = self._load_branch_spec(manifest)
         dynamic_state = self._load_dynamic_state(manifest)
@@ -236,7 +236,7 @@ class BranchRawDataStore:
         }
 
     def load(self) -> dict[str, Any]:
-        payload = self.load_graphs_and_data_payload()
+        payload = self.load_graphs_payload()
         payload.update(self.load_visualization_payload())
         return payload
 
@@ -251,7 +251,7 @@ class BranchRawDataStore:
             raise FileNotFoundError(
                 "No persisted raw MAPF data exists for "
                 f"branch '{self.branch_spec.map_type}'. "
-                "Set recompute_MAPF = True first so the program computes and saves raw MAPF data for this branch."
+                "Set to_generate = \"raw_data\" first so the program computes and saves raw MAPF data for this branch."
             )
         return self._read_json(self.manifest_path)
 
@@ -318,7 +318,7 @@ class BranchRawDataStore:
         # Older persisted branch_spec.json files may contain metadata fields that
         # no longer exist in the current BranchSpec dataclass. Ignore those
         # legacy extras so saved raw MAPF data can still be reused when
-        # recompute_MAPF is False.
+        # to_generate is not "raw_data".
         valid_branch_spec_keys = {field.name for field in fields(BranchSpec)}
         branch_spec_payload = {
             key: value

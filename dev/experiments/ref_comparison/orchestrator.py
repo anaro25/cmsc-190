@@ -31,11 +31,10 @@ from dev.master_config_ref_comparison import (
     agent_cohesion,
     cohesion_factor,
     enhanced_CBS,
-    recompute_MAPF,
     to_generate,
 )
 
-VALID_GENERATION_TARGETS = {"graphs_and_data", "visualization", "nothing"}
+VALID_GENERATION_TARGETS = {"raw_data", "graphs", "visualization"}
 
 
 def _normalize_map_agent_numbers(value: object) -> dict[int, int]:
@@ -115,8 +114,12 @@ def _selected_case_ids() -> list[str]:
 def _resolve_generation_target() -> str:
     generation_target = str(to_generate)
     if generation_target not in VALID_GENERATION_TARGETS:
-        raise ValueError("to_generate must be one of 'graphs_and_data', 'visualization', or 'nothing'.")
+        raise ValueError("to_generate must be one of 'raw_data', 'graphs', or 'visualization'.")
     return generation_target
+
+
+def _should_recompute_raw_mapf(generation_target: str) -> bool:
+    return generation_target == "raw_data"
 
 
 def _log_case_header(logger: RefExperimentLogger, case_spec: RefCaseSpec) -> None:
@@ -453,8 +456,8 @@ def _compute_reference_case(case_spec: RefCaseSpec, logger: RefExperimentLogger)
     return _compute_multi_agent_case(case_spec, logger)
 
 
-def _write_graphs_and_data_outputs(*, case_spec: RefCaseSpec, raw_payload: dict, output_manager: RefCaseOutputManager, logger: RefExperimentLogger) -> list[Path]:
-    output_manager.clear_graphs_and_data_outputs()
+def _write_graphs_outputs(*, case_spec: RefCaseSpec, raw_payload: dict, output_manager: RefCaseOutputManager, logger: RefExperimentLogger) -> list[Path]:
+    output_manager.clear_graphs_outputs()
     run_configurations = list(raw_payload.get("run_configurations", []))
     run_records = list(raw_payload.get("run_records", []))
     aggregate_payload = dict(raw_payload.get("aggregate") or {})
@@ -500,36 +503,37 @@ def _write_visualization_outputs(*, raw_payload: dict, output_manager: RefCaseOu
 
 
 def run_reference_case(case_spec: RefCaseSpec, *, generation_target: str, program_start_time: float | None = None) -> dict:
-    output_manager = RefCaseOutputManager(case_spec, generation_target=generation_target, recompute_mapf=bool(recompute_MAPF))
+    recompute_raw_mapf = _should_recompute_raw_mapf(generation_target)
+    output_manager = RefCaseOutputManager(case_spec, generation_target=generation_target, recompute_mapf=recompute_raw_mapf)
     logger = RefExperimentLogger(output_manager.prepare_log_output(), start_time=program_start_time)
     raw_store = RefRawDataStore(case_spec)
 
     _log_case_header(logger, case_spec)
-    logger.log(f"recompute_MAPF: {bool(recompute_MAPF)}")
     logger.log(f"to_generate: {generation_target}")
+    logger.log(f"recompute raw MAPF data: {recompute_raw_mapf}")
     logger.log(f"raw_reference_data_root: {raw_store.case_root}")
     logger.log_elapsed("Reference-comparison stopwatch started.")
 
-    if recompute_MAPF:
+    if recompute_raw_mapf:
         logger.log("Computing raw reference-comparison MAPF data and replacing the saved copy...")
         payload = _compute_reference_case(case_spec, logger)
         raw_store.save(payload)
         logger.log_elapsed("Raw reference-comparison data computed and saved.")
     else:
-        logger.log("recompute_MAPF is False. Persisted raw reference-comparison data will be reused if outputs are requested.")
+        logger.log("Persisted raw reference-comparison data will be reused if outputs are requested.")
 
     graph_paths: list[Path] = []
     visualization_summary: dict = {}
     raw_payload_used = False
 
-    if generation_target == "nothing":
-        logger.log("No graphs, data exports, or visualizations generated because to_generate='nothing'.")
+    if generation_target == "raw_data":
+        logger.log("Only raw reference-comparison data was generated. Graph/data exports and visualizations were not regenerated in this run.")
     else:
         raw_payload = raw_store.load()
         raw_payload_used = True
         logger.log("Loaded persisted raw reference-comparison data for output generation.")
-        if generation_target == "graphs_and_data":
-            graph_paths = _write_graphs_and_data_outputs(case_spec=case_spec, raw_payload=raw_payload, output_manager=output_manager, logger=logger)
+        if generation_target == "graphs":
+            graph_paths = _write_graphs_outputs(case_spec=case_spec, raw_payload=raw_payload, output_manager=output_manager, logger=logger)
         elif generation_target == "visualization":
             visualization_summary = _write_visualization_outputs(raw_payload=raw_payload, output_manager=output_manager, logger=logger)
 
@@ -541,7 +545,7 @@ def run_reference_case(case_spec: RefCaseSpec, *, generation_target: str, progra
         "graph_paths": [str(path) for path in graph_paths],
         "visualization_summary": visualization_summary,
         "generation_target": generation_target,
-        "recompute_MAPF": bool(recompute_MAPF),
+        "raw_mapf_data_recomputed": recompute_raw_mapf,
         "raw_payload_used_for_generation": raw_payload_used,
     }
 

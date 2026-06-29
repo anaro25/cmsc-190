@@ -40,7 +40,7 @@ from dev.experiments.study.preparation import (
 )
 from dev.experiments.study.runtime import build_mapping_record, run_dynamic_mapping, run_static_mapping
 from dev.experiments.study.visualization import render_selected_visualizations
-from dev.master_config import recompute_MAPF, to_generate
+from dev.master_config import to_generate
 
 
 def _prepare_run_context(
@@ -693,16 +693,20 @@ def _run_jointly_viable_sampling(
         discarded_runtime_selection_batches=discarded_runtime_selection_batches,
     )
 
-VALID_GENERATION_TARGETS = {"graphs_and_data", "visualization", "nothing"}
+VALID_GENERATION_TARGETS = {"raw_data", "graphs", "visualization"}
 
 
 def _resolve_generation_target() -> str:
     generation_target = str(to_generate)
     if generation_target not in VALID_GENERATION_TARGETS:
         raise ValueError(
-            "to_generate must be one of 'graphs_and_data', 'visualization', or 'nothing'."
+            "to_generate must be one of 'raw_data', 'graphs', or 'visualization'."
         )
     return generation_target
+
+
+def _should_recompute_raw_mapf(generation_target: str) -> bool:
+    return generation_target == "raw_data"
 
 
 def _build_dynamic_state_metadata(dynamic_state: DynamicBranchState) -> dict[str, Any]:
@@ -879,7 +883,7 @@ def _compute_raw_branch_data(
     }
 
 
-def _write_graphs_and_data_outputs(
+def _write_graphs_outputs(
     *,
     current_branch_spec,
     raw_payload: dict[str, Any],
@@ -894,7 +898,7 @@ def _write_graphs_and_data_outputs(
     discarded_runtime_selection_batches = list(raw_payload.get("discarded_runtime_selection_batches", []))
     branch_stop_summary = dict(raw_payload.get("branch_stop_summary", {}))
 
-    output_manager.clear_graphs_and_data_outputs()
+    output_manager.clear_graphs_outputs()
     write_json(output_manager.metadata_dir / "branch_spec.json", raw_branch_spec.to_dict())
     write_json(
         output_manager.metadata_dir / "graph_generation_branch_spec.json",
@@ -1010,23 +1014,24 @@ def run_selected_experiment(
     branch_spec = get_branch_spec(map_type)
     resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
     generation_target = _resolve_generation_target()
+    recompute_raw_mapf = _should_recompute_raw_mapf(generation_target)
     output_manager = BranchOutputManager(
         branch_spec,
         generation_target=generation_target,
-        recompute_mapf=bool(recompute_MAPF),
+        recompute_mapf=recompute_raw_mapf,
     )
     log_path = output_manager.prepare_log_output()
     logger = ExperimentLogger(log_path, start_time=program_start_time)
     raw_store = BranchRawDataStore(branch_spec)
 
     log_branch_header(logger, branch_spec)
-    logger.log(f"recompute_MAPF: {bool(recompute_MAPF)}")
     logger.log(f"to_generate: {generation_target}")
+    logger.log(f"recompute raw MAPF data: {recompute_raw_mapf}")
     logger.log(f"Persisted raw MAPF data root: {raw_store.branch_root}")
     logger.log(f"Persisted raw MAPF manifest path: {raw_store.manifest_path}")
     logger.log_elapsed("Program stopwatch started.")
 
-    if recompute_MAPF:
+    if recompute_raw_mapf:
         logger.log("")
         logger.log("Recomputing raw MAPF data for the selected branch and replacing the saved copy...")
         computed_payload = _compute_raw_branch_data(
@@ -1039,7 +1044,7 @@ def run_selected_experiment(
         logger.log("If graphs or visualization are requested in this run, they will be regenerated from the saved raw MAPF data on disk.")
     else:
         logger.log("")
-        logger.log("recompute_MAPF is False. The persisted raw MAPF data for this branch will remain unchanged.")
+        logger.log("The persisted raw MAPF data for this branch will remain unchanged.")
 
     graph_paths: list[Path] = []
     visualization_summary: dict[str, Any] = {
@@ -1049,12 +1054,12 @@ def run_selected_experiment(
     raw_payload_used = False
     result_branch_spec = branch_spec
 
-    if generation_target == "nothing":
-        logger.log("No graphs, data exports, or Pillow visualizations were generated because to_generate='nothing'.")
+    if generation_target == "raw_data":
+        logger.log("Only raw MAPF data was generated. Graph/data exports and Pillow visualizations were not regenerated in this run.")
     else:
         try:
-            if generation_target == "graphs_and_data":
-                raw_payload = raw_store.load_graphs_and_data_payload()
+            if generation_target == "graphs":
+                raw_payload = raw_store.load_graphs_payload()
             else:
                 raw_payload = raw_store.load_visualization_payload()
         except FileNotFoundError as exc:
@@ -1062,13 +1067,10 @@ def run_selected_experiment(
             raise
         raw_payload_used = True
         result_branch_spec = raw_payload["branch_spec"]
-        if recompute_MAPF:
-            logger.log("Reloaded the saved raw MAPF data from disk for output generation consistency.")
-        else:
-            logger.log("Loaded the persisted raw MAPF data for output generation.")
+        logger.log("Loaded the persisted raw MAPF data for output generation.")
 
-        if generation_target == "graphs_and_data":
-            graph_paths = _write_graphs_and_data_outputs(
+        if generation_target == "graphs":
+            graph_paths = _write_graphs_outputs(
                 current_branch_spec=branch_spec,
                 raw_payload=raw_payload,
                 output_manager=output_manager,
@@ -1103,6 +1105,6 @@ def run_selected_experiment(
         ),
         "log_path": str(log_path),
         "generation_target": generation_target,
-        "recompute_MAPF": bool(recompute_MAPF),
+        "raw_mapf_data_recomputed": recompute_raw_mapf,
         "raw_payload_used_for_generation": raw_payload_used,
     }

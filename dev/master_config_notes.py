@@ -84,16 +84,11 @@
 #   True  -> use the tighter distance-aware horizon. This still preserves a slack
 #            allowance, but it is much smaller than the older map-size-based cap.
 
-# recompute_MAPF
-#   Project-level raw-data persistence toggle.
-#   False -> keep the currently saved raw MAPF data for the selected branch.
-#   True  -> recompute raw MAPF data for the selected branch and replace it.
-#
 # to_generate
-#   Project-level output-generation selector.
-#   "graphs_and_data" -> regenerate structured outputs and graphs from saved raw MAPF data.
-#   "visualization"   -> regenerate Pillow visualizations from saved raw MAPF data.
-#   "nothing"         -> do not regenerate outputs in this run.
+#   Project-level program-mode selector. Exactly one mode is active per run.
+#   "raw_data"      -> recompute raw MAPF data for the selected branch and replace it.
+#   "graphs"        -> regenerate structured outputs and graphs from saved raw MAPF data.
+#   "visualization" -> regenerate Pillow visualizations from saved raw MAPF data.
 #
 # Presentation outputs are latest-only. Regenerating logs, graphs/data, or
 # visualizations replaces the previous copy for that same purpose instead of
@@ -103,7 +98,7 @@
 # Each branch now keeps a split raw-data directory with a manifest, metadata, and
 # per-condition files instead of one monolithic pickle. The program does not try
 # to validate whether the current code or configuration matches the saved raw data;
-# set recompute_MAPF=True when you want to replace it.
+# set to_generate="raw_data" when you want to replace it.
 # Visualization-selection controls such as
 # num_last_runs_to_visualize_jointly_successful and
 # num_last_runs_to_visualize_independently_successful are read from the current

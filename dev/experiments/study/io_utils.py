@@ -51,14 +51,9 @@ class BufferedExperimentLogger:
 
 
 def _build_execution_stage_name(*, recompute_mapf: bool, generation_target: str) -> str:
-    active_stages: list[str] = []
     if recompute_mapf:
-        active_stages.append("computation")
-    if generation_target != "nothing":
-        active_stages.append(str(generation_target))
-    if not active_stages:
-        return "no_generation"
-    return "__and__".join(active_stages)
+        return "raw_data"
+    return str(generation_target)
 
 
 class BranchOutputManager:
@@ -79,9 +74,9 @@ class BranchOutputManager:
         self.generation_target = str(generation_target)
 
         self.metadata_dir = self.branch_root / "metadata" / self.generation_target
-        self.records_dir = self.branch_root / "records" / "graphs_and_data"
-        self.aggregates_dir = self.branch_root / "aggregates" / "graphs_and_data"
-        self.graphs_dir = self.branch_root / "graphs" / "graphs_and_data"
+        self.records_dir = self.branch_root / "records" / "graphs"
+        self.aggregates_dir = self.branch_root / "aggregates" / "graphs"
+        self.graphs_dir = self.branch_root / "graphs" / "graphs"
         self.logs_dir = self.branch_root / "logs" / self.execution_stage_name
         self.visualizations_dir = self.branch_root / "visualizations"
 
@@ -95,7 +90,7 @@ class BranchOutputManager:
         self._reset_dir(self.logs_dir)
         return self.logs_dir / "experiment.log"
 
-    def clear_graphs_and_data_outputs(self) -> None:
+    def clear_graphs_outputs(self) -> None:
         self._reset_dir(self.metadata_dir)
         self._reset_dir(self.records_dir)
         self._reset_dir(self.aggregates_dir)
