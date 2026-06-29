@@ -9,6 +9,33 @@ from dev.master_config import BRANCH_USER_CONFIGS, agent_cohesion, cohesion_fact
 
 AgentNumberRange = tuple[int, int, int]
 
+TRADITIONAL_LAYOUTS: tuple[tuple[str, str], ...] = (
+    ("dispersed", "dispersed"),
+    ("dispersed", "clustered"),
+    ("clustered", "dispersed"),
+    ("clustered", "clustered"),
+)
+
+CAMPUS_LAYOUTS: tuple[tuple[str, str], ...] = (
+    ("dispersed", "dispersed"),
+    ("dispersed", "clustered"),
+    ("dispersed", "single"),
+    ("clustered", "dispersed"),
+    ("clustered", "clustered"),
+    ("clustered", "single"),
+)
+
+CATEGORY_ORDER: dict[str, int] = {
+    "static_artificial": 1,
+    "dynamic_artificial": 2,
+    "static_port": 3,
+    "dynamic_port": 4,
+    "static_campus_area_1": 5,
+    "dynamic_campus_area_1": 6,
+    "static_campus_area_2": 7,
+    "dynamic_campus_area_2": 8,
+}
+
 
 @dataclass(frozen=True)
 class BranchSpec:
@@ -26,10 +53,21 @@ class BranchSpec:
     agent_numbers: list[int]
     runtime_limit_seconds: float
     counted_runs_required: int
+    capacity_attempts_per_agent_number: int
+    capacity_successful_runs_required: int
+    capacity_agent_upper_bound: int
+    setup_generation_attempt_cap_per_solver_attempt: int
     num_last_runs_to_visualize_jointly_successful: int
     num_last_runs_to_visualize_independently_successful: int
     path_length_graph_enabled: bool
     is_dynamic: bool
+    category_map_type: str
+    category_index: int
+    layout_index: int
+    layout_key: str
+    layout_label: str
+    data_log_category_dir_name: str
+    data_log_file_stem: str
     start_distribution_mode: str = "dispersed"
     goal_distribution_mode: str = "dispersed"
     clustered_start_goal_min_distance: int | None = None
@@ -56,10 +94,6 @@ class BranchSpec:
     tight_time_horizon: bool = False
     agent_cohesion_enabled: bool = False
     cohesion_factor: float = 0.0
-    filter_individual_runs_until_cyclic_faster: bool = False
-    filter_individual_runs_until_cyclic_faster_max_attempts: int | None = None
-    rerun_until_cyclic_faster: bool = False
-    rerun_until_cyclic_faster_max_batches: int | None = None
     notes: str = ""
 
     def to_dict(self) -> dict[str, Any]:
@@ -109,6 +143,10 @@ def _clustering_style_name() -> str:
     return "compact" if compact_clustering else "spaced"
 
 
+def _is_campus_branch(map_type: str, config: dict[str, Any]) -> bool:
+    return "campus" in map_type or str(config.get("map_family", "")) == "campus_crowd_simulation"
+
+
 def _branch_supports_agent_cohesion(map_type: str, config: dict[str, Any]) -> bool:
     return _is_campus_branch(map_type, config) or map_type == "dynamic_port"
 
@@ -150,28 +188,37 @@ def _int_or_none(value: Any) -> int | None:
     return None if value is None else int(value)
 
 
-def _infer_map_type_index(map_type: str) -> int:
+def _infer_map_type_index(category_map_type: str) -> int:
     order = {
         "static_artificial": 0,
+        "dynamic_artificial": 0,
         "static_port": 1,
         "dynamic_port": 1,
         "static_campus_area_1": 2,
         "dynamic_campus_area_1": 2,
         "static_campus_area_2": 3,
         "dynamic_campus_area_2": 3,
-        "static_campus_area_3": 4,
-        "dynamic_campus_area_3": 4,
     }
-    return order.get(map_type, 99)
+    return order.get(category_map_type, 99)
 
 
-def _branch_decimal(*, is_dynamic: bool, map_type_index: int) -> str:
+def _branch_decimal(*, is_dynamic: bool, map_type_index: int, layout_index: int) -> str:
     map_obstacle_index = 1 if is_dynamic else 0
-    return f"{map_obstacle_index}.{map_type_index}"
+    return f"{map_obstacle_index}.{map_type_index}.{layout_index}"
 
 
-def _is_campus_branch(map_type: str, config: dict[str, Any]) -> bool:
-    return "campus" in map_type or str(config.get("map_family", "")) == "campus_crowd_simulation"
+def _layout_key(start_distribution_mode: str, goal_distribution_mode: str) -> str:
+    goal = "single_target" if goal_distribution_mode == "single" else goal_distribution_mode
+    return f"{start_distribution_mode}_{goal}"
+
+
+def _layout_label(start_distribution_mode: str, goal_distribution_mode: str) -> str:
+    goal = "single target" if goal_distribution_mode == "single" else goal_distribution_mode
+    return f"{start_distribution_mode.title()}-{goal}"
+
+
+def _display_name_for_config(category_display_name: str, layout_label: str) -> str:
+    return f"{category_display_name} / {layout_label}"
 
 
 def _notes_for_branch(
@@ -186,12 +233,17 @@ def _notes_for_branch(
     goal_description = _goal_distribution_description(goal_mode, cluster_description)
     assignment_description = _assignment_cardinality_description(goal_mode)
 
+    capacity_note = (
+        "Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for "
+        "classical and cyclic mapping, then runs paired comparative tests at both discovered capacity points."
+    )
+
     if config.get("image_path") is None:
+        dynamic_part = " Dynamic obstacles are generated on the artificial map." if is_dynamic else ""
         return (
-            "Fresh artificial map per run configuration. "
-            f"Starts are sampled as {start_mode}, goals use {goal_description}, and {assignment_description}. "
-            "Retained pairs are the run configurations for which both mappings are classified as successful or unfinished. "
-            "Agent numbers are generated from agent_number_range and the branch can stop early if the stopping rules trigger."
+            "Artificial map branch. "
+            f"Starts are sampled as {start_mode}, goals use {goal_description}, and {assignment_description}."
+            f"{dynamic_part} {capacity_note}"
         )
 
     if _is_campus_branch(map_type, config):
@@ -205,7 +257,7 @@ def _notes_for_branch(
             "are traversable but non-spawnable for agents/targets, and gray/black cells are non-traversable. "
             f"{dynamic_part}Starts are sampled as {start_mode} in one zone, targets use {goal_description} in a different zone, "
             f"and {assignment_description}. When single target mode is active, the shared target is sampled only from "
-            "dark marker cells inside the selected target zone."
+            f"dark marker cells inside the selected target zone. {capacity_note}"
         )
 
     if is_dynamic:
@@ -223,24 +275,28 @@ def _notes_for_branch(
     )
     return (
         f"Image-based port branch. {dynamic_part}Starts are sampled as {start_mode}, goals use {goal_description}, "
-        f"and {assignment_description}.{distance_part} Retained pairs are the run configurations for which both mappings are classified "
-        "as successful or unfinished. Agent numbers are generated from agent_number_range and the branch can stop early "
-        "if the stopping rules trigger."
+        f"and {assignment_description}.{distance_part} {capacity_note}"
     )
 
 
 def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSpec:
-    is_dynamic = bool(config.get("is_dynamic", map_type.startswith("dynamic_")))
+    category_map_type = str(config.get("category_map_type", map_type))
+    is_dynamic = bool(config.get("is_dynamic", category_map_type.startswith("dynamic_")))
     map_obstacle_type = "dynamic" if is_dynamic else "static"
     map_obstacle_index = 1 if is_dynamic else 0
-    map_type_index = int(config.get("map_type_index", _infer_map_type_index(map_type)))
-    branch_decimal = str(config.get("branch_decimal", _branch_decimal(is_dynamic=is_dynamic, map_type_index=map_type_index)))
+    map_type_index = int(config.get("map_type_index", _infer_map_type_index(category_map_type)))
+    layout_index = int(config.get("layout_index", 1))
+    branch_decimal = str(config.get("branch_decimal", _branch_decimal(is_dynamic=is_dynamic, map_type_index=map_type_index, layout_index=layout_index)))
     agent_number_range = tuple(config["agent_number_range"])
     solver_name, enhanced_cbs_enabled, solver_suboptimality_factor = _solver_metadata(config)
     clustering_style_name = _clustering_style_name()
     cluster_description = _cluster_description()
     map_size = config.get("map_size")
-    campus_branch = _is_campus_branch(map_type, config)
+    layout_key = str(config.get("layout_key", _layout_key(str(config.get("start_distribution_mode", "dispersed")), str(config.get("goal_distribution_mode", "dispersed")))))
+    layout_label = str(config.get("layout_label", _layout_label(str(config.get("start_distribution_mode", "dispersed")), str(config.get("goal_distribution_mode", "dispersed")))))
+    category_index = int(config.get("category_index", CATEGORY_ORDER.get(category_map_type, 99)))
+    data_log_category_dir_name = str(config.get("data_log_category_dir_name", f"{category_index}_{category_map_type}"))
+    data_log_file_stem = str(config.get("data_log_file_stem", f"{layout_index}_{category_map_type}_{layout_key}"))
 
     return BranchSpec(
         map_type=map_type,
@@ -249,7 +305,7 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         map_obstacle_type=map_obstacle_type,
         map_obstacle_index=map_obstacle_index,
         map_type_index=map_type_index,
-        display_name=str(config.get("display_name", map_type.replace("_", " ").title())),
+        display_name=_display_name_for_config(str(config.get("display_name", category_map_type.replace("_", " ").title())), layout_label),
         target_type_documented=_goal_type(config),
         target_type_active=_goal_type(config),
         seed_base=int(config["seed"]),
@@ -257,20 +313,21 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         agent_numbers=expand_agent_number_range(agent_number_range),
         runtime_limit_seconds=float(config["time_limit_seconds"]),
         counted_runs_required=int(config["counted_runs_required"]),
-        num_last_runs_to_visualize_jointly_successful=int(
-            config.get(
-                "num_last_runs_to_visualize_jointly_successful",
-                config.get("num_last_runs_to_visualize", 0),
-            )
-        ),
-        num_last_runs_to_visualize_independently_successful=int(
-            config.get(
-                "num_last_runs_to_visualize_independently_successful",
-                config.get("num_last_runs_to_visualize", 0),
-            )
-        ),
+        capacity_attempts_per_agent_number=int(config.get("capacity_attempts_per_agent_number", 5)),
+        capacity_successful_runs_required=int(config.get("capacity_successful_runs_required", 3)),
+        capacity_agent_upper_bound=int(config.get("capacity_agent_upper_bound", 255)),
+        setup_generation_attempt_cap_per_solver_attempt=int(config.get("setup_generation_attempt_cap_per_solver_attempt", 50)),
+        num_last_runs_to_visualize_jointly_successful=int(config.get("num_last_runs_to_visualize_jointly_successful", 0)),
+        num_last_runs_to_visualize_independently_successful=int(config.get("num_last_runs_to_visualize_independently_successful", 0)),
         path_length_graph_enabled=bool(config.get("path_length_graph_enabled", True)),
         is_dynamic=is_dynamic,
+        category_map_type=category_map_type,
+        category_index=category_index,
+        layout_index=layout_index,
+        layout_key=layout_key,
+        layout_label=layout_label,
+        data_log_category_dir_name=data_log_category_dir_name,
+        data_log_file_stem=data_log_file_stem,
         start_distribution_mode=str(config.get("start_distribution_mode", "dispersed")),
         goal_distribution_mode=str(config.get("goal_distribution_mode", "dispersed")),
         clustered_start_goal_min_distance=_int_or_none(config.get("clustered_start_goal_min_distance")),
@@ -287,9 +344,7 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         dynamic_target_static_obstacle_density=_float_or_none(config.get("target_static_obstacle_density")),
         dynamic_target_dynamic_obstacle_density=_float_or_none(config.get("target_dynamic_obstacle_density")),
         dynamic_loop_sequence_length=_int_or_none(config.get("loop_sequence_length")),
-        dynamic_group_stay_durations=(
-            None if config.get("group_stay_durations") is None else tuple(config["group_stay_durations"])
-        ),
+        dynamic_group_stay_durations=(None if config.get("group_stay_durations") is None else tuple(config["group_stay_durations"])),
         dynamic_generation_cell_mode=str(config.get("dynamic_generation_cell_mode", "all_free")),
         spawnable_cell_mode=str(config.get("spawnable_cell_mode", "all_free")),
         solver_name=solver_name,
@@ -297,18 +352,10 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         solver_suboptimality_factor=solver_suboptimality_factor,
         true_static_shortest_path_distance=bool(config.get("true_static_shortest_path_distance", False)),
         tight_time_horizon=bool(config.get("tight_time_horizon", False)),
-        agent_cohesion_enabled=bool(agent_cohesion) if _branch_supports_agent_cohesion(map_type, config) else False,
-        cohesion_factor=_resolved_cohesion_factor() if _branch_supports_agent_cohesion(map_type, config) else 0.0,
-        filter_individual_runs_until_cyclic_faster=bool(
-            config.get("filter_individual_runs_until_cyclic_faster", False)
-        ),
-        filter_individual_runs_until_cyclic_faster_max_attempts=_int_or_none(
-            config.get("filter_individual_runs_until_cyclic_faster_max_attempts")
-        ),
-        rerun_until_cyclic_faster=bool(config.get("rerun_until_cyclic_faster", False)),
-        rerun_until_cyclic_faster_max_batches=_int_or_none(config.get("rerun_until_cyclic_faster_max_batches")),
+        agent_cohesion_enabled=bool(agent_cohesion) if _branch_supports_agent_cohesion(category_map_type, config) else False,
+        cohesion_factor=_resolved_cohesion_factor() if _branch_supports_agent_cohesion(category_map_type, config) else 0.0,
         notes=_notes_for_branch(
-            map_type=map_type,
+            map_type=category_map_type,
             config=config,
             is_dynamic=is_dynamic,
             cluster_description=cluster_description,
@@ -316,18 +363,68 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
     )
 
 
+def _layouts_for_category(category_map_type: str, config: dict[str, Any]) -> tuple[tuple[str, str], ...]:
+    return CAMPUS_LAYOUTS if _is_campus_branch(category_map_type, config) else TRADITIONAL_LAYOUTS
+
+
+def _variant_seed(base_seed: int, layout_index: int) -> int:
+    return int(base_seed) + (layout_index * 1000)
+
+
+def _build_variant_specs_for_category(category_map_type: str) -> list[BranchSpec]:
+    if category_map_type not in BRANCH_USER_CONFIGS:
+        available = ", ".join(sorted(BRANCH_USER_CONFIGS))
+        raise ValueError(f"Unknown map_type '{category_map_type}'. Available map categories: {available}")
+    base_config = dict(BRANCH_USER_CONFIGS[category_map_type])
+    category_index = int(base_config.get("category_index", CATEGORY_ORDER.get(category_map_type, 99)))
+    specs: list[BranchSpec] = []
+    for layout_index, (start_mode, goal_mode) in enumerate(_layouts_for_category(category_map_type, base_config), start=1):
+        variant_config = dict(base_config)
+        layout_key = _layout_key(start_mode, goal_mode)
+        variant_config.update(
+            {
+                "category_map_type": category_map_type,
+                "category_index": category_index,
+                "layout_index": layout_index,
+                "layout_key": layout_key,
+                "layout_label": _layout_label(start_mode, goal_mode),
+                "start_distribution_mode": start_mode,
+                "goal_distribution_mode": goal_mode,
+                "seed": _variant_seed(int(base_config["seed"]), layout_index),
+                "data_log_category_dir_name": f"{category_index}_{category_map_type}",
+                "data_log_file_stem": f"{layout_index}_{category_map_type}_{layout_key}",
+            }
+        )
+        if not (start_mode == "clustered" and goal_mode == "clustered"):
+            variant_config["clustered_start_goal_min_distance"] = None
+        variant_map_type = f"{category_map_type}_{layout_key}"
+        specs.append(_build_single_branch_spec(variant_map_type, variant_config))
+    return specs
+
+
+def get_branch_specs_for_selected_map_type(map_type: str) -> list[BranchSpec]:
+    return _build_variant_specs_for_category(map_type)
+
+
 def _build_branch_specs() -> dict[str, BranchSpec]:
-    return {
-        map_type: _build_single_branch_spec(map_type, config)
-        for map_type, config in BRANCH_USER_CONFIGS.items()
-    }
+    specs: dict[str, BranchSpec] = {}
+    for category_map_type in BRANCH_USER_CONFIGS:
+        for spec in _build_variant_specs_for_category(category_map_type):
+            specs[spec.map_type] = spec
+    return specs
 
 
 BRANCH_SPECS = _build_branch_specs()
 
 
 def get_branch_spec(map_type: str) -> BranchSpec:
-    if map_type not in BRANCH_SPECS:
-        available = ", ".join(sorted(BRANCH_SPECS))
-        raise ValueError(f"Unknown map_type '{map_type}'. Available map types: {available}")
-    return BRANCH_SPECS[map_type]
+    if map_type in BRANCH_SPECS:
+        return BRANCH_SPECS[map_type]
+    category_specs = get_branch_specs_for_selected_map_type(map_type)
+    if len(category_specs) == 1:
+        return category_specs[0]
+    available = ", ".join(sorted(BRANCH_USER_CONFIGS))
+    raise ValueError(
+        f"'{map_type}' is a map category with {len(category_specs)} layout configurations. "
+        f"Use get_branch_specs_for_selected_map_type() for categories. Available categories: {available}"
+    )

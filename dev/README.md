@@ -37,36 +37,25 @@ The `study` package is split by responsibility:
 
 ## Current branches
 
-The configured branch set now contains 9 map types.
+The configured main-experiment branch set now contains 8 map categories. Selecting one category runs all documented layout configurations for that category.
 
 Traditional MAPF:
 
-- `static_artificial` — dispersed starts to dispersed targets
-- `static_port` — dispersed starts to clustered targets
-- `dynamic_port` — clustered starts to clustered targets
+- `static_artificial` — artificial static-obstacle map
+- `dynamic_artificial` — artificial map with generated dynamic obstacles
+- `static_port` — static image-based port map
+- `dynamic_port` — dynamic image-based port map
 
 Campus Crowd Simulation:
 
-- `static_campus_area_1` — dispersed starts to one shared single target
-- `dynamic_campus_area_1` — clustered starts to one shared single target
-- `static_campus_area_2` — dispersed starts to one shared single target
-- `dynamic_campus_area_2` — clustered starts to one shared single target
-- `static_campus_area_3` — dispersed starts to one shared single target
-- `dynamic_campus_area_3` — clustered starts to one shared single target
+- `static_campus_area_1` — static campus area 1
+- `dynamic_campus_area_1` — dynamic campus area 1
+- `static_campus_area_2` — static campus area 2
+- `dynamic_campus_area_2` — dynamic campus area 2
 
-## Agent-number progression
+## Capacity-search protocol
 
-Each branch now uses:
-
-```python
-agent_number_range = (start_agent_number, max_agent_number, step_size)
-```
-
-Example:
-
-```python
-(8, 40, 4) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
-```
+The main experiment now uses binary-search capacity testing instead of incrementing through an agent-number range. For each layout configuration, classical and cyclic mapping are searched independently from 1 to 255 agents. A tested agent number passes when at least 3 out of up to 5 valid solver attempts finish within the 30-second limit. Setup-failed or unsolvable initial conditions are regenerated, with a safety cap of 50 generation attempts per solver attempt.
 
 The generated list is the planned progression only. A branch may stop earlier if one
 of the stopping rules triggers.
@@ -99,67 +88,19 @@ For each planned agent number in the selected branch:
    - `unfinished`
 4. If either mapping is `unsolvable`, the configuration is discarded and a newly sampled
    configuration is tried.
-5. A condition is reported only if it reaches the full counted-pair quota without hitting
-   an early-stop rule.
-6. Aggregates use:
-   - `time_computation_halted_seconds` over retained counted pairs
-   - `num_conflicts_detected_at_halt` over retained counted pairs
-   - `average_path_length` over successful runs only for all branches, including the dynamic branches
+5. The updated main experiment now writes text-only result logs under
+   `dev/outputs_main_experiment/data_log/`.
+6. The path metric is now total path length over all agents, not average path length.
 
-The per-branch runtime limit and counted-run requirement both come from `master_config.py`.
+The per-run runtime limit and capacity-search constants come from `master_config.py`.
 
-## Early stopping rules
+## Capacity comparison outputs
 
-The branch stops before higher agent numbers when either rule triggers at the current
-condition:
-
-1. **Cyclic unfinished runs exceed cyclic successful runs** within the retained counted
-   pairs for that condition.
-   - Example trigger patterns at `n = 5`: `5 > 0`, `4 > 1`, `3 > 2`
-   - The entire current condition is discarded.
-2. **A user-defined number of consecutive failed paired sampling attempts** occur while trying to build the
-   current condition.
-   - The shared limit is configured by
-     `CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT` in `dev/master_config.py`.
-   - In this project, that means consecutive sampled configurations were rejected by
-     the joint viability screen because at least one mapping classified the configuration as
-     `unsolvable`.
-   - The entire current condition is discarded.
-
-When a stop rule triggers, only the earlier accepted conditions remain in the reported
-outputs. The stop reason is written to `metadata/branch_stop_summary.json`.
-
-There is also an internal large safeguard on total paired sampling attempts to prevent
-pathological infinite loops. It remains only a protective implementation detail.
-
-## Other important packages
-
-- `dev/experiments/branch_specs.py` — branch-level experiment definitions built from `master_config.py`
-- `dev/mapf/` — CBS/ECBS solvers, metrics, and MAPF execution helpers
-- `dev/maps/` — map construction and mapping transforms
-- `dev/navigation/` — graph/navigation helpers over composite grids
-- `dev/inputs/` — image-based inputs for dynamic and static campus/image branches
-- `dev/core/` — composite-grid primitives
-
-## Notes
-
-- The project now uses explicit `start_distribution_mode` and `goal_distribution_mode` settings instead of the older shared-goal campus toggle.
-- `goal_distribution_mode` can now be `dispersed`, `clustered`, or `single`. `single` is target-only and means all agents share one literal target cell where they disappear after arrival.
-- In campus branches, `single` targets are sampled only from the dark marker cells inside the selected target zone. The dark blue, dark green, and dark red marker pixels still count as zone cells for traversal and ordinary spawn masks.
-- The campus branches preserve their semantic-color meanings: zone colors are traversable and spawnable, white walkways are traversable but not spawnable, and gray regions are non-traversable for the solver. During Pillow visualization generation, gray campus cells are reconstructed from the current semantic image and rendered through a temporary render-only free-space override so they appear as ordinary white open cells without changing solver behavior, while already persisted raw MAPF data remains reusable.
-- Port and campus images now support both static and dynamic map types. The static variants use the same source image without dynamic obstacles, while the dynamic variants add generated moving obstacles.
-- `static_port` uses dispersed starts and clustered targets. `dynamic_port` uses clustered starts and clustered targets.
-- Every static campus branch uses dispersed starts in one campus zone and one shared single target cell in a different zone. Every dynamic campus branch uses clustered starts in one campus zone and one shared single target cell in a different zone.
-- The assignment sampler now treats dispersed, clustered, and single target modes differently: dispersed sets keep 8-neighbor separation within the set, clustered sets follow the global `compact_clustering` switch in `master_config.py`, and single targets use many-to-one assignment.
-- When `compact_clustering=True`, clustered sets are sampled as directly adjacent 8-neighbor-connected groups.
-- When `compact_clustering=False`, clustered sets remain one cluster but keep one empty cell of separation in all 8 directions.
-- Presentation outputs now keep only the latest regenerated version per output family. Logs and regenerated artifacts overwrite the prior copy instead of creating new `execution_...` folders.
-- Persisted branch-local raw MAPF storage now lives under `dev/outputs/raw_mapf_files/<map_type>/`. Older branch roots from `dev/raw_mapf_data/<map_type>/` or `dev/raw_mapf_files/<map_type>/` are migrated automatically when the branch is loaded again.
-- Pillow-rendered run images are generated selectively in the generalized study flow. Each branch now has both `num_last_runs_to_visualize_jointly_successful` and `num_last_runs_to_visualize_independently_successful` in `master_config.py`, and a visualization-only execution now generates both folder variants automatically under `dev/outputs/<map_type>/visualizations/`.
-- Branch metadata and per-run records now also capture the active solver family (`CBS` or `ECBS`) so output files remain interpretable after solver-toggle changes.
-
-- Image inputs now use `dev/inputs/dynamic_port/port_map.png`, `dev/inputs/campus_area_1.png`, `dev/inputs/campus_area_2.png`, and `dev/inputs/campus_area_3.png`.
-
+For each selected map category, the program runs every documented layout configuration.
+Each configuration receives its own `_evaluation.xml` text log and a matching
+`_raw_data.json` file. The log contains the classical capacity point, the cyclic
+capacity point, paired comparative runs at both points, and condensed evaluations
+for halted time and conflicts.
 
 ## Supplementary reference comparison
 

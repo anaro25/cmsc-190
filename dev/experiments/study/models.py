@@ -53,7 +53,7 @@ class MappingRunRecord:
     solved_run: bool
     time_computation_halted_seconds: float
     num_conflicts_detected_at_halt: int | None
-    average_path_length: float | None
+    total_path_length: float | None
     num_high_level_nodes_expanded: int | None
     runtime_limit_seconds: float
     map_identifier: str
@@ -61,6 +61,12 @@ class MappingRunRecord:
     assignment_seed: int
     dynamic_schedule_seed: int | None
     initial_condition_spec: list[dict[str, Any]]
+
+    @property
+    def average_path_length(self) -> float | None:
+        # Backward-compatible alias for older graph/aggregation helpers.
+        # The value now represents total path length over all agents.
+        return self.total_path_length
 
     def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)

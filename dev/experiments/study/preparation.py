@@ -19,7 +19,7 @@ from dev.inputs.dynamic_port.loader import (
     load_port_obstacle_matrix,
     load_spawnable_white_mask,
 )
-from dev.inputs.dynamic_port.map_builder import obstacle_matrix_to_composite_base_map
+from dev.inputs.dynamic_port.map_builder import composite_base_map_to_obstacle_matrix, obstacle_matrix_to_composite_base_map
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.maps.base_map_factory import create_base_map
 from dev.maps.classical_mapper import apply_classical_mapping
@@ -462,6 +462,15 @@ def prepare_dynamic_branch_state(
             logger,
             f"  Campus semantic masks loaded | zone_cells={zone_cell_count} | single_target_cells={single_target_cell_count} | walkway_cells={walkway_cell_count} | gray_cells={gray_cell_count} | zones={len(campus_zone_vertices_by_id)}",
         )
+    elif branch_spec.image_path is None:
+        _log(logger, "  Creating connected artificial static obstacle matrix for dynamic artificial branch...")
+        artificial_base_map = create_base_map(
+            base_rows=branch_spec.base_rows or 32,
+            base_cols=branch_spec.base_cols or 32,
+            obstacle_ratio=branch_spec.static_obstacle_density or 0.35,
+            rng=random.Random(schedule_seed),
+        )
+        raw_obstacle_matrix = composite_base_map_to_obstacle_matrix(artificial_base_map)
     else:
         raw_obstacle_matrix = load_port_obstacle_matrix(
             image_path=branch_spec.image_path,

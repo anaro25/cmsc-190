@@ -4,8 +4,9 @@ from pathlib import Path
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 OUTPUTS_ROOT = PACKAGE_ROOT / "outputs"
+OUTPUTS_MAIN_EXPERIMENT_ROOT = PACKAGE_ROOT / "outputs_main_experiment"
 OUTPUTS_REF_COMPARISON_ROOT = PACKAGE_ROOT / "outputs_ref_comparison"
-RAW_MAPF_DATA_ROOT = OUTPUTS_ROOT / "raw_mapf_files"
+RAW_MAPF_DATA_ROOT = OUTPUTS_MAIN_EXPERIMENT_ROOT / "raw_mapf_files"
 RAW_REF_COMPARISON_DATA_ROOT = OUTPUTS_REF_COMPARISON_ROOT / "raw_mapf_files"
 LEGACY_RAW_MAPF_DATA_ROOTS = [
     PACKAGE_ROOT / "raw_mapf_data",

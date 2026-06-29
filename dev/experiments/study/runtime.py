@@ -22,17 +22,16 @@ def build_progress_callback(logger: ExperimentLogger, label: str) -> Callable[[i
     return callback
 
 
-def compute_average_path_length(
+def compute_total_path_length(
     paths_by_agent: dict[int, list[tuple[int, int]]], *, dynamic: bool
 ) -> float:
     if not paths_by_agent:
         return 0.0
-    total_cost = (
+    return (
         compute_dynamic_solution_cost(paths_by_agent)
         if dynamic
         else compute_static_solution_cost(paths_by_agent)
     )
-    return total_cost / len(paths_by_agent)
 
 
 def seed_for(*parts: Any) -> int:
@@ -72,7 +71,7 @@ def build_mapping_record(
     paired_run: bool,
     dynamic: bool,
 ) -> MappingRunRecord:
-    average_path_length = None
+    total_path_length = None
     num_conflicts_detected_at_halt = None
     resolved_solver_status = solver_status or "unknown_failure"
 
@@ -82,7 +81,7 @@ def build_mapping_record(
         if num_conflicts_detected_at_halt is None:
             num_conflicts_detected_at_halt = solver_result.get("num_conflicts_detected_at_halt")
         if solver_result.get("paths_by_agent"):
-            average_path_length = compute_average_path_length(
+            total_path_length = compute_total_path_length(
                 solver_result["paths_by_agent"],
                 dynamic=dynamic,
             )
@@ -121,7 +120,7 @@ def build_mapping_record(
         solved_run=solved_run,
         time_computation_halted_seconds=halted_time,
         num_conflicts_detected_at_halt=num_conflicts_detected_at_halt,
-        average_path_length=average_path_length,
+        total_path_length=total_path_length,
         num_high_level_nodes_expanded=num_high_level_nodes_expanded,
         runtime_limit_seconds=runtime_limit_seconds,
         map_identifier=run_configuration.map_identifier,

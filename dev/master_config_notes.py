@@ -33,7 +33,6 @@
 #   static_port and dynamic_port both use dev/inputs/dynamic_port/port_map.png.
 #   static_campus_area_1 and dynamic_campus_area_1 both use dev/inputs/campus_area_1.png.
 #   static_campus_area_2 and dynamic_campus_area_2 both use dev/inputs/campus_area_2.png.
-#   static_campus_area_3 and dynamic_campus_area_3 both use dev/inputs/campus_area_3.png.
 #   Dark blue, dark green, and dark red pixels are treated as target-only marker
 #   cells for campus single-target mode while still belonging to their zones.
 #
@@ -41,8 +40,9 @@
 # - "none": starts and goals may be sampled from the same allowed pool
 # - "distinct_campus_zones": starts and goals must come from different campus zones
 #
-# agent_number_range = (start_agent_number, max_agent_number, step_size)
-# Example: (8, 40, 4) -> [8, 12, 16, 20, 24, 28, 32, 36, 40]
+# The main experiment now uses binary-search capacity testing over 1..255 agents.
+# A tested number passes when at least 3 out of 5 valid solver attempts finish within 30 seconds.
+# setup_failed and unsolvable initial conditions are regenerated, with a cap of 50 generation attempts per solver attempt.
 # num_last_runs_to_visualize_jointly_successful controls how many of the final
 # jointly successful classical-cyclic paired runs receive Pillow frame output.
 # num_last_runs_to_visualize_independently_successful controls how many of the
