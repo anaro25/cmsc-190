@@ -71,7 +71,7 @@ SHARED_TIGHT_TIME_HORIZON = False
 SHARED_COUNTED_RUNS_REQUIRED = 5
 TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER = True
 TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED = 3
-TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20 # 20
+TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 15 # 20
 
 # ===================================
 
@@ -82,15 +82,15 @@ to_generate = "graphs_and_data"
 # to_generate = "nothing"
 
 # Traditional MAPF
-# MAP_TYPE = "static_artificial" # //
-# MAP_TYPE = "static_port" # //
-# MAP_TYPE = "dynamic_port" # //
+MAP_TYPE = "static_artificial"
+# MAP_TYPE = "static_port"
+# MAP_TYPE = "dynamic_port"
 
 # Campus Crowd Simulation
-# MAP_TYPE = "static_campus_area_1" # //
-# MAP_TYPE = "dynamic_campus_area_1" # //
-# MAP_TYPE = "static_campus_area_2" # //
-MAP_TYPE = "dynamic_campus_area_2"
+# MAP_TYPE = "static_campus_area_1"
+# MAP_TYPE = "dynamic_campus_area_1"
+# MAP_TYPE = "static_campus_area_2"
+# MAP_TYPE = "dynamic_campus_area_2"
 
 # MAP_TYPE = "static_campus_area_3"
 # MAP_TYPE = "dynamic_campus_area_3"
@@ -101,10 +101,10 @@ STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
     {
         # common frequently edited constants
         "seed": 101,
-        "agent_number_range": (4, 300, 4),
+        "agent_number_range": (4, 100, 4), # goes beyond 100
         "time_limit_seconds": SHARED_TIME_LIMIT_SECONDS,
-        "num_last_runs_to_visualize_jointly_successful": 3,
-        "num_last_runs_to_visualize_independently_successful": 3,
+        "num_last_runs_to_visualize_jointly_successful": 1,
+        "num_last_runs_to_visualize_independently_successful": 1,
         "ECBS_suboptimality": 3.0,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,

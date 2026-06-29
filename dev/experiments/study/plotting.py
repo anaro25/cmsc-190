@@ -94,6 +94,61 @@ def _connector_linestyle(classical_value: float, cyclic_value: float) -> str:
     return "-"
 
 
+def _finite_values(*series: list[float]) -> list[float]:
+    values: list[float] = []
+    for value_series in series:
+        for value in value_series:
+            try:
+                numeric_value = float(value)
+            except (TypeError, ValueError):
+                continue
+            if math.isfinite(numeric_value):
+                values.append(numeric_value)
+    return values
+
+
+def _should_show_reference_line(values: list[float], reference_y_value: float | None) -> bool:
+    if reference_y_value is None:
+        return False
+    finite_values = _finite_values(values)
+    if not finite_values:
+        return False
+    return any(value >= reference_y_value - 1e-9 for value in finite_values)
+
+
+def _apply_compact_y_limits(
+    axes: plt.Axes,
+    values: list[float],
+    *,
+    reference_y_value: float | None = None,
+    include_reference: bool = False,
+    padding_ratio: float = 0.14,
+) -> None:
+    y_values = _finite_values(values)
+    if include_reference and reference_y_value is not None:
+        y_values.append(float(reference_y_value))
+    if not y_values:
+        return
+
+    lowest_value = min(y_values)
+    highest_value = max(y_values)
+    if lowest_value == highest_value:
+        baseline = abs(highest_value)
+        padding = max(baseline * padding_ratio, 1e-6)
+        if highest_value == 0:
+            padding = 1.0
+    else:
+        padding = (highest_value - lowest_value) * padding_ratio
+
+    lower_limit = lowest_value - padding
+    upper_limit = highest_value + padding
+    if lowest_value >= 0 and lower_limit < 0:
+        lower_limit = 0.0
+    if lower_limit == upper_limit:
+        upper_limit = lower_limit + 1.0
+    axes.set_ylim(lower_limit, upper_limit)
+
+
 def plot_metric_graph(
     *,
     branch_spec: BranchSpec,
@@ -108,13 +163,15 @@ def plot_metric_graph(
 ) -> None:
     x_values = [aggregate.agent_number for aggregate in aggregates]
     classical_values = [
-        math.nan if classical_getter(aggregate) is None else classical_getter(aggregate)
+        math.nan if classical_getter(aggregate) is None else float(classical_getter(aggregate))
         for aggregate in aggregates
     ]
     cyclic_values = [
-        math.nan if cyclic_getter(aggregate) is None else cyclic_getter(aggregate)
+        math.nan if cyclic_getter(aggregate) is None else float(cyclic_getter(aggregate))
         for aggregate in aggregates
     ]
+    plotted_values = classical_values + cyclic_values
+    show_reference_line = _should_show_reference_line(plotted_values, reference_y_value)
 
     display_x_ticks = _resolve_display_x_ticks(x_values)
     figure = plt.figure(figsize=(_resolve_figure_width(len(display_x_ticks)), FIGURE_HEIGHT))
@@ -163,13 +220,14 @@ def plot_metric_graph(
         zorder=3,
     )
 
-    if reference_y_value is not None:
+    if show_reference_line:
         axes.axhline(
             reference_y_value,
             color="red",
             linestyle="--",
             linewidth=REFERENCE_LINE_WIDTH,
             alpha=0.85,
+            label=reference_y_label,
             zorder=0,
         )
     _annotate_series(axes, x_values, classical_values, offset=CLASSICAL_LABEL_OFFSET)
@@ -186,7 +244,13 @@ def plot_metric_graph(
     axes.set_ylabel(y_label)
     axes.set_title(title)
     axes.grid(True, alpha=0.3)
-    axes.margins(x=0.05, y=0.12)
+    axes.margins(x=0.05)
+    _apply_compact_y_limits(
+        axes,
+        plotted_values,
+        reference_y_value=reference_y_value,
+        include_reference=show_reference_line,
+    )
     axes.legend()
     figure.tight_layout()
     figure.savefig(output_path, dpi=150)

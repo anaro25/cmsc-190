@@ -159,6 +159,8 @@ When \texttt{to\_generate="graphs\_and\_data"} is run against already-saved raw 
 
 This keeps regenerated graphs compact: if the current branch domain in \texttt{master\_config.py} extends far beyond the previously computed results, the x-axis no longer stretches across that unused range. Backward compatibility is preserved because older saved raw data remains readable without needing to recompute it under the newer domain.
 
+The plotting layer also computes compact vertical limits from the values that are actually drawn, with a small padding margin above and below the observed range. This avoids large empty regions when values are close while still preventing the extreme points from touching the frame. The runtime-limit reference line is no longer forced into every runtime graph; it is drawn only when at least one plotted runtime value reaches the configured limit.
+
 
 Each accepted condition can contribute to up to three graphs:
 \begin{itemize}[leftmargin=2em]

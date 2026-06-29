@@ -4,5 +4,10 @@ __pycache__/
 # Compiled Python files
 *.pyc
 
-dev/outputs/
-dev/outputs_ref_comparison
+# output folders
+/dev/outputs/
+/dev/outputs_ref_comparison
+
+# zipper batch file
+/output_guide_software_project.txt
+/zip_software_project.bat

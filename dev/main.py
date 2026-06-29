@@ -4,8 +4,8 @@ import time
 
 
 # Select exactly one experiment family.
-SELECTED_EXPERIMENT = "ref_comparison"
-# SELECTED_EXPERIMENT = "main_experiment"
+# SELECTED_EXPERIMENT = "ref_comparison"
+SELECTED_EXPERIMENT = "main_experiment"
 
 
 def main() -> None:
