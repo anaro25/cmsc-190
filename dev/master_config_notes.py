@@ -40,9 +40,10 @@
 # - "none": starts and goals may be sampled from the same allowed pool
 # - "distinct_campus_zones": starts and goals must come from different campus zones
 #
-# The main experiment now uses binary-search capacity testing over 1..255 agents.
-# A tested number passes when at least 3 out of 5 valid solver attempts finish within 30 seconds.
-# setup_failed and unsolvable initial conditions are regenerated, with a cap of 50 generation attempts per solver attempt.
+# The main experiment now uses limited binary-search capacity testing over 1..255 agents.
+# A tested number passes when at least 1 out of 5 valid solver attempts finishes within 30 seconds.
+# The search starts at 128 and descends at most CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES child links.
+# setup_failed and unsolvable initial conditions are regenerated, with a cap of 5 generation attempts per solver attempt.
 # num_last_runs_to_visualize_jointly_successful controls how many of the final
 # jointly successful classical-cyclic paired runs receive Pillow frame output.
 # num_last_runs_to_visualize_independently_successful controls how many of the

@@ -503,7 +503,7 @@ def _solve_mapf_with_cbs_style(
 
         if _has_reached_runtime_limit(start_time, max_runtime_seconds):
             return build_cbs_failure(
-                "bad_setup_timeout",
+                "solver_timeout",
                 0,
                 0,
                 solver_name=solver_name,
@@ -569,7 +569,7 @@ def _solve_mapf_with_cbs_style(
 
         if _has_reached_runtime_limit(start_time, max_runtime_seconds):
             return build_cbs_failure(
-                "bad_setup_timeout",
+                "solver_timeout",
                 num_conflicts_detected,
                 num_high_level_nodes_expanded,
                 solver_name=solver_name,
@@ -624,7 +624,7 @@ def _solve_mapf_with_cbs_style(
 
             if _has_reached_runtime_limit(start_time, max_runtime_seconds):
                 return build_cbs_failure(
-                    "bad_setup_timeout",
+                    "solver_timeout",
                     num_conflicts_detected,
                     num_high_level_nodes_expanded,
                     solver_name=solver_name,

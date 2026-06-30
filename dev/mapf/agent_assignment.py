@@ -141,7 +141,7 @@ def _greedy_clearance_subset(candidates, num_vertices):
     return None
 
 
-def _sample_dispersed_vertices(vertices, num_vertices, rng):
+def _sample_dispersed_vertices(vertices, num_vertices, rng, role="candidate"):
     for _ in range(MAX_ASSIGNMENT_ATTEMPTS):
         shuffled = vertices[:]
         rng.shuffle(shuffled)
@@ -149,13 +149,13 @@ def _sample_dispersed_vertices(vertices, num_vertices, rng):
         if chosen is not None:
             return chosen
     raise ValueError(
-        f"Could not sample {num_vertices} dispersed vertices with 8-neighbor clearance."
+        f"Could not sample {num_vertices} dispersed {role} vertices with 8-neighbor clearance."
     )
 
 
-def _sample_clustered_vertices(vertices, num_vertices, rng):
+def _sample_clustered_vertices(vertices, num_vertices, rng, role="candidate"):
     if not vertices:
-        raise ValueError("No candidate vertices are available for clustered sampling.")
+        raise ValueError(f"No candidate {role} vertices are available for clustered sampling.")
 
     if num_vertices == 1:
         return [rng.choice(vertices)]
@@ -199,21 +199,21 @@ def _sample_clustered_vertices(vertices, num_vertices, rng):
         else "one spaced one-cell-gap component"
     )
     raise ValueError(
-        f"Could not sample {num_vertices} clustered vertices as {cluster_description}."
+        f"Could not sample {num_vertices} clustered {role} vertices as {cluster_description}."
     )
 
 
-def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode):
+def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode, role="candidate"):
     if distribution_mode not in START_DISTRIBUTION_MODES:
         raise ValueError(f"Unsupported distribution_mode '{distribution_mode}'.")
     if len(vertices) < num_vertices:
         raise ValueError(
-            f"Not enough candidate vertices for {num_vertices} positions under distribution_mode={distribution_mode}."
+            f"Not enough candidate {role} vertices for {num_vertices} positions under distribution_mode={distribution_mode}."
         )
 
     if distribution_mode == "clustered":
-        return _sample_clustered_vertices(vertices, num_vertices, rng)
-    return _sample_dispersed_vertices(vertices, num_vertices, rng)
+        return _sample_clustered_vertices(vertices, num_vertices, rng, role=role)
+    return _sample_dispersed_vertices(vertices, num_vertices, rng, role=role)
 
 
 def _resolve_single_goal(composite_map, starts, candidate_goals, rng, require_individual_reachability):
@@ -351,8 +351,9 @@ def sample_agent_start_goal_pairs(
             f"Not enough free vertices for {num_agents} starts and goal_distribution_mode={goal_distribution_mode}."
         )
 
+    last_sampling_issue = None
     for _ in range(MAX_ASSIGNMENT_ATTEMPTS):
-        starts = _sample_vertex_subset(start_vertices, num_agents, rng, start_distribution_mode)
+        starts = _sample_vertex_subset(start_vertices, num_agents, rng, start_distribution_mode, role="start")
         if start_distribution_mode == "dispersed" and not _subset_respects_clearance(starts):
             continue
         if start_distribution_mode == "clustered" and not _subset_is_connected_cluster(starts):
@@ -369,14 +370,29 @@ def sample_agent_start_goal_pairs(
                 require_individual_reachability=require_individual_reachability,
             )
             if shared_target is None:
+                last_sampling_issue = "Could not resolve a valid single goal vertex after sampling starts."
                 continue
             paired_goals = [shared_target for _ in starts]
             return _build_agents_from_assignment(labels, starts, paired_goals)
 
         if len(remaining_goal_vertices) < num_agents:
+            last_sampling_issue = (
+                f"Not enough candidate goal vertices after removing sampled starts: "
+                f"remaining_goal_vertices={len(remaining_goal_vertices)} | required={num_agents}."
+            )
             continue
 
-        goals = _sample_vertex_subset(remaining_goal_vertices, num_agents, rng, goal_distribution_mode)
+        try:
+            goals = _sample_vertex_subset(
+                remaining_goal_vertices,
+                num_agents,
+                rng,
+                goal_distribution_mode,
+                role="goal",
+            )
+        except ValueError as exc:
+            last_sampling_issue = str(exc)
+            continue
         if goal_distribution_mode == "dispersed" and not _subset_respects_clearance(goals):
             continue
         if goal_distribution_mode == "clustered" and not _subset_is_connected_cluster(goals):
@@ -398,6 +414,7 @@ def sample_agent_start_goal_pairs(
             require_individual_reachability=require_individual_reachability,
         )
         if paired_goals is None:
+            last_sampling_issue = "Could not pair sampled starts and goals under the reachability requirement."
             continue
 
         return _build_agents_from_assignment(labels, starts, paired_goals)
@@ -410,4 +427,5 @@ def sample_agent_start_goal_pairs(
             if clustered_start_goal_min_distance
             else ""
         )
+        + (f" Last sampling issue: {last_sampling_issue}" if last_sampling_issue else "")
     )

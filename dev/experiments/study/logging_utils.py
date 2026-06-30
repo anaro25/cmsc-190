@@ -39,6 +39,7 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Capacity attempts per tested agent number: {branch_spec.capacity_attempts_per_agent_number}")
     logger.log(f"Required successful runs per tested agent number: {branch_spec.capacity_successful_runs_required}")
     logger.log(f"Capacity-search upper bound: {branch_spec.capacity_agent_upper_bound}")
+    logger.log(f"Binary-search max downward moves: {branch_spec.capacity_binary_search_max_downward_moves}")
     logger.log(f"Setup/unsolvable regeneration cap per solver attempt: {branch_spec.setup_generation_attempt_cap_per_solver_attempt}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
     if branch_spec.notes:

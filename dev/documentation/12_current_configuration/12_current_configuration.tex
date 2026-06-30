@@ -4,7 +4,6 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{enumitem}
@@ -38,117 +37,53 @@
 
 The current top-level controls in \texttt{master\_config.py} are:
 \begin{itemize}[leftmargin=2em]
-    \item selected branch: \texttt{MAP\_TYPE="static\_artificial"},
-    \item raw-data recompute: \texttt{recompute\_MAPF=False},
-    \item output generation target: \texttt{to\_generate="graphs\_and\_data"},
+    \item selected main-experiment category: \texttt{MAP\_TYPE="static\_artificial"},
+    \item output target: \texttt{to\_generate="raw\_data"},
     \item solver family: \texttt{enhanced\_CBS=True}, so the active solver family is ECBS,
     \item global clustering toggle: \texttt{compact\_clustering=True},
-    \item consecutive failed paired sampling stop limit: \texttt{15}.
+    \item agent cohesion toggle: \texttt{agent\_cohesion=True}.
 \end{itemize}
 
-\section{Shared Constants}
+\section{Shared Capacity-Search Constants}
 
 The current shared values are:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{SHARED\_TIME\_LIMIT\_SECONDS=30.0},
-    \item \texttt{SHARED\_ECBS\_SUBOPTIMALITY=2.0},
+    \item \texttt{SHARED\_ECBS\_SUBOPTIMALITY=3.0},
     \item \texttt{SHARED\_TRUE\_STATIC\_SHORTEST\_PATH\_DISTANCE=True},
-    \item \texttt{SHARED\_NARROW\_LANES=True},
     \item \texttt{SHARED\_TIGHT\_TIME\_HORIZON=False},
-    \item \texttt{SHARED\_COUNTED\_RUNS\_REQUIRED=5}.
+    \item \texttt{SHARED\_COUNTED\_RUNS\_REQUIRED=1},
+    \item \texttt{CAPACITY\_ATTEMPTS\_PER\_AGENT\_NUMBER=5},
+    \item \texttt{CAPACITY\_SUCCESSFUL\_RUNS\_REQUIRED=1},
+    \item \texttt{CAPACITY\_AGENT\_UPPER\_BOUND=255},
+    \item \texttt{CAPACITY\_BINARY\_SEARCH\_MAX\_DOWNWARD\_MOVES=3},
+    \item \texttt{SETUP\_GENERATION\_ATTEMPT\_CAP\_PER\_SOLVER\_ATTEMPT=5}.
 \end{itemize}
 
-\section{Current Branch Configurations}
+\section{Configured Map Categories}
 
-\begin{longtable}{>{\raggedright\arraybackslash}p{0.26\linewidth} >{\raggedright\arraybackslash}p{0.68\linewidth}}
+The current branch set contains eight map categories. Traditional MAPF categories use four layouts each. Campus crowd-simulation categories use six layouts each. This gives forty map configurations overall.
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.30\linewidth} >{\raggedright\arraybackslash}p{0.62\linewidth}}
 \toprule
-branch & current important values \\
+category & important notes \\
 \midrule
 \endhead
 
-\texttt{static\_artificial} &
-\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=3};
-\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=3};
-\texttt{time\_limit\_seconds=30.0};
-\texttt{ECBS\_suboptimality=1.5};
-\texttt{true\_static\_shortest\_path\_distance=True};
-\texttt{tight\_time\_horizon=False};
-\texttt{agent\_number\_range=(4,300,4)} so the planned sequence is $4,8,12,\dots,300$;
-\texttt{seed=101};
-\texttt{map\_size=(32,32)};
-\texttt{static\_obstacle\_density=0.40};
-\texttt{counted\_runs\_required=5};
-\texttt{start\_distribution\_mode=dispersed};
-\texttt{goal\_distribution\_mode=dispersed};
-\texttt{require\_individual\_reachability=False}. \\
-
-\texttt{static\_campus\_area\_1} &
-\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=1};
-\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=1};
-\texttt{time\_limit\_seconds=30.0};
-\texttt{ECBS\_suboptimality=2.0};
-\texttt{true\_static\_shortest\_path\_distance=True};
-\texttt{tight\_time\_horizon=False};
-\texttt{agent\_number\_range=(2,100,1)} so the planned sequence is $2,3,4,\dots,100$;
-\texttt{seed=201};
-\texttt{counted\_runs\_required=5};
-\texttt{start\_distribution\_mode=dispersed};
-\texttt{goal\_distribution\_mode=clustered};
-\texttt{require\_individual\_reachability=True};
-\texttt{zone\_relationship\_mode=distinct\_campus\_zones};
-\texttt{dynamic\_generation\_cell\_mode=zone\_colors\_only};
-\texttt{spawnable\_cell\_mode=zone\_colors\_only};
-\texttt{image\_path=static\_campus\_area\_1/campus\_area\_1.png}. \\
-
-\texttt{dynamic\_port} &
-\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=1};
-\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=1};
-\texttt{time\_limit\_seconds=30.0};
-\texttt{ECBS\_suboptimality=2.0};
-\texttt{true\_static\_shortest\_path\_distance=True};
-\texttt{tight\_time\_horizon=False};
-\texttt{agent\_number\_range=(2,100,1)} so the planned sequence is $2,3,4,\dots,100$;
-\texttt{seed=301};
-\texttt{counted\_runs\_required=5};
-\texttt{target\_static\_obstacle\_density=1.0};
-\texttt{target\_dynamic\_obstacle\_density=0.030};
-\texttt{loop\_sequence\_length=100};
-\texttt{group\_stay\_durations=(7,9,11)};
-\texttt{image\_threshold=127};
-\texttt{image\_resize\_longest\_side=40};
-\texttt{start\_distribution\_mode=clustered};
-\texttt{goal\_distribution\_mode=dispersed};
-\texttt{require\_individual\_reachability=True};
-\texttt{dynamic\_generation\_cell\_mode=all\_free}. \\
-
-\texttt{dynamic\_campus\_area\_2} &
-\texttt{num\_last\_runs\_to\_visualize\_jointly\_successful=1};
-\texttt{num\_last\_runs\_to\_visualize\_independently\_successful=1};
-\texttt{time\_limit\_seconds=30.0};
-\texttt{ECBS\_suboptimality=2.0};
-\texttt{true\_static\_shortest\_path\_distance=True};
-\texttt{tight\_time\_horizon=False};
-\texttt{agent\_number\_range=(2,100,1)} so the planned sequence is $2,3,4,\dots,100$;
-\texttt{seed=401};
-\texttt{counted\_runs\_required=5};
-\texttt{target\_static\_obstacle\_density=None} meaning the source-image static layout is preserved;
-\texttt{target\_dynamic\_obstacle\_density=0.015};
-\texttt{loop\_sequence\_length=100};
-\texttt{group\_stay\_durations=(7,9,11)};
-\texttt{image\_threshold=127};
-\texttt{start\_distribution\_mode=clustered};
-\texttt{goal\_distribution\_mode=clustered};
-\texttt{require\_individual\_reachability=True};
-\texttt{zone\_relationship\_mode=distinct\_campus\_zones};
-\texttt{dynamic\_generation\_cell\_mode=zone\_colors\_only};
-\texttt{spawnable\_cell\_mode=zone\_colors\_only};
-\texttt{image\_path=dynamic\_campus\_area\_2/campus\_area\_2.png}. \\
+\texttt{static\_artificial} & Artificial static-obstacle map; four dispersed/clustered start-goal layouts. \\
+\texttt{dynamic\_artificial} & Artificial map with generated dynamic obstacles; four dispersed/clustered start-goal layouts. \\
+\texttt{static\_port} & Image-based port map without dynamic obstacles; four dispersed/clustered start-goal layouts. \\
+\texttt{dynamic\_port} & Image-based port map with dynamic obstacles; four dispersed/clustered start-goal layouts. \\
+\texttt{static\_campus\_area\_1} & Campus area 1 without dynamic obstacles; six layouts including single-target modes. \\
+\texttt{dynamic\_campus\_area\_1} & Campus area 1 with dynamic obstacles; six layouts including single-target modes. \\
+\texttt{static\_campus\_area\_2} & Campus area 2 without dynamic obstacles; six layouts including single-target modes. \\
+\texttt{dynamic\_campus\_area\_2} & Campus area 2 with dynamic obstacles; six layouts including single-target modes. \\
 
 \bottomrule
 \end{longtable}
 
 \section{Interpretation Advice}
 
-This file is a snapshot, not a substitute for \texttt{master\_config.py}. The important current design fact is that the project now uses manual branch-local raw-data persistence: solver-stage results are stored under \texttt{dev/outputs/raw\_mapf\_files/<map\_type>/}, while graphs/data exports and Pillow visualizations are regenerated separately on demand. Those presentation outputs are latest-only, so a newer regeneration replaces the older copy for that same purpose instead of creating another execution-version folder. Older branch roots in the previous top-level raw-data folders are migrated automatically when the branch is accessed again. In particular, the visualization-selection controls \texttt{num\_last\_runs\_to\_visualize\_jointly\_successful} and \texttt{num\_last\_runs\_to\_visualize\_independently\_successful} are intended to be changed without forcing a new MAPF recomputation, and one visualization-only execution now generates both output variants under \texttt{dev/outputs/<map\_type>/visualizations/}.
+This file is a snapshot, not a substitute for \texttt{master\_config.py}. The important current design fact is that the project now uses limited binary-search capacity testing. Each tested agent number follows a one-success-out-of-five pass rule, and each mapping retains one successful capacity run per configuration. As a result, the detailed main-experiment logs report direct run values rather than averages over three successful runs.
 
 \end{document}

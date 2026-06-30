@@ -25,6 +25,7 @@ def _with_shared_runtime(config: dict[str, Any]) -> dict[str, Any]:
         "capacity_successful_runs_required": CAPACITY_SUCCESSFUL_RUNS_REQUIRED,
         "capacity_attempts_per_agent_number": CAPACITY_ATTEMPTS_PER_AGENT_NUMBER,
         "capacity_agent_upper_bound": CAPACITY_AGENT_UPPER_BOUND,
+        "capacity_binary_search_max_downward_moves": CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES,
         "setup_generation_attempt_cap_per_solver_attempt": SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
@@ -52,11 +53,12 @@ SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
 SHARED_TIGHT_TIME_HORIZON = False
 
 # Capacity-search protocol constants.
-SHARED_COUNTED_RUNS_REQUIRED = 5
+SHARED_COUNTED_RUNS_REQUIRED = 1
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
-CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 3
+CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
 CAPACITY_AGENT_UPPER_BOUND = 255
-SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 50
+CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
+SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 5
 
 # ===================================
 

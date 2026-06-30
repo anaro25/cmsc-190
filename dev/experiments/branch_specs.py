@@ -56,6 +56,7 @@ class BranchSpec:
     capacity_attempts_per_agent_number: int
     capacity_successful_runs_required: int
     capacity_agent_upper_bound: int
+    capacity_binary_search_max_downward_moves: int
     setup_generation_attempt_cap_per_solver_attempt: int
     num_last_runs_to_visualize_jointly_successful: int
     num_last_runs_to_visualize_independently_successful: int
@@ -235,7 +236,8 @@ def _notes_for_branch(
 
     capacity_note = (
         "Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for "
-        "classical and cyclic mapping, then runs paired comparative tests at both discovered capacity points."
+        "classical and cyclic mapping, with the binary-search descent limited by the configured maximum downward moves. "
+        "It then runs paired comparative tests at both discovered capacity points."
     )
 
     if config.get("image_path") is None:
@@ -314,9 +316,10 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         runtime_limit_seconds=float(config["time_limit_seconds"]),
         counted_runs_required=int(config["counted_runs_required"]),
         capacity_attempts_per_agent_number=int(config.get("capacity_attempts_per_agent_number", 5)),
-        capacity_successful_runs_required=int(config.get("capacity_successful_runs_required", 3)),
+        capacity_successful_runs_required=int(config.get("capacity_successful_runs_required", 1)),
         capacity_agent_upper_bound=int(config.get("capacity_agent_upper_bound", 255)),
-        setup_generation_attempt_cap_per_solver_attempt=int(config.get("setup_generation_attempt_cap_per_solver_attempt", 50)),
+        capacity_binary_search_max_downward_moves=int(config.get("capacity_binary_search_max_downward_moves", 3)),
+        setup_generation_attempt_cap_per_solver_attempt=int(config.get("setup_generation_attempt_cap_per_solver_attempt", 5)),
         num_last_runs_to_visualize_jointly_successful=int(config.get("num_last_runs_to_visualize_jointly_successful", 0)),
         num_last_runs_to_visualize_independently_successful=int(config.get("num_last_runs_to_visualize_independently_successful", 0)),
         path_length_graph_enabled=bool(config.get("path_length_graph_enabled", True)),

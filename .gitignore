@@ -5,9 +5,10 @@ __pycache__/
 *.pyc
 
 # output folders
-/dev/outputs/
-/dev/outputs_ref_comparison
+/dev/outputs_main_experiment/
+/dev/outputs_ref_comparison/
 
-# zipper batch file
+# other root files
+/dev.zip
 /output_guide_software_project.txt
 /zip_software_project.bat

@@ -230,7 +230,7 @@ def _solve_time_expanded_with_vanilla_cbs(
     for agent in agents:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", 0, 0, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
+            return build_failure("solver_timeout", 0, 0, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
 
         path = _replan_dynamic_agent(
             mapped_loop,
@@ -257,7 +257,7 @@ def _solve_time_expanded_with_vanilla_cbs(
     while open_heap:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
+            return build_failure("solver_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
 
         _, _, node = heapq.heappop(open_heap)
         num_high_level_nodes_expanded += 1
@@ -335,7 +335,7 @@ def _solve_time_expanded_with_ecbs(
     for agent in agents:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", 0, 0, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
+            return build_failure("solver_timeout", 0, 0, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
         path = _replan_dynamic_agent(
             mapped_loop,
@@ -366,7 +366,7 @@ def _solve_time_expanded_with_ecbs(
     while active_nodes:
         next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
         if time.perf_counter() - start_time > max_runtime_seconds:
-            return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
+            return build_failure("solver_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
         _clean_open_heap(open_heap, active_nodes)
         if not open_heap:
@@ -387,7 +387,7 @@ def _solve_time_expanded_with_ecbs(
         for new_constraint in split_conflict_into_constraints(conflict):
             next_report_seconds = maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback)
             if time.perf_counter() - start_time > max_runtime_seconds:
-                return build_failure("bad_setup_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
+                return build_failure("solver_timeout", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
 
             child_constraints = list(node["constraints"]) + [new_constraint]
             signature = make_constraint_signature(child_constraints)

@@ -16,6 +16,7 @@ from dev.experiments.study.preparation import (
 )
 from dev.experiments.study.runtime import build_mapping_record, run_dynamic_mapping, run_static_mapping
 from dev.master_config import to_generate
+from dev.mapf.agent_assignment import MAX_ASSIGNMENT_ATTEMPTS, _iter_free_vertices
 from dev.paths import OUTPUTS_MAIN_EXPERIMENT_ROOT
 
 
@@ -133,6 +134,87 @@ def _execute_mapping(
     )
 
 
+def _format_invalid_generation_summary(invalid_trace: list[dict[str, Any]]) -> str:
+    if not invalid_trace:
+        return "none"
+
+    grouped: dict[tuple[str, str], int] = {}
+    for item in invalid_trace:
+        kind = str(item.get("kind", "invalid"))
+        if kind == "setup_failed":
+            detail = f"{item.get('error_type', 'Exception')}: {item.get('error_message', '')}"
+        else:
+            status = item.get("solver_status")
+            detail = f"solver_status={status}" if status else kind
+        key = (kind, detail)
+        grouped[key] = grouped.get(key, 0) + 1
+
+    parts = [f"{kind} x{count} ({detail})" for (kind, detail), count in grouped.items()]
+    return "; ".join(parts)
+
+
+def _log_invalid_generation_summary(
+    *,
+    logger: ExperimentLogger,
+    invalid_trace: list[dict[str, Any]],
+    mapping_name: str,
+    solver_attempt_index: int,
+    cap: int,
+) -> None:
+    if not invalid_trace:
+        return
+    logger.log(
+        f"      Regeneration summary | mapping={mapping_name} | "
+        f"solver_attempt={solver_attempt_index + 1} | "
+        f"invalid_generations={len(invalid_trace)}/{cap} | "
+        f"details={_format_invalid_generation_summary(invalid_trace)}"
+    )
+
+
+def _count_free_assignment_vertices(composite_map: list[list[Any]] | None) -> int | None:
+    if composite_map is None:
+        return None
+    return sum(1 for _ in _iter_free_vertices(composite_map))
+
+
+def _log_feasibility_diagnostic(
+    *,
+    branch_spec: BranchSpec,
+    dynamic_state: DynamicBranchState | None,
+    mapping_name: str,
+    agent_number: int,
+    logger: ExperimentLogger,
+) -> None:
+    details = [
+        f"N={agent_number}",
+        f"mapping={mapping_name}",
+        f"start_mode={branch_spec.start_distribution_mode}",
+        f"goal_mode={branch_spec.goal_distribution_mode}",
+        f"zone_mode={branch_spec.zone_relationship_mode}",
+        f"spawn_mode={branch_spec.spawnable_cell_mode}",
+        f"setup_generation_cap={branch_spec.setup_generation_attempt_cap_per_solver_attempt}",
+        f"assignment_attempt_cap={MAX_ASSIGNMENT_ATTEMPTS}",
+    ]
+
+    if dynamic_state is not None:
+        free_count = _count_free_assignment_vertices(dynamic_state.assignment_map)
+        details.append(f"assignment_free_vertices={free_count}")
+        if dynamic_state.allowed_spawn_vertices is not None:
+            details.append(f"allowed_spawn_vertices={len(dynamic_state.allowed_spawn_vertices)}")
+        if dynamic_state.zone_vertices_by_id:
+            zone_counts = {zone_id: len(vertices) for zone_id, vertices in sorted(dynamic_state.zone_vertices_by_id.items())}
+            details.append(f"zone_vertices={zone_counts}")
+        if dynamic_state.single_target_vertices_by_id:
+            single_counts = {zone_id: len(vertices) for zone_id, vertices in sorted(dynamic_state.single_target_vertices_by_id.items())}
+            details.append(f"single_target_vertices={single_counts}")
+    elif branch_spec.image_path is None:
+        details.append("candidate_counts=per generated artificial map")
+    else:
+        details.append("candidate_counts=per static image run context")
+
+    logger.log("    Feasibility diagnostic | " + " | ".join(details))
+
+
 def _run_valid_solver_attempt(
     *,
     branch_spec: BranchSpec,
@@ -146,6 +228,7 @@ def _run_valid_solver_attempt(
     logger: ExperimentLogger,
 ) -> tuple[SolverAttempt | None, list[dict[str, Any]]]:
     invalid_trace: list[dict[str, Any]] = []
+    logged_invalid_count = 0
     cap = int(branch_spec.setup_generation_attempt_cap_per_solver_attempt)
     for generation_attempt_index in range(cap):
         run_index = (
@@ -171,14 +254,17 @@ def _run_valid_solver_attempt(
                     "error_message": str(exc),
                 }
             )
-            logger.log(
-                f"      setup_failed regenerated | mapping={mapping_name} | "
-                f"solver_attempt={solver_attempt_index + 1} | "
-                f"generation_attempt={generation_attempt_index + 1}/{cap} | "
-                f"{type(exc).__name__}: {exc}"
-            )
             continue
 
+        _log_invalid_generation_summary(
+            logger=logger,
+            invalid_trace=invalid_trace[logged_invalid_count:],
+            mapping_name=mapping_name,
+            solver_attempt_index=solver_attempt_index,
+            cap=cap,
+        )
+        logged_invalid_count = len(invalid_trace)
+        logger.log("")
         logger.log(
             f"      Solver attempt {solver_attempt_index + 1} | mapping={mapping_name} | "
             f"agent_number={agent_number} | generation_attempt={generation_attempt_index + 1}/{cap}"
@@ -216,12 +302,6 @@ def _run_valid_solver_attempt(
                     "elapsed_seconds": record.time_computation_halted_seconds,
                 }
             )
-            logger.log(
-                f"      {record.result_category} regenerated | mapping={mapping_name} | "
-                f"solver_attempt={solver_attempt_index + 1} | "
-                f"generation_attempt={generation_attempt_index + 1}/{cap} | "
-                f"solver_status={record.solver_status}"
-            )
             continue
 
         log_mapping_record(logger, record)
@@ -235,6 +315,13 @@ def _run_valid_solver_attempt(
             invalid_trace,
         )
 
+    _log_invalid_generation_summary(
+        logger=logger,
+        invalid_trace=invalid_trace[logged_invalid_count:],
+        mapping_name=mapping_name,
+        solver_attempt_index=solver_attempt_index,
+        cap=cap,
+    )
     return None, invalid_trace
 
 
@@ -256,9 +343,17 @@ def _test_agent_number_for_mapping(
     max_attempts = int(branch_spec.capacity_attempts_per_agent_number)
     required_successes = int(branch_spec.capacity_successful_runs_required)
 
+    logger.log("")
     logger.log(
         f"    Testing N={agent_number} for {mapping_name} | "
         f"pass_rule={required_successes}/{max_attempts} successful within {branch_spec.runtime_limit_seconds:.0f}s"
+    )
+    _log_feasibility_diagnostic(
+        branch_spec=branch_spec,
+        dynamic_state=dynamic_state,
+        mapping_name=mapping_name,
+        agent_number=agent_number,
+        logger=logger,
     )
 
     solver_attempt_index = 0
@@ -308,6 +403,7 @@ def _test_agent_number_for_mapping(
         f"passed={passed} | successful={len(successful_attempts)} | counted_attempts={len(attempts)} | "
         f"invalid_regenerated={invalid_attempt_count}"
     )
+    logger.log_elapsed(f"Finished tested agent number N={agent_number} for {mapping_name}")
     return AgentNumberTestResult(
         mapping_name=mapping_name,
         agent_number=agent_number,
@@ -333,6 +429,8 @@ def _run_capacity_search(
 ) -> CapacitySearchResult:
     low = 1
     high = int(branch_spec.capacity_agent_upper_bound)
+    max_downward_moves = max(0, int(branch_spec.capacity_binary_search_max_downward_moves))
+    current_depth = 0
     best_agent_number = 0
     best_successful_attempts: list[SolverAttempt] = []
     tested_agent_numbers: list[AgentNumberTestResult] = []
@@ -341,10 +439,13 @@ def _run_capacity_search(
 
     logger.log("")
     logger.log("-" * 88)
-    logger.log(f"Capacity search started | mapping={mapping_name} | range=1..{high}")
+    logger.log(
+        f"Capacity search started | mapping={mapping_name} | range=1..{high} | "
+        f"max_downward_moves={max_downward_moves}"
+    )
     logger.log("-" * 88)
 
-    while low <= high:
+    while low <= high and current_depth <= max_downward_moves:
         midpoint = (low + high) // 2
         search_step_index += 1
         test_result = _test_agent_number_for_mapping(
@@ -360,6 +461,7 @@ def _run_capacity_search(
         search_trace.append(
             {
                 "step": search_step_index,
+                "depth_from_root": current_depth,
                 "low_before": low,
                 "high_before": high,
                 "tested_agent_number": midpoint,
@@ -369,18 +471,31 @@ def _run_capacity_search(
                 "invalid_attempt_count": test_result.invalid_attempt_count,
             }
         )
+
         if test_result.passed:
             best_agent_number = midpoint
             best_successful_attempts = test_result.successful_attempts
+
+        if current_depth >= max_downward_moves:
+            logger.log(
+                f"    N={midpoint} {'passed' if test_result.passed else 'failed'}; "
+                f"binary-search downward-move limit reached ({max_downward_moves}). "
+                "Stopping without descending to another child."
+            )
+            break
+
+        if test_result.passed:
             low = midpoint + 1
             logger.log(f"    N={midpoint} passed; moving to right child/search interval {low}..{high}.")
         else:
             high = midpoint - 1
             logger.log(f"    N={midpoint} failed; moving to left child/search interval {low}..{high}.")
+        current_depth += 1
 
     logger.log(
         f"Capacity search finished | mapping={mapping_name} | "
-        f"N_max={best_agent_number} | saved_successful_runs={len(best_successful_attempts)}"
+        f"N_max={best_agent_number} | saved_successful_runs={len(best_successful_attempts)} | "
+        f"tested_agent_numbers={len(tested_agent_numbers)}"
     )
     return CapacitySearchResult(
         mapping_name=mapping_name,
@@ -410,6 +525,7 @@ def _run_comparative_attempts(
     )
     for paired_index, baseline_attempt in enumerate(baseline_successful_attempts, start=1):
         prepared_context = baseline_attempt.prepared_context
+        logger.log("")
         logger.log(
             f"    Comparative paired run {paired_index} | "
             f"{comparative_mapping_name} on {baseline_mapping_name} capacity initial conditions"
@@ -513,6 +629,32 @@ def _records_from_attempts(attempts: list[SolverAttempt]) -> list[MappingRunReco
     return [attempt.record for attempt in attempts]
 
 
+def _append_run_values(
+    lines: list[str],
+    *,
+    records: list[MappingRunRecord],
+    metric: str,
+    successful_label: bool,
+) -> None:
+    for index, record in enumerate(records, start=1):
+        if successful_label:
+            prefix = "Successful run" if record.solved_run else "Run"
+        else:
+            prefix = "Run"
+        if metric == "path":
+            value_text = _format_path_value(record)
+        else:
+            value_text = _format_value(_metric_value(record, metric))
+        lines.append(f"                    {prefix} {index}: {value_text}")
+
+    if len(records) > 1:
+        if metric == "path":
+            aggregate_text = _format_path_average(records)
+        else:
+            aggregate_text = _format_value(_average_metric(records, metric))
+        lines.append(f"                    Average: {aggregate_text}")
+
+
 def _append_metric_block(
     lines: list[str],
     *,
@@ -525,31 +667,20 @@ def _append_metric_block(
 ) -> None:
     lines.append(f"            {metric_title}")
     lines.append(f"                {baseline_title}")
-    for index, record in enumerate(baseline_records, start=1):
-        prefix = "Successful run" if record.solved_run else "Run"
-        if metric == "path":
-            value_text = _format_path_value(record)
-        else:
-            value_text = _format_value(_metric_value(record, metric))
-        lines.append(f"                    {prefix} {index}: {value_text}")
-    if metric == "path":
-        average_text = _format_path_average(baseline_records)
-    else:
-        average_text = _format_value(_average_metric(baseline_records, metric))
-    lines.append(f"                    Average: {average_text}")
+    _append_run_values(
+        lines,
+        records=baseline_records,
+        metric=metric,
+        successful_label=True,
+    )
 
     lines.append(f"                {comparative_title}")
-    for index, record in enumerate(comparative_records, start=1):
-        if metric == "path":
-            value_text = _format_path_value(record)
-        else:
-            value_text = _format_value(_metric_value(record, metric))
-        lines.append(f"                    Run {index}: {value_text}")
-    if metric == "path":
-        average_text = _format_path_average(comparative_records)
-    else:
-        average_text = _format_value(_average_metric(comparative_records, metric))
-    lines.append(f"                    Average: {average_text}")
+    _append_run_values(
+        lines,
+        records=comparative_records,
+        metric=metric,
+        successful_label=False,
+    )
     lines.append("")
 
 

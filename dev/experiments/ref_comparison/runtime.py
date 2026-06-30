@@ -335,7 +335,7 @@ def total_turns(paths_by_agent: dict[int, list[Any]] | None) -> int | None:
 def categorize_solver_status(solver_status: str | None) -> tuple[str, bool, bool]:
     if solver_status == "solved":
         return "successful", True, True
-    if solver_status == "bad_setup_timeout":
+    if solver_status == "solver_timeout":
         return "unfinished", True, False
     if solver_status == "no_solution":
         return "unsolvable", False, False

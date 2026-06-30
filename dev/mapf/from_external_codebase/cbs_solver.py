@@ -299,7 +299,7 @@ def _solve_mapf_with_vanilla_cbs(
 
         if time.perf_counter() - start_time > max_runtime_seconds:
             return build_cbs_failure(
-                reason="bad_setup_timeout",
+                reason="solver_timeout",
                 num_conflicts_detected=0,
                 num_high_level_nodes_expanded=0,
                 solver_name="CBS",
@@ -343,7 +343,7 @@ def _solve_mapf_with_vanilla_cbs(
         elapsed_seconds = time.perf_counter() - start_time
         if elapsed_seconds > max_runtime_seconds:
             return build_cbs_failure(
-                reason="bad_setup_timeout",
+                reason="solver_timeout",
                 num_conflicts_detected=num_conflicts_detected,
                 num_high_level_nodes_expanded=num_high_level_nodes_expanded,
                 solver_name="CBS",
@@ -372,7 +372,7 @@ def _solve_mapf_with_vanilla_cbs(
             )
             if time.perf_counter() - start_time > max_runtime_seconds:
                 return build_cbs_failure(
-                    reason="bad_setup_timeout",
+                    reason="solver_timeout",
                     num_conflicts_detected=num_conflicts_detected,
                     num_high_level_nodes_expanded=num_high_level_nodes_expanded,
                     solver_name="CBS",
@@ -459,7 +459,7 @@ def _solve_mapf_with_ecbs(
 
         if time.perf_counter() - start_time > max_runtime_seconds:
             return build_cbs_failure(
-                reason="bad_setup_timeout",
+                reason="solver_timeout",
                 num_conflicts_detected=0,
                 num_high_level_nodes_expanded=0,
                 solver_name="ECBS",
@@ -506,7 +506,7 @@ def _solve_mapf_with_ecbs(
 
         if time.perf_counter() - start_time > max_runtime_seconds:
             return build_cbs_failure(
-                reason="bad_setup_timeout",
+                reason="solver_timeout",
                 num_conflicts_detected=num_conflicts_detected,
                 num_high_level_nodes_expanded=num_high_level_nodes_expanded,
                 solver_name="ECBS",
@@ -549,7 +549,7 @@ def _solve_mapf_with_ecbs(
             )
             if time.perf_counter() - start_time > max_runtime_seconds:
                 return build_cbs_failure(
-                    reason="bad_setup_timeout",
+                    reason="solver_timeout",
                     num_conflicts_detected=num_conflicts_detected,
                     num_high_level_nodes_expanded=num_high_level_nodes_expanded,
                     solver_name="ECBS",

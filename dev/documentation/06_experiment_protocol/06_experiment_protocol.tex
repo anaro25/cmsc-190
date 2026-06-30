@@ -5,11 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
 \usepackage{amsmath,amssymb}
-\usepackage{booktabs}
-\usepackage{array}
 \usepackage{enumitem}
-\usepackage{longtable}
-\usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{listings}
 
@@ -27,125 +23,84 @@
     frame=single
 }
 
-\title{Experiment Protocol and Paired Sampling Rules}
+\title{Experiment Protocol and Capacity Search Rules}
 \author{}
 \date{}
 
 \begin{document}
 \maketitle
 
-\section{Condition Structure}
+\section{Current Main-Experiment Structure}
 
-Each branch is evaluated over an agent-number progression generated from:
+The main experiment is organized around map configurations. Selecting a map category in \texttt{master\_config.py} runs every documented layout configuration for that category. Across all categories, the design contains forty configurations.
+
+For each configuration, classical mapping and cyclic mapping are tested independently. The goal is to find two capacity values:
 \[
-\texttt{agent\_number\_range}=(a,b,c)
+\Nclass = \text{highest tested agent number passed by classical mapping},
 \]
-in the current code meaning
 \[
-(a,\text{ max agent number},\text{ step size}).
-\]
-
-So the planned sequence is:
-\[
-a,\ a+c,\ a+2c,\ \dots
-\]
-up to the maximum agent number \(b\).
-
-\section{Run Configuration Identity}
-
-The experiment uses explicit identifiers such as:
-\[
-\texttt{run[branch.agent\_number\_index.run\_index]}.
-\]
-The project also uses branch decimal labels such as:
-\begin{itemize}[leftmargin=2em]
-    \item \texttt{0.0} for \texttt{static\_artificial},
-    \item \texttt{0.1} for \texttt{static\_campus\_area\_1},
-    \item \texttt{1.0} for \texttt{dynamic\_port},
-    \item \texttt{1.1} for \texttt{dynamic\_campus\_area\_2}.
-\end{itemize}
-
-\section{Paired Jointly Viable Sampling}
-
-For each current agent number, the orchestrator keeps sampling candidate run configurations until it either:
-\begin{itemize}[leftmargin=2em]
-    \item reaches the counted-pair quota, or
-    \item triggers a branch stop rule.
-\end{itemize}
-
-The operational loop is:
-\begin{enumerate}[leftmargin=2em]
-    \item prepare one run configuration,
-    \item solve it under classical mapping,
-    \item solve the same configuration under cyclic mapping,
-    \item retain the configuration only if both results are counted categories.
-\end{enumerate}
-
-The counted categories are:
-\[
-\{\texttt{successful},\ \texttt{unfinished}\}.
+\Ncyc = \text{highest tested agent number passed by cyclic mapping}.
 \]
 
-If either mapping returns \texttt{unsolvable}, the configuration is discarded and does \emph{not} count toward the quota.
+\section{Limited Binary-Search Capacity Testing}
 
-\section{Static vs.\ Dynamic Sharing Rule}
-
-The branches do not all share maps in the same way:
-\begin{itemize}[leftmargin=2em]
-    \item \textbf{static branches}: a fresh static run context is prepared per run configuration. For \texttt{static\_artificial} this means a fresh artificial map; for \texttt{static\_campus\_area\_1} it means reloading the same semantic campus image and resampling new starts/goals.
-    \item \textbf{dynamic branches}: one shared dynamic branch state is prepared once, then reused across all agent-number conditions and run indices for that branch execution.
-\end{itemize}
-
-This difference is intentional and should not be treated as an accident.
-
-\section{Sampling Rules That Now Matter Scientifically}
-
-The current project varies run configurations along three sampling axes.
-
-\subsection{Start Distribution Mode}
-A branch can request \texttt{dispersed} or \texttt{clustered} starts.
-
-\subsection{Goal Distribution Mode}
-A branch can request \texttt{dispersed}, \texttt{clustered}, or \texttt{single} goals. The \texttt{single} mode is target-only and gives all agents one shared literal target cell.
-
-\subsection{Zone Relationship Mode}
-Campus branches can require starts and goals to come from \emph{different} semantic zones. This is what forces transitions through bottlenecks and connectors rather than allowing both groups to occupy the same campus region.
-
-\subsection{Mode-Dependent Internal Spacing}
-Within any one sampled run configuration:
-\begin{itemize}[leftmargin=2em]
-    \item \texttt{dispersed} starts avoid edge and vertex adjacency to other starts,
-    \item \texttt{dispersed} goals avoid edge and vertex adjacency to other goals,
-    \item when \texttt{compact\_clustering=True}, \texttt{clustered} starts form one directly adjacent 8-neighbor-connected component,
-    \item when \texttt{compact\_clustering=True}, \texttt{clustered} goals form one directly adjacent 8-neighbor-connected component,
-    \item when \texttt{compact\_clustering=False}, clustered starts and goals remain connected clusters but keep one empty cell of separation in all 8 directions,
-    \item \texttt{single} goals use one shared target cell for all agents,
-    \item start-goal adjacency is allowed as long as the cells are not identical.
-\end{itemize}
-
-\section{Stopping Rules}
-
-The current branch execution stops before moving to higher agent numbers when either of the following happens.
-
-\subsection{Cyclic Majority-Unfinished Rule}
-
-After the counted quota is reached for the current condition, the condition is discarded and the branch stops if cyclic has more unfinished runs than successful runs within the retained set.
-
-\subsection{Consecutive Failed Paired Sampling Rule}
-
-If too many consecutive paired attempts are rejected because at least one mapping returned \texttt{unsolvable}, the current condition is discarded and the branch stops. The user-configurable global limit currently comes from:
+The tested range is fixed at:
 \[
-\texttt{CONSECUTIVE\_FAILED\_PAIRED\_SAMPLING\_ATTEMPTS\_LIMIT}.
+1 \leq N \leq 255.
 \]
 
-\section{Internal Safeguard}
+The values are treated as nodes of a complete binary search tree whose root is 128. A pass moves the search to the right child. A failure moves the search to the left child.
 
-There is also an internal large attempt safeguard to prevent pathological infinite loops. It is an implementation safety net, not the main scientific stopping rule.
+The search no longer continues until a leaf node. It stops after the configured number of downward child moves from the root:
 
-\section{Seed Discipline}
+\begin{lstlisting}
+CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
+\end{lstlisting}
 
-The project derives deterministic seeds using a helper function \texttt{seed\_for(*parts)}. The branch name, role, agent number, and run index are folded into a stable integer seed.
+For example, one possible traversal is:
 
-This means reproducibility is not based on one giant global random stream. Different parts of the experiment derive role-specific seeds from semantic labels such as \texttt{"map"}, \texttt{"assign"}, and \texttt{"dynamic\_schedule"}.
+\begin{lstlisting}
+128 -> 64 -> 32 -> 48
+\end{lstlisting}
+
+With three downward moves, the furthest possible tested values are:
+
+\begin{lstlisting}
+16, 48, 80, 112, 144, 176, 208, 240
+\end{lstlisting}
+
+\section{Backtracking Behavior}
+
+There is no separate manual backtracking phase. During traversal, the program stores the highest passed value seen so far. If a later tested value fails and the traversal moves left, the earlier passed value remains stored unless a higher tested value passes later.
+
+\section{Pass/Fail Rule for a Tested Agent Number}
+
+Each tested agent number permits up to five valid solver attempts. The current pass rule is:
+
+\begin{lstlisting}
+CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
+CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
+SHARED_TIME_LIMIT_SECONDS = 30.0
+\end{lstlisting}
+
+A tested agent number passes as soon as one valid attempt solves within the time limit. It fails only when all five valid attempts are counted without any successful solution.
+
+Setup-failed and unsolvable initial conditions are regenerated and do not count as valid attempts. The setup-generation cap per solver attempt is currently:
+
+\begin{lstlisting}
+SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 5
+\end{lstlisting}
+
+\section{Saved Capacity Runs and Comparative Runs}
+
+Because the current rule needs only one successful run, each mapping keeps one successful capacity-run initial condition at its discovered capacity point. That condition is then reused for the opposite mapping.
+
+At \(\Nclass\), the classical successful run is compared with cyclic mapping on the same initial condition. At \(\Ncyc\), the cyclic successful run is compared with classical mapping on the same initial condition.
+
+This gives paired evidence at both discovered capacity points while avoiding averages over multiple successful capacity runs.
+
+\section{Logging Expectations}
+
+Console and file logs separate solver attempts with blank lines so that successive runs are easier to read. After each tested agent number, the log also prints the elapsed time from the start of the experiment execution.
 
 \end{document}

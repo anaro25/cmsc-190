@@ -112,7 +112,7 @@ def build_elapsed_time_reporter(interval_seconds=PROGRESS_LOG_INTERVAL_SECONDS):
 def print_bad_setup_message(result):
     status = result["status"]
 
-    if status == "bad_setup_timeout":
+    if status == "solver_timeout":
         print("[Failed: solver timeout reached]")
     elif status == "no_solution":
         print("[Failed: no feasible path for this assignment]")

@@ -160,25 +160,18 @@ This keeps regenerated graphs compact: if the current branch domain in \texttt{m
 The plotting layer also computes compact vertical limits from the values that are actually drawn, with a small padding margin above and below the observed range. This avoids large empty regions when values are close while still preventing the extreme points from touching the frame. The runtime-limit reference line is no longer forced into every runtime graph; it is drawn only when at least one plotted runtime value reaches the configured limit.
 
 
-Each accepted condition can contribute to up to three graphs:
+The updated capacity-search protocol currently writes text-only raw-data and evaluation logs. Graph regeneration is intentionally marked as a later update for the new protocol, because the main output no longer consists of averaged metric curves over a long agent-number progression.
+
+\section{How Detailed Capacity Values Are Reported}
+
+For a reported capacity point:
 \begin{itemize}[leftmargin=2em]
-    \item average halted computation time vs.\ agent number,
-    \item average conflicts at halt vs.\ agent number,
-    \item average path length vs.\ agent number.
+    \item halted time is written as the direct run value,
+    \item conflicts at halt is written as the direct run value,
+    \item total path length is written only when the run is successful.
 \end{itemize}
 
-Path-length graphs are enabled through the branch specification and currently remain enabled for all branches.
-
-\section{How Aggregates Are Computed}
-
-For a reported condition:
-\begin{itemize}[leftmargin=2em]
-    \item halted time is averaged over counted runs,
-    \item conflicts at halt are averaged over counted runs,
-    \item average path length is averaged only over successful runs.
-\end{itemize}
-
-This means unfinished runs still influence the first two metrics but not path length.
+The current main-experiment protocol keeps one successful capacity run per mapping and configuration. Therefore, the detailed logs do not add average lines for the main values.
 
 \section{Pillow Rendering Contract}
 
