@@ -1,0 +1,55 @@
+Dynamic Artificial
+    Dispersed-Clustered
+        N_temp_classical_capacity: 16
+        N_temp_cyclic_capacity: 48
+        Temp capacity criterion: the primary mapping must solve, and cyclic must solve and have lower halted time and lower conflicts than classical on the same setup
+
+        Under temp classical capacity (N_temp_classical_capacity)
+            Time computation halted (secs)
+                Stats of classical at temp classical capacity
+                    Successful run 1: 0.13
+                Stats of cyclic at temp classical capacity
+                    Run 1: 0.15
+
+            Number of conflicts at halt
+                Stats of classical at temp classical capacity
+                    Successful run 1: 41
+                Stats of cyclic at temp classical capacity
+                    Run 1: 28
+
+            Total path length
+                Stats of classical at temp classical capacity
+                    Successful run 1: 489
+                Stats of cyclic at temp classical capacity
+                    Run 1: 574
+
+            Condensed evaluation
+                Time computation halted
+                    Evaluation: CLASSICAL IS BETTER
+                Number of conflicts at halt
+                    Evaluation: CYCLIC IS BETTER
+
+        Under temp cyclic capacity (N_temp_cyclic_capacity)
+            Time computation halted (secs)
+                Stats of cyclic at temp cyclic capacity
+                    Successful run 1: 0.10
+                Stats of classical at temp cyclic capacity
+                    Run 1: 30.00
+
+            Number of conflicts at halt
+                Stats of cyclic at temp cyclic capacity
+                    Successful run 1: 25
+                Stats of classical at temp cyclic capacity
+                    Run 1: 12919
+
+            Total path length
+                Stats of cyclic at temp cyclic capacity
+                    Successful run 1: 955
+                Stats of classical at temp cyclic capacity
+                    Run 1: null (unfinished)
+
+            Condensed evaluation
+                Time computation halted
+                    Evaluation: CYCLIC IS BETTER
+                Number of conflicts at halt
+                    Evaluation: CYCLIC IS BETTER

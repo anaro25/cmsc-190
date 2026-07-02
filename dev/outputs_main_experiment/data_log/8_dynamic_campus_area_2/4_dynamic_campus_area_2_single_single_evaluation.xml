@@ -1,0 +1,43 @@
+Dynamic Campus Area 2
+    Single-cell-Single-cell target
+        N_temp_classical_capacity: 0
+        N_temp_cyclic_capacity: 0
+        Temp capacity criterion: the primary mapping must solve, and cyclic must solve and have lower halted time and lower conflicts than classical on the same setup
+
+        Under temp classical capacity (N_temp_classical_capacity)
+            Time computation halted (secs)
+                Stats of classical at temp classical capacity
+                Stats of cyclic at temp classical capacity
+
+            Number of conflicts at halt
+                Stats of classical at temp classical capacity
+                Stats of cyclic at temp classical capacity
+
+            Total path length
+                Stats of classical at temp classical capacity
+                Stats of cyclic at temp classical capacity
+
+            Condensed evaluation
+                Time computation halted
+                    Evaluation: TBD
+                Number of conflicts at halt
+                    Evaluation: TBD
+
+        Under temp cyclic capacity (N_temp_cyclic_capacity)
+            Time computation halted (secs)
+                Stats of cyclic at temp cyclic capacity
+                Stats of classical at temp cyclic capacity
+
+            Number of conflicts at halt
+                Stats of cyclic at temp cyclic capacity
+                Stats of classical at temp cyclic capacity
+
+            Total path length
+                Stats of cyclic at temp cyclic capacity
+                Stats of classical at temp cyclic capacity
+
+            Condensed evaluation
+                Time computation halted
+                    Evaluation: TBD
+                Number of conflicts at halt
+                    Evaluation: TBD

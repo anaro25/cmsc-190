@@ -93,8 +93,8 @@ to_generate = "raw_data"        # compute binary-search capacity data and text l
 SELECTED_MAP_CONFIGS = [
     # "static_artificial_dispersed_dispersed",
     # "static_artificial_dispersed_clustered",
-    "static_artificial_clustered_dispersed",
-    "static_artificial_clustered_clustered",
+    # "static_artificial_clustered_dispersed",
+    # "static_artificial_clustered_clustered",
     "dynamic_artificial_dispersed_dispersed",
     "dynamic_artificial_dispersed_clustered",
     "dynamic_artificial_clustered_dispersed",

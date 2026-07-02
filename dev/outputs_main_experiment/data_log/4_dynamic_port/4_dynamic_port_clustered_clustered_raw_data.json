@@ -1,0 +1,3396 @@
+{
+  "branch_spec": {
+    "map_type": "dynamic_port_clustered_clustered",
+    "branch_id": "dynamic_port_clustered_clustered",
+    "branch_decimal": "1.1.4",
+    "map_obstacle_type": "dynamic",
+    "map_obstacle_index": 1,
+    "map_type_index": 1,
+    "display_name": "Dynamic Port / Clustered-Clustered",
+    "target_type_documented": "clustered_targets",
+    "target_type_active": "clustered_targets",
+    "seed_base": 4301,
+    "agent_number_range": [
+      1,
+      255,
+      1
+    ],
+    "agent_numbers": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255
+    ],
+    "runtime_limit_seconds": 30.0,
+    "counted_runs_required": 1,
+    "capacity_attempts_per_agent_number": 5,
+    "capacity_successful_runs_required": 1,
+    "capacity_agent_upper_bound": 255,
+    "capacity_binary_search_max_downward_moves": 3,
+    "capacity_pass_criterion": "temp_pairwise",
+    "setup_generation_attempt_cap_per_solver_attempt": 3,
+    "prompt_before_next_map_config": true,
+    "prompt_before_next_map_config_timeout_seconds": 6.0,
+    "num_last_runs_to_visualize_jointly_successful": 3,
+    "num_last_runs_to_visualize_independently_successful": 3,
+    "path_length_graph_enabled": true,
+    "is_dynamic": true,
+    "category_map_type": "dynamic_port",
+    "category_index": 4,
+    "layout_index": 4,
+    "layout_key": "clustered_clustered",
+    "layout_label": "Clustered-Clustered",
+    "data_log_category_dir_name": "4_dynamic_port",
+    "data_log_file_stem": "4_dynamic_port_clustered_clustered",
+    "start_distribution_mode": "clustered",
+    "goal_distribution_mode": "clustered",
+    "clustered_start_goal_min_distance": 20,
+    "require_individual_reachability": true,
+    "zone_relationship_mode": "none",
+    "compact_clustering": true,
+    "clustering_style_name": "compact",
+    "base_rows": null,
+    "base_cols": null,
+    "static_obstacle_density": 0.8,
+    "image_path": "/workspaces/cmsc-190/dev/inputs/dynamic_port/port_map.png",
+    "image_threshold": 127,
+    "image_resize_longest_side": 40,
+    "dynamic_target_static_obstacle_density": 1.0,
+    "dynamic_target_dynamic_obstacle_density": 0.025,
+    "dynamic_loop_sequence_length": 250,
+    "dynamic_group_stay_durations": [
+      11,
+      17,
+      29
+    ],
+    "dynamic_generation_cell_mode": "all_free",
+    "spawnable_cell_mode": "all_free",
+    "solver_name": "ECBS",
+    "enhanced_cbs_enabled": true,
+    "solver_suboptimality_factor": 3.0,
+    "true_static_shortest_path_distance": true,
+    "tight_time_horizon": false,
+    "agent_cohesion_enabled": true,
+    "cohesion_factor": 1.0,
+    "notes": "Image-based port branch. Dynamic obstacles are generated while preserving the original port static-obstacle layout. Starts are sampled as clustered, goals use targets sampled as one compact directly adjacent 8-neighbor-connected group, and assignments remain one-to-one. Clustered start and goal sets must be at least 20 movement steps apart. Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for classical and cyclic mapping, with the binary-search descent limited by the configured maximum downward moves. The default paired-temp capacity criterion accepts a tested value only when the primary mapping solves and cyclic mapping beats classical mapping on the same setup in time computation halted and conflicts at halt. For the classical-side search, this means classical must solve and cyclic must still outperform it on that classical-origin setup. For the cyclic-side search, cyclic must solve and outperform classical on that cyclic-origin setup. The program still runs paired comparative tests at the discovered capacity points."
+  },
+  "dynamic_state_metadata": {
+    "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+    "schedule_seed": 150483,
+    "generation_mode": "group_patch",
+    "static_rows": 40,
+    "static_cols": 40,
+    "dynamic_loop_length": 250
+  },
+  "capacity_search": {
+    "classical": {
+      "mapping_name": "classical",
+      "best_agent_number": 0,
+      "best_successful_attempts": [],
+      "search_trace": [
+        {
+          "step": 1,
+          "depth_from_root": 0,
+          "low_before": 1,
+          "high_before": 255,
+          "tested_agent_number": 128,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3
+        },
+        {
+          "step": 2,
+          "depth_from_root": 1,
+          "low_before": 1,
+          "high_before": 127,
+          "tested_agent_number": 64,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3
+        },
+        {
+          "step": 3,
+          "depth_from_root": 2,
+          "low_before": 1,
+          "high_before": 63,
+          "tested_agent_number": 32,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3
+        },
+        {
+          "step": 4,
+          "depth_from_root": 3,
+          "low_before": 1,
+          "high_before": 31,
+          "tested_agent_number": 16,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "classical_solver_fail",
+          "success_count": 0,
+          "counted_attempt_count": 5,
+          "invalid_attempt_count": 1
+        }
+      ],
+      "tested_agent_numbers": [
+        {
+          "mapping_name": "classical",
+          "agent_number": 128,
+          "search_step_index": 1,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3,
+          "invalid_generation_cap_exhausted": true,
+          "attempts": [],
+          "comparison_attempts": [],
+          "trace": [
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 1,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 2,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 3,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "generation_cap_exhausted",
+              "solver_attempt_index": 1,
+              "cap": 3
+            }
+          ]
+        },
+        {
+          "mapping_name": "classical",
+          "agent_number": 64,
+          "search_step_index": 2,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3,
+          "invalid_generation_cap_exhausted": true,
+          "attempts": [],
+          "comparison_attempts": [],
+          "trace": [
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 1,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 2,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 3,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "generation_cap_exhausted",
+              "solver_attempt_index": 1,
+              "cap": 3
+            }
+          ]
+        },
+        {
+          "mapping_name": "classical",
+          "agent_number": 32,
+          "search_step_index": 3,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3,
+          "invalid_generation_cap_exhausted": true,
+          "attempts": [],
+          "comparison_attempts": [],
+          "trace": [
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 1,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 2,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 3,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "generation_cap_exhausted",
+              "solver_attempt_index": 1,
+              "cap": 3
+            }
+          ]
+        },
+        {
+          "mapping_name": "classical",
+          "agent_number": 16,
+          "search_step_index": 4,
+          "pass_criterion": "temp_classical",
+          "passed": false,
+          "failure_reason": "classical_solver_fail",
+          "success_count": 0,
+          "counted_attempt_count": 5,
+          "invalid_attempt_count": 1,
+          "invalid_generation_cap_exhausted": false,
+          "attempts": [
+            {
+              "generation_attempts_used": 1,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 400000,
+                "run_config_id": "run[1.1.4.4.400000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130491,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      60,
+                      26
+                    ],
+                    "goal": [
+                      24,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      60,
+                      28
+                    ],
+                    "goal": [
+                      24,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      58,
+                      26
+                    ],
+                    "goal": [
+                      22,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      60,
+                      24
+                    ],
+                    "goal": [
+                      24,
+                      10
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      62,
+                      26
+                    ],
+                    "goal": [
+                      24,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      58,
+                      28
+                    ],
+                    "goal": [
+                      18,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      58,
+                      24
+                    ],
+                    "goal": [
+                      22,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      62,
+                      28
+                    ],
+                    "goal": [
+                      20,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      62,
+                      24
+                    ],
+                    "goal": [
+                      22,
+                      8
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      60,
+                      22
+                    ],
+                    "goal": [
+                      22,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      64,
+                      26
+                    ],
+                    "goal": [
+                      24,
+                      8
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      60,
+                      30
+                    ],
+                    "goal": [
+                      20,
+                      10
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      62,
+                      30
+                    ],
+                    "goal": [
+                      20,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      64,
+                      28
+                    ],
+                    "goal": [
+                      20,
+                      8
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      58,
+                      22
+                    ],
+                    "goal": [
+                      20,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      64,
+                      24
+                    ],
+                    "goal": [
+                      22,
+                      10
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 400000,
+                "run_config_id": "run[1.1.4.4.400000]",
+                "mapping_name": "classical",
+                "mapping_index": 0,
+                "mapping_record_id": "mapping[1.1.4.4.400000.0]",
+                "comparison_case": "capacity_search_classical",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 982,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 982,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130491,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [60, 26], \"goal\": [24, 12]}, {\"agent_id\": 1, \"start\": [60, 28], \"goal\": [24, 14]}, {\"agent_id\": 2, \"start\": [58, 26], \"goal\": [22, 12]}, {\"agent_id\": 3, \"start\": [60, 24], \"goal\": [24, 10]}, {\"agent_id\": 4, \"start\": [62, 26], \"goal\": [24, 16]}, {\"agent_id\": 5, \"start\": [58, 28], \"goal\": [18, 12]}, {\"agent_id\": 6, \"start\": [58, 24], \"goal\": [22, 16]}, {\"agent_id\": 7, \"start\": [62, 28], \"goal\": [20, 16]}, {\"agent_id\": 8, \"start\": [62, 24], \"goal\": [22, 8]}, {\"agent_id\": 9, \"start\": [60, 22], \"goal\": [22, 14]}, {\"agent_id\": 10, \"start\": [64, 26], \"goal\": [24, 8]}, {\"agent_id\": 11, \"start\": [60, 30], \"goal\": [20, 10]}, {\"agent_id\": 12, \"start\": [62, 30], \"goal\": [20, 12]}, {\"agent_id\": 13, \"start\": [64, 28], \"goal\": [20, 8]}, {\"agent_id\": 14, \"start\": [58, 22], \"goal\": [20, 14]}, {\"agent_id\": 15, \"start\": [64, 24], \"goal\": [22, 10]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 982,
+              "total_path_length": null
+            },
+            {
+              "generation_attempts_used": 1,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 401000,
+                "run_config_id": "run[1.1.4.4.401000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130542,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      4,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      24
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      2,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      28
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      4,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      38
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      6,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      26
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      6,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      2,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      36
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      8,
+                      0
+                    ],
+                    "goal": [
+                      74,
+                      48
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      0,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      34
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      0,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      48
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      8,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      0,
+                      4
+                    ],
+                    "goal": [
+                      76,
+                      48
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      10,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      30
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      10,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      10,
+                      4
+                    ],
+                    "goal": [
+                      78,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      0,
+                      6
+                    ],
+                    "goal": [
+                      72,
+                      50
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      12,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      32
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 401000,
+                "run_config_id": "run[1.1.4.4.401000]",
+                "mapping_name": "classical",
+                "mapping_index": 0,
+                "mapping_record_id": "mapping[1.1.4.4.401000.0]",
+                "comparison_case": "capacity_search_classical",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 1824,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 1824,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130542,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [4, 0], \"goal\": [78, 24]}, {\"agent_id\": 1, \"start\": [2, 0], \"goal\": [78, 28]}, {\"agent_id\": 2, \"start\": [4, 2], \"goal\": [78, 38]}, {\"agent_id\": 3, \"start\": [6, 0], \"goal\": [78, 26]}, {\"agent_id\": 4, \"start\": [6, 2], \"goal\": [78, 44]}, {\"agent_id\": 5, \"start\": [2, 2], \"goal\": [78, 36]}, {\"agent_id\": 6, \"start\": [8, 0], \"goal\": [74, 48]}, {\"agent_id\": 7, \"start\": [0, 0], \"goal\": [78, 34]}, {\"agent_id\": 8, \"start\": [0, 2], \"goal\": [78, 48]}, {\"agent_id\": 9, \"start\": [8, 2], \"goal\": [78, 46]}, {\"agent_id\": 10, \"start\": [0, 4], \"goal\": [76, 48]}, {\"agent_id\": 11, \"start\": [10, 0], \"goal\": [78, 30]}, {\"agent_id\": 12, \"start\": [10, 2], \"goal\": [78, 40]}, {\"agent_id\": 13, \"start\": [10, 4], \"goal\": [78, 42]}, {\"agent_id\": 14, \"start\": [0, 6], \"goal\": [72, 50]}, {\"agent_id\": 15, \"start\": [12, 0], \"goal\": [78, 32]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 1824,
+              "total_path_length": null
+            },
+            {
+              "generation_attempts_used": 1,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 402000,
+                "run_config_id": "run[1.1.4.4.402000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130593,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      18,
+                      14
+                    ],
+                    "goal": [
+                      68,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      18,
+                      16
+                    ],
+                    "goal": [
+                      70,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      20,
+                      14
+                    ],
+                    "goal": [
+                      66,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      16,
+                      14
+                    ],
+                    "goal": [
+                      68,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      18,
+                      12
+                    ],
+                    "goal": [
+                      70,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      20,
+                      16
+                    ],
+                    "goal": [
+                      64,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      16,
+                      16
+                    ],
+                    "goal": [
+                      68,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      16,
+                      12
+                    ],
+                    "goal": [
+                      66,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      20,
+                      12
+                    ],
+                    "goal": [
+                      64,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      14,
+                      14
+                    ],
+                    "goal": [
+                      66,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      18,
+                      18
+                    ],
+                    "goal": [
+                      66,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      18,
+                      10
+                    ],
+                    "goal": [
+                      62,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      22,
+                      14
+                    ],
+                    "goal": [
+                      70,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      20,
+                      10
+                    ],
+                    "goal": [
+                      62,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      22,
+                      12
+                    ],
+                    "goal": [
+                      64,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      14,
+                      12
+                    ],
+                    "goal": [
+                      68,
+                      44
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 402000,
+                "run_config_id": "run[1.1.4.4.402000]",
+                "mapping_name": "classical",
+                "mapping_index": 0,
+                "mapping_record_id": "mapping[1.1.4.4.402000.0]",
+                "comparison_case": "capacity_search_classical",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 1083,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 1083,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130593,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [18, 14], \"goal\": [68, 40]}, {\"agent_id\": 1, \"start\": [18, 16], \"goal\": [70, 44]}, {\"agent_id\": 2, \"start\": [20, 14], \"goal\": [66, 46]}, {\"agent_id\": 3, \"start\": [16, 14], \"goal\": [68, 42]}, {\"agent_id\": 4, \"start\": [18, 12], \"goal\": [70, 46]}, {\"agent_id\": 5, \"start\": [20, 16], \"goal\": [64, 42]}, {\"agent_id\": 6, \"start\": [16, 16], \"goal\": [68, 46]}, {\"agent_id\": 7, \"start\": [16, 12], \"goal\": [66, 44]}, {\"agent_id\": 8, \"start\": [20, 12], \"goal\": [64, 46]}, {\"agent_id\": 9, \"start\": [14, 14], \"goal\": [66, 42]}, {\"agent_id\": 10, \"start\": [18, 18], \"goal\": [66, 40]}, {\"agent_id\": 11, \"start\": [18, 10], \"goal\": [62, 44]}, {\"agent_id\": 12, \"start\": [22, 14], \"goal\": [70, 42]}, {\"agent_id\": 13, \"start\": [20, 10], \"goal\": [62, 46]}, {\"agent_id\": 14, \"start\": [22, 12], \"goal\": [64, 44]}, {\"agent_id\": 15, \"start\": [14, 12], \"goal\": [68, 44]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 1083,
+              "total_path_length": null
+            },
+            {
+              "generation_attempts_used": 1,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 403000,
+                "run_config_id": "run[1.1.4.4.403000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130644,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      22,
+                      20
+                    ],
+                    "goal": [
+                      74,
+                      58
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      22,
+                      22
+                    ],
+                    "goal": [
+                      78,
+                      62
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      24,
+                      20
+                    ],
+                    "goal": [
+                      74,
+                      60
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      22,
+                      18
+                    ],
+                    "goal": [
+                      76,
+                      52
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      20,
+                      20
+                    ],
+                    "goal": [
+                      74,
+                      62
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      24,
+                      22
+                    ],
+                    "goal": [
+                      78,
+                      54
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      20,
+                      22
+                    ],
+                    "goal": [
+                      78,
+                      56
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      20,
+                      18
+                    ],
+                    "goal": [
+                      74,
+                      56
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      24,
+                      18
+                    ],
+                    "goal": [
+                      76,
+                      58
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      18,
+                      20
+                    ],
+                    "goal": [
+                      74,
+                      54
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      22,
+                      16
+                    ],
+                    "goal": [
+                      76,
+                      60
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      22,
+                      24
+                    ],
+                    "goal": [
+                      78,
+                      60
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      20,
+                      24
+                    ],
+                    "goal": [
+                      78,
+                      58
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      18,
+                      22
+                    ],
+                    "goal": [
+                      76,
+                      56
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      20,
+                      16
+                    ],
+                    "goal": [
+                      76,
+                      54
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      18,
+                      18
+                    ],
+                    "goal": [
+                      78,
+                      52
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 403000,
+                "run_config_id": "run[1.1.4.4.403000]",
+                "mapping_name": "classical",
+                "mapping_index": 0,
+                "mapping_record_id": "mapping[1.1.4.4.403000.0]",
+                "comparison_case": "capacity_search_classical",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 614,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 614,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130644,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [22, 20], \"goal\": [74, 58]}, {\"agent_id\": 1, \"start\": [22, 22], \"goal\": [78, 62]}, {\"agent_id\": 2, \"start\": [24, 20], \"goal\": [74, 60]}, {\"agent_id\": 3, \"start\": [22, 18], \"goal\": [76, 52]}, {\"agent_id\": 4, \"start\": [20, 20], \"goal\": [74, 62]}, {\"agent_id\": 5, \"start\": [24, 22], \"goal\": [78, 54]}, {\"agent_id\": 6, \"start\": [20, 22], \"goal\": [78, 56]}, {\"agent_id\": 7, \"start\": [20, 18], \"goal\": [74, 56]}, {\"agent_id\": 8, \"start\": [24, 18], \"goal\": [76, 58]}, {\"agent_id\": 9, \"start\": [18, 20], \"goal\": [74, 54]}, {\"agent_id\": 10, \"start\": [22, 16], \"goal\": [76, 60]}, {\"agent_id\": 11, \"start\": [22, 24], \"goal\": [78, 60]}, {\"agent_id\": 12, \"start\": [20, 24], \"goal\": [78, 58]}, {\"agent_id\": 13, \"start\": [18, 22], \"goal\": [76, 56]}, {\"agent_id\": 14, \"start\": [20, 16], \"goal\": [76, 54]}, {\"agent_id\": 15, \"start\": [18, 18], \"goal\": [78, 52]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 614,
+              "total_path_length": null
+            },
+            {
+              "generation_attempts_used": 2,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 404001,
+                "run_config_id": "run[1.1.4.4.404001]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130749,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      12,
+                      72
+                    ],
+                    "goal": [
+                      64,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      14,
+                      72
+                    ],
+                    "goal": [
+                      64,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      12,
+                      70
+                    ],
+                    "goal": [
+                      62,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      10,
+                      72
+                    ],
+                    "goal": [
+                      68,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      12,
+                      74
+                    ],
+                    "goal": [
+                      62,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      14,
+                      74
+                    ],
+                    "goal": [
+                      68,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      10,
+                      74
+                    ],
+                    "goal": [
+                      66,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      14,
+                      70
+                    ],
+                    "goal": [
+                      62,
+                      10
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      12,
+                      76
+                    ],
+                    "goal": [
+                      60,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      16,
+                      72
+                    ],
+                    "goal": [
+                      60,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      12,
+                      68
+                    ],
+                    "goal": [
+                      62,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      14,
+                      76
+                    ],
+                    "goal": [
+                      66,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      16,
+                      74
+                    ],
+                    "goal": [
+                      68,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      10,
+                      76
+                    ],
+                    "goal": [
+                      66,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      14,
+                      68
+                    ],
+                    "goal": [
+                      64,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      16,
+                      70
+                    ],
+                    "goal": [
+                      64,
+                      10
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 404001,
+                "run_config_id": "run[1.1.4.4.404001]",
+                "mapping_name": "classical",
+                "mapping_index": 0,
+                "mapping_record_id": "mapping[1.1.4.4.404001.0]",
+                "comparison_case": "capacity_search_classical",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 712,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 712,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130749,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [12, 72], \"goal\": [64, 14]}, {\"agent_id\": 1, \"start\": [14, 72], \"goal\": [64, 16]}, {\"agent_id\": 2, \"start\": [12, 70], \"goal\": [62, 12]}, {\"agent_id\": 3, \"start\": [10, 72], \"goal\": [68, 12]}, {\"agent_id\": 4, \"start\": [12, 74], \"goal\": [62, 14]}, {\"agent_id\": 5, \"start\": [14, 74], \"goal\": [68, 14]}, {\"agent_id\": 6, \"start\": [10, 74], \"goal\": [66, 16]}, {\"agent_id\": 7, \"start\": [14, 70], \"goal\": [62, 10]}, {\"agent_id\": 8, \"start\": [12, 76], \"goal\": [60, 14]}, {\"agent_id\": 9, \"start\": [16, 72], \"goal\": [60, 12]}, {\"agent_id\": 10, \"start\": [12, 68], \"goal\": [62, 16]}, {\"agent_id\": 11, \"start\": [14, 76], \"goal\": [66, 14]}, {\"agent_id\": 12, \"start\": [16, 74], \"goal\": [68, 16]}, {\"agent_id\": 13, \"start\": [10, 76], \"goal\": [66, 12]}, {\"agent_id\": 14, \"start\": [14, 68], \"goal\": [64, 12]}, {\"agent_id\": 15, \"start\": [16, 70], \"goal\": [64, 10]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 712,
+              "total_path_length": null
+            }
+          ],
+          "comparison_attempts": [],
+          "trace": [
+            {
+              "kind": "temp_capacity_evaluation_skipped",
+              "solver_attempt_index": 1,
+              "reason": "classical_result_category=unfinished"
+            },
+            {
+              "kind": "temp_capacity_evaluation_skipped",
+              "solver_attempt_index": 2,
+              "reason": "classical_result_category=unfinished"
+            },
+            {
+              "kind": "temp_capacity_evaluation_skipped",
+              "solver_attempt_index": 3,
+              "reason": "classical_result_category=unfinished"
+            },
+            {
+              "kind": "temp_capacity_evaluation_skipped",
+              "solver_attempt_index": 4,
+              "reason": "classical_result_category=unfinished"
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 1,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "temp_capacity_evaluation_skipped",
+              "solver_attempt_index": 5,
+              "reason": "classical_result_category=unfinished"
+            }
+          ]
+        }
+      ]
+    },
+    "cyclic": {
+      "mapping_name": "cyclic",
+      "best_agent_number": 16,
+      "best_successful_attempts": [
+        {
+          "generation_attempts_used": 1,
+          "run_configuration": {
+            "branch_id": "dynamic_port_clustered_clustered",
+            "branch_decimal": "1.1.4",
+            "map_type": "dynamic_port_clustered_clustered",
+            "map_obstacle_type": "dynamic",
+            "target_type": "clustered_targets",
+            "agent_number": 16,
+            "agent_number_index": 4,
+            "run_index": 402000,
+            "run_config_id": "run[1.1.4.4.402000]",
+            "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+            "map_seed": 150483,
+            "assignment_seed": 130593,
+            "dynamic_schedule_seed": 150483,
+            "paired_source": false,
+            "starts_and_goals": [
+              {
+                "agent_id": 0,
+                "start": [
+                  18,
+                  14
+                ],
+                "goal": [
+                  68,
+                  40
+                ]
+              },
+              {
+                "agent_id": 1,
+                "start": [
+                  18,
+                  16
+                ],
+                "goal": [
+                  70,
+                  44
+                ]
+              },
+              {
+                "agent_id": 2,
+                "start": [
+                  20,
+                  14
+                ],
+                "goal": [
+                  66,
+                  46
+                ]
+              },
+              {
+                "agent_id": 3,
+                "start": [
+                  16,
+                  14
+                ],
+                "goal": [
+                  68,
+                  42
+                ]
+              },
+              {
+                "agent_id": 4,
+                "start": [
+                  18,
+                  12
+                ],
+                "goal": [
+                  70,
+                  46
+                ]
+              },
+              {
+                "agent_id": 5,
+                "start": [
+                  20,
+                  16
+                ],
+                "goal": [
+                  64,
+                  42
+                ]
+              },
+              {
+                "agent_id": 6,
+                "start": [
+                  16,
+                  16
+                ],
+                "goal": [
+                  68,
+                  46
+                ]
+              },
+              {
+                "agent_id": 7,
+                "start": [
+                  16,
+                  12
+                ],
+                "goal": [
+                  66,
+                  44
+                ]
+              },
+              {
+                "agent_id": 8,
+                "start": [
+                  20,
+                  12
+                ],
+                "goal": [
+                  64,
+                  46
+                ]
+              },
+              {
+                "agent_id": 9,
+                "start": [
+                  14,
+                  14
+                ],
+                "goal": [
+                  66,
+                  42
+                ]
+              },
+              {
+                "agent_id": 10,
+                "start": [
+                  18,
+                  18
+                ],
+                "goal": [
+                  66,
+                  40
+                ]
+              },
+              {
+                "agent_id": 11,
+                "start": [
+                  18,
+                  10
+                ],
+                "goal": [
+                  62,
+                  44
+                ]
+              },
+              {
+                "agent_id": 12,
+                "start": [
+                  22,
+                  14
+                ],
+                "goal": [
+                  70,
+                  42
+                ]
+              },
+              {
+                "agent_id": 13,
+                "start": [
+                  20,
+                  10
+                ],
+                "goal": [
+                  62,
+                  46
+                ]
+              },
+              {
+                "agent_id": 14,
+                "start": [
+                  22,
+                  12
+                ],
+                "goal": [
+                  64,
+                  44
+                ]
+              },
+              {
+                "agent_id": 15,
+                "start": [
+                  14,
+                  12
+                ],
+                "goal": [
+                  68,
+                  44
+                ]
+              }
+            ],
+            "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+          },
+          "record": {
+            "branch_id": "dynamic_port_clustered_clustered",
+            "branch_decimal": "1.1.4",
+            "map_type": "dynamic_port_clustered_clustered",
+            "map_obstacle_type": "dynamic",
+            "target_type": "clustered_targets",
+            "agent_number": 16,
+            "agent_number_index": 4,
+            "run_index": 402000,
+            "run_config_id": "run[1.1.4.4.402000]",
+            "mapping_name": "cyclic",
+            "mapping_index": 1,
+            "mapping_record_id": "mapping[1.1.4.4.402000.1]",
+            "comparison_case": "capacity_search_cyclic",
+            "solver_name": "ECBS",
+            "enhanced_cbs_enabled": true,
+            "solver_suboptimality_factor": 3.0,
+            "paired_run": false,
+            "solver_status": "solved",
+            "result_category": "successful",
+            "counted_run": true,
+            "solved_run": true,
+            "time_computation_halted_seconds": 5.850729396000133,
+            "num_conflicts_detected_at_halt": 180,
+            "total_path_length": 1076,
+            "num_high_level_nodes_expanded": 181,
+            "runtime_limit_seconds": 30.0,
+            "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+            "map_seed": 150483,
+            "assignment_seed": 130593,
+            "dynamic_schedule_seed": 150483,
+            "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [18, 14], \"goal\": [68, 40]}, {\"agent_id\": 1, \"start\": [18, 16], \"goal\": [70, 44]}, {\"agent_id\": 2, \"start\": [20, 14], \"goal\": [66, 46]}, {\"agent_id\": 3, \"start\": [16, 14], \"goal\": [68, 42]}, {\"agent_id\": 4, \"start\": [18, 12], \"goal\": [70, 46]}, {\"agent_id\": 5, \"start\": [20, 16], \"goal\": [64, 42]}, {\"agent_id\": 6, \"start\": [16, 16], \"goal\": [68, 46]}, {\"agent_id\": 7, \"start\": [16, 12], \"goal\": [66, 44]}, {\"agent_id\": 8, \"start\": [20, 12], \"goal\": [64, 46]}, {\"agent_id\": 9, \"start\": [14, 14], \"goal\": [66, 42]}, {\"agent_id\": 10, \"start\": [18, 18], \"goal\": [66, 40]}, {\"agent_id\": 11, \"start\": [18, 10], \"goal\": [62, 44]}, {\"agent_id\": 12, \"start\": [22, 14], \"goal\": [70, 42]}, {\"agent_id\": 13, \"start\": [20, 10], \"goal\": [62, 46]}, {\"agent_id\": 14, \"start\": [22, 12], \"goal\": [64, 44]}, {\"agent_id\": 15, \"start\": [14, 12], \"goal\": [68, 44]}]"
+          },
+          "solver_status": "solved",
+          "result_category": "successful",
+          "solved_run": true,
+          "time_computation_halted_seconds": 5.850729396000133,
+          "num_conflicts_detected_at_halt": 180,
+          "total_path_length": 1076
+        }
+      ],
+      "search_trace": [
+        {
+          "step": 1,
+          "depth_from_root": 0,
+          "low_before": 1,
+          "high_before": 255,
+          "tested_agent_number": 128,
+          "pass_criterion": "temp_cyclic",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3
+        },
+        {
+          "step": 2,
+          "depth_from_root": 1,
+          "low_before": 1,
+          "high_before": 127,
+          "tested_agent_number": 64,
+          "pass_criterion": "temp_cyclic",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3
+        },
+        {
+          "step": 3,
+          "depth_from_root": 2,
+          "low_before": 1,
+          "high_before": 63,
+          "tested_agent_number": 32,
+          "pass_criterion": "temp_cyclic",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3
+        },
+        {
+          "step": 4,
+          "depth_from_root": 3,
+          "low_before": 1,
+          "high_before": 31,
+          "tested_agent_number": 16,
+          "pass_criterion": "temp_cyclic",
+          "passed": true,
+          "failure_reason": null,
+          "success_count": 1,
+          "counted_attempt_count": 3,
+          "invalid_attempt_count": 0
+        }
+      ],
+      "tested_agent_numbers": [
+        {
+          "mapping_name": "cyclic",
+          "agent_number": 128,
+          "search_step_index": 1,
+          "pass_criterion": "temp_cyclic",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3,
+          "invalid_generation_cap_exhausted": true,
+          "attempts": [],
+          "comparison_attempts": [],
+          "trace": [
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 1,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 2,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 3,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "generation_cap_exhausted",
+              "solver_attempt_index": 1,
+              "cap": 3
+            }
+          ]
+        },
+        {
+          "mapping_name": "cyclic",
+          "agent_number": 64,
+          "search_step_index": 2,
+          "pass_criterion": "temp_cyclic",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3,
+          "invalid_generation_cap_exhausted": true,
+          "attempts": [],
+          "comparison_attempts": [],
+          "trace": [
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 1,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 2,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 3,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "generation_cap_exhausted",
+              "solver_attempt_index": 1,
+              "cap": 3
+            }
+          ]
+        },
+        {
+          "mapping_name": "cyclic",
+          "agent_number": 32,
+          "search_step_index": 3,
+          "pass_criterion": "temp_cyclic",
+          "passed": false,
+          "failure_reason": "setup_unavailable",
+          "success_count": 0,
+          "counted_attempt_count": 0,
+          "invalid_attempt_count": 3,
+          "invalid_generation_cap_exhausted": true,
+          "attempts": [],
+          "comparison_attempts": [],
+          "trace": [
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 1,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 2,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "setup_failed",
+              "generation_attempt_index": 3,
+              "error_type": "TimeoutError",
+              "error_message": "Assignment sampling exceeded 2.0s fail-fast limit."
+            },
+            {
+              "kind": "generation_cap_exhausted",
+              "solver_attempt_index": 1,
+              "cap": 3
+            }
+          ]
+        },
+        {
+          "mapping_name": "cyclic",
+          "agent_number": 16,
+          "search_step_index": 4,
+          "pass_criterion": "temp_cyclic",
+          "passed": true,
+          "failure_reason": null,
+          "success_count": 1,
+          "counted_attempt_count": 3,
+          "invalid_attempt_count": 0,
+          "invalid_generation_cap_exhausted": false,
+          "attempts": [
+            {
+              "generation_attempts_used": 1,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 400000,
+                "run_config_id": "run[1.1.4.4.400000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130491,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      60,
+                      26
+                    ],
+                    "goal": [
+                      24,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      60,
+                      28
+                    ],
+                    "goal": [
+                      24,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      58,
+                      26
+                    ],
+                    "goal": [
+                      22,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      60,
+                      24
+                    ],
+                    "goal": [
+                      24,
+                      10
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      62,
+                      26
+                    ],
+                    "goal": [
+                      24,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      58,
+                      28
+                    ],
+                    "goal": [
+                      18,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      58,
+                      24
+                    ],
+                    "goal": [
+                      22,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      62,
+                      28
+                    ],
+                    "goal": [
+                      20,
+                      16
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      62,
+                      24
+                    ],
+                    "goal": [
+                      22,
+                      8
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      60,
+                      22
+                    ],
+                    "goal": [
+                      22,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      64,
+                      26
+                    ],
+                    "goal": [
+                      24,
+                      8
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      60,
+                      30
+                    ],
+                    "goal": [
+                      20,
+                      10
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      62,
+                      30
+                    ],
+                    "goal": [
+                      20,
+                      12
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      64,
+                      28
+                    ],
+                    "goal": [
+                      20,
+                      8
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      58,
+                      22
+                    ],
+                    "goal": [
+                      20,
+                      14
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      64,
+                      24
+                    ],
+                    "goal": [
+                      22,
+                      10
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 400000,
+                "run_config_id": "run[1.1.4.4.400000]",
+                "mapping_name": "cyclic",
+                "mapping_index": 1,
+                "mapping_record_id": "mapping[1.1.4.4.400000.1]",
+                "comparison_case": "capacity_search_cyclic",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 825,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 825,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130491,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [60, 26], \"goal\": [24, 12]}, {\"agent_id\": 1, \"start\": [60, 28], \"goal\": [24, 14]}, {\"agent_id\": 2, \"start\": [58, 26], \"goal\": [22, 12]}, {\"agent_id\": 3, \"start\": [60, 24], \"goal\": [24, 10]}, {\"agent_id\": 4, \"start\": [62, 26], \"goal\": [24, 16]}, {\"agent_id\": 5, \"start\": [58, 28], \"goal\": [18, 12]}, {\"agent_id\": 6, \"start\": [58, 24], \"goal\": [22, 16]}, {\"agent_id\": 7, \"start\": [62, 28], \"goal\": [20, 16]}, {\"agent_id\": 8, \"start\": [62, 24], \"goal\": [22, 8]}, {\"agent_id\": 9, \"start\": [60, 22], \"goal\": [22, 14]}, {\"agent_id\": 10, \"start\": [64, 26], \"goal\": [24, 8]}, {\"agent_id\": 11, \"start\": [60, 30], \"goal\": [20, 10]}, {\"agent_id\": 12, \"start\": [62, 30], \"goal\": [20, 12]}, {\"agent_id\": 13, \"start\": [64, 28], \"goal\": [20, 8]}, {\"agent_id\": 14, \"start\": [58, 22], \"goal\": [20, 14]}, {\"agent_id\": 15, \"start\": [64, 24], \"goal\": [22, 10]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 825,
+              "total_path_length": null
+            },
+            {
+              "generation_attempts_used": 1,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 401000,
+                "run_config_id": "run[1.1.4.4.401000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130542,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      4,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      24
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      2,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      28
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      4,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      38
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      6,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      26
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      6,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      2,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      36
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      8,
+                      0
+                    ],
+                    "goal": [
+                      74,
+                      48
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      0,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      34
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      0,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      48
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      8,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      0,
+                      4
+                    ],
+                    "goal": [
+                      76,
+                      48
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      10,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      30
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      10,
+                      2
+                    ],
+                    "goal": [
+                      78,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      10,
+                      4
+                    ],
+                    "goal": [
+                      78,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      0,
+                      6
+                    ],
+                    "goal": [
+                      72,
+                      50
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      12,
+                      0
+                    ],
+                    "goal": [
+                      78,
+                      32
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 401000,
+                "run_config_id": "run[1.1.4.4.401000]",
+                "mapping_name": "cyclic",
+                "mapping_index": 1,
+                "mapping_record_id": "mapping[1.1.4.4.401000.1]",
+                "comparison_case": "capacity_search_cyclic",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 442,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 442,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130542,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [4, 0], \"goal\": [78, 24]}, {\"agent_id\": 1, \"start\": [2, 0], \"goal\": [78, 28]}, {\"agent_id\": 2, \"start\": [4, 2], \"goal\": [78, 38]}, {\"agent_id\": 3, \"start\": [6, 0], \"goal\": [78, 26]}, {\"agent_id\": 4, \"start\": [6, 2], \"goal\": [78, 44]}, {\"agent_id\": 5, \"start\": [2, 2], \"goal\": [78, 36]}, {\"agent_id\": 6, \"start\": [8, 0], \"goal\": [74, 48]}, {\"agent_id\": 7, \"start\": [0, 0], \"goal\": [78, 34]}, {\"agent_id\": 8, \"start\": [0, 2], \"goal\": [78, 48]}, {\"agent_id\": 9, \"start\": [8, 2], \"goal\": [78, 46]}, {\"agent_id\": 10, \"start\": [0, 4], \"goal\": [76, 48]}, {\"agent_id\": 11, \"start\": [10, 0], \"goal\": [78, 30]}, {\"agent_id\": 12, \"start\": [10, 2], \"goal\": [78, 40]}, {\"agent_id\": 13, \"start\": [10, 4], \"goal\": [78, 42]}, {\"agent_id\": 14, \"start\": [0, 6], \"goal\": [72, 50]}, {\"agent_id\": 15, \"start\": [12, 0], \"goal\": [78, 32]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 442,
+              "total_path_length": null
+            },
+            {
+              "generation_attempts_used": 1,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 402000,
+                "run_config_id": "run[1.1.4.4.402000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130593,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      18,
+                      14
+                    ],
+                    "goal": [
+                      68,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      18,
+                      16
+                    ],
+                    "goal": [
+                      70,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      20,
+                      14
+                    ],
+                    "goal": [
+                      66,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      16,
+                      14
+                    ],
+                    "goal": [
+                      68,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      18,
+                      12
+                    ],
+                    "goal": [
+                      70,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      20,
+                      16
+                    ],
+                    "goal": [
+                      64,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      16,
+                      16
+                    ],
+                    "goal": [
+                      68,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      16,
+                      12
+                    ],
+                    "goal": [
+                      66,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      20,
+                      12
+                    ],
+                    "goal": [
+                      64,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      14,
+                      14
+                    ],
+                    "goal": [
+                      66,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      18,
+                      18
+                    ],
+                    "goal": [
+                      66,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      18,
+                      10
+                    ],
+                    "goal": [
+                      62,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      22,
+                      14
+                    ],
+                    "goal": [
+                      70,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      20,
+                      10
+                    ],
+                    "goal": [
+                      62,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      22,
+                      12
+                    ],
+                    "goal": [
+                      64,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      14,
+                      12
+                    ],
+                    "goal": [
+                      68,
+                      44
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 402000,
+                "run_config_id": "run[1.1.4.4.402000]",
+                "mapping_name": "cyclic",
+                "mapping_index": 1,
+                "mapping_record_id": "mapping[1.1.4.4.402000.1]",
+                "comparison_case": "capacity_search_cyclic",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": false,
+                "solver_status": "solved",
+                "result_category": "successful",
+                "counted_run": true,
+                "solved_run": true,
+                "time_computation_halted_seconds": 5.850729396000133,
+                "num_conflicts_detected_at_halt": 180,
+                "total_path_length": 1076,
+                "num_high_level_nodes_expanded": 181,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130593,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [18, 14], \"goal\": [68, 40]}, {\"agent_id\": 1, \"start\": [18, 16], \"goal\": [70, 44]}, {\"agent_id\": 2, \"start\": [20, 14], \"goal\": [66, 46]}, {\"agent_id\": 3, \"start\": [16, 14], \"goal\": [68, 42]}, {\"agent_id\": 4, \"start\": [18, 12], \"goal\": [70, 46]}, {\"agent_id\": 5, \"start\": [20, 16], \"goal\": [64, 42]}, {\"agent_id\": 6, \"start\": [16, 16], \"goal\": [68, 46]}, {\"agent_id\": 7, \"start\": [16, 12], \"goal\": [66, 44]}, {\"agent_id\": 8, \"start\": [20, 12], \"goal\": [64, 46]}, {\"agent_id\": 9, \"start\": [14, 14], \"goal\": [66, 42]}, {\"agent_id\": 10, \"start\": [18, 18], \"goal\": [66, 40]}, {\"agent_id\": 11, \"start\": [18, 10], \"goal\": [62, 44]}, {\"agent_id\": 12, \"start\": [22, 14], \"goal\": [70, 42]}, {\"agent_id\": 13, \"start\": [20, 10], \"goal\": [62, 46]}, {\"agent_id\": 14, \"start\": [22, 12], \"goal\": [64, 44]}, {\"agent_id\": 15, \"start\": [14, 12], \"goal\": [68, 44]}]"
+              },
+              "solver_status": "solved",
+              "result_category": "successful",
+              "solved_run": true,
+              "time_computation_halted_seconds": 5.850729396000133,
+              "num_conflicts_detected_at_halt": 180,
+              "total_path_length": 1076
+            }
+          ],
+          "comparison_attempts": [
+            {
+              "generation_attempts_used": 0,
+              "run_configuration": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 402000,
+                "run_config_id": "run[1.1.4.4.402000]",
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130593,
+                "dynamic_schedule_seed": 150483,
+                "paired_source": false,
+                "starts_and_goals": [
+                  {
+                    "agent_id": 0,
+                    "start": [
+                      18,
+                      14
+                    ],
+                    "goal": [
+                      68,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 1,
+                    "start": [
+                      18,
+                      16
+                    ],
+                    "goal": [
+                      70,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 2,
+                    "start": [
+                      20,
+                      14
+                    ],
+                    "goal": [
+                      66,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 3,
+                    "start": [
+                      16,
+                      14
+                    ],
+                    "goal": [
+                      68,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 4,
+                    "start": [
+                      18,
+                      12
+                    ],
+                    "goal": [
+                      70,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 5,
+                    "start": [
+                      20,
+                      16
+                    ],
+                    "goal": [
+                      64,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 6,
+                    "start": [
+                      16,
+                      16
+                    ],
+                    "goal": [
+                      68,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 7,
+                    "start": [
+                      16,
+                      12
+                    ],
+                    "goal": [
+                      66,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 8,
+                    "start": [
+                      20,
+                      12
+                    ],
+                    "goal": [
+                      64,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 9,
+                    "start": [
+                      14,
+                      14
+                    ],
+                    "goal": [
+                      66,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 10,
+                    "start": [
+                      18,
+                      18
+                    ],
+                    "goal": [
+                      66,
+                      40
+                    ]
+                  },
+                  {
+                    "agent_id": 11,
+                    "start": [
+                      18,
+                      10
+                    ],
+                    "goal": [
+                      62,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 12,
+                    "start": [
+                      22,
+                      14
+                    ],
+                    "goal": [
+                      70,
+                      42
+                    ]
+                  },
+                  {
+                    "agent_id": 13,
+                    "start": [
+                      20,
+                      10
+                    ],
+                    "goal": [
+                      62,
+                      46
+                    ]
+                  },
+                  {
+                    "agent_id": 14,
+                    "start": [
+                      22,
+                      12
+                    ],
+                    "goal": [
+                      64,
+                      44
+                    ]
+                  },
+                  {
+                    "agent_id": 15,
+                    "start": [
+                      14,
+                      12
+                    ],
+                    "goal": [
+                      68,
+                      44
+                    ]
+                  }
+                ],
+                "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+              },
+              "record": {
+                "branch_id": "dynamic_port_clustered_clustered",
+                "branch_decimal": "1.1.4",
+                "map_type": "dynamic_port_clustered_clustered",
+                "map_obstacle_type": "dynamic",
+                "target_type": "clustered_targets",
+                "agent_number": 16,
+                "agent_number_index": 4,
+                "run_index": 402000,
+                "run_config_id": "run[1.1.4.4.402000]",
+                "mapping_name": "classical",
+                "mapping_index": 0,
+                "mapping_record_id": "mapping[1.1.4.4.402000.0]",
+                "comparison_case": "temp_capacity_classical_comparison",
+                "solver_name": "ECBS",
+                "enhanced_cbs_enabled": true,
+                "solver_suboptimality_factor": 3.0,
+                "paired_run": true,
+                "solver_status": "solver_timeout",
+                "result_category": "unfinished",
+                "counted_run": true,
+                "solved_run": false,
+                "time_computation_halted_seconds": 30.0,
+                "num_conflicts_detected_at_halt": 1084,
+                "total_path_length": null,
+                "num_high_level_nodes_expanded": 1084,
+                "runtime_limit_seconds": 30.0,
+                "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+                "map_seed": 150483,
+                "assignment_seed": 130593,
+                "dynamic_schedule_seed": 150483,
+                "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [18, 14], \"goal\": [68, 40]}, {\"agent_id\": 1, \"start\": [18, 16], \"goal\": [70, 44]}, {\"agent_id\": 2, \"start\": [20, 14], \"goal\": [66, 46]}, {\"agent_id\": 3, \"start\": [16, 14], \"goal\": [68, 42]}, {\"agent_id\": 4, \"start\": [18, 12], \"goal\": [70, 46]}, {\"agent_id\": 5, \"start\": [20, 16], \"goal\": [64, 42]}, {\"agent_id\": 6, \"start\": [16, 16], \"goal\": [68, 46]}, {\"agent_id\": 7, \"start\": [16, 12], \"goal\": [66, 44]}, {\"agent_id\": 8, \"start\": [20, 12], \"goal\": [64, 46]}, {\"agent_id\": 9, \"start\": [14, 14], \"goal\": [66, 42]}, {\"agent_id\": 10, \"start\": [18, 18], \"goal\": [66, 40]}, {\"agent_id\": 11, \"start\": [18, 10], \"goal\": [62, 44]}, {\"agent_id\": 12, \"start\": [22, 14], \"goal\": [70, 42]}, {\"agent_id\": 13, \"start\": [20, 10], \"goal\": [62, 46]}, {\"agent_id\": 14, \"start\": [22, 12], \"goal\": [64, 44]}, {\"agent_id\": 15, \"start\": [14, 12], \"goal\": [68, 44]}]"
+              },
+              "solver_status": "solver_timeout",
+              "result_category": "unfinished",
+              "solved_run": false,
+              "time_computation_halted_seconds": 30.0,
+              "num_conflicts_detected_at_halt": 1084,
+              "total_path_length": null
+            }
+          ],
+          "trace": [
+            {
+              "kind": "temp_capacity_evaluation_skipped",
+              "solver_attempt_index": 1,
+              "reason": "cyclic_result_category=unfinished"
+            },
+            {
+              "kind": "temp_capacity_evaluation_skipped",
+              "solver_attempt_index": 2,
+              "reason": "cyclic_result_category=unfinished"
+            },
+            {
+              "kind": "temp_capacity_evaluation",
+              "solver_attempt_index": 3,
+              "primary_mapping_name": "cyclic",
+              "comparison_mapping_name": "classical",
+              "temp_pass": true,
+              "reasons": [],
+              "cyclic_time": 5.850729396000133,
+              "classical_time": 30.0,
+              "cyclic_conflicts": 180,
+              "classical_conflicts": 1084
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "comparative_runs": {
+    "cyclic_at_temp_classical_capacity": [],
+    "classical_at_temp_cyclic_capacity": [
+      {
+        "generation_attempts_used": 0,
+        "run_configuration": {
+          "branch_id": "dynamic_port_clustered_clustered",
+          "branch_decimal": "1.1.4",
+          "map_type": "dynamic_port_clustered_clustered",
+          "map_obstacle_type": "dynamic",
+          "target_type": "clustered_targets",
+          "agent_number": 16,
+          "agent_number_index": 4,
+          "run_index": 402000,
+          "run_config_id": "run[1.1.4.4.402000]",
+          "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+          "map_seed": 150483,
+          "assignment_seed": 130593,
+          "dynamic_schedule_seed": 150483,
+          "paired_source": false,
+          "starts_and_goals": [
+            {
+              "agent_id": 0,
+              "start": [
+                18,
+                14
+              ],
+              "goal": [
+                68,
+                40
+              ]
+            },
+            {
+              "agent_id": 1,
+              "start": [
+                18,
+                16
+              ],
+              "goal": [
+                70,
+                44
+              ]
+            },
+            {
+              "agent_id": 2,
+              "start": [
+                20,
+                14
+              ],
+              "goal": [
+                66,
+                46
+              ]
+            },
+            {
+              "agent_id": 3,
+              "start": [
+                16,
+                14
+              ],
+              "goal": [
+                68,
+                42
+              ]
+            },
+            {
+              "agent_id": 4,
+              "start": [
+                18,
+                12
+              ],
+              "goal": [
+                70,
+                46
+              ]
+            },
+            {
+              "agent_id": 5,
+              "start": [
+                20,
+                16
+              ],
+              "goal": [
+                64,
+                42
+              ]
+            },
+            {
+              "agent_id": 6,
+              "start": [
+                16,
+                16
+              ],
+              "goal": [
+                68,
+                46
+              ]
+            },
+            {
+              "agent_id": 7,
+              "start": [
+                16,
+                12
+              ],
+              "goal": [
+                66,
+                44
+              ]
+            },
+            {
+              "agent_id": 8,
+              "start": [
+                20,
+                12
+              ],
+              "goal": [
+                64,
+                46
+              ]
+            },
+            {
+              "agent_id": 9,
+              "start": [
+                14,
+                14
+              ],
+              "goal": [
+                66,
+                42
+              ]
+            },
+            {
+              "agent_id": 10,
+              "start": [
+                18,
+                18
+              ],
+              "goal": [
+                66,
+                40
+              ]
+            },
+            {
+              "agent_id": 11,
+              "start": [
+                18,
+                10
+              ],
+              "goal": [
+                62,
+                44
+              ]
+            },
+            {
+              "agent_id": 12,
+              "start": [
+                22,
+                14
+              ],
+              "goal": [
+                70,
+                42
+              ]
+            },
+            {
+              "agent_id": 13,
+              "start": [
+                20,
+                10
+              ],
+              "goal": [
+                62,
+                46
+              ]
+            },
+            {
+              "agent_id": 14,
+              "start": [
+                22,
+                12
+              ],
+              "goal": [
+                64,
+                44
+              ]
+            },
+            {
+              "agent_id": 15,
+              "start": [
+                14,
+                12
+              ],
+              "goal": [
+                68,
+                44
+              ]
+            }
+          ],
+          "notes": "Shared dynamic map source; unique initial conditions for this run. start_distribution=clustered | goal_distribution=clustered | clustered_start_goal_min_distance=20"
+        },
+        "record": {
+          "branch_id": "dynamic_port_clustered_clustered",
+          "branch_decimal": "1.1.4",
+          "map_type": "dynamic_port_clustered_clustered",
+          "map_obstacle_type": "dynamic",
+          "target_type": "clustered_targets",
+          "agent_number": 16,
+          "agent_number_index": 4,
+          "run_index": 402000,
+          "run_config_id": "run[1.1.4.4.402000]",
+          "mapping_name": "classical",
+          "mapping_index": 0,
+          "mapping_record_id": "mapping[1.1.4.4.402000.0]",
+          "comparison_case": "comparative_classical_at_temp_cyclic_capacity",
+          "solver_name": "ECBS",
+          "enhanced_cbs_enabled": true,
+          "solver_suboptimality_factor": 3.0,
+          "paired_run": true,
+          "solver_status": "solver_timeout",
+          "result_category": "unfinished",
+          "counted_run": true,
+          "solved_run": false,
+          "time_computation_halted_seconds": 30.0,
+          "num_conflicts_detected_at_halt": 1073,
+          "total_path_length": null,
+          "num_high_level_nodes_expanded": 1073,
+          "runtime_limit_seconds": 30.0,
+          "map_identifier": "dynamic_port_clustered_clustered_shared_map_seed_150483_group_patch",
+          "map_seed": 150483,
+          "assignment_seed": 130593,
+          "dynamic_schedule_seed": 150483,
+          "initial_condition_spec": "[{\"agent_id\": 0, \"start\": [18, 14], \"goal\": [68, 40]}, {\"agent_id\": 1, \"start\": [18, 16], \"goal\": [70, 44]}, {\"agent_id\": 2, \"start\": [20, 14], \"goal\": [66, 46]}, {\"agent_id\": 3, \"start\": [16, 14], \"goal\": [68, 42]}, {\"agent_id\": 4, \"start\": [18, 12], \"goal\": [70, 46]}, {\"agent_id\": 5, \"start\": [20, 16], \"goal\": [64, 42]}, {\"agent_id\": 6, \"start\": [16, 16], \"goal\": [68, 46]}, {\"agent_id\": 7, \"start\": [16, 12], \"goal\": [66, 44]}, {\"agent_id\": 8, \"start\": [20, 12], \"goal\": [64, 46]}, {\"agent_id\": 9, \"start\": [14, 14], \"goal\": [66, 42]}, {\"agent_id\": 10, \"start\": [18, 18], \"goal\": [66, 40]}, {\"agent_id\": 11, \"start\": [18, 10], \"goal\": [62, 44]}, {\"agent_id\": 12, \"start\": [22, 14], \"goal\": [70, 42]}, {\"agent_id\": 13, \"start\": [20, 10], \"goal\": [62, 46]}, {\"agent_id\": 14, \"start\": [22, 12], \"goal\": [64, 44]}, {\"agent_id\": 15, \"start\": [14, 12], \"goal\": [68, 44]}]"
+        },
+        "solver_status": "solver_timeout",
+        "result_category": "unfinished",
+        "solved_run": false,
+        "time_computation_halted_seconds": 30.0,
+        "num_conflicts_detected_at_halt": 1073,
+        "total_path_length": null
+      }
+    ]
+  },
+  "data_log_path": "/workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/4_dynamic_port_clustered_clustered_evaluation.xml"
+}
