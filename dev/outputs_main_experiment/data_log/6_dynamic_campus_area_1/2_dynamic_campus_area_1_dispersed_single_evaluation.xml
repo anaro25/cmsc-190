@@ -1,46 +1,52 @@
 Dynamic Campus Area 1
     Dispersed-Single-cell target
-        N_temp_classical_capacity: 0
-        N_temp_cyclic_capacity: 16
+        N_temp_classical_capacity: 12
+        N_temp_cyclic_capacity: 12
         Temp capacity criterion: the primary mapping must solve, and cyclic must solve and have lower halted time and lower conflicts than classical on the same setup
 
         Under temp classical capacity (N_temp_classical_capacity)
             Time computation halted (secs)
                 Stats of classical at temp classical capacity
+                    Successful run 1: 0.49
                 Stats of cyclic at temp classical capacity
+                    Run 1: 0.42
 
             Number of conflicts at halt
                 Stats of classical at temp classical capacity
+                    Successful run 1: 12
                 Stats of cyclic at temp classical capacity
+                    Run 1: 5
 
             Total path length
                 Stats of classical at temp classical capacity
+                    Successful run 1: 1046
                 Stats of cyclic at temp classical capacity
+                    Run 1: 1324
 
             Condensed evaluation
                 Time computation halted
-                    Evaluation: TBD
+                    Evaluation: CYCLIC IS BETTER
                 Number of conflicts at halt
-                    Evaluation: TBD
+                    Evaluation: CYCLIC IS BETTER
 
         Under temp cyclic capacity (N_temp_cyclic_capacity)
             Time computation halted (secs)
                 Stats of cyclic at temp cyclic capacity
-                    Successful run 1: 0.51
+                    Successful run 1: 0.43
                 Stats of classical at temp cyclic capacity
-                    Run 1: 30.00
+                    Run 1: 0.50
 
             Number of conflicts at halt
                 Stats of cyclic at temp cyclic capacity
-                    Successful run 1: 14
+                    Successful run 1: 5
                 Stats of classical at temp cyclic capacity
-                    Run 1: 804
+                    Run 1: 12
 
             Total path length
                 Stats of cyclic at temp cyclic capacity
-                    Successful run 1: 1385
+                    Successful run 1: 1324
                 Stats of classical at temp cyclic capacity
-                    Run 1: null (unfinished)
+                    Run 1: 1046
 
             Condensed evaluation
                 Time computation halted

@@ -1,7 +1,7 @@
 Dynamic Port
     Dispersed-Dispersed
         N_temp_classical_capacity: 0
-        N_temp_cyclic_capacity: 16
+        N_temp_cyclic_capacity: 14
         Temp capacity criterion: the primary mapping must solve, and cyclic must solve and have lower halted time and lower conflicts than classical on the same setup
 
         Under temp classical capacity (N_temp_classical_capacity)
@@ -26,19 +26,19 @@ Dynamic Port
         Under temp cyclic capacity (N_temp_cyclic_capacity)
             Time computation halted (secs)
                 Stats of cyclic at temp cyclic capacity
-                    Successful run 1: 5.19
+                    Successful run 1: 1.14
                 Stats of classical at temp cyclic capacity
                     Run 1: 30.00
 
             Number of conflicts at halt
                 Stats of cyclic at temp cyclic capacity
-                    Successful run 1: 5
+                    Successful run 1: 3
                 Stats of classical at temp cyclic capacity
-                    Run 1: 2704
+                    Run 1: 4814
 
             Total path length
                 Stats of cyclic at temp cyclic capacity
-                    Successful run 1: 953
+                    Successful run 1: 686
                 Stats of classical at temp cyclic capacity
                     Run 1: null (unfinished)
 

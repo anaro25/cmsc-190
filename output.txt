@@ -482,6 +482,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/2_dynamic_artificial/1_dynamic_artificial_dispersed_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/2_dynamic_artificial/1_dynamic_artificial_dispersed_dispersed_raw_data.json
 [Elapsed: 05m 55s] Configuration completed: dynamic_artificial_dispersed_dispersed
+
+Completed map config 1/17. Next: Dynamic Artificial / Clustered-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 1/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -956,6 +959,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/2_dynamic_artificial/3_dynamic_artificial_clustered_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/2_dynamic_artificial/3_dynamic_artificial_clustered_dispersed_raw_data.json
 [Elapsed: 12m 08s] Configuration completed: dynamic_artificial_clustered_dispersed
+
+Completed map config 2/17. Next: Static Port / Dispersed-Clustered.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 2/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -1151,6 +1157,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/3_static_port/2_static_port_dispersed_clustered_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/3_static_port/2_static_port_dispersed_clustered_raw_data.json
 [Elapsed: 12m 25s] Configuration completed: static_port_dispersed_clustered
+
+Completed map config 3/17. Next: Dynamic Port / Dispersed-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 3/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -1674,6 +1683,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/1_dynamic_port_dispersed_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/1_dynamic_port_dispersed_dispersed_raw_data.json
 [Elapsed: 18m 38s] Configuration completed: dynamic_port_dispersed_dispersed
+
+Completed map config 4/17. Next: Dynamic Port / Dispersed-Clustered.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 4/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -2249,6 +2261,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/2_dynamic_port_dispersed_clustered_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/2_dynamic_port_dispersed_clustered_raw_data.json
 [Elapsed: 20m 08s] Configuration completed: dynamic_port_dispersed_clustered
+
+Completed map config 5/17. Next: Dynamic Port / Clustered-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 5/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -2724,6 +2739,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/3_dynamic_port_clustered_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/3_dynamic_port_clustered_dispersed_raw_data.json
 [Elapsed: 28m 34s] Configuration completed: dynamic_port_clustered_dispersed
+
+Completed map config 6/17. Next: Dynamic Port / Clustered-Clustered.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 6/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -3166,6 +3184,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/4_dynamic_port_clustered_clustered_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/4_dynamic_port/4_dynamic_port_clustered_clustered_raw_data.json
 [Elapsed: 35m 24s] Configuration completed: dynamic_port_clustered_clustered
+
+Completed map config 7/17. Next: Static Campus Area 1 / Single-cell-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 7/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -3549,6 +3570,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/5_static_campus_area_1/3_static_campus_area_1_single_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/5_static_campus_area_1/3_static_campus_area_1_single_dispersed_raw_data.json
 [Elapsed: 37m 03s] Configuration completed: static_campus_area_1_single_dispersed
+
+Completed map config 8/17. Next: Static Campus Area 1 / Single-cell-Single-cell target.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 8/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -3955,6 +3979,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/5_static_campus_area_1/4_static_campus_area_1_single_single_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/5_static_campus_area_1/4_static_campus_area_1_single_single_raw_data.json
 [Elapsed: 39m 25s] Configuration completed: static_campus_area_1_single_single
+
+Completed map config 9/17. Next: Dynamic Campus Area 1 / Dispersed-Single-cell target.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 9/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -4516,6 +4543,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/6_dynamic_campus_area_1/2_dynamic_campus_area_1_dispersed_single_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/6_dynamic_campus_area_1/2_dynamic_campus_area_1_dispersed_single_raw_data.json
 [Elapsed: 47m 21s] Configuration completed: dynamic_campus_area_1_dispersed_single
+
+Completed map config 10/17. Next: Dynamic Campus Area 1 / Single-cell-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 10/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -5044,6 +5074,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/6_dynamic_campus_area_1/3_dynamic_campus_area_1_single_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/6_dynamic_campus_area_1/3_dynamic_campus_area_1_single_dispersed_raw_data.json
 [Elapsed: 50m 44s] Configuration completed: dynamic_campus_area_1_single_dispersed
+
+Completed map config 11/17. Next: Dynamic Campus Area 1 / Single-cell-Single-cell target.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 11/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -5498,6 +5531,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/6_dynamic_campus_area_1/4_dynamic_campus_area_1_single_single_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/6_dynamic_campus_area_1/4_dynamic_campus_area_1_single_single_raw_data.json
 [Elapsed: 54m 56s] Configuration completed: dynamic_campus_area_1_single_single
+
+Completed map config 12/17. Next: Static Campus Area 2 / Dispersed-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 12/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -5785,6 +5821,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/7_static_campus_area_2/1_static_campus_area_2_dispersed_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/7_static_campus_area_2/1_static_campus_area_2_dispersed_dispersed_raw_data.json
 [Elapsed: 55m 50s] Configuration completed: static_campus_area_2_dispersed_dispersed
+
+Completed map config 13/17. Next: Static Campus Area 2 / Single-cell-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 13/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -6179,6 +6218,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/7_static_campus_area_2/3_static_campus_area_2_single_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/7_static_campus_area_2/3_static_campus_area_2_single_dispersed_raw_data.json
 [Elapsed: 57m 39s] Configuration completed: static_campus_area_2_single_dispersed
+
+Completed map config 14/17. Next: Static Campus Area 2 / Single-cell-Single-cell target.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 14/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -6611,6 +6653,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/7_static_campus_area_2/4_static_campus_area_2_single_single_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/7_static_campus_area_2/4_static_campus_area_2_single_single_raw_data.json
 [Elapsed: 61m 32s] Configuration completed: static_campus_area_2_single_single
+
+Completed map config 15/17. Next: Dynamic Campus Area 2 / Single-cell-Dispersed.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 15/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -7133,6 +7178,9 @@ Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic
 Detailed configuration/evaluation log written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/8_dynamic_campus_area_2/3_dynamic_campus_area_2_single_dispersed_evaluation.xml
 Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/8_dynamic_campus_area_2/3_dynamic_campus_area_2_single_dispersed_raw_data.json
 [Elapsed: 66m 11s] Configuration completed: dynamic_campus_area_2_single_dispersed
+
+Completed map config 16/17. Next: Dynamic Campus Area 2 / Single-cell-Single-cell target.
+Enter 1 to continue, or 0 to terminate early (auto-continues after 5 seconds): 
 No continue/terminate response after map config 16/17 within 5 seconds. Continuing to next map config by default.
 
 ========================================================================================
@@ -7540,3 +7588,29 @@ Structured raw data written: /workspaces/cmsc-190/dev/outputs_main_experiment/da
 
 Selected map-config summary written: /workspaces/cmsc-190/dev/outputs_main_experiment/data_log/selected_map_configs_raw_data_summary.json
 [Elapsed: 71m 08s] Selected main-experiment map configurations finished.
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+===========================
+
