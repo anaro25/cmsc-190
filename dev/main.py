@@ -13,9 +13,9 @@ def main() -> None:
 
     if SELECTED_EXPERIMENT == "main_experiment":
         from dev.experiments.generalized_study import run_selected_experiment
-        from dev.master_config import MAP_TYPE
+        from dev.master_config import SELECTED_MAP_CONFIGS
 
-        run_selected_experiment(MAP_TYPE, program_start_time=program_start_time)
+        run_selected_experiment(SELECTED_MAP_CONFIGS, program_start_time=program_start_time)
     elif SELECTED_EXPERIMENT == "ref_comparison":
         from dev.experiments.ref_comparison.orchestrator import run_selected_ref_comparison
 

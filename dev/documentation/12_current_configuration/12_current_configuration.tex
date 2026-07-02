@@ -53,6 +53,7 @@ The current shared values are:
     \item \texttt{SHARED\_TRUE\_STATIC\_SHORTEST\_PATH\_DISTANCE=True},
     \item \texttt{SHARED\_TIGHT\_TIME\_HORIZON=False},
     \item \texttt{SHARED\_COUNTED\_RUNS\_REQUIRED=1},
+    \item \texttt{CAPACITY\_PASS\_CRITERION="temp\_cyclic"},
     \item \texttt{CAPACITY\_ATTEMPTS\_PER\_AGENT\_NUMBER=5},
     \item \texttt{CAPACITY\_SUCCESSFUL\_RUNS\_REQUIRED=1},
     \item \texttt{CAPACITY\_AGENT\_UPPER\_BOUND=255},
@@ -62,7 +63,7 @@ The current shared values are:
 
 \section{Configured Map Categories}
 
-The current branch set contains eight map categories. Traditional MAPF categories use four layouts each. Campus crowd-simulation categories use six layouts each. This gives forty map configurations overall.
+The current branch set contains eight map categories. Every category now has four exact configurations. This gives thirty-two map configurations overall.
 
 \begin{longtable}{>{\raggedright\arraybackslash}p{0.30\linewidth} >{\raggedright\arraybackslash}p{0.62\linewidth}}
 \toprule
@@ -74,16 +75,16 @@ category & important notes \\
 \texttt{dynamic\_artificial} & Artificial map with generated dynamic obstacles; four dispersed/clustered start-goal layouts. \\
 \texttt{static\_port} & Image-based port map without dynamic obstacles; four dispersed/clustered start-goal layouts. \\
 \texttt{dynamic\_port} & Image-based port map with dynamic obstacles; four dispersed/clustered start-goal layouts. \\
-\texttt{static\_campus\_area\_1} & Campus area 1 without dynamic obstacles; six layouts including single-target modes. \\
-\texttt{dynamic\_campus\_area\_1} & Campus area 1 with dynamic obstacles; six layouts including single-target modes. \\
-\texttt{static\_campus\_area\_2} & Campus area 2 without dynamic obstacles; six layouts including single-target modes. \\
-\texttt{dynamic\_campus\_area\_2} & Campus area 2 with dynamic obstacles; six layouts including single-target modes. \\
+\texttt{static\_campus\_area\_1} & Campus area 1 without dynamic obstacles; four layouts using dispersed or single-cell agents and targets. \\
+\texttt{dynamic\_campus\_area\_1} & Campus area 1 with dynamic obstacles; four layouts using dispersed or single-cell agents and targets. \\
+\texttt{static\_campus\_area\_2} & Campus area 2 without dynamic obstacles; four layouts using dispersed or single-cell agents and targets. \\
+\texttt{dynamic\_campus\_area\_2} & Campus area 2 with dynamic obstacles; four layouts using dispersed or single-cell agents and targets. \\
 
 \bottomrule
 \end{longtable}
 
 \section{Interpretation Advice}
 
-This file is a snapshot, not a substitute for \texttt{master\_config.py}. The important current design fact is that the project now uses limited binary-search capacity testing. Each tested agent number follows a one-success-out-of-five pass rule, and each mapping retains one successful capacity run per configuration. As a result, the detailed main-experiment logs report direct run values rather than averages over three successful runs.
+This file is a snapshot, not a substitute for \texttt{master\_config.py}. The important current design fact is that the project now uses limited binary-search capacity testing with paired temp criteria. The classical-side search reports the highest tested agent number where classical solves and cyclic still beats classical on the same setup. The cyclic-side search reports the highest tested agent number where cyclic solves and beats classical on the same setup. In both cases, the temp comparison uses time computation halted and conflicts at halt. The count rule is still one accepted run out of five attempts, so the detailed main-experiment logs report direct run values rather than averages over three successful runs. The program also prompts the user before proceeding to the next map configuration.
 
 \end{document}

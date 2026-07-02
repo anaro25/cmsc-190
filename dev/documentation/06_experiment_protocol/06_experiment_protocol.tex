@@ -32,15 +32,36 @@
 
 \section{Current Main-Experiment Structure}
 
-The main experiment is organized around map configurations. Selecting a map category in \texttt{master\_config.py} runs every documented layout configuration for that category. Across all categories, the design contains forty configurations.
+The main experiment is organized around exact map configurations. The user selects one or more exact entries in \texttt{SELECTED\_MAP\_CONFIGS} in \texttt{master\_config.py}. Across all categories, the design contains thirty-two configurations.
 
-For each configuration, classical mapping and cyclic mapping are tested independently. The goal is to find two capacity values:
+The current protocol separates two ideas that were previously easy to mix together:
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{setup availability}: whether the program can generate a valid start-target setup for the tested number of agents;
+    \item \textbf{capacity judgement}: whether the solver result satisfies the configured pass criterion after a valid setup exists.
+\end{itemize}
+
+A setup-generation failure is logged separately as unavailable input for that tested value. It is not treated as proof that either mapping failed to solve the MAPF instance, because no valid MAPF instance was actually solved.
+
+\section{Capacity Values Reported}
+
+The classical-side search now reports temp classical capacity:
 \[
-\Nclass = \text{highest tested agent number passed by classical mapping},
+N_{\text{temp classical}} = \text{highest tested agent number where classical solves and cyclic performs better than classical}.
 \]
+
+The cyclic-side search reports temp cyclic capacity:
 \[
-\Ncyc = \text{highest tested agent number passed by cyclic mapping}.
+N_{\text{temp cyclic}} = \text{highest tested agent number where cyclic solves and performs better than classical}.
 \]
+
+Both values are controlled by:
+
+\begin{lstlisting}
+CAPACITY_PASS_CRITERION = "temp_pairwise"
+\end{lstlisting}
+
+If this is changed to \texttt{"temp\_cyclic"}, only the cyclic-side search uses the temp criterion and the classical-side search reverts to solver success. If this is changed to \texttt{"solver\_success"}, both mappings pass if they solve within the time limit.
 
 \section{Limited Binary-Search Capacity Testing}
 
@@ -51,7 +72,7 @@ The tested range is fixed at:
 
 The values are treated as nodes of a complete binary search tree whose root is 128. A pass moves the search to the right child. A failure moves the search to the left child.
 
-The search no longer continues until a leaf node. It stops after the configured number of downward child moves from the root:
+The search does not continue until a leaf node. It stops after the configured number of downward child moves from the root:
 
 \begin{lstlisting}
 CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
@@ -75,7 +96,7 @@ There is no separate manual backtracking phase. During traversal, the program st
 
 \section{Pass/Fail Rule for a Tested Agent Number}
 
-Each tested agent number permits up to five valid solver attempts. The current pass rule is:
+Each tested agent number permits up to five solver attempts. The current count rule remains:
 
 \begin{lstlisting}
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
@@ -83,24 +104,47 @@ CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
 SHARED_TIME_LIMIT_SECONDS = 30.0
 \end{lstlisting}
 
-A tested agent number passes as soon as one valid attempt solves within the time limit. It fails only when all five valid attempts are counted without any successful solution.
+Thus, only one accepted run is needed for the tested value to pass. The number of attempts and the required number of successes are still configurable in \texttt{master\_config.py}.
 
-Setup-failed and unsolvable initial conditions are regenerated and do not count as valid attempts. The setup-generation cap per solver attempt is currently:
+For the classical-side search, a classical run is accepted only if:
 
-\begin{lstlisting}
-SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 5
-\end{lstlisting}
+\begin{enumerate}[leftmargin=2em]
+    \item setup generation succeeds;
+    \item classical mapping solves within the time limit;
+    \item cyclic mapping is run on the same generated setup;
+    \item cyclic mapping also solves;
+    \item cyclic has lower time computation halted than classical;
+    \item cyclic has lower number of conflicts at halt than classical.
+\end{enumerate}
+
+For the cyclic-side search, a cyclic run is accepted only if:
+
+\begin{enumerate}[leftmargin=2em]
+    \item setup generation succeeds;
+    \item cyclic mapping solves within the time limit;
+    \item classical mapping is run on the same generated setup;
+    \item cyclic has lower time computation halted than classical;
+    \item cyclic has lower number of conflicts at halt than classical.
+\end{enumerate}
+
+Total path length is not part of the pass/fail rule. It remains a reported tradeoff because cyclic mapping is expected to sometimes produce longer paths.
+
+\section{Setup Availability and Sampling Ceiling}
+
+When setup generation fails, the tested value is marked as setup unavailable. This means the program could not produce the required number of starts and targets under the current sampling rules, such as dispersed placement with clearance.
+
+This is different from solver failure. A solver failure means a valid setup existed, but the solver did not satisfy the pass criterion. The log now records the reason for a failed tested value, such as \texttt{setup\_unavailable}, \texttt{solver\_fail}, \texttt{classical\_solver\_fail}, \texttt{cyclic\_solver\_fail}, or \texttt{temp\_fail}.
 
 \section{Saved Capacity Runs and Comparative Runs}
 
-Because the current rule needs only one successful run, each mapping keeps one successful capacity-run initial condition at its discovered capacity point. That condition is then reused for the opposite mapping.
+Because the current rule needs only one accepted run, the program keeps one accepted run at each discovered capacity point.
 
-At \(\Nclass\), the classical successful run is compared with cyclic mapping on the same initial condition. At \(\Ncyc\), the cyclic successful run is compared with classical mapping on the same initial condition.
+At \(N_{\text{temp classical}}\), the accepted classical-side run is compared with cyclic mapping on the same initial condition. At \(N_{\text{temp cyclic}}\), the accepted cyclic-side run is compared with classical mapping on the same initial condition.
 
-This gives paired evidence at both discovered capacity points while avoiding averages over multiple successful capacity runs.
+This gives paired evidence at the two important capacity points while avoiding averages over multiple successful capacity runs.
 
 \section{Logging Expectations}
 
-Console and file logs separate solver attempts with blank lines so that successive runs are easier to read. After each tested agent number, the log also prints the elapsed time from the start of the experiment execution.
+Console and file logs separate solver attempts with blank lines so that successive runs are easier to read. After each tested agent number, the log prints whether the value passed, the active criterion, and the reason for failure when it fails. When the selected exact-configuration list contains another map configuration after the current one, the program prompts the user before proceeding. Entering \texttt{1} continues to the next map configuration, while entering \texttt{0} terminates the program early.
 
 \end{document}

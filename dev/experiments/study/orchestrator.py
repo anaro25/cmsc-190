@@ -5,7 +5,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from dev.experiments.branch_specs import BranchSpec, get_branch_specs_for_selected_map_type
+from dev.experiments.branch_specs import BranchSpec, get_branch_specs_for_selected_map_configs
 from dev.experiments.study.io_utils import ExperimentLogger, write_json
 from dev.experiments.study.logging_utils import log_branch_header, log_dynamic_state, log_mapping_record
 from dev.experiments.study.models import DynamicBranchState, MappingRunRecord, PreparedRunContext, VisualizationCandidate
@@ -38,13 +38,16 @@ class AgentNumberTestResult:
     mapping_name: str
     agent_number: int
     search_step_index: int
+    pass_criterion: str
     passed: bool
+    failure_reason: str | None
     success_count: int
     counted_attempt_count: int
     invalid_attempt_count: int
     invalid_generation_cap_exhausted: bool
     attempts: list[SolverAttempt]
     successful_attempts: list[SolverAttempt]
+    comparison_attempts: list[SolverAttempt]
     trace: list[dict[str, Any]]
 
 
@@ -325,6 +328,131 @@ def _run_valid_solver_attempt(
     return None, invalid_trace
 
 
+
+def _effective_pass_criterion(branch_spec: BranchSpec, mapping_name: str) -> str:
+    configured = str(branch_spec.capacity_pass_criterion)
+    valid_criteria = {"solver_success", "temp_cyclic", "temp_pairwise"}
+    if configured not in valid_criteria:
+        raise ValueError(
+            "capacity_pass_criterion must be one of "
+            "'solver_success', 'temp_cyclic', or 'temp_pairwise'."
+        )
+    if configured == "solver_success":
+        return "solver_success"
+    if configured == "temp_cyclic":
+        return "temp_cyclic" if mapping_name == "cyclic" else "solver_success"
+    if mapping_name == "classical":
+        return "temp_classical"
+    return "temp_cyclic"
+
+
+def _criterion_description(criterion: str, *, required_successes: int, max_attempts: int, time_limit_seconds: float) -> str:
+    if criterion == "temp_classical":
+        return (
+            f"{required_successes}/{max_attempts} temp classical-origin run(s): classical must solve within "
+            f"{time_limit_seconds:.0f}s, and cyclic must solve and have lower halted time and lower "
+            "conflicts than classical on the same generated setup"
+        )
+    if criterion == "temp_cyclic":
+        return (
+            f"{required_successes}/{max_attempts} temp cyclic-origin run(s): cyclic must solve within "
+            f"{time_limit_seconds:.0f}s and have lower halted time and lower conflicts than classical "
+            "on the same generated setup"
+        )
+    return f"{required_successes}/{max_attempts} successful within {time_limit_seconds:.0f}s"
+
+
+def _run_paired_mapping_on_context(
+    *,
+    branch_spec: BranchSpec,
+    dynamic_state: DynamicBranchState | None,
+    prepared_context: PreparedRunContext,
+    mapping_name: str,
+    comparison_case: str,
+    logger: ExperimentLogger,
+) -> SolverAttempt:
+    solver_result, elapsed_seconds, solver_status = _execute_mapping(
+        branch_spec=branch_spec,
+        dynamic_state=dynamic_state,
+        prepared_context=prepared_context,
+        mapping_name=mapping_name,
+        logger=logger,
+    )
+    record = build_mapping_record(
+        run_configuration=prepared_context.run_configuration,
+        mapping_name=mapping_name,
+        comparison_case=comparison_case,
+        runtime_limit_seconds=branch_spec.runtime_limit_seconds,
+        solver_name=(solver_result or {}).get("solver_name", branch_spec.solver_name),
+        enhanced_cbs_enabled=branch_spec.enhanced_cbs_enabled,
+        solver_suboptimality_factor=(solver_result or {}).get(
+            "solver_suboptimality_factor",
+            branch_spec.solver_suboptimality_factor,
+        ),
+        solver_result=solver_result,
+        elapsed_seconds=elapsed_seconds,
+        solver_status=solver_status,
+        paired_run=True,
+        dynamic=branch_spec.is_dynamic,
+    )
+    log_mapping_record(logger, record)
+    return SolverAttempt(
+        prepared_context=prepared_context,
+        record=record,
+        solver_result=solver_result,
+        generation_attempts_used=0,
+    )
+
+
+def _conflict_value_for_comparison(record: MappingRunRecord) -> int | None:
+    return record.num_conflicts_detected_at_halt
+
+
+def _is_cyclic_temp(
+    *,
+    cyclic_record: MappingRunRecord,
+    classical_record: MappingRunRecord,
+) -> tuple[bool, list[str]]:
+    reasons: list[str] = []
+    if not cyclic_record.solved_run:
+        reasons.append("cyclic_not_successful")
+    if classical_record.result_category not in COUNTED_RESULT_CATEGORIES:
+        reasons.append(f"classical_not_counted:{classical_record.result_category}")
+
+    cyclic_time = cyclic_record.time_computation_halted_seconds
+    classical_time = classical_record.time_computation_halted_seconds
+    if not (cyclic_time < classical_time):
+        reasons.append("cyclic_time_not_lower")
+
+    cyclic_conflicts = _conflict_value_for_comparison(cyclic_record)
+    classical_conflicts = _conflict_value_for_comparison(classical_record)
+    if cyclic_conflicts is None or classical_conflicts is None:
+        reasons.append("conflicts_unavailable")
+    elif not (cyclic_conflicts < classical_conflicts):
+        reasons.append("cyclic_conflicts_not_lower")
+
+    return not reasons, reasons
+
+
+def _classify_failure_reason(
+    *,
+    criterion: str,
+    attempts: list[SolverAttempt],
+    invalid_generation_cap_exhausted: bool,
+) -> str:
+    if not attempts and invalid_generation_cap_exhausted:
+        return "setup_unavailable"
+    if criterion == "temp_classical":
+        if not any(attempt.record.solved_run for attempt in attempts):
+            return "classical_solver_fail"
+        return "temp_fail"
+    if criterion == "temp_cyclic":
+        if not any(attempt.record.solved_run for attempt in attempts):
+            return "cyclic_solver_fail"
+        return "temp_fail"
+    return "solver_fail"
+
+
 def _test_agent_number_for_mapping(
     *,
     branch_spec: BranchSpec,
@@ -336,17 +464,19 @@ def _test_agent_number_for_mapping(
     logger: ExperimentLogger,
 ) -> AgentNumberTestResult:
     attempts: list[SolverAttempt] = []
+    comparison_attempts: list[SolverAttempt] = []
     successful_attempts: list[SolverAttempt] = []
     trace: list[dict[str, Any]] = []
     invalid_attempt_count = 0
     invalid_generation_cap_exhausted = False
     max_attempts = int(branch_spec.capacity_attempts_per_agent_number)
     required_successes = int(branch_spec.capacity_successful_runs_required)
+    criterion = _effective_pass_criterion(branch_spec, mapping_name)
 
     logger.log("")
     logger.log(
         f"    Testing N={agent_number} for {mapping_name} | "
-        f"pass_rule={required_successes}/{max_attempts} successful within {branch_spec.runtime_limit_seconds:.0f}s"
+        f"pass_rule={_criterion_description(criterion, required_successes=required_successes, max_attempts=max_attempts, time_limit_seconds=branch_spec.runtime_limit_seconds)}"
     )
     _log_feasibility_diagnostic(
         branch_spec=branch_spec,
@@ -393,28 +523,95 @@ def _test_agent_number_for_mapping(
             break
 
         attempts.append(attempt)
-        if attempt.record.result_category == "successful":
+        if criterion in {"temp_classical", "temp_cyclic"}:
+            if attempt.record.result_category == "successful":
+                comparison_mapping_name = "cyclic" if mapping_name == "classical" else "classical"
+                comparison_case = (
+                    "temp_capacity_cyclic_comparison"
+                    if comparison_mapping_name == "cyclic"
+                    else "temp_capacity_classical_comparison"
+                )
+                logger.log(
+                    f"      Temp-capacity comparison | running {comparison_mapping_name} on "
+                    f"the same setup before accepting this {mapping_name} success"
+                )
+                comparison_attempt = _run_paired_mapping_on_context(
+                    branch_spec=branch_spec,
+                    dynamic_state=dynamic_state,
+                    prepared_context=attempt.prepared_context,
+                    mapping_name=comparison_mapping_name,
+                    comparison_case=comparison_case,
+                    logger=logger,
+                )
+                comparison_attempts.append(comparison_attempt)
+                if mapping_name == "cyclic":
+                    cyclic_record = attempt.record
+                    classical_record = comparison_attempt.record
+                else:
+                    cyclic_record = comparison_attempt.record
+                    classical_record = attempt.record
+                temp_pass, reasons = _is_cyclic_temp(
+                    cyclic_record=cyclic_record,
+                    classical_record=classical_record,
+                )
+                trace.append(
+                    {
+                        "kind": "temp_capacity_evaluation",
+                        "solver_attempt_index": solver_attempt_index + 1,
+                        "primary_mapping_name": mapping_name,
+                        "comparison_mapping_name": comparison_mapping_name,
+                        "temp_pass": temp_pass,
+                        "reasons": reasons,
+                        "cyclic_time": cyclic_record.time_computation_halted_seconds,
+                        "classical_time": classical_record.time_computation_halted_seconds,
+                        "cyclic_conflicts": cyclic_record.num_conflicts_detected_at_halt,
+                        "classical_conflicts": classical_record.num_conflicts_detected_at_halt,
+                    }
+                )
+                logger.log(
+                    f"      Temp-capacity evaluation | passed={temp_pass} | "
+                    f"reasons={','.join(reasons) if reasons else 'none'}"
+                )
+                if temp_pass:
+                    successful_attempts.append(attempt)
+            else:
+                trace.append(
+                    {
+                        "kind": "temp_capacity_evaluation_skipped",
+                        "solver_attempt_index": solver_attempt_index + 1,
+                        "reason": f"{mapping_name}_result_category={attempt.record.result_category}",
+                    }
+                )
+        elif attempt.record.result_category == "successful":
             successful_attempts.append(attempt)
         solver_attempt_index += 1
 
     passed = len(successful_attempts) >= required_successes
+    failure_reason = None if passed else _classify_failure_reason(
+        criterion=criterion,
+        attempts=attempts,
+        invalid_generation_cap_exhausted=invalid_generation_cap_exhausted,
+    )
     logger.log(
-        f"    Result for N={agent_number} | mapping={mapping_name} | "
+        f"    Result for N={agent_number} | mapping={mapping_name} | criterion={criterion} | "
         f"passed={passed} | successful={len(successful_attempts)} | counted_attempts={len(attempts)} | "
-        f"invalid_regenerated={invalid_attempt_count}"
+        f"invalid_regenerated={invalid_attempt_count} | failure_reason={failure_reason or 'none'}"
     )
     logger.log_elapsed(f"Finished tested agent number N={agent_number} for {mapping_name}")
     return AgentNumberTestResult(
         mapping_name=mapping_name,
         agent_number=agent_number,
         search_step_index=search_step_index,
+        pass_criterion=criterion,
         passed=passed,
+        failure_reason=failure_reason,
         success_count=len(successful_attempts),
         counted_attempt_count=len(attempts),
         invalid_attempt_count=invalid_attempt_count,
         invalid_generation_cap_exhausted=invalid_generation_cap_exhausted,
         attempts=attempts,
         successful_attempts=successful_attempts[:required_successes],
+        comparison_attempts=comparison_attempts,
         trace=trace,
     )
 
@@ -439,8 +636,15 @@ def _run_capacity_search(
 
     logger.log("")
     logger.log("-" * 88)
+    search_criterion = _effective_pass_criterion(branch_spec, mapping_name)
+    if search_criterion == "temp_classical":
+        search_label = "Temp classical capacity search"
+    elif search_criterion == "temp_cyclic":
+        search_label = "Temp cyclic capacity search"
+    else:
+        search_label = "Solver capacity search"
     logger.log(
-        f"Capacity search started | mapping={mapping_name} | range=1..{high} | "
+        f"{search_label} started | mapping={mapping_name} | criterion={search_criterion} | range=1..{high} | "
         f"max_downward_moves={max_downward_moves}"
     )
     logger.log("-" * 88)
@@ -465,7 +669,9 @@ def _run_capacity_search(
                 "low_before": low,
                 "high_before": high,
                 "tested_agent_number": midpoint,
+                "pass_criterion": test_result.pass_criterion,
                 "passed": test_result.passed,
+                "failure_reason": test_result.failure_reason,
                 "success_count": test_result.success_count,
                 "counted_attempt_count": test_result.counted_attempt_count,
                 "invalid_attempt_count": test_result.invalid_attempt_count,
@@ -478,7 +684,8 @@ def _run_capacity_search(
 
         if current_depth >= max_downward_moves:
             logger.log(
-                f"    N={midpoint} {'passed' if test_result.passed else 'failed'}; "
+                f"    N={midpoint} {'passed' if test_result.passed else 'failed'} "
+                f"(reason={test_result.failure_reason or 'none'}); "
                 f"binary-search downward-move limit reached ({max_downward_moves}). "
                 "Stopping without descending to another child."
             )
@@ -489,11 +696,14 @@ def _run_capacity_search(
             logger.log(f"    N={midpoint} passed; moving to right child/search interval {low}..{high}.")
         else:
             high = midpoint - 1
-            logger.log(f"    N={midpoint} failed; moving to left child/search interval {low}..{high}.")
+            logger.log(
+                f"    N={midpoint} failed (reason={test_result.failure_reason or 'unknown'}); "
+                f"moving to left child/search interval {low}..{high}."
+            )
         current_depth += 1
 
     logger.log(
-        f"Capacity search finished | mapping={mapping_name} | "
+        f"{search_label} finished | mapping={mapping_name} | criterion={search_criterion} | "
         f"N_max={best_agent_number} | saved_successful_runs={len(best_successful_attempts)} | "
         f"tested_agent_numbers={len(tested_agent_numbers)}"
     )
@@ -720,8 +930,9 @@ def _build_configuration_log_text(
     lines: list[str] = []
     lines.append(category_title)
     lines.append(f"    {branch_spec.layout_label}")
-    lines.append(f"        N_classical_max: {classical_search.best_agent_number}")
-    lines.append(f"        N_cyclic_max: {cyclic_search.best_agent_number}")
+    lines.append(f"        N_temp_classical_capacity: {classical_search.best_agent_number}")
+    lines.append(f"        N_temp_cyclic_capacity: {cyclic_search.best_agent_number}")
+    lines.append("        Temp capacity criterion: the primary mapping must solve, and cyclic must solve and have lower halted time and lower conflicts than classical on the same setup")
     lines.append("")
 
     classical_baseline = _records_from_attempts(classical_search.best_successful_attempts)
@@ -729,12 +940,12 @@ def _build_configuration_log_text(
     cyclic_baseline = _records_from_attempts(cyclic_search.best_successful_attempts)
     classical_comparative = _records_from_attempts(classical_at_cyclic)
 
-    lines.append("        Under classical max agent number (N_classical_max)")
+    lines.append("        Under temp classical capacity (N_temp_classical_capacity)")
     _append_metric_block(
         lines,
         metric_title="Time computation halted (secs)",
-        baseline_title="Stats of classical at classical max",
-        comparative_title="Stats of cyclic at classical max",
+        baseline_title="Stats of classical at temp classical capacity",
+        comparative_title="Stats of cyclic at temp classical capacity",
         baseline_records=classical_baseline,
         comparative_records=cyclic_comparative,
         metric="time",
@@ -742,8 +953,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Number of conflicts at halt",
-        baseline_title="Stats of classical at classical max",
-        comparative_title="Stats of cyclic at classical max",
+        baseline_title="Stats of classical at temp classical capacity",
+        comparative_title="Stats of cyclic at temp classical capacity",
         baseline_records=classical_baseline,
         comparative_records=cyclic_comparative,
         metric="conflicts",
@@ -751,8 +962,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Total path length",
-        baseline_title="Stats of classical at classical max",
-        comparative_title="Stats of cyclic at classical max",
+        baseline_title="Stats of classical at temp classical capacity",
+        comparative_title="Stats of cyclic at temp classical capacity",
         baseline_records=classical_baseline,
         comparative_records=cyclic_comparative,
         metric="path",
@@ -763,12 +974,12 @@ def _build_configuration_log_text(
         comparative_records=cyclic_comparative,
     )
 
-    lines.append("        Under cyclic max agent number (N_cyclic_max)")
+    lines.append("        Under temp cyclic capacity (N_temp_cyclic_capacity)")
     _append_metric_block(
         lines,
         metric_title="Time computation halted (secs)",
-        baseline_title="Stats of cyclic at cyclic max",
-        comparative_title="Stats of classical at cyclic max",
+        baseline_title="Stats of cyclic at temp cyclic capacity",
+        comparative_title="Stats of classical at temp cyclic capacity",
         baseline_records=cyclic_baseline,
         comparative_records=classical_comparative,
         metric="time",
@@ -776,8 +987,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Number of conflicts at halt",
-        baseline_title="Stats of cyclic at cyclic max",
-        comparative_title="Stats of classical at cyclic max",
+        baseline_title="Stats of cyclic at temp cyclic capacity",
+        comparative_title="Stats of classical at temp cyclic capacity",
         baseline_records=cyclic_baseline,
         comparative_records=classical_comparative,
         metric="conflicts",
@@ -785,8 +996,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Total path length",
-        baseline_title="Stats of cyclic at cyclic max",
-        comparative_title="Stats of classical at cyclic max",
+        baseline_title="Stats of cyclic at temp cyclic capacity",
+        comparative_title="Stats of classical at temp cyclic capacity",
         baseline_records=cyclic_baseline,
         comparative_records=classical_comparative,
         metric="path",
@@ -819,12 +1030,15 @@ def _test_to_summary(test_result: AgentNumberTestResult) -> dict[str, Any]:
         "mapping_name": test_result.mapping_name,
         "agent_number": test_result.agent_number,
         "search_step_index": test_result.search_step_index,
+        "pass_criterion": test_result.pass_criterion,
         "passed": test_result.passed,
+        "failure_reason": test_result.failure_reason,
         "success_count": test_result.success_count,
         "counted_attempt_count": test_result.counted_attempt_count,
         "invalid_attempt_count": test_result.invalid_attempt_count,
         "invalid_generation_cap_exhausted": test_result.invalid_generation_cap_exhausted,
         "attempts": [_attempt_to_summary(attempt) for attempt in test_result.attempts],
+        "comparison_attempts": [_attempt_to_summary(attempt) for attempt in test_result.comparison_attempts],
         "trace": test_result.trace,
     }
 
@@ -894,7 +1108,7 @@ def _compute_single_configuration(
         dynamic_state=dynamic_state,
         baseline_mapping_name="classical",
         comparative_mapping_name="cyclic",
-        capacity_label="classical_capacity",
+        capacity_label="temp_classical_capacity",
         baseline_successful_attempts=classical_search.best_successful_attempts,
         logger=logger,
     )
@@ -903,7 +1117,7 @@ def _compute_single_configuration(
         dynamic_state=dynamic_state,
         baseline_mapping_name="cyclic",
         comparative_mapping_name="classical",
-        capacity_label="cyclic_capacity",
+        capacity_label="temp_cyclic_capacity",
         baseline_successful_attempts=cyclic_search.best_successful_attempts,
         logger=logger,
     )
@@ -930,8 +1144,8 @@ def _compute_single_configuration(
             "cyclic": _search_to_summary(cyclic_search),
         },
         "comparative_runs": {
-            "cyclic_at_classical_capacity": [_attempt_to_summary(attempt) for attempt in cyclic_at_classical],
-            "classical_at_cyclic_capacity": [_attempt_to_summary(attempt) for attempt in classical_at_cyclic],
+            "cyclic_at_temp_classical_capacity": [_attempt_to_summary(attempt) for attempt in cyclic_at_classical],
+            "classical_at_temp_cyclic_capacity": [_attempt_to_summary(attempt) for attempt in classical_at_cyclic],
         },
         "data_log_path": str(data_log_path),
     }
@@ -945,6 +1159,8 @@ def _compute_single_configuration(
         "map_type": branch_spec.map_type,
         "category_map_type": branch_spec.category_map_type,
         "layout_key": branch_spec.layout_key,
+        "n_temp_classical_capacity": classical_search.best_agent_number,
+        "n_temp_cyclic_capacity": cyclic_search.best_agent_number,
         "n_classical_max": classical_search.best_agent_number,
         "n_cyclic_max": cyclic_search.best_agent_number,
         "data_log_path": str(data_log_path),
@@ -952,63 +1168,323 @@ def _compute_single_configuration(
     }
 
 
+
+def _prompt_continue_to_next_map_config(
+    *,
+    logger: ExperimentLogger,
+    completed_index: int,
+    total_count: int,
+    next_branch_spec: BranchSpec,
+) -> bool:
+    prompt = (
+        "\n"
+        f"Completed map config {completed_index}/{total_count}. "
+        f"Next: {next_branch_spec.display_name}.\n"
+        "Enter 1 to continue to the next map config, or 0 to terminate early: "
+    )
+    while True:
+        try:
+            choice = input(prompt).strip()
+        except EOFError:
+            logger.log(
+                "No interactive input was available for the continue/terminate prompt. "
+                "Terminating early before the next map config."
+            )
+            return False
+        if choice == "1":
+            logger.log(
+                f"User prompt response after map config {completed_index}/{total_count}: "
+                "1 -> continuing to next map config."
+            )
+            return True
+        if choice == "0":
+            logger.log(
+                f"User prompt response after map config {completed_index}/{total_count}: "
+                "0 -> terminating early."
+            )
+            return False
+        print("Invalid entry. Enter 1 to continue or 0 to terminate early.")
+
+
+def _raw_data_path_for_config(branch_spec: BranchSpec) -> Path:
+    return (
+        OUTPUTS_MAIN_EXPERIMENT_ROOT
+        / "data_log"
+        / branch_spec.data_log_category_dir_name
+        / f"{branch_spec.data_log_file_stem}_raw_data.json"
+    )
+
+
+def _load_raw_payload(branch_spec: BranchSpec) -> dict[str, Any]:
+    raw_path = _raw_data_path_for_config(branch_spec)
+    if not raw_path.exists():
+        raise FileNotFoundError(
+            f"Saved raw data was not found for {branch_spec.map_type}: {raw_path}. "
+            "Run with to_generate = 'raw_data' for this selected map config first."
+        )
+    return json.loads(raw_path.read_text(encoding="utf-8"))
+
+
+def _record_dicts_from_payload(payload: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
+    def records(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [item.get("record", {}) for item in items]
+
+    capacity = payload.get("capacity_search", {})
+    comparative = payload.get("comparative_runs", {})
+    return {
+        "classical_at_temp_classical_capacity": records(
+            capacity.get("classical", {}).get("best_successful_attempts", [])
+        ),
+        "cyclic_at_temp_classical_capacity": records(
+            comparative.get("cyclic_at_temp_classical_capacity", [])
+        ),
+        "cyclic_at_temp_cyclic_capacity": records(
+            capacity.get("cyclic", {}).get("best_successful_attempts", [])
+        ),
+        "classical_at_temp_cyclic_capacity": records(
+            comparative.get("classical_at_temp_cyclic_capacity", [])
+        ),
+    }
+
+
+def _numeric_record_value(record: dict[str, Any], metric: str) -> float | None:
+    if metric == "time":
+        value = record.get("time_computation_halted_seconds")
+    elif metric == "conflicts":
+        value = record.get("num_conflicts_detected_at_halt")
+    elif metric == "path":
+        value = record.get("total_path_length") if record.get("solved_run") else None
+    else:
+        raise ValueError(f"Unsupported metric: {metric}")
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _average_record_value(records: list[dict[str, Any]], metric: str) -> float | None:
+    values = [_numeric_record_value(record, metric) for record in records]
+    filtered = [value for value in values if value is not None]
+    if not filtered:
+        return None
+    return sum(filtered) / len(filtered)
+
+
+def _write_graph_csv(branch_spec: BranchSpec, payload: dict[str, Any], graphs_dir: Path) -> Path:
+    records_by_group = _record_dicts_from_payload(payload)
+    rows: list[dict[str, Any]] = []
+    for capacity_label, group_names in {
+        "temp_classical_capacity": [
+            "classical_at_temp_classical_capacity",
+            "cyclic_at_temp_classical_capacity",
+        ],
+        "temp_cyclic_capacity": [
+            "cyclic_at_temp_cyclic_capacity",
+            "classical_at_temp_cyclic_capacity",
+        ],
+    }.items():
+        for group_name in group_names:
+            mapping_name = "cyclic" if group_name.startswith("cyclic") else "classical"
+            row = {
+                "map_config": branch_spec.map_type,
+                "capacity_label": capacity_label,
+                "mapping_name": mapping_name,
+                "time_avg": _average_record_value(records_by_group[group_name], "time"),
+                "conflicts_avg": _average_record_value(records_by_group[group_name], "conflicts"),
+                "path_avg": _average_record_value(records_by_group[group_name], "path"),
+                "record_count": len(records_by_group[group_name]),
+            }
+            rows.append(row)
+
+    csv_path = graphs_dir / f"{branch_spec.data_log_file_stem}_graph_values.csv"
+    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    if rows:
+        import csv
+        with csv_path.open("w", newline="", encoding="utf-8") as handle:
+            writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
+            writer.writeheader()
+            writer.writerows(rows)
+    else:
+        csv_path.write_text("", encoding="utf-8")
+    return csv_path
+
+
+def _generate_single_configuration_graphs(*, branch_spec: BranchSpec, logger: ExperimentLogger) -> dict[str, Any]:
+    payload = _load_raw_payload(branch_spec)
+    graphs_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "graphs" / branch_spec.data_log_category_dir_name
+    graphs_dir.mkdir(parents=True, exist_ok=True)
+    csv_path = _write_graph_csv(branch_spec, payload, graphs_dir)
+    output_paths = [str(csv_path)]
+
+    try:
+        import matplotlib.pyplot as plt
+
+        records_by_group = _record_dicts_from_payload(payload)
+        metric_specs = [
+            ("time", "Time computation halted (s)"),
+            ("conflicts", "Conflicts at halt"),
+            ("path", "Total path length"),
+        ]
+        group_order = [
+            "classical_at_temp_classical_capacity",
+            "cyclic_at_temp_classical_capacity",
+            "cyclic_at_temp_cyclic_capacity",
+            "classical_at_temp_cyclic_capacity",
+        ]
+        labels = [
+            "Classical @ temp classical",
+            "Cyclic @ temp classical",
+            "Cyclic @ temp cyclic",
+            "Classical @ temp cyclic",
+        ]
+        for metric, ylabel in metric_specs:
+            values = [_average_record_value(records_by_group[name], metric) for name in group_order]
+            plotted_values = [value for value in values if value is not None]
+            if not plotted_values:
+                continue
+            fig, ax = plt.subplots(figsize=(10, 5))
+            x_values = list(range(len(group_order)))
+            y_values = [float('nan') if value is None else value for value in values]
+            ax.plot(x_values, y_values, marker='o')
+            ax.set_xticks(x_values)
+            ax.set_xticklabels(labels, rotation=20, ha='right')
+            ax.set_ylabel(ylabel)
+            ax.set_title(branch_spec.display_name)
+            y_min = min(plotted_values)
+            y_max = max(plotted_values)
+            if y_min == y_max:
+                padding = max(1.0, abs(y_min) * 0.1)
+            else:
+                padding = (y_max - y_min) * 0.1
+            ax.set_ylim(y_min - padding, y_max + padding)
+            fig.tight_layout()
+            png_path = graphs_dir / f"{branch_spec.data_log_file_stem}_{metric}.png"
+            fig.savefig(png_path, dpi=150)
+            plt.close(fig)
+            output_paths.append(str(png_path))
+    except Exception as exc:
+        logger.log(f"Graph PNG generation skipped for {branch_spec.map_type}: {type(exc).__name__}: {exc}")
+
+    logger.log(f"Graph outputs written for {branch_spec.map_type}: {graphs_dir}")
+    return {
+        "map_type": branch_spec.map_type,
+        "raw_data_path": str(_raw_data_path_for_config(branch_spec)),
+        "graphs_dir": str(graphs_dir),
+        "output_paths": output_paths,
+    }
+
+
+def _generate_single_configuration_visualization_manifest(*, branch_spec: BranchSpec, logger: ExperimentLogger) -> dict[str, Any]:
+    payload = _load_raw_payload(branch_spec)
+    records_by_group = _record_dicts_from_payload(payload)
+    visualization_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "visualization" / branch_spec.data_log_category_dir_name
+    visualization_dir.mkdir(parents=True, exist_ok=True)
+    manifest_path = visualization_dir / f"{branch_spec.data_log_file_stem}_visualization_selection.json"
+    selections = []
+    for group_name, records in records_by_group.items():
+        successful_records = [record for record in records if record.get("solved_run")]
+        selections.append(
+            {
+                "selection_group": group_name,
+                "candidate_count": len(records),
+                "successful_candidate_count": len(successful_records),
+                "selected_record_ids": [record.get("run_id") or record.get("run_config_id") for record in successful_records],
+                "note": "This manifest identifies the saved successful runs for visualization selection from the current raw-data format.",
+            }
+        )
+    write_json(
+        manifest_path,
+        {
+            "map_config": branch_spec.map_type,
+            "display_name": branch_spec.display_name,
+            "raw_data_path": str(_raw_data_path_for_config(branch_spec)),
+            "selections": selections,
+        },
+    )
+    logger.log(f"Visualization selection manifest written for {branch_spec.map_type}: {manifest_path}")
+    return {
+        "map_type": branch_spec.map_type,
+        "raw_data_path": str(_raw_data_path_for_config(branch_spec)),
+        "visualization_manifest_path": str(manifest_path),
+    }
+
+
 def run_selected_experiment(
-    map_type: str,
+    selected_map_configs: list[str] | tuple[str, ...] | str,
     *,
     seed_base: int | None = None,
     program_start_time: float | None = None,
 ) -> dict[str, Any]:
     generation_target = _resolve_generation_target()
-    if generation_target != "raw_data":
-        raise NotImplementedError(
-            "The updated main-experiment protocol currently supports to_generate = 'raw_data'. "
-            "Graphs and visualization should be updated later from the new raw-data/log format."
-        )
-
-    branch_specs = get_branch_specs_for_selected_map_type(map_type)
+    branch_specs = get_branch_specs_for_selected_map_configs(selected_map_configs)
     if not branch_specs:
-        raise ValueError(f"No layout configurations found for MAP_TYPE={map_type!r}")
+        raise ValueError("No map configurations were selected in SELECTED_MAP_CONFIGS.")
 
-    logs_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "logs" / map_type
+    logs_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "logs" / "selected_map_configs"
     logs_dir.mkdir(parents=True, exist_ok=True)
-    logger = ExperimentLogger(logs_dir / "raw_data_capacity_protocol.log", start_time=program_start_time)
+    log_path = logs_dir / f"{generation_target}_protocol.log"
+    logger = ExperimentLogger(log_path, start_time=program_start_time)
 
     logger.log("=" * 88)
-    logger.log(f"Selected main-experiment category: {map_type}")
+    logger.log("Selected exact main-experiment map configurations:")
+    for index, branch_spec in enumerate(branch_specs, start=1):
+        logger.log(f"  {index}. {branch_spec.map_type} — {branch_spec.display_name}")
     logger.log(f"to_generate: {generation_target}")
-    logger.log(f"Layout configurations to run: {len(branch_specs)}")
+    logger.log(f"Map configurations to process: {len(branch_specs)}")
     logger.log(f"Data-log root: {OUTPUTS_MAIN_EXPERIMENT_ROOT / 'data_log'}")
     logger.log("=" * 88)
 
     summaries: list[dict[str, Any]] = []
-    for branch_spec in branch_specs:
-        resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
-        summaries.append(
-            _compute_single_configuration(
+    terminated_early = False
+    for branch_index, branch_spec in enumerate(branch_specs, start=1):
+        if generation_target == "raw_data":
+            resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
+            summary = _compute_single_configuration(
                 branch_spec=branch_spec,
                 seed_base=resolved_seed_base,
                 logger=logger,
             )
-        )
+        elif generation_target == "graphs":
+            summary = _generate_single_configuration_graphs(branch_spec=branch_spec, logger=logger)
+        elif generation_target == "visualization":
+            summary = _generate_single_configuration_visualization_manifest(branch_spec=branch_spec, logger=logger)
+        else:
+            raise ValueError(f"Unsupported generation target: {generation_target}")
 
-    summary_path = OUTPUTS_MAIN_EXPERIMENT_ROOT / "data_log" / f"{branch_specs[0].data_log_category_dir_name}_summary.json"
+        summaries.append(summary)
+
+        if branch_index < len(branch_specs) and branch_spec.prompt_before_next_map_config:
+            if not _prompt_continue_to_next_map_config(
+                logger=logger,
+                completed_index=branch_index,
+                total_count=len(branch_specs),
+                next_branch_spec=branch_specs[branch_index],
+            ):
+                terminated_early = True
+                break
+
+    summary_path = OUTPUTS_MAIN_EXPERIMENT_ROOT / "data_log" / f"selected_map_configs_{generation_target}_summary.json"
     write_json(
         summary_path,
         {
-            "selected_map_type": map_type,
+            "selected_map_configs": [branch_spec.map_type for branch_spec in branch_specs],
             "generation_target": generation_target,
-            "layout_configurations": summaries,
+            "map_configurations": summaries,
+            "terminated_early": terminated_early,
         },
     )
     logger.log("")
-    logger.log(f"Category summary written: {summary_path}")
-    logger.log_elapsed("Selected main-experiment category finished.")
+    logger.log(f"Selected map-config summary written: {summary_path}")
+    logger.log_elapsed("Selected main-experiment map configurations finished.")
 
     return {
-        "selected_map_type": map_type,
+        "selected_map_configs": [branch_spec.map_type for branch_spec in branch_specs],
         "generation_target": generation_target,
         "output_root": str(OUTPUTS_MAIN_EXPERIMENT_ROOT),
-        "log_path": str(logs_dir / "raw_data_capacity_protocol.log"),
-        "category_summary_path": str(summary_path),
-        "layout_configurations": summaries,
+        "log_path": str(log_path),
+        "summary_path": str(summary_path),
+        "map_configurations": summaries,
+        "terminated_early": terminated_early,
     }

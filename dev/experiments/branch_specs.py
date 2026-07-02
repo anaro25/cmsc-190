@@ -18,11 +18,9 @@ TRADITIONAL_LAYOUTS: tuple[tuple[str, str], ...] = (
 
 CAMPUS_LAYOUTS: tuple[tuple[str, str], ...] = (
     ("dispersed", "dispersed"),
-    ("dispersed", "clustered"),
     ("dispersed", "single"),
-    ("clustered", "dispersed"),
-    ("clustered", "clustered"),
-    ("clustered", "single"),
+    ("single", "dispersed"),
+    ("single", "single"),
 )
 
 CATEGORY_ORDER: dict[str, int] = {
@@ -57,7 +55,9 @@ class BranchSpec:
     capacity_successful_runs_required: int
     capacity_agent_upper_bound: int
     capacity_binary_search_max_downward_moves: int
+    capacity_pass_criterion: str
     setup_generation_attempt_cap_per_solver_attempt: int
+    prompt_before_next_map_config: bool
     num_last_runs_to_visualize_jointly_successful: int
     num_last_runs_to_visualize_independently_successful: int
     path_length_graph_enabled: bool
@@ -209,13 +209,15 @@ def _branch_decimal(*, is_dynamic: bool, map_type_index: int, layout_index: int)
 
 
 def _layout_key(start_distribution_mode: str, goal_distribution_mode: str) -> str:
-    goal = "single_target" if goal_distribution_mode == "single" else goal_distribution_mode
-    return f"{start_distribution_mode}_{goal}"
+    return f"{start_distribution_mode}_{goal_distribution_mode}"
 
 
 def _layout_label(start_distribution_mode: str, goal_distribution_mode: str) -> str:
-    goal = "single target" if goal_distribution_mode == "single" else goal_distribution_mode
-    return f"{start_distribution_mode.title()}-{goal}"
+    def label(mode: str, *, target: bool = False) -> str:
+        if mode == "single":
+            return "Single-cell target" if target else "Single-cell"
+        return mode.title()
+    return f"{label(start_distribution_mode)}-{label(goal_distribution_mode, target=True)}"
 
 
 def _display_name_for_config(category_display_name: str, layout_label: str) -> str:
@@ -237,7 +239,9 @@ def _notes_for_branch(
     capacity_note = (
         "Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for "
         "classical and cyclic mapping, with the binary-search descent limited by the configured maximum downward moves. "
-        "It then runs paired comparative tests at both discovered capacity points."
+        "The default paired-temp capacity criterion accepts a tested value only when the primary mapping solves and cyclic mapping beats classical mapping on the same setup in time computation halted and conflicts at halt. "
+        "For the classical-side search, this means classical must solve and cyclic must still outperform it on that classical-origin setup. For the cyclic-side search, cyclic must solve and outperform classical on that cyclic-origin setup. "
+        "The program still runs paired comparative tests at the discovered capacity points."
     )
 
     if config.get("image_path") is None:
@@ -319,7 +323,9 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         capacity_successful_runs_required=int(config.get("capacity_successful_runs_required", 1)),
         capacity_agent_upper_bound=int(config.get("capacity_agent_upper_bound", 255)),
         capacity_binary_search_max_downward_moves=int(config.get("capacity_binary_search_max_downward_moves", 3)),
+        capacity_pass_criterion=str(config.get("capacity_pass_criterion", "temp_pairwise")),
         setup_generation_attempt_cap_per_solver_attempt=int(config.get("setup_generation_attempt_cap_per_solver_attempt", 5)),
+        prompt_before_next_map_config=bool(config.get("prompt_before_next_map_config", True)),
         num_last_runs_to_visualize_jointly_successful=int(config.get("num_last_runs_to_visualize_jointly_successful", 0)),
         num_last_runs_to_visualize_independently_successful=int(config.get("num_last_runs_to_visualize_independently_successful", 0)),
         path_length_graph_enabled=bool(config.get("path_length_graph_enabled", True)),
@@ -406,6 +412,7 @@ def _build_variant_specs_for_category(category_map_type: str) -> list[BranchSpec
 
 
 def get_branch_specs_for_selected_map_type(map_type: str) -> list[BranchSpec]:
+    """Compatibility helper: expand one legacy map category into its exact configs."""
     return _build_variant_specs_for_category(map_type)
 
 
@@ -423,11 +430,37 @@ BRANCH_SPECS = _build_branch_specs()
 def get_branch_spec(map_type: str) -> BranchSpec:
     if map_type in BRANCH_SPECS:
         return BRANCH_SPECS[map_type]
-    category_specs = get_branch_specs_for_selected_map_type(map_type)
-    if len(category_specs) == 1:
-        return category_specs[0]
-    available = ", ".join(sorted(BRANCH_USER_CONFIGS))
-    raise ValueError(
-        f"'{map_type}' is a map category with {len(category_specs)} layout configurations. "
-        f"Use get_branch_specs_for_selected_map_type() for categories. Available categories: {available}"
-    )
+    available = ", ".join(sorted(BRANCH_SPECS))
+    raise ValueError(f"Unknown map configuration '{map_type}'. Available map configurations: {available}")
+
+
+def get_branch_specs_for_selected_map_configs(selected_map_configs: list[str] | tuple[str, ...] | str) -> list[BranchSpec]:
+    if isinstance(selected_map_configs, str):
+        selected_map_configs = [selected_map_configs]
+
+    normalized = [str(map_config).strip() for map_config in selected_map_configs if str(map_config).strip()]
+    if not normalized:
+        available = "\n".join(f"    # {name!r}," for name in sorted(BRANCH_SPECS))
+        raise ValueError(
+            "SELECTED_MAP_CONFIGS is empty. Uncomment at least one exact map configuration in master_config.py.\n"
+            "Available map configurations are:\n"
+            f"{available}"
+        )
+
+    specs: list[BranchSpec] = []
+    unknown: list[str] = []
+    for map_config in normalized:
+        if map_config in BRANCH_SPECS:
+            specs.append(BRANCH_SPECS[map_config])
+        else:
+            unknown.append(map_config)
+
+    if unknown:
+        available = "\n".join(f"    # {name!r}," for name in sorted(BRANCH_SPECS))
+        raise ValueError(
+            "Unknown map configuration(s) in SELECTED_MAP_CONFIGS: "
+            + ", ".join(repr(name) for name in unknown)
+            + "\nAvailable map configurations are:\n"
+            + available
+        )
+    return specs

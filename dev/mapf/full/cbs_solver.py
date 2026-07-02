@@ -57,6 +57,11 @@ def compute_solution_cost(paths_by_agent):
 
 
 def _count_vertex_conflicts_at_time(paths_by_agent, agent_ids, time_step):
+    # Single-cell agent layouts intentionally allow agents to share the release
+    # cell at t=0. Conflicts are enforced after movement begins.
+    if time_step == 0:
+        return 0
+
     occupied_positions = {}
     num_conflicts = 0
 
@@ -145,25 +150,26 @@ def detect_first_conflict(paths_by_agent):
     max_time = max(len(path) for path in paths_by_agent.values())
 
     for time_step in range(max_time):
-        # Check vertex conflicts first.
-        # Example: position(A, t=1) == position(B, t=1)
-        occupied_positions = {}
+        # Single-cell agent layouts may deliberately place all agents on one
+        # start cell at t=0. Those initial co-locations are not collisions.
+        if time_step > 0:
+            occupied_positions = {}
 
-        for agent_id in agent_ids:
-            position = get_path_position(paths_by_agent[agent_id], time_step)
-            if position is None:
-                continue
+            for agent_id in agent_ids:
+                position = get_path_position(paths_by_agent[agent_id], time_step)
+                if position is None:
+                    continue
 
-            if position in occupied_positions:
-                other_agent_id = occupied_positions[position]
-                return {
-                    "type": "vertex",
-                    "time": time_step,
-                    "position": position,
-                    "agents": (other_agent_id, agent_id),
-                }
+                if position in occupied_positions:
+                    other_agent_id = occupied_positions[position]
+                    return {
+                        "type": "vertex",
+                        "time": time_step,
+                        "position": position,
+                        "agents": (other_agent_id, agent_id),
+                    }
 
-            occupied_positions[position] = agent_id
+                occupied_positions[position] = agent_id
 
         # At t = 0, nobody has moved yet, so no edge/swap conflict can happen.
         if time_step == 0:

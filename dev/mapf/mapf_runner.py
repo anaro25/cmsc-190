@@ -2,7 +2,7 @@ import random
 import shutil
 from pathlib import Path
 
-from dev.master_config import BRANCH_USER_CONFIGS, MAP_TYPE, agent_cohesion, enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, SELECTED_MAP_CONFIGS, agent_cohesion, enhanced_CBS
 from dev.mapf.agent_assignment import sample_agent_start_goal_pairs
 from dev.mapf.full.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.mapf_logger import (
@@ -14,23 +14,36 @@ from dev.mapf.mapf_logger import (
 from dev.mapf.metrics import summarize_mapf_result
 
 
+def _active_category_map_type() -> str:
+    """Best-effort compatibility for older direct runner entry points."""
+    selected = [str(item).strip() for item in SELECTED_MAP_CONFIGS if str(item).strip()]
+    if not selected:
+        return next(iter(BRANCH_USER_CONFIGS))
+    active_map_config = selected[0]
+    for category_map_type in sorted(BRANCH_USER_CONFIGS, key=len, reverse=True):
+        if active_map_config == category_map_type or active_map_config.startswith(category_map_type + "_"):
+            return category_map_type
+    return next(iter(BRANCH_USER_CONFIGS))
+
+
 PROGRESS_LOG_INTERVAL_SECONDS = 5
 
 
 def current_ecbs_suboptimality_factor():
-    return float(BRANCH_USER_CONFIGS[MAP_TYPE].get("ECBS_suboptimality", 1.5))
+    return float(BRANCH_USER_CONFIGS[_active_category_map_type()].get("ECBS_suboptimality", 1.5))
 
 
 def current_true_static_shortest_path_distance_enabled():
-    return bool(BRANCH_USER_CONFIGS[MAP_TYPE].get("true_static_shortest_path_distance", False))
+    return bool(BRANCH_USER_CONFIGS[_active_category_map_type()].get("true_static_shortest_path_distance", False))
 
 
 def current_tight_time_horizon_enabled():
-    return bool(BRANCH_USER_CONFIGS[MAP_TYPE].get("tight_time_horizon", False))
+    return bool(BRANCH_USER_CONFIGS[_active_category_map_type()].get("tight_time_horizon", False))
 
 
 def current_agent_cohesion_enabled():
-    return bool(agent_cohesion) and ("campus" in MAP_TYPE or MAP_TYPE == "dynamic_port")
+    category_map_type = _active_category_map_type()
+    return bool(agent_cohesion) and ("campus" in category_map_type or category_map_type == "dynamic_port")
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):

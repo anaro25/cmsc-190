@@ -2,7 +2,7 @@
 
 ## How to run
 
-Edit `dev/master_config.py` and leave exactly one `MAP_TYPE` uncommented, then run:
+Edit `dev/master_config.py`, set `to_generate`, and uncomment one or more exact names in `SELECTED_MAP_CONFIGS`, then run:
 
 ```bash
 python -m dev.main
@@ -13,7 +13,7 @@ agent-number ranges, runtime limits, densities, thresholds, loop settings, start
 positioning modes, the global consecutive failed paired sampling limit, the
 project-wide `enhanced_CBS` solver toggle, and each branch's `ECBS_suboptimality`.
 
-Results are written under `dev/outputs/<map_type>/`, and persisted solver-stage raw data is stored under `dev/outputs/raw_mapf_files/<map_type>/`.
+Results are written under `dev/outputs_main_experiment/`, grouped by the selected exact map configurations.
 
 ## Current orchestration path
 
@@ -37,21 +37,11 @@ The `study` package is split by responsibility:
 
 ## Current branches
 
-The configured main-experiment branch set now contains 8 map categories. Selecting one category runs all documented layout configurations for that category.
+The configured main-experiment branch set now contains 32 exact map configurations. Select exact configurations in `SELECTED_MAP_CONFIGS`; the active `to_generate` mode applies only to those selected configurations.
 
-Traditional MAPF:
+Traditional MAPF exact configurations are generated from Artificial/Port × Static/Dynamic × Dispersed/Clustered agents × Dispersed/Clustered targets.
 
-- `static_artificial` — artificial static-obstacle map
-- `dynamic_artificial` — artificial map with generated dynamic obstacles
-- `static_port` — static image-based port map
-- `dynamic_port` — dynamic image-based port map
-
-Campus Crowd Simulation:
-
-- `static_campus_area_1` — static campus area 1
-- `dynamic_campus_area_1` — dynamic campus area 1
-- `static_campus_area_2` — static campus area 2
-- `dynamic_campus_area_2` — dynamic campus area 2
+Campus Crowd Simulation exact configurations are generated from Campus Area 1/2 × Static/Dynamic × Dispersed/Single-cell agents × Dispersed/Single-cell targets.
 
 ## Capacity-search protocol
 
@@ -95,7 +85,7 @@ The per-run runtime limit, 1-out-of-5 pass rule, and binary-search downward-move
 
 ## Capacity comparison outputs
 
-For each selected map category, the program runs every documented layout configuration.
+For each selected exact map configuration, the program processes that configuration directly.
 Each configuration receives its own `_evaluation.xml` text log and a matching
 `_raw_data.json` file. The log contains the classical capacity point, the cyclic capacity point, one saved successful capacity run per mapping, paired comparative runs at both points, and condensed evaluations for halted time and conflicts. Because only one successful capacity run is retained, the detailed main-experiment log reports direct values rather than averages.
 

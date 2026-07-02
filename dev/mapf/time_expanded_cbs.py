@@ -34,20 +34,23 @@ def detect_first_conflict(paths_by_agent):
     max_time = max(len(path) for path in paths_by_agent.values())
 
     for time_step in range(max_time):
-        occupied_positions = {}
-        for agent_id in agent_ids:
-            position = get_path_position(paths_by_agent[agent_id], time_step)
-            if position is None:
-                continue
-            if position in occupied_positions:
-                other_agent_id = occupied_positions[position]
-                return {
-                    "type": "vertex",
-                    "time": time_step,
-                    "position": position,
-                    "agents": (other_agent_id, agent_id),
-                }
-            occupied_positions[position] = agent_id
+        # Single-cell agent layouts intentionally allow shared release at t=0.
+        # Vertex conflicts are enforced from t=1 onward.
+        if time_step > 0:
+            occupied_positions = {}
+            for agent_id in agent_ids:
+                position = get_path_position(paths_by_agent[agent_id], time_step)
+                if position is None:
+                    continue
+                if position in occupied_positions:
+                    other_agent_id = occupied_positions[position]
+                    return {
+                        "type": "vertex",
+                        "time": time_step,
+                        "position": position,
+                        "agents": (other_agent_id, agent_id),
+                    }
+                occupied_positions[position] = agent_id
 
         if time_step == 0:
             continue
@@ -83,16 +86,17 @@ def count_all_conflicts(paths_by_agent):
     total_conflicts = 0
 
     for time_step in range(max_time):
-        occupied_positions = {}
-        for agent_id in agent_ids:
-            position = get_path_position(paths_by_agent[agent_id], time_step)
-            if position is None:
-                continue
-            occupied_positions.setdefault(position, []).append(agent_id)
+        if time_step > 0:
+            occupied_positions = {}
+            for agent_id in agent_ids:
+                position = get_path_position(paths_by_agent[agent_id], time_step)
+                if position is None:
+                    continue
+                occupied_positions.setdefault(position, []).append(agent_id)
 
-        for occupants in occupied_positions.values():
-            if len(occupants) >= 2:
-                total_conflicts += len(occupants) - 1
+            for occupants in occupied_positions.values():
+                if len(occupants) >= 2:
+                    total_conflicts += len(occupants) - 1
 
         if time_step == 0:
             continue

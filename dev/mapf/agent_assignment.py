@@ -8,7 +8,7 @@ from dev.utils.log_symbols import AGENT_LOG_SYMBOL, TARGET_LOG_SYMBOL
 MAX_ASSIGNMENT_ATTEMPTS = 200
 VERTEX_ADJACENCY_CLEARANCE = 2
 CLUSTER_GAP_ONE_STEP = 4
-START_DISTRIBUTION_MODES = {"dispersed", "clustered"}
+START_DISTRIBUTION_MODES = {"dispersed", "clustered", "single"}
 GOAL_DISTRIBUTION_MODES = {"dispersed", "clustered", "single"}
 
 
@@ -203,14 +203,24 @@ def _sample_clustered_vertices(vertices, num_vertices, rng, role="candidate"):
     )
 
 
+def _sample_single_vertices(vertices, num_vertices, rng, role="candidate"):
+    if not vertices:
+        raise ValueError(f"No candidate {role} vertices are available for single-cell sampling.")
+    shared_vertex = rng.choice(vertices)
+    return [shared_vertex for _ in range(num_vertices)]
+
+
 def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode, role="candidate"):
     if distribution_mode not in START_DISTRIBUTION_MODES:
         raise ValueError(f"Unsupported distribution_mode '{distribution_mode}'.")
-    if len(vertices) < num_vertices:
+    minimum_vertices = 1 if distribution_mode == "single" else num_vertices
+    if len(vertices) < minimum_vertices:
         raise ValueError(
             f"Not enough candidate {role} vertices for {num_vertices} positions under distribution_mode={distribution_mode}."
         )
 
+    if distribution_mode == "single":
+        return _sample_single_vertices(vertices, num_vertices, rng, role=role)
     if distribution_mode == "clustered":
         return _sample_clustered_vertices(vertices, num_vertices, rng, role=role)
     return _sample_dispersed_vertices(vertices, num_vertices, rng, role=role)
@@ -306,6 +316,8 @@ def sample_agent_start_goal_pairs(
         * starts must be free vertices
         * goals must be free vertices
         * starts remain unique positions
+        * starts remain unique for dispersed and clustered start modes
+        * start_distribution_mode="single" gives all agents the same literal start cell
         * goals remain unique one-to-one positions for dispersed and clustered target modes
         * goal_distribution_mode="single" gives all agents the same literal target cell
         * start != goal for each agent
@@ -313,7 +325,6 @@ def sample_agent_start_goal_pairs(
         * dispersed sets respect 8-neighbor clearance internally
         * clustered sets form one connected cluster whose spacing is controlled by compact_clustering
         * when both starts and goals are clustered, clustered_start_goal_min_distance can keep the two clusters apart
-        * "single" is valid only for goal_distribution_mode, not start_distribution_mode
     """
     if rng is None:
         rng = random.Random()
@@ -329,8 +340,7 @@ def sample_agent_start_goal_pairs(
     if start_distribution_mode not in START_DISTRIBUTION_MODES:
         raise ValueError(
             f"Unsupported start_distribution_mode '{start_distribution_mode}'. "
-            f"Valid start modes are: {sorted(START_DISTRIBUTION_MODES)}. "
-            "The 'single' mode can only be used for targets/goals."
+            f"Valid start modes are: {sorted(START_DISTRIBUTION_MODES)}."
         )
     if goal_distribution_mode not in GOAL_DISTRIBUTION_MODES:
         raise ValueError(
@@ -345,10 +355,12 @@ def sample_agent_start_goal_pairs(
     start_vertices = _filter_allowed_vertices(composite_map, allowed_start_vertices)
     goal_vertices = _filter_allowed_vertices(composite_map, allowed_goal_vertices)
 
+    minimum_start_vertices = 1 if start_distribution_mode == "single" else num_agents
     minimum_goal_vertices = 1 if goal_distribution_mode == "single" else num_agents
-    if len(start_vertices) < num_agents or len(goal_vertices) < minimum_goal_vertices:
+    if len(start_vertices) < minimum_start_vertices or len(goal_vertices) < minimum_goal_vertices:
         raise ValueError(
-            f"Not enough free vertices for {num_agents} starts and goal_distribution_mode={goal_distribution_mode}."
+            f"Not enough free vertices for {num_agents} starts under start_distribution_mode={start_distribution_mode} "
+            f"and goal_distribution_mode={goal_distribution_mode}."
         )
 
     last_sampling_issue = None

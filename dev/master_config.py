@@ -26,7 +26,9 @@ def _with_shared_runtime(config: dict[str, Any]) -> dict[str, Any]:
         "capacity_attempts_per_agent_number": CAPACITY_ATTEMPTS_PER_AGENT_NUMBER,
         "capacity_agent_upper_bound": CAPACITY_AGENT_UPPER_BOUND,
         "capacity_binary_search_max_downward_moves": CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES,
+        "capacity_pass_criterion": CAPACITY_PASS_CRITERION,
         "setup_generation_attempt_cap_per_solver_attempt": SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT,
+        "prompt_before_next_map_config": PROMPT_BEFORE_NEXT_MAP_CONFIG,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -53,6 +55,17 @@ SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
 SHARED_TIGHT_TIME_HORIZON = False
 
 # Capacity-search protocol constants.
+# Valid values:
+#   "solver_success"       -> each mapping passes if it solves within the time limit.
+#   "temp_cyclic"    -> classical uses solver capacity, while cyclic passes only
+#                             when it solves and beats classical on the same setup in
+#                             time computation halted and conflicts at halt.
+#   "temp_pairwise"  -> both capacity searches use the temp criterion:
+#                             classical passes only when classical solves and cyclic
+#                             beats it on the same setup; cyclic passes only when cyclic
+#                             solves and beats classical on the same setup.
+CAPACITY_PASS_CRITERION = "temp_pairwise"
+
 SHARED_COUNTED_RUNS_REQUIRED = 1
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
 CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
@@ -60,24 +73,57 @@ CAPACITY_AGENT_UPPER_BOUND = 255
 CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
 SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 5
 
+# When multiple map configurations are selected, ask after each completed
+# configuration whether to continue. Enter 1 to continue or 0 to terminate
+# early.
+PROMPT_BEFORE_NEXT_MAP_CONFIG = True
+
 # ===================================
 
 # Select exactly one program mode.
-to_generate = "raw_data"       # compute binary-search capacity data and text logs
-# to_generate = "graphs"       # not updated yet for the new capacity protocol
-# to_generate = "visualization" # not updated yet for the new capacity protocol
+to_generate = "raw_data"        # compute binary-search capacity data and text logs
+# to_generate = "graphs"        # generate graphs for the selected map configs from saved raw data
+# to_generate = "visualization" # generate visualizations for the selected map configs from saved raw data
 
-# Select exactly one main-experiment map category. The selected category runs all
-# layout configurations documented in the experimental design.
-MAP_TYPE = "static_artificial"
-# MAP_TYPE = "dynamic_artificial"
-# MAP_TYPE = "static_port"
-# MAP_TYPE = "dynamic_port"
-# MAP_TYPE = "static_campus_area_1"
-# MAP_TYPE = "dynamic_campus_area_1"
-# MAP_TYPE = "static_campus_area_2"
-# MAP_TYPE = "dynamic_campus_area_2"
+# Select one or more exact main-experiment map configurations. Uncomment only
+# the configurations that should be processed by the active to_generate mode.
+SELECTED_MAP_CONFIGS = [
+    # "static_artificial_dispersed_dispersed",
+    # "static_artificial_dispersed_clustered",
+    # "static_artificial_clustered_dispersed",
+    # "static_artificial_clustered_clustered",
+    # "dynamic_artificial_dispersed_dispersed",
+    # "dynamic_artificial_dispersed_clustered",
+    # "dynamic_artificial_clustered_dispersed",
+    # "dynamic_artificial_clustered_clustered",
 
+    # "static_port_dispersed_dispersed",
+    # "static_port_dispersed_clustered",
+    # "static_port_clustered_dispersed",
+    # "static_port_clustered_clustered",
+    # "dynamic_port_dispersed_dispersed",
+    # "dynamic_port_dispersed_clustered",
+    # "dynamic_port_clustered_dispersed",
+    # "dynamic_port_clustered_clustered",
+
+    # "static_campus_area_1_dispersed_dispersed",
+    # "static_campus_area_1_dispersed_single",
+    # "static_campus_area_1_single_dispersed",
+    # "static_campus_area_1_single_single",
+    # "dynamic_campus_area_1_dispersed_dispersed",
+    # "dynamic_campus_area_1_dispersed_single",
+    # "dynamic_campus_area_1_single_dispersed",
+    # "dynamic_campus_area_1_single_single",
+
+    # "static_campus_area_2_dispersed_dispersed",
+    # "static_campus_area_2_dispersed_single",
+    # "static_campus_area_2_single_dispersed",
+    # "static_campus_area_2_single_single",
+    # "dynamic_campus_area_2_dispersed_dispersed",
+    # "dynamic_campus_area_2_dispersed_single",
+    # "dynamic_campus_area_2_single_dispersed",
+    # "dynamic_campus_area_2_single_single",
+]
 
 STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
     {
