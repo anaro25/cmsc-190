@@ -1,15 +1,26 @@
 import random
+import time
 
 from dev.maps.connectivity_postprocessor import are_mutually_reachable, is_free_vertex
 from dev.master_config import compact_clustering
 from dev.utils.log_symbols import AGENT_LOG_SYMBOL, TARGET_LOG_SYMBOL
 
 
-MAX_ASSIGNMENT_ATTEMPTS = 200
+MAX_ASSIGNMENT_ATTEMPTS = 12
+MAX_DISPERSED_SHUFFLE_ATTEMPTS = 12
+MAX_CLUSTER_CENTER_ATTEMPTS = 40
+MAX_ASSIGNMENT_WALLTIME_SECONDS = 2.0
 VERTEX_ADJACENCY_CLEARANCE = 2
 CLUSTER_GAP_ONE_STEP = 4
 START_DISTRIBUTION_MODES = {"dispersed", "clustered", "single"}
 GOAL_DISTRIBUTION_MODES = {"dispersed", "clustered", "single"}
+
+
+def _raise_if_assignment_deadline_exceeded(deadline):
+    if deadline is not None and time.monotonic() >= deadline:
+        raise TimeoutError(
+            f"Assignment sampling exceeded {MAX_ASSIGNMENT_WALLTIME_SECONDS:.1f}s fail-fast limit."
+        )
 
 
 def _build_label_info(num_agents):
@@ -141,19 +152,21 @@ def _greedy_clearance_subset(candidates, num_vertices):
     return None
 
 
-def _sample_dispersed_vertices(vertices, num_vertices, rng, role="candidate"):
-    for _ in range(MAX_ASSIGNMENT_ATTEMPTS):
+def _sample_dispersed_vertices(vertices, num_vertices, rng, role="candidate", deadline=None):
+    for _ in range(MAX_DISPERSED_SHUFFLE_ATTEMPTS):
+        _raise_if_assignment_deadline_exceeded(deadline)
         shuffled = vertices[:]
         rng.shuffle(shuffled)
         chosen = _greedy_clearance_subset(shuffled, num_vertices)
         if chosen is not None:
             return chosen
     raise ValueError(
-        f"Could not sample {num_vertices} dispersed {role} vertices with 8-neighbor clearance."
+        f"Could not sample {num_vertices} dispersed {role} vertices with 8-neighbor clearance "
+        f"after {MAX_DISPERSED_SHUFFLE_ATTEMPTS} shuffle attempts."
     )
 
 
-def _sample_clustered_vertices(vertices, num_vertices, rng, role="candidate"):
+def _sample_clustered_vertices(vertices, num_vertices, rng, role="candidate", deadline=None):
     if not vertices:
         raise ValueError(f"No candidate {role} vertices are available for clustered sampling.")
 
@@ -163,11 +176,13 @@ def _sample_clustered_vertices(vertices, num_vertices, rng, role="candidate"):
     vertex_set = set(vertices)
     centers = vertices[:]
     rng.shuffle(centers)
-    for center in centers[: min(len(centers), MAX_ASSIGNMENT_ATTEMPTS)]:
+    for center in centers[: min(len(centers), MAX_CLUSTER_CENTER_ATTEMPTS)]:
+        _raise_if_assignment_deadline_exceeded(deadline)
         chosen = [center]
         chosen_set = {center}
 
         while len(chosen) < num_vertices:
+            _raise_if_assignment_deadline_exceeded(deadline)
             frontier = []
             for candidate in vertex_set - chosen_set:
                 if not compact_clustering and any(
@@ -199,7 +214,8 @@ def _sample_clustered_vertices(vertices, num_vertices, rng, role="candidate"):
         else "one spaced one-cell-gap component"
     )
     raise ValueError(
-        f"Could not sample {num_vertices} clustered {role} vertices as {cluster_description}."
+        f"Could not sample {num_vertices} clustered {role} vertices as {cluster_description} "
+        f"after checking up to {MAX_CLUSTER_CENTER_ATTEMPTS} centers."
     )
 
 
@@ -210,7 +226,7 @@ def _sample_single_vertices(vertices, num_vertices, rng, role="candidate"):
     return [shared_vertex for _ in range(num_vertices)]
 
 
-def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode, role="candidate"):
+def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode, role="candidate", deadline=None):
     if distribution_mode not in START_DISTRIBUTION_MODES:
         raise ValueError(f"Unsupported distribution_mode '{distribution_mode}'.")
     minimum_vertices = 1 if distribution_mode == "single" else num_vertices
@@ -222,15 +238,16 @@ def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode, role="
     if distribution_mode == "single":
         return _sample_single_vertices(vertices, num_vertices, rng, role=role)
     if distribution_mode == "clustered":
-        return _sample_clustered_vertices(vertices, num_vertices, rng, role=role)
-    return _sample_dispersed_vertices(vertices, num_vertices, rng, role=role)
+        return _sample_clustered_vertices(vertices, num_vertices, rng, role=role, deadline=deadline)
+    return _sample_dispersed_vertices(vertices, num_vertices, rng, role=role, deadline=deadline)
 
 
-def _resolve_single_goal(composite_map, starts, candidate_goals, rng, require_individual_reachability):
+def _resolve_single_goal(composite_map, starts, candidate_goals, rng, require_individual_reachability, deadline=None):
     possible_goals = [goal for goal in candidate_goals if goal not in set(starts)]
     rng.shuffle(possible_goals)
 
     for goal in possible_goals:
+        _raise_if_assignment_deadline_exceeded(deadline)
         if not require_individual_reachability:
             return goal
         if all(are_mutually_reachable(composite_map, start, goal) for start in starts):
@@ -239,9 +256,10 @@ def _resolve_single_goal(composite_map, starts, candidate_goals, rng, require_in
     return None
 
 
-def _build_reachability_adjacency(composite_map, starts, goals):
+def _build_reachability_adjacency(composite_map, starts, goals, deadline=None):
     adjacency = [[] for _ in starts]
     for start_index, start in enumerate(starts):
+        _raise_if_assignment_deadline_exceeded(deadline)
         for goal_index, goal in enumerate(goals):
             if start == goal:
                 continue
@@ -250,10 +268,11 @@ def _build_reachability_adjacency(composite_map, starts, goals):
     return adjacency
 
 
-def _find_bipartite_matching(adjacency, num_goals, rng):
+def _find_bipartite_matching(adjacency, num_goals, rng, deadline=None):
     goal_to_start = [-1] * num_goals
 
     def try_assign(start_index, visited_goals):
+        _raise_if_assignment_deadline_exceeded(deadline)
         candidate_goals = adjacency[start_index][:]
         rng.shuffle(candidate_goals)
         for goal_index in candidate_goals:
@@ -281,12 +300,12 @@ def _find_bipartite_matching(adjacency, num_goals, rng):
     return start_to_goal
 
 
-def _pair_starts_and_goals(composite_map, starts, goals, rng, require_individual_reachability):
+def _pair_starts_and_goals(composite_map, starts, goals, rng, require_individual_reachability, deadline=None):
     if require_individual_reachability:
-        adjacency = _build_reachability_adjacency(composite_map, starts, goals)
+        adjacency = _build_reachability_adjacency(composite_map, starts, goals, deadline=deadline)
         if any(not goal_indices for goal_indices in adjacency):
             return None
-        start_to_goal = _find_bipartite_matching(adjacency, len(goals), rng)
+        start_to_goal = _find_bipartite_matching(adjacency, len(goals), rng, deadline=deadline)
         if start_to_goal is None:
             return None
         return [goals[goal_index] for goal_index in start_to_goal]
@@ -351,6 +370,8 @@ def sample_agent_start_goal_pairs(
     if clustered_start_goal_min_distance is not None:
         clustered_start_goal_min_distance = int(clustered_start_goal_min_distance)
 
+    assignment_deadline = time.monotonic() + MAX_ASSIGNMENT_WALLTIME_SECONDS
+
     labels = _build_label_info(num_agents)
     start_vertices = _filter_allowed_vertices(composite_map, allowed_start_vertices)
     goal_vertices = _filter_allowed_vertices(composite_map, allowed_goal_vertices)
@@ -365,7 +386,15 @@ def sample_agent_start_goal_pairs(
 
     last_sampling_issue = None
     for _ in range(MAX_ASSIGNMENT_ATTEMPTS):
-        starts = _sample_vertex_subset(start_vertices, num_agents, rng, start_distribution_mode, role="start")
+        _raise_if_assignment_deadline_exceeded(assignment_deadline)
+        starts = _sample_vertex_subset(
+            start_vertices,
+            num_agents,
+            rng,
+            start_distribution_mode,
+            role="start",
+            deadline=assignment_deadline,
+        )
         if start_distribution_mode == "dispersed" and not _subset_respects_clearance(starts):
             continue
         if start_distribution_mode == "clustered" and not _subset_is_connected_cluster(starts):
@@ -380,6 +409,7 @@ def sample_agent_start_goal_pairs(
                 candidate_goals=remaining_goal_vertices,
                 rng=rng,
                 require_individual_reachability=require_individual_reachability,
+                deadline=assignment_deadline,
             )
             if shared_target is None:
                 last_sampling_issue = "Could not resolve a valid single goal vertex after sampling starts."
@@ -401,6 +431,7 @@ def sample_agent_start_goal_pairs(
                 rng,
                 goal_distribution_mode,
                 role="goal",
+                deadline=assignment_deadline,
             )
         except ValueError as exc:
             last_sampling_issue = str(exc)
@@ -424,6 +455,7 @@ def sample_agent_start_goal_pairs(
             goals=goals,
             rng=rng,
             require_individual_reachability=require_individual_reachability,
+            deadline=assignment_deadline,
         )
         if paired_goals is None:
             last_sampling_issue = "Could not pair sampled starts and goals under the reachability requirement."
@@ -432,7 +464,8 @@ def sample_agent_start_goal_pairs(
         return _build_agents_from_assignment(labels, starts, paired_goals)
 
     raise ValueError(
-        f"Could not sample valid start-goal pairs for {num_agents} agents with start_distribution_mode={start_distribution_mode} "
+        f"Could not sample valid start-goal pairs for {num_agents} agents after {MAX_ASSIGNMENT_ATTEMPTS} assignment attempts "
+        f"or {MAX_ASSIGNMENT_WALLTIME_SECONDS:.1f}s with start_distribution_mode={start_distribution_mode} "
         f"and goal_distribution_mode={goal_distribution_mode}."
         + (
             f" Required clustered start-goal minimum distance: {clustered_start_goal_min_distance}."

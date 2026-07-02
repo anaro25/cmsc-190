@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import sys
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
@@ -16,7 +18,11 @@ from dev.experiments.study.preparation import (
 )
 from dev.experiments.study.runtime import build_mapping_record, run_dynamic_mapping, run_static_mapping
 from dev.master_config import to_generate
-from dev.mapf.agent_assignment import MAX_ASSIGNMENT_ATTEMPTS, _iter_free_vertices
+from dev.mapf.agent_assignment import (
+    MAX_ASSIGNMENT_ATTEMPTS,
+    MAX_ASSIGNMENT_WALLTIME_SECONDS,
+    _iter_free_vertices,
+)
 from dev.paths import OUTPUTS_MAIN_EXPERIMENT_ROOT
 
 
@@ -197,6 +203,7 @@ def _log_feasibility_diagnostic(
         f"spawn_mode={branch_spec.spawnable_cell_mode}",
         f"setup_generation_cap={branch_spec.setup_generation_attempt_cap_per_solver_attempt}",
         f"assignment_attempt_cap={MAX_ASSIGNMENT_ATTEMPTS}",
+        f"assignment_walltime_cap={MAX_ASSIGNMENT_WALLTIME_SECONDS:.1f}s",
     ]
 
     if dynamic_state is not None:
@@ -239,6 +246,10 @@ def _run_valid_solver_attempt(
             + solver_attempt_index * 1000
             + generation_attempt_index
         )
+        logger.log(
+            f"      Setup generation attempt {generation_attempt_index + 1}/{cap} | "
+            f"mapping={mapping_name} | solver_attempt={solver_attempt_index + 1} | N={agent_number}"
+        )
         try:
             prepared_context = _prepare_run_context(
                 branch_spec=branch_spec,
@@ -257,6 +268,13 @@ def _run_valid_solver_attempt(
                     "error_message": str(exc),
                 }
             )
+            logger.log(
+                f"      Setup generation failed | mapping={mapping_name} | "
+                f"solver_attempt={solver_attempt_index + 1} | "
+                f"generation_attempt={generation_attempt_index + 1}/{cap} | "
+                f"{type(exc).__name__}: {exc}"
+            )
+            logged_invalid_count = len(invalid_trace)
             continue
 
         _log_invalid_generation_summary(
@@ -1169,6 +1187,67 @@ def _compute_single_configuration(
 
 
 
+def _read_line_with_timeout(prompt: str, timeout_seconds: float) -> str | None:
+    """Read one console line with a timeout.
+
+    Returns None when no complete response is available before the timeout,
+    or when stdin is not interactive. This keeps unattended experiment runs
+    from blocking forever at the between-config prompt.
+    """
+    timeout_seconds = max(0.0, float(timeout_seconds))
+    print(prompt, end="", flush=True)
+
+    if timeout_seconds <= 0.0 or not sys.stdin.isatty():
+        print()
+        return None
+
+    if sys.platform.startswith("win"):
+        try:
+            import msvcrt
+        except ImportError:
+            print()
+            return None
+
+        buffer: list[str] = []
+        deadline = time.monotonic() + timeout_seconds
+        while time.monotonic() < deadline:
+            if msvcrt.kbhit():
+                char = msvcrt.getwch()
+                if char in {"\r", "\n"}:
+                    print()
+                    return "".join(buffer)
+                if char == "\003":
+                    raise KeyboardInterrupt
+                if char in {"\b", "\x7f"}:
+                    if buffer:
+                        buffer.pop()
+                        print("\b \b", end="", flush=True)
+                    continue
+                buffer.append(char)
+                print(char, end="", flush=True)
+            time.sleep(0.05)
+
+        print()
+        return None
+
+    try:
+        import select
+
+        readable, _, _ = select.select([sys.stdin], [], [], timeout_seconds)
+    except (OSError, ValueError):
+        print()
+        return None
+
+    if not readable:
+        print()
+        return None
+
+    line = sys.stdin.readline()
+    if line == "":
+        return None
+    return line.rstrip("\r\n")
+
+
 def _prompt_continue_to_next_map_config(
     *,
     logger: ExperimentLogger,
@@ -1176,34 +1255,43 @@ def _prompt_continue_to_next_map_config(
     total_count: int,
     next_branch_spec: BranchSpec,
 ) -> bool:
+    timeout_seconds = next_branch_spec.prompt_before_next_map_config_timeout_seconds
     prompt = (
         "\n"
         f"Completed map config {completed_index}/{total_count}. "
         f"Next: {next_branch_spec.display_name}.\n"
-        "Enter 1 to continue to the next map config, or 0 to terminate early: "
+        f"Enter 1 to continue, or 0 to terminate early "
+        f"(auto-continues after {timeout_seconds:g} seconds): "
     )
-    while True:
-        try:
-            choice = input(prompt).strip()
-        except EOFError:
-            logger.log(
-                "No interactive input was available for the continue/terminate prompt. "
-                "Terminating early before the next map config."
-            )
-            return False
-        if choice == "1":
-            logger.log(
-                f"User prompt response after map config {completed_index}/{total_count}: "
-                "1 -> continuing to next map config."
-            )
-            return True
-        if choice == "0":
-            logger.log(
-                f"User prompt response after map config {completed_index}/{total_count}: "
-                "0 -> terminating early."
-            )
-            return False
-        print("Invalid entry. Enter 1 to continue or 0 to terminate early.")
+    choice = _read_line_with_timeout(prompt, timeout_seconds)
+
+    if choice is None or not choice.strip():
+        logger.log(
+            f"No continue/terminate response after map config {completed_index}/{total_count} "
+            f"within {timeout_seconds:g} seconds. Continuing to next map config by default."
+        )
+        return True
+
+    choice = choice.strip()
+    if choice == "1":
+        logger.log(
+            f"User prompt response after map config {completed_index}/{total_count}: "
+            "1 -> continuing to next map config."
+        )
+        return True
+    if choice == "0":
+        logger.log(
+            f"User prompt response after map config {completed_index}/{total_count}: "
+            "0 -> terminating early."
+        )
+        return False
+
+    print("Invalid entry. Defaulting to continue.")
+    logger.log(
+        f"Invalid continue/terminate response after map config {completed_index}/{total_count}: "
+        f"{choice!r}. Continuing to next map config by default."
+    )
+    return True
 
 
 def _raw_data_path_for_config(branch_spec: BranchSpec) -> Path:

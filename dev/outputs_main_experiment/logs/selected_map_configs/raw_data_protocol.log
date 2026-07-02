@@ -1,0 +1,1113 @@
+========================================================================================
+Selected exact main-experiment map configurations:
+  1. static_artificial_clustered_dispersed — Static Artificial / Clustered-Dispersed
+  2. static_artificial_clustered_clustered — Static Artificial / Clustered-Clustered
+  3. dynamic_artificial_dispersed_dispersed — Dynamic Artificial / Dispersed-Dispersed
+  4. dynamic_artificial_dispersed_clustered — Dynamic Artificial / Dispersed-Clustered
+  5. dynamic_artificial_clustered_dispersed — Dynamic Artificial / Clustered-Dispersed
+  6. dynamic_artificial_clustered_clustered — Dynamic Artificial / Clustered-Clustered
+  7. static_port_dispersed_dispersed — Static Port / Dispersed-Dispersed
+  8. static_port_dispersed_clustered — Static Port / Dispersed-Clustered
+  9. static_port_clustered_dispersed — Static Port / Clustered-Dispersed
+  10. static_port_clustered_clustered — Static Port / Clustered-Clustered
+  11. dynamic_port_dispersed_dispersed — Dynamic Port / Dispersed-Dispersed
+  12. dynamic_port_dispersed_clustered — Dynamic Port / Dispersed-Clustered
+  13. dynamic_port_clustered_dispersed — Dynamic Port / Clustered-Dispersed
+  14. dynamic_port_clustered_clustered — Dynamic Port / Clustered-Clustered
+  15. static_campus_area_1_dispersed_dispersed — Static Campus Area 1 / Dispersed-Dispersed
+  16. static_campus_area_1_dispersed_single — Static Campus Area 1 / Dispersed-Single-cell target
+  17. static_campus_area_1_single_dispersed — Static Campus Area 1 / Single-cell-Dispersed
+  18. static_campus_area_1_single_single — Static Campus Area 1 / Single-cell-Single-cell target
+  19. dynamic_campus_area_1_dispersed_dispersed — Dynamic Campus Area 1 / Dispersed-Dispersed
+  20. dynamic_campus_area_1_dispersed_single — Dynamic Campus Area 1 / Dispersed-Single-cell target
+  21. dynamic_campus_area_1_single_dispersed — Dynamic Campus Area 1 / Single-cell-Dispersed
+  22. dynamic_campus_area_1_single_single — Dynamic Campus Area 1 / Single-cell-Single-cell target
+  23. static_campus_area_2_dispersed_dispersed — Static Campus Area 2 / Dispersed-Dispersed
+  24. static_campus_area_2_dispersed_single — Static Campus Area 2 / Dispersed-Single-cell target
+  25. static_campus_area_2_single_dispersed — Static Campus Area 2 / Single-cell-Dispersed
+  26. static_campus_area_2_single_single — Static Campus Area 2 / Single-cell-Single-cell target
+  27. dynamic_campus_area_2_dispersed_dispersed — Dynamic Campus Area 2 / Dispersed-Dispersed
+  28. dynamic_campus_area_2_dispersed_single — Dynamic Campus Area 2 / Dispersed-Single-cell target
+  29. dynamic_campus_area_2_single_dispersed — Dynamic Campus Area 2 / Single-cell-Dispersed
+  30. dynamic_campus_area_2_single_single — Dynamic Campus Area 2 / Single-cell-Single-cell target
+to_generate: raw_data
+Map configurations to process: 30
+Data-log root: D:\projects\cmsc-190\dev\outputs_main_experiment\data_log
+========================================================================================
+
+========================================================================================
+Configuration started: Static Artificial / Clustered-Dispersed (static_artificial_clustered_dispersed)
+========================================================================================
+========================================================================================
+Branch: Static Artificial / Clustered-Dispersed (static_artificial_clustered_dispersed)
+Map obstacle type: static
+Documented target type: dispersed_targets
+Active target type: dispersed_targets
+Start distribution mode: clustered
+Goal distribution mode: dispersed
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: False
+Zone relationship mode: none
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 3.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Agent cohesion enabled: False
+Cohesion factor: 0.00
+Seed: 3101
+Capacity attempts per tested agent number: 5
+Required successful runs per tested agent number: 1
+Capacity-search upper bound: 255
+Binary-search max downward moves: 3
+Setup/unsolvable regeneration cap per solver attempt: 3
+Runtime limit per run: 30.00s
+Notes: Artificial map branch. Starts are sampled as clustered, goals use dispersed one-to-one targets, and assignments remain one-to-one. Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for classical and cyclic mapping, with the binary-search descent limited by the configured maximum downward moves. The default paired-temp capacity criterion accepts a tested value only when the primary mapping solves and cyclic mapping beats classical mapping on the same setup in time computation halted and conflicts at halt. For the classical-side search, this means classical must solve and cyclic must still outperform it on that classical-origin setup. For the cyclic-side search, cyclic must solve and outperform classical on that cyclic-origin setup. The program still runs paired comparative tests at the discovered capacity points.
+========================================================================================
+
+----------------------------------------------------------------------------------------
+Temp classical capacity search started | mapping=classical | criterion=temp_classical | range=1..255 | max_downward_moves=3
+----------------------------------------------------------------------------------------
+
+    Testing N=128 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=128 | mapping=classical | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=128
+      Setup generation failed | mapping=classical | solver_attempt=1 | generation_attempt=1/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Setup generation attempt 2/3 | mapping=classical | solver_attempt=1 | N=128
+      Setup generation failed | mapping=classical | solver_attempt=1 | generation_attempt=2/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Setup generation attempt 3/3 | mapping=classical | solver_attempt=1 | N=128
+      Setup generation failed | mapping=classical | solver_attempt=1 | generation_attempt=3/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Generation cap exhausted for one solver attempt | mapping=classical | agent_number=128 | cap=3
+    Result for N=128 | mapping=classical | criterion=temp_classical | passed=False | successful=0 | counted_attempts=0 | invalid_regenerated=3 | failure_reason=setup_unavailable
+[Elapsed: 00m 07s] Finished tested agent number N=128 for classical
+    N=128 failed (reason=setup_unavailable); moving to left child/search interval 1..127.
+
+    Testing N=64 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=64 | mapping=classical | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=64
+
+      Solver attempt 1 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.3.2.200000] progress: 0.00s
+      Classical | mapping[0.0.3.2.200000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.63s | conflicts_at_halt=763.00 | total_path=1194.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.3.2.200000] progress: 0.00s
+    Cyclic run[0.0.3.2.200000] progress: 5.00s
+    Cyclic run[0.0.3.2.200000] progress: 10.00s
+    Cyclic run[0.0.3.2.200000] progress: 15.00s
+      Cyclic | mapping[0.0.3.2.200000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=15.22s | conflicts_at_halt=2940.00 | total_path=1346.00 | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=64
+
+      Solver attempt 2 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.3.2.201000] progress: 0.00s
+      Classical | mapping[0.0.3.2.201000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.56s | conflicts_at_halt=692.00 | total_path=1137.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.3.2.201000] progress: 0.00s
+    Cyclic run[0.0.3.2.201000] progress: 5.00s
+    Cyclic run[0.0.3.2.201000] progress: 10.00s
+    Cyclic run[0.0.3.2.201000] progress: 15.00s
+      Cyclic | mapping[0.0.3.2.201000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=15.22s | conflicts_at_halt=3441.00 | total_path=1466.00 | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=3 | N=64
+
+      Solver attempt 3 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.3.2.202000] progress: 0.00s
+      Classical | mapping[0.0.3.2.202000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.52s | conflicts_at_halt=676.00 | total_path=1208.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.3.2.202000] progress: 0.00s
+      Cyclic | mapping[0.0.3.2.202000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.21s | conflicts_at_halt=234.00 | total_path=1363.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=64 | mapping=classical | criterion=temp_classical | passed=True | successful=1 | counted_attempts=3 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 00m 51s] Finished tested agent number N=64 for classical
+    N=64 passed; moving to right child/search interval 65..127.
+
+    Testing N=96 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=96 | mapping=classical | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=96
+
+      Solver attempt 1 | mapping=classical | agent_number=96 | generation_attempt=1/3
+    Classical run[0.0.3.3.300000] progress: 0.00s
+    Classical run[0.0.3.3.300000] progress: 5.00s
+    Classical run[0.0.3.3.300000] progress: 10.00s
+    Classical run[0.0.3.3.300000] progress: 15.00s
+    Classical run[0.0.3.3.300000] progress: 20.00s
+      Classical | mapping[0.0.3.3.300000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=20.29s | conflicts_at_halt=2991.00 | total_path=1914.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.3.3.300000] progress: 0.00s
+    Cyclic run[0.0.3.3.300000] progress: 5.00s
+    Cyclic run[0.0.3.3.300000] progress: 10.00s
+    Cyclic run[0.0.3.3.300000] progress: 15.00s
+    Cyclic run[0.0.3.3.300000] progress: 20.00s
+    Cyclic run[0.0.3.3.300000] progress: 25.00s
+    Cyclic run[0.0.3.3.300000] progress: 30.00s
+      Cyclic | mapping[0.0.3.3.300000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7170.00 | total_path=null | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_not_successful,cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=96
+
+      Solver attempt 2 | mapping=classical | agent_number=96 | generation_attempt=1/3
+    Classical run[0.0.3.3.301000] progress: 0.00s
+    Classical run[0.0.3.3.301000] progress: 5.00s
+    Classical run[0.0.3.3.301000] progress: 10.00s
+    Classical run[0.0.3.3.301000] progress: 15.00s
+    Classical run[0.0.3.3.301000] progress: 20.00s
+    Classical run[0.0.3.3.301000] progress: 25.00s
+    Classical run[0.0.3.3.301000] progress: 30.00s
+      Classical | mapping[0.0.3.3.301000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4247.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=3 | N=96
+
+      Solver attempt 3 | mapping=classical | agent_number=96 | generation_attempt=1/3
+    Classical run[0.0.3.3.302000] progress: 0.00s
+    Classical run[0.0.3.3.302000] progress: 5.00s
+    Classical run[0.0.3.3.302000] progress: 10.00s
+    Classical run[0.0.3.3.302000] progress: 15.00s
+    Classical run[0.0.3.3.302000] progress: 20.00s
+    Classical run[0.0.3.3.302000] progress: 25.00s
+    Classical run[0.0.3.3.302000] progress: 30.00s
+      Classical | mapping[0.0.3.3.302000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4083.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=4 | N=96
+
+      Solver attempt 4 | mapping=classical | agent_number=96 | generation_attempt=1/3
+    Classical run[0.0.3.3.303000] progress: 0.00s
+    Classical run[0.0.3.3.303000] progress: 5.00s
+    Classical run[0.0.3.3.303000] progress: 10.00s
+    Classical run[0.0.3.3.303000] progress: 15.00s
+    Classical run[0.0.3.3.303000] progress: 20.00s
+    Classical run[0.0.3.3.303000] progress: 25.00s
+    Classical run[0.0.3.3.303000] progress: 30.00s
+      Classical | mapping[0.0.3.3.303000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4487.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=5 | N=96
+
+      Solver attempt 5 | mapping=classical | agent_number=96 | generation_attempt=1/3
+    Classical run[0.0.3.3.304000] progress: 0.00s
+    Classical run[0.0.3.3.304000] progress: 5.00s
+    Classical run[0.0.3.3.304000] progress: 10.00s
+    Classical run[0.0.3.3.304000] progress: 15.00s
+    Classical run[0.0.3.3.304000] progress: 20.00s
+    Classical run[0.0.3.3.304000] progress: 25.00s
+    Classical run[0.0.3.3.304000] progress: 30.00s
+      Classical | mapping[0.0.3.3.304000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4454.00 | total_path=null | paired=False
+    Result for N=96 | mapping=classical | criterion=temp_classical | passed=False | successful=0 | counted_attempts=5 | invalid_regenerated=0 | failure_reason=temp_fail
+[Elapsed: 03m 45s] Finished tested agent number N=96 for classical
+    N=96 failed (reason=temp_fail); moving to left child/search interval 65..95.
+
+    Testing N=80 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=80 | mapping=classical | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=80
+
+      Solver attempt 1 | mapping=classical | agent_number=80 | generation_attempt=1/3
+    Classical run[0.0.3.4.400000] progress: 0.00s
+    Classical run[0.0.3.4.400000] progress: 5.00s
+    Classical run[0.0.3.4.400000] progress: 10.00s
+      Classical | mapping[0.0.3.4.400000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=11.90s | conflicts_at_halt=1686.00 | total_path=1960.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.3.4.400000] progress: 0.00s
+    Cyclic run[0.0.3.4.400000] progress: 5.00s
+    Cyclic run[0.0.3.4.400000] progress: 10.00s
+    Cyclic run[0.0.3.4.400000] progress: 15.00s
+    Cyclic run[0.0.3.4.400000] progress: 20.00s
+    Cyclic run[0.0.3.4.400000] progress: 25.00s
+    Cyclic run[0.0.3.4.400000] progress: 30.00s
+      Cyclic | mapping[0.0.3.4.400000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=6355.00 | total_path=null | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_not_successful,cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=80
+
+      Solver attempt 2 | mapping=classical | agent_number=80 | generation_attempt=1/3
+    Classical run[0.0.3.4.401000] progress: 0.00s
+    Classical run[0.0.3.4.401000] progress: 5.00s
+    Classical run[0.0.3.4.401000] progress: 10.00s
+      Classical | mapping[0.0.3.4.401000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=12.84s | conflicts_at_halt=2039.00 | total_path=1621.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.3.4.401000] progress: 0.00s
+    Cyclic run[0.0.3.4.401000] progress: 5.00s
+      Cyclic | mapping[0.0.3.4.401000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.56s | conflicts_at_halt=1121.00 | total_path=1841.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=80 | mapping=classical | criterion=temp_classical | passed=True | successful=1 | counted_attempts=2 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 04m 48s] Finished tested agent number N=80 for classical
+    N=80 passed (reason=none); binary-search downward-move limit reached (3). Stopping without descending to another child.
+Temp classical capacity search finished | mapping=classical | criterion=temp_classical | N_max=80 | saved_successful_runs=1 | tested_agent_numbers=4
+
+----------------------------------------------------------------------------------------
+Temp cyclic capacity search started | mapping=cyclic | criterion=temp_cyclic | range=1..255 | max_downward_moves=3
+----------------------------------------------------------------------------------------
+
+    Testing N=128 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=128 | mapping=cyclic | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=128
+      Setup generation failed | mapping=cyclic | solver_attempt=1 | generation_attempt=1/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Setup generation attempt 2/3 | mapping=cyclic | solver_attempt=1 | N=128
+      Setup generation failed | mapping=cyclic | solver_attempt=1 | generation_attempt=2/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Setup generation attempt 3/3 | mapping=cyclic | solver_attempt=1 | N=128
+      Setup generation failed | mapping=cyclic | solver_attempt=1 | generation_attempt=3/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Generation cap exhausted for one solver attempt | mapping=cyclic | agent_number=128 | cap=3
+    Result for N=128 | mapping=cyclic | criterion=temp_cyclic | passed=False | successful=0 | counted_attempts=0 | invalid_regenerated=3 | failure_reason=setup_unavailable
+[Elapsed: 04m 55s] Finished tested agent number N=128 for cyclic
+    N=128 failed (reason=setup_unavailable); moving to left child/search interval 1..127.
+
+    Testing N=64 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=64 | mapping=cyclic | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=64
+
+      Solver attempt 1 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.3.2.200000] progress: 0.00s
+    Cyclic run[0.0.3.2.200000] progress: 5.00s
+    Cyclic run[0.0.3.2.200000] progress: 10.00s
+    Cyclic run[0.0.3.2.200000] progress: 15.00s
+      Cyclic | mapping[0.0.3.2.200000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=15.97s | conflicts_at_halt=2940.00 | total_path=1346.00 | paired=False
+      Temp-capacity comparison | running classical on the same setup before accepting this cyclic success
+    Classical run[0.0.3.2.200000] progress: 0.00s
+      Classical | mapping[0.0.3.2.200000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.86s | conflicts_at_halt=763.00 | total_path=1194.00 | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=2 | N=64
+
+      Solver attempt 2 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.3.2.201000] progress: 0.00s
+    Cyclic run[0.0.3.2.201000] progress: 5.00s
+    Cyclic run[0.0.3.2.201000] progress: 10.00s
+    Cyclic run[0.0.3.2.201000] progress: 15.00s
+      Cyclic | mapping[0.0.3.2.201000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=15.57s | conflicts_at_halt=3441.00 | total_path=1466.00 | paired=False
+      Temp-capacity comparison | running classical on the same setup before accepting this cyclic success
+    Classical run[0.0.3.2.201000] progress: 0.00s
+      Classical | mapping[0.0.3.2.201000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.67s | conflicts_at_halt=692.00 | total_path=1137.00 | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=3 | N=64
+
+      Solver attempt 3 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.3.2.202000] progress: 0.00s
+      Cyclic | mapping[0.0.3.2.202000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.31s | conflicts_at_halt=234.00 | total_path=1363.00 | paired=False
+      Temp-capacity comparison | running classical on the same setup before accepting this cyclic success
+    Classical run[0.0.3.2.202000] progress: 0.00s
+      Classical | mapping[0.0.3.2.202000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.57s | conflicts_at_halt=676.00 | total_path=1208.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=64 | mapping=cyclic | criterion=temp_cyclic | passed=True | successful=1 | counted_attempts=3 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 05m 40s] Finished tested agent number N=64 for cyclic
+    N=64 passed; moving to right child/search interval 65..127.
+
+    Testing N=96 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=96 | mapping=cyclic | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=96
+
+      Solver attempt 1 | mapping=cyclic | agent_number=96 | generation_attempt=1/3
+    Cyclic run[0.0.3.3.300000] progress: 0.00s
+    Cyclic run[0.0.3.3.300000] progress: 5.00s
+    Cyclic run[0.0.3.3.300000] progress: 10.00s
+    Cyclic run[0.0.3.3.300000] progress: 15.00s
+    Cyclic run[0.0.3.3.300000] progress: 20.00s
+    Cyclic run[0.0.3.3.300000] progress: 25.00s
+    Cyclic run[0.0.3.3.300000] progress: 30.00s
+      Cyclic | mapping[0.0.3.3.300000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7190.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=2 | N=96
+
+      Solver attempt 2 | mapping=cyclic | agent_number=96 | generation_attempt=1/3
+    Cyclic run[0.0.3.3.301000] progress: 0.00s
+    Cyclic run[0.0.3.3.301000] progress: 5.00s
+    Cyclic run[0.0.3.3.301000] progress: 10.00s
+    Cyclic run[0.0.3.3.301000] progress: 15.00s
+    Cyclic run[0.0.3.3.301000] progress: 20.00s
+    Cyclic run[0.0.3.3.301000] progress: 25.00s
+    Cyclic run[0.0.3.3.301000] progress: 30.00s
+      Cyclic | mapping[0.0.3.3.301000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=2513.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=3 | N=96
+
+      Solver attempt 3 | mapping=cyclic | agent_number=96 | generation_attempt=1/3
+    Cyclic run[0.0.3.3.302000] progress: 0.00s
+    Cyclic run[0.0.3.3.302000] progress: 5.00s
+    Cyclic run[0.0.3.3.302000] progress: 10.00s
+    Cyclic run[0.0.3.3.302000] progress: 15.00s
+    Cyclic run[0.0.3.3.302000] progress: 20.00s
+    Cyclic run[0.0.3.3.302000] progress: 25.00s
+    Cyclic run[0.0.3.3.302000] progress: 30.00s
+      Cyclic | mapping[0.0.3.3.302000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=6229.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=4 | N=96
+
+      Solver attempt 4 | mapping=cyclic | agent_number=96 | generation_attempt=1/3
+    Cyclic run[0.0.3.3.303000] progress: 0.00s
+    Cyclic run[0.0.3.3.303000] progress: 5.00s
+    Cyclic run[0.0.3.3.303000] progress: 10.00s
+    Cyclic run[0.0.3.3.303000] progress: 15.00s
+    Cyclic run[0.0.3.3.303000] progress: 20.00s
+    Cyclic run[0.0.3.3.303000] progress: 25.00s
+    Cyclic run[0.0.3.3.303000] progress: 30.00s
+      Cyclic | mapping[0.0.3.3.303000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4425.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=5 | N=96
+
+      Solver attempt 5 | mapping=cyclic | agent_number=96 | generation_attempt=1/3
+    Cyclic run[0.0.3.3.304000] progress: 0.00s
+    Cyclic run[0.0.3.3.304000] progress: 5.00s
+    Cyclic run[0.0.3.3.304000] progress: 10.00s
+    Cyclic run[0.0.3.3.304000] progress: 15.00s
+    Cyclic run[0.0.3.3.304000] progress: 20.00s
+    Cyclic run[0.0.3.3.304000] progress: 25.00s
+    Cyclic run[0.0.3.3.304000] progress: 30.00s
+      Cyclic | mapping[0.0.3.3.304000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4164.00 | total_path=null | paired=False
+    Result for N=96 | mapping=cyclic | criterion=temp_cyclic | passed=False | successful=0 | counted_attempts=5 | invalid_regenerated=0 | failure_reason=cyclic_solver_fail
+[Elapsed: 08m 15s] Finished tested agent number N=96 for cyclic
+    N=96 failed (reason=cyclic_solver_fail); moving to left child/search interval 65..95.
+
+    Testing N=80 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=80 | mapping=cyclic | start_mode=clustered | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=80
+
+      Solver attempt 1 | mapping=cyclic | agent_number=80 | generation_attempt=1/3
+    Cyclic run[0.0.3.4.400000] progress: 0.00s
+    Cyclic run[0.0.3.4.400000] progress: 5.00s
+    Cyclic run[0.0.3.4.400000] progress: 10.00s
+    Cyclic run[0.0.3.4.400000] progress: 15.00s
+    Cyclic run[0.0.3.4.400000] progress: 20.00s
+    Cyclic run[0.0.3.4.400000] progress: 25.00s
+    Cyclic run[0.0.3.4.400000] progress: 30.00s
+      Cyclic | mapping[0.0.3.4.400000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=6434.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=2 | N=80
+
+      Solver attempt 2 | mapping=cyclic | agent_number=80 | generation_attempt=1/3
+    Cyclic run[0.0.3.4.401000] progress: 0.00s
+    Cyclic run[0.0.3.4.401000] progress: 5.00s
+      Cyclic | mapping[0.0.3.4.401000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.40s | conflicts_at_halt=1121.00 | total_path=1841.00 | paired=False
+      Temp-capacity comparison | running classical on the same setup before accepting this cyclic success
+    Classical run[0.0.3.4.401000] progress: 0.00s
+    Classical run[0.0.3.4.401000] progress: 5.00s
+    Classical run[0.0.3.4.401000] progress: 10.00s
+      Classical | mapping[0.0.3.4.401000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=12.45s | conflicts_at_halt=2039.00 | total_path=1621.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=80 | mapping=cyclic | criterion=temp_cyclic | passed=True | successful=1 | counted_attempts=2 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 09m 05s] Finished tested agent number N=80 for cyclic
+    N=80 passed (reason=none); binary-search downward-move limit reached (3). Stopping without descending to another child.
+Temp cyclic capacity search finished | mapping=cyclic | criterion=temp_cyclic | N_max=80 | saved_successful_runs=1 | tested_agent_numbers=4
+
+Comparative runs started | capacity_point=temp_classical_capacity | baseline=classical | comparative=cyclic | paired_initial_conditions=1
+
+    Comparative paired run 1 | cyclic on classical capacity initial conditions
+    Cyclic run[0.0.3.4.401000] progress: 0.00s
+    Cyclic run[0.0.3.4.401000] progress: 5.00s
+      Cyclic | mapping[0.0.3.4.401000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=6.46s | conflicts_at_halt=1121.00 | total_path=1841.00 | paired=True
+
+Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic | comparative=classical | paired_initial_conditions=1
+
+    Comparative paired run 1 | classical on cyclic capacity initial conditions
+    Classical run[0.0.3.4.401000] progress: 0.00s
+    Classical run[0.0.3.4.401000] progress: 5.00s
+    Classical run[0.0.3.4.401000] progress: 10.00s
+      Classical | mapping[0.0.3.4.401000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=12.74s | conflicts_at_halt=2039.00 | total_path=1621.00 | paired=True
+Detailed configuration/evaluation log written: D:\projects\cmsc-190\dev\outputs_main_experiment\data_log\1_static_artificial\3_static_artificial_clustered_dispersed_evaluation.xml
+Structured raw data written: D:\projects\cmsc-190\dev\outputs_main_experiment\data_log\1_static_artificial\3_static_artificial_clustered_dispersed_raw_data.json
+[Elapsed: 09m 25s] Configuration completed: static_artificial_clustered_dispersed
+No continue/terminate response after map config 1/30 within 6 seconds. Continuing to next map config by default.
+
+========================================================================================
+Configuration started: Static Artificial / Clustered-Clustered (static_artificial_clustered_clustered)
+========================================================================================
+========================================================================================
+Branch: Static Artificial / Clustered-Clustered (static_artificial_clustered_clustered)
+Map obstacle type: static
+Documented target type: clustered_targets
+Active target type: clustered_targets
+Start distribution mode: clustered
+Goal distribution mode: clustered
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: False
+Zone relationship mode: none
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 3.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Agent cohesion enabled: False
+Cohesion factor: 0.00
+Seed: 4101
+Capacity attempts per tested agent number: 5
+Required successful runs per tested agent number: 1
+Capacity-search upper bound: 255
+Binary-search max downward moves: 3
+Setup/unsolvable regeneration cap per solver attempt: 3
+Runtime limit per run: 30.00s
+Notes: Artificial map branch. Starts are sampled as clustered, goals use targets sampled as one compact directly adjacent 8-neighbor-connected group, and assignments remain one-to-one. Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for classical and cyclic mapping, with the binary-search descent limited by the configured maximum downward moves. The default paired-temp capacity criterion accepts a tested value only when the primary mapping solves and cyclic mapping beats classical mapping on the same setup in time computation halted and conflicts at halt. For the classical-side search, this means classical must solve and cyclic must still outperform it on that classical-origin setup. For the cyclic-side search, cyclic must solve and outperform classical on that cyclic-origin setup. The program still runs paired comparative tests at the discovered capacity points.
+========================================================================================
+
+----------------------------------------------------------------------------------------
+Temp classical capacity search started | mapping=classical | criterion=temp_classical | range=1..255 | max_downward_moves=3
+----------------------------------------------------------------------------------------
+
+    Testing N=128 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=128 | mapping=classical | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=128
+
+      Solver attempt 1 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[0.0.4.1.100000] progress: 0.00s
+    Classical run[0.0.4.1.100000] progress: 5.00s
+    Classical run[0.0.4.1.100000] progress: 10.00s
+    Classical run[0.0.4.1.100000] progress: 15.00s
+    Classical run[0.0.4.1.100000] progress: 20.00s
+    Classical run[0.0.4.1.100000] progress: 25.00s
+    Classical run[0.0.4.1.100000] progress: 30.00s
+      Classical | mapping[0.0.4.1.100000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=3692.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=128
+
+      Solver attempt 2 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[0.0.4.1.101000] progress: 0.00s
+    Classical run[0.0.4.1.101000] progress: 5.00s
+    Classical run[0.0.4.1.101000] progress: 10.00s
+    Classical run[0.0.4.1.101000] progress: 15.00s
+    Classical run[0.0.4.1.101000] progress: 20.00s
+    Classical run[0.0.4.1.101000] progress: 25.00s
+    Classical run[0.0.4.1.101000] progress: 30.00s
+      Classical | mapping[0.0.4.1.101000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4056.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=3 | N=128
+
+      Solver attempt 3 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[0.0.4.1.102000] progress: 0.00s
+    Classical run[0.0.4.1.102000] progress: 5.00s
+    Classical run[0.0.4.1.102000] progress: 10.00s
+    Classical run[0.0.4.1.102000] progress: 15.00s
+    Classical run[0.0.4.1.102000] progress: 20.00s
+    Classical run[0.0.4.1.102000] progress: 25.00s
+    Classical run[0.0.4.1.102000] progress: 30.00s
+      Classical | mapping[0.0.4.1.102000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=6193.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=4 | N=128
+
+      Solver attempt 4 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[0.0.4.1.103000] progress: 0.00s
+    Classical run[0.0.4.1.103000] progress: 5.00s
+    Classical run[0.0.4.1.103000] progress: 10.00s
+    Classical run[0.0.4.1.103000] progress: 15.00s
+    Classical run[0.0.4.1.103000] progress: 20.00s
+    Classical run[0.0.4.1.103000] progress: 25.00s
+    Classical run[0.0.4.1.103000] progress: 30.00s
+      Classical | mapping[0.0.4.1.103000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=3386.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=5 | N=128
+
+      Solver attempt 5 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[0.0.4.1.104000] progress: 0.00s
+    Classical run[0.0.4.1.104000] progress: 5.00s
+    Classical run[0.0.4.1.104000] progress: 10.00s
+    Classical run[0.0.4.1.104000] progress: 15.00s
+    Classical run[0.0.4.1.104000] progress: 20.00s
+    Classical run[0.0.4.1.104000] progress: 25.00s
+    Classical run[0.0.4.1.104000] progress: 30.00s
+      Classical | mapping[0.0.4.1.104000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4093.00 | total_path=null | paired=False
+    Result for N=128 | mapping=classical | criterion=temp_classical | passed=False | successful=0 | counted_attempts=5 | invalid_regenerated=0 | failure_reason=classical_solver_fail
+[Elapsed: 12m 09s] Finished tested agent number N=128 for classical
+    N=128 failed (reason=classical_solver_fail); moving to left child/search interval 1..127.
+
+    Testing N=64 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=64 | mapping=classical | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=64
+
+      Solver attempt 1 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.4.2.200000] progress: 0.00s
+    Classical run[0.0.4.2.200000] progress: 5.00s
+    Classical run[0.0.4.2.200000] progress: 10.00s
+    Classical run[0.0.4.2.200000] progress: 15.00s
+      Classical | mapping[0.0.4.2.200000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=16.97s | conflicts_at_halt=2210.00 | total_path=2110.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.2.200000] progress: 0.00s
+    Cyclic run[0.0.4.2.200000] progress: 5.00s
+    Cyclic run[0.0.4.2.200000] progress: 10.00s
+    Cyclic run[0.0.4.2.200000] progress: 15.00s
+    Cyclic run[0.0.4.2.200000] progress: 20.00s
+    Cyclic run[0.0.4.2.200000] progress: 25.00s
+    Cyclic run[0.0.4.2.200000] progress: 30.00s
+      Cyclic | mapping[0.0.4.2.200000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4113.00 | total_path=null | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_not_successful,cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=64
+
+      Solver attempt 2 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.4.2.201000] progress: 0.00s
+    Classical run[0.0.4.2.201000] progress: 5.00s
+      Classical | mapping[0.0.4.2.201000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=5.46s | conflicts_at_halt=980.00 | total_path=1259.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.2.201000] progress: 0.00s
+    Cyclic run[0.0.4.2.201000] progress: 5.00s
+    Cyclic run[0.0.4.2.201000] progress: 10.00s
+    Cyclic run[0.0.4.2.201000] progress: 15.00s
+    Cyclic run[0.0.4.2.201000] progress: 20.00s
+      Cyclic | mapping[0.0.4.2.201000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=20.31s | conflicts_at_halt=3945.00 | total_path=1469.00 | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=3 | N=64
+
+      Solver attempt 3 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.4.2.202000] progress: 0.00s
+    Classical run[0.0.4.2.202000] progress: 5.00s
+    Classical run[0.0.4.2.202000] progress: 10.00s
+      Classical | mapping[0.0.4.2.202000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=13.22s | conflicts_at_halt=1710.00 | total_path=1800.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.2.202000] progress: 0.00s
+    Cyclic run[0.0.4.2.202000] progress: 5.00s
+    Cyclic run[0.0.4.2.202000] progress: 10.00s
+    Cyclic run[0.0.4.2.202000] progress: 15.00s
+    Cyclic run[0.0.4.2.202000] progress: 20.00s
+    Cyclic run[0.0.4.2.202000] progress: 25.00s
+      Cyclic | mapping[0.0.4.2.202000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=25.34s | conflicts_at_halt=3798.00 | total_path=1997.00 | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=4 | N=64
+
+      Solver attempt 4 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.4.2.203000] progress: 0.00s
+    Classical run[0.0.4.2.203000] progress: 5.00s
+    Classical run[0.0.4.2.203000] progress: 10.00s
+    Classical run[0.0.4.2.203000] progress: 15.00s
+    Classical run[0.0.4.2.203000] progress: 20.00s
+    Classical run[0.0.4.2.203000] progress: 25.00s
+    Classical run[0.0.4.2.203000] progress: 30.00s
+      Classical | mapping[0.0.4.2.203000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7744.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=5 | N=64
+
+      Solver attempt 5 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[0.0.4.2.204000] progress: 0.00s
+    Classical run[0.0.4.2.204000] progress: 5.00s
+      Classical | mapping[0.0.4.2.204000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.62s | conflicts_at_halt=1212.00 | total_path=1803.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.2.204000] progress: 0.00s
+    Cyclic run[0.0.4.2.204000] progress: 5.00s
+    Cyclic run[0.0.4.2.204000] progress: 10.00s
+    Cyclic run[0.0.4.2.204000] progress: 15.00s
+    Cyclic run[0.0.4.2.204000] progress: 20.00s
+    Cyclic run[0.0.4.2.204000] progress: 25.00s
+    Cyclic run[0.0.4.2.204000] progress: 30.00s
+      Cyclic | mapping[0.0.4.2.204000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=5444.00 | total_path=null | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_not_successful,cyclic_time_not_lower,cyclic_conflicts_not_lower
+    Result for N=64 | mapping=classical | criterion=temp_classical | passed=False | successful=0 | counted_attempts=5 | invalid_regenerated=0 | failure_reason=temp_fail
+[Elapsed: 15m 13s] Finished tested agent number N=64 for classical
+    N=64 failed (reason=temp_fail); moving to left child/search interval 1..63.
+
+    Testing N=32 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=32 | mapping=classical | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=32
+
+      Solver attempt 1 | mapping=classical | agent_number=32 | generation_attempt=1/3
+    Classical run[0.0.4.3.300000] progress: 0.00s
+      Classical | mapping[0.0.4.3.300000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.73s | conflicts_at_halt=866.00 | total_path=689.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.3.300000] progress: 0.00s
+    Cyclic run[0.0.4.3.300000] progress: 5.00s
+    Cyclic run[0.0.4.3.300000] progress: 10.00s
+    Cyclic run[0.0.4.3.300000] progress: 15.00s
+    Cyclic run[0.0.4.3.300000] progress: 20.00s
+    Cyclic run[0.0.4.3.300000] progress: 25.00s
+    Cyclic run[0.0.4.3.300000] progress: 30.00s
+      Cyclic | mapping[0.0.4.3.300000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=9538.00 | total_path=null | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_not_successful,cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=32
+
+      Solver attempt 2 | mapping=classical | agent_number=32 | generation_attempt=1/3
+    Classical run[0.0.4.3.301000] progress: 0.00s
+      Classical | mapping[0.0.4.3.301000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.60s | conflicts_at_halt=419.00 | total_path=485.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.3.301000] progress: 0.00s
+      Cyclic | mapping[0.0.4.3.301000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.54s | conflicts_at_halt=131.00 | total_path=549.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=32 | mapping=classical | criterion=temp_classical | passed=True | successful=1 | counted_attempts=2 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 15m 49s] Finished tested agent number N=32 for classical
+    N=32 passed; moving to right child/search interval 33..63.
+
+    Testing N=48 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=48 | mapping=classical | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=48
+
+      Solver attempt 1 | mapping=classical | agent_number=48 | generation_attempt=1/3
+    Classical run[0.0.4.4.400000] progress: 0.00s
+    Classical run[0.0.4.4.400000] progress: 5.00s
+    Classical run[0.0.4.4.400000] progress: 10.00s
+    Classical run[0.0.4.4.400000] progress: 15.00s
+    Classical run[0.0.4.4.400000] progress: 20.00s
+    Classical run[0.0.4.4.400000] progress: 25.00s
+    Classical run[0.0.4.4.400000] progress: 30.00s
+      Classical | mapping[0.0.4.4.400000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=5405.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=48
+
+      Solver attempt 2 | mapping=classical | agent_number=48 | generation_attempt=1/3
+    Classical run[0.0.4.4.401000] progress: 0.00s
+      Classical | mapping[0.0.4.4.401000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.32s | conflicts_at_halt=270.00 | total_path=955.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.4.401000] progress: 0.00s
+    Cyclic run[0.0.4.4.401000] progress: 5.00s
+    Cyclic run[0.0.4.4.401000] progress: 10.00s
+    Cyclic run[0.0.4.4.401000] progress: 15.00s
+    Cyclic run[0.0.4.4.401000] progress: 20.00s
+    Cyclic run[0.0.4.4.401000] progress: 25.00s
+    Cyclic run[0.0.4.4.401000] progress: 30.00s
+      Cyclic | mapping[0.0.4.4.401000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=9176.00 | total_path=null | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_not_successful,cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=3 | N=48
+
+      Solver attempt 3 | mapping=classical | agent_number=48 | generation_attempt=1/3
+    Classical run[0.0.4.4.402000] progress: 0.00s
+    Classical run[0.0.4.4.402000] progress: 5.00s
+      Classical | mapping[0.0.4.4.402000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.65s | conflicts_at_halt=1306.00 | total_path=1464.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.4.402000] progress: 0.00s
+    Cyclic run[0.0.4.4.402000] progress: 5.00s
+    Cyclic run[0.0.4.4.402000] progress: 10.00s
+    Cyclic run[0.0.4.4.402000] progress: 15.00s
+    Cyclic run[0.0.4.4.402000] progress: 20.00s
+    Cyclic run[0.0.4.4.402000] progress: 25.00s
+    Cyclic run[0.0.4.4.402000] progress: 30.00s
+      Cyclic | mapping[0.0.4.4.402000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7569.00 | total_path=null | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_not_successful,cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=4 | N=48
+
+      Solver attempt 4 | mapping=classical | agent_number=48 | generation_attempt=1/3
+    Classical run[0.0.4.4.403000] progress: 0.00s
+    Classical run[0.0.4.4.403000] progress: 5.00s
+      Classical | mapping[0.0.4.4.403000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.91s | conflicts_at_halt=1707.00 | total_path=967.00 | paired=False
+      Temp-capacity comparison | running cyclic on the same setup before accepting this classical success
+    Cyclic run[0.0.4.4.403000] progress: 0.00s
+      Cyclic | mapping[0.0.4.4.403000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.63s | conflicts_at_halt=659.00 | total_path=1106.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=48 | mapping=classical | criterion=temp_classical | passed=True | successful=1 | counted_attempts=4 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 17m 44s] Finished tested agent number N=48 for classical
+    N=48 passed (reason=none); binary-search downward-move limit reached (3). Stopping without descending to another child.
+Temp classical capacity search finished | mapping=classical | criterion=temp_classical | N_max=48 | saved_successful_runs=1 | tested_agent_numbers=4
+
+----------------------------------------------------------------------------------------
+Temp cyclic capacity search started | mapping=cyclic | criterion=temp_cyclic | range=1..255 | max_downward_moves=3
+----------------------------------------------------------------------------------------
+
+    Testing N=128 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=128 | mapping=cyclic | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=128
+
+      Solver attempt 1 | mapping=cyclic | agent_number=128 | generation_attempt=1/3
+    Cyclic run[0.0.4.1.100000] progress: 0.00s
+    Cyclic run[0.0.4.1.100000] progress: 5.00s
+    Cyclic run[0.0.4.1.100000] progress: 10.00s
+    Cyclic run[0.0.4.1.100000] progress: 15.00s
+    Cyclic run[0.0.4.1.100000] progress: 20.00s
+    Cyclic run[0.0.4.1.100000] progress: 25.00s
+    Cyclic run[0.0.4.1.100000] progress: 30.00s
+      Cyclic | mapping[0.0.4.1.100000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=5642.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=2 | N=128
+
+      Solver attempt 2 | mapping=cyclic | agent_number=128 | generation_attempt=1/3
+    Cyclic run[0.0.4.1.101000] progress: 0.00s
+    Cyclic run[0.0.4.1.101000] progress: 5.00s
+    Cyclic run[0.0.4.1.101000] progress: 10.00s
+    Cyclic run[0.0.4.1.101000] progress: 15.00s
+    Cyclic run[0.0.4.1.101000] progress: 20.00s
+    Cyclic run[0.0.4.1.101000] progress: 25.00s
+    Cyclic run[0.0.4.1.101000] progress: 30.00s
+      Cyclic | mapping[0.0.4.1.101000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=4459.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=3 | N=128
+
+      Solver attempt 3 | mapping=cyclic | agent_number=128 | generation_attempt=1/3
+    Cyclic run[0.0.4.1.102000] progress: 0.00s
+    Cyclic run[0.0.4.1.102000] progress: 5.00s
+    Cyclic run[0.0.4.1.102000] progress: 10.00s
+    Cyclic run[0.0.4.1.102000] progress: 15.00s
+    Cyclic run[0.0.4.1.102000] progress: 20.00s
+    Cyclic run[0.0.4.1.102000] progress: 25.00s
+    Cyclic run[0.0.4.1.102000] progress: 30.00s
+      Cyclic | mapping[0.0.4.1.102000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=5464.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=4 | N=128
+      Setup generation failed | mapping=cyclic | solver_attempt=4 | generation_attempt=1/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Setup generation attempt 2/3 | mapping=cyclic | solver_attempt=4 | N=128
+      Setup generation failed | mapping=cyclic | solver_attempt=4 | generation_attempt=2/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Setup generation attempt 3/3 | mapping=cyclic | solver_attempt=4 | N=128
+      Setup generation failed | mapping=cyclic | solver_attempt=4 | generation_attempt=3/3 | TimeoutError: Assignment sampling exceeded 2.0s fail-fast limit.
+      Generation cap exhausted for one solver attempt | mapping=cyclic | agent_number=128 | cap=3
+    Result for N=128 | mapping=cyclic | criterion=temp_cyclic | passed=False | successful=0 | counted_attempts=3 | invalid_regenerated=3 | failure_reason=cyclic_solver_fail
+[Elapsed: 19m 27s] Finished tested agent number N=128 for cyclic
+    N=128 failed (reason=cyclic_solver_fail); moving to left child/search interval 1..127.
+
+    Testing N=64 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=64 | mapping=cyclic | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=64
+
+      Solver attempt 1 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.4.2.200000] progress: 0.00s
+    Cyclic run[0.0.4.2.200000] progress: 5.00s
+    Cyclic run[0.0.4.2.200000] progress: 10.00s
+    Cyclic run[0.0.4.2.200000] progress: 15.00s
+    Cyclic run[0.0.4.2.200000] progress: 20.00s
+    Cyclic run[0.0.4.2.200000] progress: 25.00s
+    Cyclic run[0.0.4.2.200000] progress: 30.00s
+      Cyclic | mapping[0.0.4.2.200000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=2753.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=2 | N=64
+
+      Solver attempt 2 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.4.2.201000] progress: 0.00s
+    Cyclic run[0.0.4.2.201000] progress: 5.00s
+    Cyclic run[0.0.4.2.201000] progress: 10.00s
+    Cyclic run[0.0.4.2.201000] progress: 15.00s
+    Cyclic run[0.0.4.2.201000] progress: 20.00s
+    Cyclic run[0.0.4.2.201000] progress: 25.00s
+    Cyclic run[0.0.4.2.201000] progress: 30.00s
+      Cyclic | mapping[0.0.4.2.201000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=3942.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=3 | N=64
+
+      Solver attempt 3 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.4.2.202000] progress: 0.00s
+    Cyclic run[0.0.4.2.202000] progress: 5.00s
+    Cyclic run[0.0.4.2.202000] progress: 10.00s
+    Cyclic run[0.0.4.2.202000] progress: 15.00s
+    Cyclic run[0.0.4.2.202000] progress: 20.00s
+      Cyclic | mapping[0.0.4.2.202000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=24.57s | conflicts_at_halt=3798.00 | total_path=1997.00 | paired=False
+      Temp-capacity comparison | running classical on the same setup before accepting this cyclic success
+    Classical run[0.0.4.2.202000] progress: 0.00s
+    Classical run[0.0.4.2.202000] progress: 5.00s
+    Classical run[0.0.4.2.202000] progress: 10.00s
+      Classical | mapping[0.0.4.2.202000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=12.28s | conflicts_at_halt=1710.00 | total_path=1800.00 | paired=True
+      Temp-capacity evaluation | passed=False | reasons=cyclic_time_not_lower,cyclic_conflicts_not_lower
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=4 | N=64
+
+      Solver attempt 4 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.4.2.203000] progress: 0.00s
+    Cyclic run[0.0.4.2.203000] progress: 5.00s
+    Cyclic run[0.0.4.2.203000] progress: 10.00s
+    Cyclic run[0.0.4.2.203000] progress: 15.00s
+    Cyclic run[0.0.4.2.203000] progress: 20.00s
+    Cyclic run[0.0.4.2.203000] progress: 25.00s
+    Cyclic run[0.0.4.2.203000] progress: 30.00s
+      Cyclic | mapping[0.0.4.2.203000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=6684.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=5 | N=64
+
+      Solver attempt 5 | mapping=cyclic | agent_number=64 | generation_attempt=1/3
+    Cyclic run[0.0.4.2.204000] progress: 0.00s
+    Cyclic run[0.0.4.2.204000] progress: 5.00s
+    Cyclic run[0.0.4.2.204000] progress: 10.00s
+    Cyclic run[0.0.4.2.204000] progress: 15.00s
+    Cyclic run[0.0.4.2.204000] progress: 20.00s
+    Cyclic run[0.0.4.2.204000] progress: 25.00s
+    Cyclic run[0.0.4.2.204000] progress: 30.00s
+      Cyclic | mapping[0.0.4.2.204000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=5423.00 | total_path=null | paired=False
+    Result for N=64 | mapping=cyclic | criterion=temp_cyclic | passed=False | successful=0 | counted_attempts=5 | invalid_regenerated=0 | failure_reason=temp_fail
+[Elapsed: 22m 08s] Finished tested agent number N=64 for cyclic
+    N=64 failed (reason=temp_fail); moving to left child/search interval 1..63.
+
+    Testing N=32 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=32 | mapping=cyclic | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=32
+
+      Solver attempt 1 | mapping=cyclic | agent_number=32 | generation_attempt=1/3
+    Cyclic run[0.0.4.3.300000] progress: 0.00s
+    Cyclic run[0.0.4.3.300000] progress: 5.00s
+    Cyclic run[0.0.4.3.300000] progress: 10.00s
+    Cyclic run[0.0.4.3.300000] progress: 15.00s
+    Cyclic run[0.0.4.3.300000] progress: 20.00s
+    Cyclic run[0.0.4.3.300000] progress: 25.00s
+    Cyclic run[0.0.4.3.300000] progress: 30.00s
+      Cyclic | mapping[0.0.4.3.300000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=8839.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=2 | N=32
+
+      Solver attempt 2 | mapping=cyclic | agent_number=32 | generation_attempt=1/3
+    Cyclic run[0.0.4.3.301000] progress: 0.00s
+      Cyclic | mapping[0.0.4.3.301000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=0.56s | conflicts_at_halt=131.00 | total_path=549.00 | paired=False
+      Temp-capacity comparison | running classical on the same setup before accepting this cyclic success
+    Classical run[0.0.4.3.301000] progress: 0.00s
+      Classical | mapping[0.0.4.3.301000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=1.77s | conflicts_at_halt=419.00 | total_path=485.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=32 | mapping=cyclic | criterion=temp_cyclic | passed=True | successful=1 | counted_attempts=2 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 22m 42s] Finished tested agent number N=32 for cyclic
+    N=32 passed; moving to right child/search interval 33..63.
+
+    Testing N=48 for cyclic | pass_rule=1/5 temp cyclic-origin run(s): cyclic must solve within 30s and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=48 | mapping=cyclic | start_mode=clustered | goal_mode=clustered | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | candidate_counts=per generated artificial map
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=1 | N=48
+
+      Solver attempt 1 | mapping=cyclic | agent_number=48 | generation_attempt=1/3
+    Cyclic run[0.0.4.4.400000] progress: 0.00s
+    Cyclic run[0.0.4.4.400000] progress: 5.00s
+    Cyclic run[0.0.4.4.400000] progress: 10.00s
+    Cyclic run[0.0.4.4.400000] progress: 15.00s
+    Cyclic run[0.0.4.4.400000] progress: 20.00s
+    Cyclic run[0.0.4.4.400000] progress: 25.00s
+    Cyclic run[0.0.4.4.400000] progress: 30.00s
+      Cyclic | mapping[0.0.4.4.400000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7919.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=2 | N=48
+
+      Solver attempt 2 | mapping=cyclic | agent_number=48 | generation_attempt=1/3
+    Cyclic run[0.0.4.4.401000] progress: 0.00s
+    Cyclic run[0.0.4.4.401000] progress: 5.00s
+    Cyclic run[0.0.4.4.401000] progress: 10.00s
+    Cyclic run[0.0.4.4.401000] progress: 15.00s
+    Cyclic run[0.0.4.4.401000] progress: 20.00s
+    Cyclic run[0.0.4.4.401000] progress: 25.00s
+    Cyclic run[0.0.4.4.401000] progress: 30.00s
+      Cyclic | mapping[0.0.4.4.401000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=9245.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=3 | N=48
+
+      Solver attempt 3 | mapping=cyclic | agent_number=48 | generation_attempt=1/3
+    Cyclic run[0.0.4.4.402000] progress: 0.00s
+    Cyclic run[0.0.4.4.402000] progress: 5.00s
+    Cyclic run[0.0.4.4.402000] progress: 10.00s
+    Cyclic run[0.0.4.4.402000] progress: 15.00s
+    Cyclic run[0.0.4.4.402000] progress: 20.00s
+    Cyclic run[0.0.4.4.402000] progress: 25.00s
+    Cyclic run[0.0.4.4.402000] progress: 30.00s
+      Cyclic | mapping[0.0.4.4.402000.1] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7546.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=cyclic | solver_attempt=4 | N=48
+
+      Solver attempt 4 | mapping=cyclic | agent_number=48 | generation_attempt=1/3
+    Cyclic run[0.0.4.4.403000] progress: 0.00s
+      Cyclic | mapping[0.0.4.4.403000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.26s | conflicts_at_halt=659.00 | total_path=1106.00 | paired=False
+      Temp-capacity comparison | running classical on the same setup before accepting this cyclic success
+    Classical run[0.0.4.4.403000] progress: 0.00s
+    Classical run[0.0.4.4.403000] progress: 5.00s
+      Classical | mapping[0.0.4.4.403000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.91s | conflicts_at_halt=1707.00 | total_path=967.00 | paired=True
+      Temp-capacity evaluation | passed=True | reasons=none
+    Result for N=48 | mapping=cyclic | criterion=temp_cyclic | passed=True | successful=1 | counted_attempts=4 | invalid_regenerated=0 | failure_reason=none
+[Elapsed: 24m 26s] Finished tested agent number N=48 for cyclic
+    N=48 passed (reason=none); binary-search downward-move limit reached (3). Stopping without descending to another child.
+Temp cyclic capacity search finished | mapping=cyclic | criterion=temp_cyclic | N_max=48 | saved_successful_runs=1 | tested_agent_numbers=4
+
+Comparative runs started | capacity_point=temp_classical_capacity | baseline=classical | comparative=cyclic | paired_initial_conditions=1
+
+    Comparative paired run 1 | cyclic on classical capacity initial conditions
+    Cyclic run[0.0.4.4.403000] progress: 0.00s
+      Cyclic | mapping[0.0.4.4.403000.1] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=3.35s | conflicts_at_halt=659.00 | total_path=1106.00 | paired=True
+
+Comparative runs started | capacity_point=temp_cyclic_capacity | baseline=cyclic | comparative=classical | paired_initial_conditions=1
+
+    Comparative paired run 1 | classical on cyclic capacity initial conditions
+    Classical run[0.0.4.4.403000] progress: 0.00s
+    Classical run[0.0.4.4.403000] progress: 5.00s
+      Classical | mapping[0.0.4.4.403000.0] | solver=ECBS | result=successful | solver_status=solved | counted=True | time_halted=8.99s | conflicts_at_halt=1707.00 | total_path=967.00 | paired=True
+Detailed configuration/evaluation log written: D:\projects\cmsc-190\dev\outputs_main_experiment\data_log\1_static_artificial\4_static_artificial_clustered_clustered_evaluation.xml
+Structured raw data written: D:\projects\cmsc-190\dev\outputs_main_experiment\data_log\1_static_artificial\4_static_artificial_clustered_clustered_raw_data.json
+[Elapsed: 24m 38s] Configuration completed: static_artificial_clustered_clustered
+No continue/terminate response after map config 2/30 within 6 seconds. Continuing to next map config by default.
+
+========================================================================================
+Configuration started: Dynamic Artificial / Dispersed-Dispersed (dynamic_artificial_dispersed_dispersed)
+========================================================================================
+========================================================================================
+Branch: Dynamic Artificial / Dispersed-Dispersed (dynamic_artificial_dispersed_dispersed)
+Map obstacle type: dynamic
+Documented target type: dispersed_targets
+Active target type: dispersed_targets
+Start distribution mode: dispersed
+Goal distribution mode: dispersed
+Compact clustering: True
+Clustering style: compact
+Require individual reachability: False
+Zone relationship mode: none
+Solver: ECBS
+Enhanced CBS enabled: True
+Solver suboptimality factor: 3.00
+True static shortest-path heuristic: True
+Tight time horizon: False
+Agent cohesion enabled: False
+Cohesion factor: 0.00
+Seed: 1151
+Capacity attempts per tested agent number: 5
+Required successful runs per tested agent number: 1
+Capacity-search upper bound: 255
+Binary-search max downward moves: 3
+Setup/unsolvable regeneration cap per solver attempt: 3
+Runtime limit per run: 30.00s
+Notes: Artificial map branch. Starts are sampled as dispersed, goals use dispersed one-to-one targets, and assignments remain one-to-one. Dynamic obstacles are generated on the artificial map. Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for classical and cyclic mapping, with the binary-search descent limited by the configured maximum downward moves. The default paired-temp capacity criterion accepts a tested value only when the primary mapping solves and cyclic mapping beats classical mapping on the same setup in time computation halted and conflicts at halt. For the classical-side search, this means classical must solve and cyclic must still outperform it on that classical-origin setup. For the cyclic-side search, cyclic must solve and outperform classical on that cyclic-origin setup. The program still runs paired comparative tests at the discovered capacity points.
+========================================================================================
+Preparing shared dynamic map state for this layout configuration...
+Preparing shared dynamic branch state | schedule_seed=184986 | image_path=None
+  Loading obstacle matrix | threshold=127 | resize_longest_side=None
+  Creating connected artificial static obstacle matrix for dynamic artificial branch...
+  Obstacle matrix loaded | dimensions=32x32
+  Traversable-space diagnostic | free_cells=666 | connected_components=1
+  Using all thresholded non-black cells for grouped dynamic-obstacle generation and connectivity checks.
+  Preserving source-image static obstacle layout (no static-density preprocessing).
+  Building shared dynamic loop with grouped obstacle patches...
+Dynamic loop generation started | grid=32x32 | dynamic_density=0.05 | target_dynamic_cells=51 | loop_length=250
+Dynamic loop group split | group_count=3 | group_sizes=[17, 17, 17] | stay_durations=(7, 11, 17)
+Dynamic patch-bank center candidates prepared: 648 usable centers.
+Building dynamic patch bank for group 1/3 | target_patch_size=17 | required_entries=90
+  Patch bank group 1/3 progress | entries=1/90 | center_attempts=1
+  Patch bank group 1/3 progress | entries=10/90 | center_attempts=10
+  Patch bank group 1/3 progress | entries=20/90 | center_attempts=20
+  Patch bank group 1/3 progress | entries=30/90 | center_attempts=30
+  Patch bank group 1/3 progress | entries=40/90 | center_attempts=41
+  Patch bank group 1/3 progress | entries=50/90 | center_attempts=51
+  Patch bank group 1/3 progress | entries=58/90 | center_attempts=60 | last_patch_size=0/17
+  Patch bank group 1/3 progress | entries=60/90 | center_attempts=62
+  Patch bank group 1/3 progress | entries=70/90 | center_attempts=72
+  Patch bank group 1/3 progress | entries=80/90 | center_attempts=82
+  Patch bank group 1/3 progress | entries=90/90 | center_attempts=92
+Completed dynamic patch bank for group 1/3 | entries=90/90 | center_attempts=92
+Building dynamic patch bank for group 2/3 | target_patch_size=17 | required_entries=90
+  Patch bank group 2/3 progress | entries=1/90 | center_attempts=1
+  Patch bank group 2/3 progress | entries=10/90 | center_attempts=10
+  Patch bank group 2/3 progress | entries=20/90 | center_attempts=21
+  Patch bank group 2/3 progress | entries=30/90 | center_attempts=31
+  Patch bank group 2/3 progress | entries=40/90 | center_attempts=41
+  Patch bank group 2/3 progress | entries=50/90 | center_attempts=51
+  Patch bank group 2/3 progress | entries=60/90 | center_attempts=61
+  Patch bank group 2/3 progress | entries=70/90 | center_attempts=72
+  Patch bank group 2/3 progress | entries=80/90 | center_attempts=82
+  Patch bank group 2/3 progress | entries=90/90 | center_attempts=93
+Completed dynamic patch bank for group 2/3 | entries=90/90 | center_attempts=93
+Building dynamic patch bank for group 3/3 | target_patch_size=17 | required_entries=90
+  Patch bank group 3/3 progress | entries=1/90 | center_attempts=1
+  Patch bank group 3/3 progress | entries=10/90 | center_attempts=10
+  Patch bank group 3/3 progress | entries=20/90 | center_attempts=20
+  Patch bank group 3/3 progress | entries=30/90 | center_attempts=30
+  Patch bank group 3/3 progress | entries=40/90 | center_attempts=40
+  Patch bank group 3/3 progress | entries=50/90 | center_attempts=50
+  Patch bank group 3/3 progress | entries=60/90 | center_attempts=60
+  Patch bank group 3/3 progress | entries=70/90 | center_attempts=70
+  Patch bank group 3/3 progress | entries=80/90 | center_attempts=80
+  Patch bank group 3/3 progress | entries=90/90 | center_attempts=90
+Completed dynamic patch bank for group 3/3 | entries=90/90 | center_attempts=90
+Dynamic loop frame progress | frame=1/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=5/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=10/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=15/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=20/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=25/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=30/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=35/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=40/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=45/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=50/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=55/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=60/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=65/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=70/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=75/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=80/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=85/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=90/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=95/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=100/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=105/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=110/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=115/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=120/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=125/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=130/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=135/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=140/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=145/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=150/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=155/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=160/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=165/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=170/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=175/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=180/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=185/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=190/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=195/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=200/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=205/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=210/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=215/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=220/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=225/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=230/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=235/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=240/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=245/250 | dynamic_cells=51
+Dynamic loop frame progress | frame=250/250 | dynamic_cells=51
+Dynamic loop generation completed successfully.
+  Building mapped loop representations for classical and cyclic mappings...
+  Shared mapped loop representations completed.
+  Building shared assignment map from the classical loop...
+  Shared assignment map ready.
+Shared dynamic branch state preparation completed.
+Shared dynamic map prepared:
+  Image path: None
+  Dimensions: 32x32
+  Raw static density: 0.35
+  Target static density: 1.00 / preserved from source image
+  Dynamic density target: 0.05
+  Static obstacle cells per frame: 358
+  Dynamic obstacle cells per frame: 51
+  Loop length: 250
+  Shared schedule seed: 184986
+  Dynamic generation mode: group_patch
+  Dynamic generation cell mode: all_free
+  Spawnable cell mode: all_free
+
+----------------------------------------------------------------------------------------
+Temp classical capacity search started | mapping=classical | criterion=temp_classical | range=1..255 | max_downward_moves=3
+----------------------------------------------------------------------------------------
+
+    Testing N=128 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=128 | mapping=classical | start_mode=dispersed | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | assignment_free_vertices=615
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=128
+
+      Solver attempt 1 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[1.0.1.1.100000] progress: 0.00s
+    Classical run[1.0.1.1.100000] progress: 5.00s
+    Classical run[1.0.1.1.100000] progress: 10.00s
+    Classical run[1.0.1.1.100000] progress: 15.00s
+    Classical run[1.0.1.1.100000] progress: 20.00s
+    Classical run[1.0.1.1.100000] progress: 25.00s
+    Classical run[1.0.1.1.100000] progress: 30.00s
+      Classical | mapping[1.0.1.1.100000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=9090.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=128
+
+      Solver attempt 2 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[1.0.1.1.101000] progress: 0.00s
+    Classical run[1.0.1.1.101000] progress: 5.00s
+    Classical run[1.0.1.1.101000] progress: 10.00s
+    Classical run[1.0.1.1.101000] progress: 15.00s
+    Classical run[1.0.1.1.101000] progress: 20.00s
+    Classical run[1.0.1.1.101000] progress: 25.00s
+    Classical run[1.0.1.1.101000] progress: 30.00s
+      Classical | mapping[1.0.1.1.101000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=7982.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=3 | N=128
+
+      Solver attempt 3 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[1.0.1.1.102000] progress: 0.00s
+    Classical run[1.0.1.1.102000] progress: 5.00s
+    Classical run[1.0.1.1.102000] progress: 10.00s
+    Classical run[1.0.1.1.102000] progress: 15.00s
+    Classical run[1.0.1.1.102000] progress: 20.00s
+    Classical run[1.0.1.1.102000] progress: 25.00s
+    Classical run[1.0.1.1.102000] progress: 30.00s
+      Classical | mapping[1.0.1.1.102000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=9263.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=4 | N=128
+
+      Solver attempt 4 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[1.0.1.1.103000] progress: 0.00s
+    Classical run[1.0.1.1.103000] progress: 5.00s
+    Classical run[1.0.1.1.103000] progress: 10.00s
+    Classical run[1.0.1.1.103000] progress: 15.00s
+    Classical run[1.0.1.1.103000] progress: 20.00s
+    Classical run[1.0.1.1.103000] progress: 25.00s
+    Classical run[1.0.1.1.103000] progress: 30.00s
+      Classical | mapping[1.0.1.1.103000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=8860.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=5 | N=128
+
+      Solver attempt 5 | mapping=classical | agent_number=128 | generation_attempt=1/3
+    Classical run[1.0.1.1.104000] progress: 0.00s
+    Classical run[1.0.1.1.104000] progress: 5.00s
+    Classical run[1.0.1.1.104000] progress: 10.00s
+    Classical run[1.0.1.1.104000] progress: 15.00s
+    Classical run[1.0.1.1.104000] progress: 20.00s
+    Classical run[1.0.1.1.104000] progress: 25.00s
+    Classical run[1.0.1.1.104000] progress: 30.00s
+      Classical | mapping[1.0.1.1.104000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=9314.00 | total_path=null | paired=False
+    Result for N=128 | mapping=classical | criterion=temp_classical | passed=False | successful=0 | counted_attempts=5 | invalid_regenerated=0 | failure_reason=classical_solver_fail
+[Elapsed: 28m 01s] Finished tested agent number N=128 for classical
+    N=128 failed (reason=classical_solver_fail); moving to left child/search interval 1..127.
+
+    Testing N=64 for classical | pass_rule=1/5 temp classical-origin run(s): classical must solve within 30s, and cyclic must solve and have lower halted time and lower conflicts than classical on the same generated setup
+    Feasibility diagnostic | N=64 | mapping=classical | start_mode=dispersed | goal_mode=dispersed | zone_mode=none | spawn_mode=all_free | setup_generation_cap=3 | assignment_attempt_cap=12 | assignment_walltime_cap=2.0s | assignment_free_vertices=615
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=1 | N=64
+
+      Solver attempt 1 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[1.0.1.2.200000] progress: 0.00s
+    Classical run[1.0.1.2.200000] progress: 5.00s
+    Classical run[1.0.1.2.200000] progress: 10.00s
+    Classical run[1.0.1.2.200000] progress: 15.00s
+    Classical run[1.0.1.2.200000] progress: 20.00s
+    Classical run[1.0.1.2.200000] progress: 25.00s
+    Classical run[1.0.1.2.200000] progress: 30.00s
+      Classical | mapping[1.0.1.2.200000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=11450.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=2 | N=64
+
+      Solver attempt 2 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[1.0.1.2.201000] progress: 0.00s
+    Classical run[1.0.1.2.201000] progress: 5.00s
+    Classical run[1.0.1.2.201000] progress: 10.00s
+    Classical run[1.0.1.2.201000] progress: 15.00s
+    Classical run[1.0.1.2.201000] progress: 20.00s
+    Classical run[1.0.1.2.201000] progress: 25.00s
+    Classical run[1.0.1.2.201000] progress: 30.00s
+      Classical | mapping[1.0.1.2.201000.0] | solver=ECBS | result=unfinished | solver_status=solver_timeout | counted=True | time_halted=30.00s | conflicts_at_halt=15504.00 | total_path=null | paired=False
+      Setup generation attempt 1/3 | mapping=classical | solver_attempt=3 | N=64
+
+      Solver attempt 3 | mapping=classical | agent_number=64 | generation_attempt=1/3
+    Classical run[1.0.1.2.202000] progress: 0.00s
+    Classical run[1.0.1.2.202000] progress: 5.00s

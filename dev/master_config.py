@@ -29,6 +29,7 @@ def _with_shared_runtime(config: dict[str, Any]) -> dict[str, Any]:
         "capacity_pass_criterion": CAPACITY_PASS_CRITERION,
         "setup_generation_attempt_cap_per_solver_attempt": SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT,
         "prompt_before_next_map_config": PROMPT_BEFORE_NEXT_MAP_CONFIG,
+        "prompt_before_next_map_config_timeout_seconds": PROMPT_BEFORE_NEXT_MAP_CONFIG_TIMEOUT_SECONDS,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
         "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
@@ -71,12 +72,14 @@ CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
 CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
 CAPACITY_AGENT_UPPER_BOUND = 255
 CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
-SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 5
+SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 3
 
 # When multiple map configurations are selected, ask after each completed
 # configuration whether to continue. Enter 1 to continue or 0 to terminate
-# early.
+# early. If there is no response before the timeout, the program continues
+# automatically so unattended runs are not blocked.
 PROMPT_BEFORE_NEXT_MAP_CONFIG = True
+PROMPT_BEFORE_NEXT_MAP_CONFIG_TIMEOUT_SECONDS = 6.0
 
 # ===================================
 
@@ -90,39 +93,39 @@ to_generate = "raw_data"        # compute binary-search capacity data and text l
 SELECTED_MAP_CONFIGS = [
     # "static_artificial_dispersed_dispersed",
     # "static_artificial_dispersed_clustered",
-    # "static_artificial_clustered_dispersed",
-    # "static_artificial_clustered_clustered",
-    # "dynamic_artificial_dispersed_dispersed",
-    # "dynamic_artificial_dispersed_clustered",
-    # "dynamic_artificial_clustered_dispersed",
-    # "dynamic_artificial_clustered_clustered",
+    "static_artificial_clustered_dispersed",
+    "static_artificial_clustered_clustered",
+    "dynamic_artificial_dispersed_dispersed",
+    "dynamic_artificial_dispersed_clustered",
+    "dynamic_artificial_clustered_dispersed",
+    "dynamic_artificial_clustered_clustered",
 
-    # "static_port_dispersed_dispersed",
-    # "static_port_dispersed_clustered",
-    # "static_port_clustered_dispersed",
-    # "static_port_clustered_clustered",
-    # "dynamic_port_dispersed_dispersed",
-    # "dynamic_port_dispersed_clustered",
-    # "dynamic_port_clustered_dispersed",
-    # "dynamic_port_clustered_clustered",
+    "static_port_dispersed_dispersed",
+    "static_port_dispersed_clustered",
+    "static_port_clustered_dispersed",
+    "static_port_clustered_clustered",
+    "dynamic_port_dispersed_dispersed",
+    "dynamic_port_dispersed_clustered",
+    "dynamic_port_clustered_dispersed",
+    "dynamic_port_clustered_clustered",
 
-    # "static_campus_area_1_dispersed_dispersed",
-    # "static_campus_area_1_dispersed_single",
-    # "static_campus_area_1_single_dispersed",
-    # "static_campus_area_1_single_single",
-    # "dynamic_campus_area_1_dispersed_dispersed",
-    # "dynamic_campus_area_1_dispersed_single",
-    # "dynamic_campus_area_1_single_dispersed",
-    # "dynamic_campus_area_1_single_single",
+    "static_campus_area_1_dispersed_dispersed",
+    "static_campus_area_1_dispersed_single",
+    "static_campus_area_1_single_dispersed",
+    "static_campus_area_1_single_single",
+    "dynamic_campus_area_1_dispersed_dispersed",
+    "dynamic_campus_area_1_dispersed_single",
+    "dynamic_campus_area_1_single_dispersed",
+    "dynamic_campus_area_1_single_single",
 
-    # "static_campus_area_2_dispersed_dispersed",
-    # "static_campus_area_2_dispersed_single",
-    # "static_campus_area_2_single_dispersed",
-    # "static_campus_area_2_single_single",
-    # "dynamic_campus_area_2_dispersed_dispersed",
-    # "dynamic_campus_area_2_dispersed_single",
-    # "dynamic_campus_area_2_single_dispersed",
-    # "dynamic_campus_area_2_single_single",
+    "static_campus_area_2_dispersed_dispersed",
+    "static_campus_area_2_dispersed_single",
+    "static_campus_area_2_single_dispersed",
+    "static_campus_area_2_single_single",
+    "dynamic_campus_area_2_dispersed_dispersed",
+    "dynamic_campus_area_2_dispersed_single",
+    "dynamic_campus_area_2_single_dispersed",
+    "dynamic_campus_area_2_single_single",
 ]
 
 STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(

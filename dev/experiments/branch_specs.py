@@ -58,6 +58,7 @@ class BranchSpec:
     capacity_pass_criterion: str
     setup_generation_attempt_cap_per_solver_attempt: int
     prompt_before_next_map_config: bool
+    prompt_before_next_map_config_timeout_seconds: float
     num_last_runs_to_visualize_jointly_successful: int
     num_last_runs_to_visualize_independently_successful: int
     path_length_graph_enabled: bool
@@ -326,6 +327,7 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         capacity_pass_criterion=str(config.get("capacity_pass_criterion", "temp_pairwise")),
         setup_generation_attempt_cap_per_solver_attempt=int(config.get("setup_generation_attempt_cap_per_solver_attempt", 5)),
         prompt_before_next_map_config=bool(config.get("prompt_before_next_map_config", True)),
+        prompt_before_next_map_config_timeout_seconds=float(config.get("prompt_before_next_map_config_timeout_seconds", 6.0)),
         num_last_runs_to_visualize_jointly_successful=int(config.get("num_last_runs_to_visualize_jointly_successful", 0)),
         num_last_runs_to_visualize_independently_successful=int(config.get("num_last_runs_to_visualize_independently_successful", 0)),
         path_length_graph_enabled=bool(config.get("path_length_graph_enabled", True)),

@@ -1,0 +1,29 @@
+{
+  "selected_map_type": "static_artificial",
+  "generation_target": "raw_data",
+  "layout_configurations": [
+    {
+      "map_type": "static_artificial_dispersed_dispersed",
+      "category_map_type": "static_artificial",
+      "layout_key": "dispersed_dispersed",
+      "n_temp_classical_capacity": 128,
+      "n_temp_cyclic_capacity": 128,
+      "n_classical_max": 128,
+      "n_cyclic_max": 128,
+      "data_log_path": "D:\\projects\\cmsc-190\\dev\\outputs_main_experiment\\data_log\\1_static_artificial\\1_static_artificial_dispersed_dispersed_evaluation.xml",
+      "raw_data_path": "D:\\projects\\cmsc-190\\dev\\outputs_main_experiment\\data_log\\1_static_artificial\\1_static_artificial_dispersed_dispersed_raw_data.json"
+    },
+    {
+      "map_type": "static_artificial_dispersed_clustered",
+      "category_map_type": "static_artificial",
+      "layout_key": "dispersed_clustered",
+      "n_temp_classical_capacity": 128,
+      "n_temp_cyclic_capacity": 128,
+      "n_classical_max": 128,
+      "n_cyclic_max": 128,
+      "data_log_path": "D:\\projects\\cmsc-190\\dev\\outputs_main_experiment\\data_log\\1_static_artificial\\2_static_artificial_dispersed_clustered_evaluation.xml",
+      "raw_data_path": "D:\\projects\\cmsc-190\\dev\\outputs_main_experiment\\data_log\\1_static_artificial\\2_static_artificial_dispersed_clustered_raw_data.json"
+    }
+  ],
+  "terminated_early": true
+}
