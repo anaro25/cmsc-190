@@ -72,23 +72,19 @@ The tested range is fixed at:
 
 The values are treated as nodes of a complete binary search tree whose root is 128. A pass moves the search to the right child. A failure moves the search to the left child.
 
-The search does not continue until a leaf node. It stops after the configured number of downward child moves from the root:
+The search does not continue until a leaf node after it has already found a passing agent number. However, the downward-move limit is not enforced while no passing value has been found yet. This prevents the search from incorrectly reporting zero capacity merely because the first viable agent number is below 16.
 
 \begin{lstlisting}
 CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
 \end{lstlisting}
 
-For example, one possible traversal is:
+For example, if the search has not found any passing value yet, it may continue down the left side:
 
 \begin{lstlisting}
-128 -> 64 -> 32 -> 48
+128 -> 64 -> 32 -> 16 -> 8 -> 4 -> 2 -> 1
 \end{lstlisting}
 
-With three downward moves, the furthest possible tested values are:
-
-\begin{lstlisting}
-16, 48, 80, 112, 144, 176, 208, 240
-\end{lstlisting}
+Once the first passing value has been found, the configured limit is applied to the following child moves. With the default value of three, the search may take at most three additional downward child moves after the first success.
 
 \section{Backtracking Behavior}
 

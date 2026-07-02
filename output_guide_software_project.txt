@@ -1,0 +1,18 @@
+
+Update the uploaded project. 
+
+Create an outer parent zip file named:
+
+dev_parent_<hex-string>.zip
+
+where <hex-string> is a randomly generated 6-character string using letters and numbers, for example:
+
+dev_parent_a2wq9R.zip
+
+The contents of the outer parent zip file must be exactly:
+
+dev_parent_<hex-string>.zip
+└── dev.zip
+
+Important:
+* Do not put dev.zip inside an extra folder.

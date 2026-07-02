@@ -646,6 +646,8 @@ def _run_capacity_search(
     high = int(branch_spec.capacity_agent_upper_bound)
     max_downward_moves = max(0, int(branch_spec.capacity_binary_search_max_downward_moves))
     current_depth = 0
+    downward_moves_after_first_success = 0
+    has_found_success = False
     best_agent_number = 0
     best_successful_attempts: list[SolverAttempt] = []
     tested_agent_numbers: list[AgentNumberTestResult] = []
@@ -663,11 +665,11 @@ def _run_capacity_search(
         search_label = "Solver capacity search"
     logger.log(
         f"{search_label} started | mapping={mapping_name} | criterion={search_criterion} | range=1..{high} | "
-        f"max_downward_moves={max_downward_moves}"
+        f"max_downward_moves_after_first_success={max_downward_moves}"
     )
     logger.log("-" * 88)
 
-    while low <= high and current_depth <= max_downward_moves:
+    while low <= high:
         midpoint = (low + high) // 2
         search_step_index += 1
         test_result = _test_agent_number_for_mapping(
@@ -684,6 +686,8 @@ def _run_capacity_search(
             {
                 "step": search_step_index,
                 "depth_from_root": current_depth,
+                "downward_moves_after_first_success": downward_moves_after_first_success,
+                "limit_active": has_found_success,
                 "low_before": low,
                 "high_before": high,
                 "tested_agent_number": midpoint,
@@ -699,12 +703,13 @@ def _run_capacity_search(
         if test_result.passed:
             best_agent_number = midpoint
             best_successful_attempts = test_result.successful_attempts
+            has_found_success = True
 
-        if current_depth >= max_downward_moves:
+        if has_found_success and downward_moves_after_first_success >= max_downward_moves:
             logger.log(
                 f"    N={midpoint} {'passed' if test_result.passed else 'failed'} "
                 f"(reason={test_result.failure_reason or 'none'}); "
-                f"binary-search downward-move limit reached ({max_downward_moves}). "
+                f"binary-search downward-move limit after first success reached ({max_downward_moves}). "
                 "Stopping without descending to another child."
             )
             break
@@ -719,6 +724,8 @@ def _run_capacity_search(
                 f"moving to left child/search interval {low}..{high}."
             )
         current_depth += 1
+        if has_found_success:
+            downward_moves_after_first_success += 1
 
     logger.log(
         f"{search_label} finished | mapping={mapping_name} | criterion={search_criterion} | "

@@ -239,7 +239,7 @@ def _notes_for_branch(
 
     capacity_note = (
         "Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for "
-        "classical and cyclic mapping, with the binary-search descent limited by the configured maximum downward moves. "
+        "classical and cyclic mapping. The search may keep descending below the normal depth limit until it finds at least one passing agent number; after the first pass, further descent is limited by the configured maximum downward moves. "
         "The default paired-temp capacity criterion accepts a tested value only when the primary mapping solves and cyclic mapping beats classical mapping on the same setup in time computation halted and conflicts at halt. "
         "For the classical-side search, this means classical must solve and cyclic must still outperform it on that classical-origin setup. For the cyclic-side search, cyclic must solve and outperform classical on that cyclic-origin setup. "
         "The program still runs paired comparative tests at the discovered capacity points."

@@ -45,7 +45,7 @@ Campus Crowd Simulation exact configurations are generated from Campus Area 1/2 
 
 ## Capacity-search protocol
 
-The main experiment now uses limited binary-search capacity testing instead of incrementing through an agent-number range. For each layout configuration, classical and cyclic mapping are searched independently from 1 to 255 agents. A tested agent number passes when at least 1 out of up to 5 valid solver attempts finishes within the 30-second limit. The search starts at 128 and follows at most 3 downward child moves from the root, so it does not continue all the way to a leaf. Setup-failed or unsolvable initial conditions are regenerated, with a safety cap of 5 generation attempts per solver attempt.
+The main experiment now uses limited binary-search capacity testing instead of incrementing through an agent-number range. For each layout configuration, classical and cyclic mapping are searched independently from 1 to 255 agents. A tested agent number passes when at least 1 out of up to 5 valid solver attempts finishes within the 30-second limit. The search starts at 128. If no passing agent number has been found yet, the search may continue descending to smaller left-child values below the normal depth limit. After the first pass is found, the search follows at most 3 additional downward child moves, so difficult configurations can still test values below 16 without allowing an unbounded search. Setup-failed or unsolvable initial conditions are regenerated, with a safety cap of 5 generation attempts per solver attempt.
 
 The highest passed tested value along the limited traversal is reported as the mapping capacity for that configuration.
 
@@ -81,7 +81,7 @@ For each planned agent number in the selected branch:
    `dev/outputs_main_experiment/data_log/`.
 6. The path metric is now total path length over all agents, not average path length.
 
-The per-run runtime limit, 1-out-of-5 pass rule, and binary-search downward-move limit come from `master_config.py`.
+The per-run runtime limit, 1-out-of-5 pass rule, and post-first-success binary-search downward-move limit come from `master_config.py`.
 
 ## Capacity comparison outputs
 
