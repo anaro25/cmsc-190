@@ -30,7 +30,10 @@ def _aggregate_agent_number(case_spec: RefCaseSpec, records: list[RefMappingRunR
     agent_numbers = {int(record.agent_number) for record in records}
     if len(agent_numbers) == 1:
         return next(iter(agent_numbers))
-    return int(case_spec.agent_number)
+    # A cross-map multi-agent aggregate can combine different discovered
+    # classical capacities. Zero explicitly means that no single agent count
+    # represents the overall aggregate; each map aggregate keeps its own count.
+    return 0
 
 
 def build_reference_aggregate(
@@ -74,6 +77,6 @@ def build_reference_aggregate(
         notes=(
             f"Single-agent reference case: cyclic-faster filtering is disabled; runtime values use {int(case_spec.single_agent_timing_repetitions)} repeated timing samples per map."
             if case_spec.experiment_mode == "single_agent"
-            else f"Multi-agent reference case: cyclic-faster filtering is disabled; three reference port maps are evaluated with map-specific agent counts; runtime values use {int(case_spec.multi_agent_timing_repetitions)} repeated timing samples per map."
+            else f"Multi-agent reference case: each map is evaluated at its discovered temporary pairwise classical capacity; runtime values use {int(case_spec.multi_agent_timing_repetitions)} repeated timing samples per mapping at that capacity."
         ),
     )

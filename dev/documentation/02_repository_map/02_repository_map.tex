@@ -80,9 +80,9 @@ This is the active experiment engine. Its submodules are separated by responsibi
     \item \texttt{preparation.py}: branch-aware setup logic,
     \item \texttt{runtime.py}: solver execution, solver-mode dispatch, and result-category conversion,
     \item \texttt{aggregation.py}: condition-level summaries,
-    \item \texttt{plotting.py}: metric graphs,
-    \item \texttt{io\_utils.py}: output folder management, JSON/CSV writing, and immediate console/log flushing,
+    \item \texttt{io\_utils.py}: JSON/CSV writing and immediate console/log flushing,
     \item \texttt{logging\_utils.py}: console/log formatting,
+    \item \texttt{metrics\_data\_store.py}: Results-ready configuration packages, descriptive summaries, paired comparisons, reader guides, and the project-level data dictionary,
     \item \texttt{raw\_data\_store.py}: branch-local persisted raw MAPF storage under \texttt{dev/raw\_mapf\_data/}, organized as a manifest plus metadata and per-condition files rather than one monolithic pickle,
     \item \texttt{visualization.py}: selection and rendering of final Pillow exports, with selection driven by the current visualization settings even when the frame ingredients come from persisted raw MAPF data,
     \item \texttt{orchestrator.py}: the main control flow.
@@ -125,14 +125,15 @@ These are useful references for branch intent, but the current top-level executi
 
 \section{Output Contract}
 
-Presentation outputs are written under:
-\[
-\texttt{dev/outputs/<map\_type>/}
-\]
-with subfolders for metadata, records, aggregates, graphs, logs, and visualizations. Persisted branch-local raw MAPF data is stored separately under:
-\[
-\texttt{dev/outputs/raw\_mapf\_files/<map\_type>/}
-\]
-so they survive later graph or visualization regeneration runs. The persisted raw-data tree is now organized as a branch root containing a manifest, metadata files, and one subfolder per reported condition, which keeps large experiments more navigable than a single all-in-one pickle. The loader also migrates older branch roots from \texttt{dev/raw\_mapf\_data/<map\_type>/} or \texttt{dev/raw\_mapf\_files/<map\_type>/} the next time that branch is accessed. This split between persisted raw data and disposable presentation outputs is now part of the practical contract of the project.
+Main-experiment outputs are written under \texttt{dev/outputs\_main/}. The active output families are:
+\begin{itemize}[leftmargin=2em]
+    \item \texttt{metrics\_data\_inspection/}: author-facing evaluation text for each exact configuration;
+    \item \texttt{metrics\_data/}: independent Results-ready per-configuration packages plus the project-level data dictionary;
+    \item \texttt{frame\_by\_frame/}: designated successful trajectory packages;
+    \item \texttt{terminal\_logs/}: one \texttt{raw\_data.log} or \texttt{visualization.log} per exact configuration;
+    \item \texttt{visualization/}: Pillow frames generated from the saved trajectory packages.
+\end{itemize}
+
+The exact map hierarchy is retained beneath the metrics, frame-by-frame, terminal-log, and visualization trees. The main experiment no longer has a graph-generation mode or a PNG metric-output folder. Reference-comparison outputs remain separate under \texttt{dev/outputs\_ref\_comparison/}.
 
 \end{document}

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import sys
 import time
 from dataclasses import asdict, dataclass
@@ -8,25 +7,35 @@ from pathlib import Path
 from typing import Any
 
 from dev.experiments.branch_specs import BranchSpec, get_branch_specs_for_selected_map_configs
-from dev.experiments.study.io_utils import ExperimentLogger, write_json
+from dev.experiments.frame_by_frame_store import MainExperimentFrameByFrameStore
+from dev.experiments.study.io_utils import (
+    ExperimentLogger,
+    format_elapsed_mmss,
+    write_csv,
+)
 from dev.experiments.study.logging_utils import log_branch_header, log_dynamic_state, log_mapping_record
-from dev.experiments.study.models import DynamicBranchState, MappingRunRecord, PreparedRunContext, VisualizationCandidate
+from dev.experiments.study.metrics_data_store import (
+    prepare_metrics_data_root,
+    write_metrics_data_package,
+)
+from dev.experiments.study.models import DynamicBranchState, MappingRunRecord, PreparedRunContext
 from dev.experiments.study.preparation import (
     prepare_dynamic_branch_state,
     prepare_dynamic_run_context,
     prepare_static_run_context,
 )
 from dev.experiments.study.runtime import build_mapping_record, run_dynamic_mapping, run_static_mapping
+from dev.experiments.study.visualization import render_saved_frame_by_frame_packages
 from dev.master_config import to_generate
 from dev.mapf.agent_assignment import (
     MAX_ASSIGNMENT_ATTEMPTS,
     MAX_ASSIGNMENT_WALLTIME_SECONDS,
     _iter_free_vertices,
 )
-from dev.paths import OUTPUTS_MAIN_EXPERIMENT_ROOT
+from dev.paths import OUTPUTS_MAIN_ROOT
 
 
-VALID_GENERATION_TARGETS = {"raw_data", "graphs", "visualization"}
+VALID_GENERATION_TARGETS = {"raw_data", "visualization"}
 COUNTED_RESULT_CATEGORIES = {"successful", "unfinished"}
 MAPPING_NAMES = ("classical", "cyclic")
 
@@ -69,7 +78,7 @@ class CapacitySearchResult:
 def _resolve_generation_target() -> str:
     generation_target = str(to_generate)
     if generation_target not in VALID_GENERATION_TARGETS:
-        raise ValueError("to_generate must be one of 'raw_data', 'graphs', or 'visualization'.")
+        raise ValueError("to_generate must be either 'raw_data' or 'visualization'.")
     return generation_target
 
 
@@ -1063,6 +1072,7 @@ def _test_to_summary(test_result: AgentNumberTestResult) -> dict[str, Any]:
         "invalid_attempt_count": test_result.invalid_attempt_count,
         "invalid_generation_cap_exhausted": test_result.invalid_generation_cap_exhausted,
         "attempts": [_attempt_to_summary(attempt) for attempt in test_result.attempts],
+        "successful_attempts": [_attempt_to_summary(attempt) for attempt in test_result.successful_attempts],
         "comparison_attempts": [_attempt_to_summary(attempt) for attempt in test_result.comparison_attempts],
         "trace": test_result.trace,
     }
@@ -1102,6 +1112,18 @@ def _compute_single_configuration(
     logger.log(f"Configuration started: {branch_spec.display_name} ({branch_spec.map_type})")
     logger.log("=" * 88)
     log_branch_header(logger, branch_spec)
+
+    metrics_inspection_dir = (
+        OUTPUTS_MAIN_ROOT
+        / "metrics_data_inspection"
+        / branch_spec.data_log_category_dir_name
+    )
+    metrics_inspection_dir.mkdir(parents=True, exist_ok=True)
+    data_log_path = metrics_inspection_dir / f"{branch_spec.data_log_file_stem}_evaluation.xml"
+    obsolete_raw_json_path = metrics_inspection_dir / f"{branch_spec.data_log_file_stem}_raw_data.json"
+    if obsolete_raw_json_path.is_file():
+        obsolete_raw_json_path.unlink()
+        logger.log(f"Removed obsolete configuration raw-data JSON: {obsolete_raw_json_path}")
 
     dynamic_state: DynamicBranchState | None = None
     if branch_spec.is_dynamic:
@@ -1147,11 +1169,6 @@ def _compute_single_configuration(
         logger=logger,
     )
 
-    data_log_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "data_log" / branch_spec.data_log_category_dir_name
-    data_log_dir.mkdir(parents=True, exist_ok=True)
-    data_log_path = data_log_dir / f"{branch_spec.data_log_file_stem}_evaluation.xml"
-    raw_json_path = data_log_dir / f"{branch_spec.data_log_file_stem}_raw_data.json"
-
     data_log_text = _build_configuration_log_text(
         branch_spec=branch_spec,
         classical_search=classical_search,
@@ -1174,10 +1191,40 @@ def _compute_single_configuration(
         },
         "data_log_path": str(data_log_path),
     }
-    write_json(raw_json_path, raw_payload)
+    metrics_package_summary = write_metrics_data_package(
+        branch_spec=branch_spec,
+        payload=raw_payload,
+        metrics_data_root=OUTPUTS_MAIN_ROOT / "metrics_data",
+    )
+    metrics_data_dir = Path(metrics_package_summary["metrics_data_dir"])
+    metrics_csv_path = Path(metrics_package_summary["primary_results_csv_path"])
+
+    frame_by_frame_store = MainExperimentFrameByFrameStore(branch_spec)
+    classical_selected_attempt = (
+        classical_search.best_successful_attempts[-1]
+        if classical_search.best_successful_attempts
+        else None
+    )
+    cyclic_selected_attempt = (
+        cyclic_search.best_successful_attempts[-1]
+        if cyclic_search.best_successful_attempts
+        else None
+    )
+    frame_by_frame_summary = frame_by_frame_store.save_selected_runs(
+        classical_attempt=classical_selected_attempt,
+        cyclic_attempt=cyclic_selected_attempt,
+        dynamic_state=dynamic_state,
+    )
 
     logger.log(f"Detailed configuration/evaluation log written: {data_log_path}")
-    logger.log(f"Structured raw data written: {raw_json_path}")
+    logger.log(f"Results-ready metrics CSV written: {metrics_csv_path}")
+    logger.log(f"Metrics package JSON written: {metrics_package_summary['package_json_path']}")
+    logger.log(f"Metrics reader guide written: {metrics_package_summary['reader_guide_path']}")
+    logger.log(
+        "Designated frame-by-frame runs written | "
+        f"count={frame_by_frame_summary.get('saved_run_count', 0)} | "
+        f"root={frame_by_frame_summary.get('frame_by_frame_root')}"
+    )
     logger.log_elapsed(f"Configuration completed: {branch_spec.map_type}")
 
     return {
@@ -1189,7 +1236,14 @@ def _compute_single_configuration(
         "n_classical_max": classical_search.best_agent_number,
         "n_cyclic_max": cyclic_search.best_agent_number,
         "data_log_path": str(data_log_path),
-        "raw_data_path": str(raw_json_path),
+        "metrics_data_dir": str(metrics_data_dir),
+        "metrics_data_path": str(metrics_csv_path),
+        "metrics_package_path": metrics_package_summary["package_json_path"],
+        "metrics_reader_guide_path": metrics_package_summary["reader_guide_path"],
+        "metrics_written_files": metrics_package_summary["written_files"],
+        "frame_by_frame_root": frame_by_frame_summary.get("frame_by_frame_root"),
+        "frame_by_frame_manifest_path": frame_by_frame_summary.get("manifest_path"),
+        "frame_by_frame_saved_run_count": frame_by_frame_summary.get("saved_run_count", 0),
     }
 
 
@@ -1301,209 +1355,52 @@ def _prompt_continue_to_next_map_config(
     return True
 
 
-def _raw_data_path_for_config(branch_spec: BranchSpec) -> Path:
-    return (
-        OUTPUTS_MAIN_EXPERIMENT_ROOT
-        / "data_log"
+
+
+
+def _generate_single_configuration_visualizations(
+    *,
+    branch_spec: BranchSpec,
+    logger: ExperimentLogger,
+) -> dict[str, Any]:
+    frame_by_frame_store = MainExperimentFrameByFrameStore(branch_spec)
+    packages = frame_by_frame_store.load_packages()
+    visualization_root = (
+        OUTPUTS_MAIN_ROOT
+        / "visualization"
         / branch_spec.data_log_category_dir_name
-        / f"{branch_spec.data_log_file_stem}_raw_data.json"
+        / branch_spec.data_log_file_stem
     )
-
-
-def _load_raw_payload(branch_spec: BranchSpec) -> dict[str, Any]:
-    raw_path = _raw_data_path_for_config(branch_spec)
-    if not raw_path.exists():
-        raise FileNotFoundError(
-            f"Saved raw data was not found for {branch_spec.map_type}: {raw_path}. "
-            "Run with to_generate = 'raw_data' for this selected map config first."
-        )
-    return json.loads(raw_path.read_text(encoding="utf-8"))
-
-
-def _record_dicts_from_payload(payload: dict[str, Any]) -> dict[str, list[dict[str, Any]]]:
-    def records(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        return [item.get("record", {}) for item in items]
-
-    capacity = payload.get("capacity_search", {})
-    comparative = payload.get("comparative_runs", {})
-    return {
-        "classical_at_temp_classical_capacity": records(
-            capacity.get("classical", {}).get("best_successful_attempts", [])
-        ),
-        "cyclic_at_temp_classical_capacity": records(
-            comparative.get("cyclic_at_temp_classical_capacity", [])
-        ),
-        "cyclic_at_temp_cyclic_capacity": records(
-            capacity.get("cyclic", {}).get("best_successful_attempts", [])
-        ),
-        "classical_at_temp_cyclic_capacity": records(
-            comparative.get("classical_at_temp_cyclic_capacity", [])
-        ),
-    }
-
-
-def _numeric_record_value(record: dict[str, Any], metric: str) -> float | None:
-    if metric == "time":
-        value = record.get("time_computation_halted_seconds")
-    elif metric == "conflicts":
-        value = record.get("num_conflicts_detected_at_halt")
-    elif metric == "path":
-        value = record.get("total_path_length") if record.get("solved_run") else None
-    else:
-        raise ValueError(f"Unsupported metric: {metric}")
-    if value is None:
-        return None
-    try:
-        return float(value)
-    except (TypeError, ValueError):
-        return None
-
-
-def _average_record_value(records: list[dict[str, Any]], metric: str) -> float | None:
-    values = [_numeric_record_value(record, metric) for record in records]
-    filtered = [value for value in values if value is not None]
-    if not filtered:
-        return None
-    return sum(filtered) / len(filtered)
-
-
-def _write_graph_csv(branch_spec: BranchSpec, payload: dict[str, Any], graphs_dir: Path) -> Path:
-    records_by_group = _record_dicts_from_payload(payload)
-    rows: list[dict[str, Any]] = []
-    for capacity_label, group_names in {
-        "temp_classical_capacity": [
-            "classical_at_temp_classical_capacity",
-            "cyclic_at_temp_classical_capacity",
-        ],
-        "temp_cyclic_capacity": [
-            "cyclic_at_temp_cyclic_capacity",
-            "classical_at_temp_cyclic_capacity",
-        ],
-    }.items():
-        for group_name in group_names:
-            mapping_name = "cyclic" if group_name.startswith("cyclic") else "classical"
-            row = {
-                "map_config": branch_spec.map_type,
-                "capacity_label": capacity_label,
-                "mapping_name": mapping_name,
-                "time_avg": _average_record_value(records_by_group[group_name], "time"),
-                "conflicts_avg": _average_record_value(records_by_group[group_name], "conflicts"),
-                "path_avg": _average_record_value(records_by_group[group_name], "path"),
-                "record_count": len(records_by_group[group_name]),
-            }
-            rows.append(row)
-
-    csv_path = graphs_dir / f"{branch_spec.data_log_file_stem}_graph_values.csv"
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
-    if rows:
-        import csv
-        with csv_path.open("w", newline="", encoding="utf-8") as handle:
-            writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
-            writer.writeheader()
-            writer.writerows(rows)
-    else:
-        csv_path.write_text("", encoding="utf-8")
-    return csv_path
-
-
-def _generate_single_configuration_graphs(*, branch_spec: BranchSpec, logger: ExperimentLogger) -> dict[str, Any]:
-    payload = _load_raw_payload(branch_spec)
-    graphs_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "graphs" / branch_spec.data_log_category_dir_name
-    graphs_dir.mkdir(parents=True, exist_ok=True)
-    csv_path = _write_graph_csv(branch_spec, payload, graphs_dir)
-    output_paths = [str(csv_path)]
-
-    try:
-        import matplotlib.pyplot as plt
-
-        records_by_group = _record_dicts_from_payload(payload)
-        metric_specs = [
-            ("time", "Time computation halted (s)"),
-            ("conflicts", "Conflicts at halt"),
-            ("path", "Total path length"),
-        ]
-        group_order = [
-            "classical_at_temp_classical_capacity",
-            "cyclic_at_temp_classical_capacity",
-            "cyclic_at_temp_cyclic_capacity",
-            "classical_at_temp_cyclic_capacity",
-        ]
-        labels = [
-            "Classical @ temp classical",
-            "Cyclic @ temp classical",
-            "Cyclic @ temp cyclic",
-            "Classical @ temp cyclic",
-        ]
-        for metric, ylabel in metric_specs:
-            values = [_average_record_value(records_by_group[name], metric) for name in group_order]
-            plotted_values = [value for value in values if value is not None]
-            if not plotted_values:
-                continue
-            fig, ax = plt.subplots(figsize=(10, 5))
-            x_values = list(range(len(group_order)))
-            y_values = [float('nan') if value is None else value for value in values]
-            ax.plot(x_values, y_values, marker='o')
-            ax.set_xticks(x_values)
-            ax.set_xticklabels(labels, rotation=20, ha='right')
-            ax.set_ylabel(ylabel)
-            ax.set_title(branch_spec.display_name)
-            y_min = min(plotted_values)
-            y_max = max(plotted_values)
-            if y_min == y_max:
-                padding = max(1.0, abs(y_min) * 0.1)
-            else:
-                padding = (y_max - y_min) * 0.1
-            ax.set_ylim(y_min - padding, y_max + padding)
-            fig.tight_layout()
-            png_path = graphs_dir / f"{branch_spec.data_log_file_stem}_{metric}.png"
-            fig.savefig(png_path, dpi=150)
-            plt.close(fig)
-            output_paths.append(str(png_path))
-    except Exception as exc:
-        logger.log(f"Graph PNG generation skipped for {branch_spec.map_type}: {type(exc).__name__}: {exc}")
-
-    logger.log(f"Graph outputs written for {branch_spec.map_type}: {graphs_dir}")
+    logger.log(
+        "Loaded saved frame-by-frame packages for Pillow visualization generation | "
+        f"count={len(packages)} | root={frame_by_frame_store.config_root}"
+    )
+    summary = render_saved_frame_by_frame_packages(
+        packages=packages,
+        output_root=visualization_root,
+        logger=logger,
+    )
     return {
         "map_type": branch_spec.map_type,
-        "raw_data_path": str(_raw_data_path_for_config(branch_spec)),
-        "graphs_dir": str(graphs_dir),
-        "output_paths": output_paths,
+        "frame_by_frame_root": str(frame_by_frame_store.config_root),
+        "frame_by_frame_manifest_path": str(frame_by_frame_store.manifest_path),
+        "visualization_root": str(visualization_root),
+        "visualization_summary": summary,
     }
 
 
-def _generate_single_configuration_visualization_manifest(*, branch_spec: BranchSpec, logger: ExperimentLogger) -> dict[str, Any]:
-    payload = _load_raw_payload(branch_spec)
-    records_by_group = _record_dicts_from_payload(payload)
-    visualization_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "visualization" / branch_spec.data_log_category_dir_name
-    visualization_dir.mkdir(parents=True, exist_ok=True)
-    manifest_path = visualization_dir / f"{branch_spec.data_log_file_stem}_visualization_selection.json"
-    selections = []
-    for group_name, records in records_by_group.items():
-        successful_records = [record for record in records if record.get("solved_run")]
-        selections.append(
-            {
-                "selection_group": group_name,
-                "candidate_count": len(records),
-                "successful_candidate_count": len(successful_records),
-                "selected_record_ids": [record.get("run_id") or record.get("run_config_id") for record in successful_records],
-                "note": "This manifest identifies the saved successful runs for visualization selection from the current raw-data format.",
-            }
-        )
-    write_json(
-        manifest_path,
-        {
-            "map_config": branch_spec.map_type,
-            "display_name": branch_spec.display_name,
-            "raw_data_path": str(_raw_data_path_for_config(branch_spec)),
-            "selections": selections,
-        },
+def _selected_map_config_terminal_log_path(
+    *,
+    branch_spec: BranchSpec,
+    generation_target: str,
+) -> Path:
+    return (
+        OUTPUTS_MAIN_ROOT
+        / "terminal_logs"
+        / branch_spec.data_log_category_dir_name
+        / branch_spec.data_log_file_stem
+        / f"{generation_target}.log"
     )
-    logger.log(f"Visualization selection manifest written for {branch_spec.map_type}: {manifest_path}")
-    return {
-        "map_type": branch_spec.map_type,
-        "raw_data_path": str(_raw_data_path_for_config(branch_spec)),
-        "visualization_manifest_path": str(manifest_path),
-    }
 
 
 def run_selected_experiment(
@@ -1517,23 +1414,74 @@ def run_selected_experiment(
     if not branch_specs:
         raise ValueError("No map configurations were selected in SELECTED_MAP_CONFIGS.")
 
-    logs_dir = OUTPUTS_MAIN_EXPERIMENT_ROOT / "logs" / "selected_map_configs"
-    logs_dir.mkdir(parents=True, exist_ok=True)
-    log_path = logs_dir / f"{generation_target}_protocol.log"
-    logger = ExperimentLogger(log_path, start_time=program_start_time)
+    run_start_time = time.perf_counter() if program_start_time is None else program_start_time
+    terminal_logs_root = OUTPUTS_MAIN_ROOT / "terminal_logs"
+    terminal_logs_root.mkdir(parents=True, exist_ok=True)
 
-    logger.log("=" * 88)
-    logger.log("Selected exact main-experiment map configurations:")
+    metrics_data_root = OUTPUTS_MAIN_ROOT / "metrics_data"
+    metrics_root_summary: dict[str, Any] | None = None
+    if generation_target == "raw_data":
+        metrics_root_summary = prepare_metrics_data_root(metrics_data_root)
+
+    metrics_inspection_root = OUTPUTS_MAIN_ROOT / "metrics_data_inspection"
+    metrics_inspection_root.mkdir(parents=True, exist_ok=True)
+    removed_general_summaries: list[str] = []
+    for obsolete_summary in metrics_inspection_root.glob("selected_map_configs_*_summary.json"):
+        if obsolete_summary.is_file():
+            obsolete_summary.unlink()
+            removed_general_summaries.append(str(obsolete_summary))
+
+    print("=" * 88, flush=True)
+    print("Selected exact main-experiment map configurations:", flush=True)
     for index, branch_spec in enumerate(branch_specs, start=1):
-        logger.log(f"  {index}. {branch_spec.map_type} — {branch_spec.display_name}")
-    logger.log(f"to_generate: {generation_target}")
-    logger.log(f"Map configurations to process: {len(branch_specs)}")
-    logger.log(f"Data-log root: {OUTPUTS_MAIN_EXPERIMENT_ROOT / 'data_log'}")
-    logger.log("=" * 88)
+        print(f"  {index}. {branch_spec.map_type} — {branch_spec.display_name}", flush=True)
+    print(f"to_generate: {generation_target}", flush=True)
+    print(f"Map configurations to process: {len(branch_specs)}", flush=True)
+    print(
+        f"Metrics-data-inspection root: {OUTPUTS_MAIN_ROOT / 'metrics_data_inspection'}",
+        flush=True,
+    )
+    print(f"Metrics-data root: {OUTPUTS_MAIN_ROOT / 'metrics_data'}", flush=True)
+    print(f"Frame-by-frame root: {OUTPUTS_MAIN_ROOT / 'frame_by_frame'}", flush=True)
+    print(f"Terminal-log root: {terminal_logs_root}", flush=True)
+    removed_general_files = list(removed_general_summaries)
+    if metrics_root_summary is not None:
+        print(
+            f"Project-level data dictionary: {metrics_root_summary['data_dictionary_path']}",
+            flush=True,
+        )
+        removed_general_files.extend(metrics_root_summary.get("removed_obsolete_files", []))
+    if removed_general_files:
+        print(f"Removed obsolete project-level output files: {len(removed_general_files)}", flush=True)
+    print("=" * 88, flush=True)
 
     summaries: list[dict[str, Any]] = []
+    terminal_log_paths: list[str] = []
     terminated_early = False
     for branch_index, branch_spec in enumerate(branch_specs, start=1):
+        terminal_log_path = _selected_map_config_terminal_log_path(
+            branch_spec=branch_spec,
+            generation_target=generation_target,
+        )
+        logger = ExperimentLogger(terminal_log_path, start_time=run_start_time)
+        terminal_log_paths.append(str(terminal_log_path))
+
+        logger.log("=" * 88)
+        logger.log(
+            f"Selected exact main-experiment map configuration "
+            f"{branch_index} of {len(branch_specs)}:"
+        )
+        logger.log(f"  {branch_spec.map_type} — {branch_spec.display_name}")
+        logger.log(f"to_generate: {generation_target}")
+        logger.log(
+            f"Metrics-data-inspection root: "
+            f"{OUTPUTS_MAIN_ROOT / 'metrics_data_inspection'}"
+        )
+        logger.log(f"Metrics-data root: {OUTPUTS_MAIN_ROOT / 'metrics_data'}")
+        logger.log(f"Frame-by-frame root: {OUTPUTS_MAIN_ROOT / 'frame_by_frame'}")
+        logger.log(f"Terminal log: {terminal_log_path}")
+        logger.log("=" * 88)
+
         if generation_target == "raw_data":
             resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
             summary = _compute_single_configuration(
@@ -1541,14 +1489,16 @@ def run_selected_experiment(
                 seed_base=resolved_seed_base,
                 logger=logger,
             )
-        elif generation_target == "graphs":
-            summary = _generate_single_configuration_graphs(branch_spec=branch_spec, logger=logger)
         elif generation_target == "visualization":
-            summary = _generate_single_configuration_visualization_manifest(branch_spec=branch_spec, logger=logger)
+            summary = _generate_single_configuration_visualizations(branch_spec=branch_spec, logger=logger)
         else:
             raise ValueError(f"Unsupported generation target: {generation_target}")
 
+        summary = dict(summary)
+        summary["terminal_log_path"] = str(terminal_log_path)
         summaries.append(summary)
+        logger.log("")
+        logger.log_elapsed(f"{branch_spec.map_type} {generation_target} finished.")
 
         if branch_index < len(branch_specs) and branch_spec.prompt_before_next_map_config:
             if not _prompt_continue_to_next_map_config(
@@ -1560,26 +1510,20 @@ def run_selected_experiment(
                 terminated_early = True
                 break
 
-    summary_path = OUTPUTS_MAIN_EXPERIMENT_ROOT / "data_log" / f"selected_map_configs_{generation_target}_summary.json"
-    write_json(
-        summary_path,
-        {
-            "selected_map_configs": [branch_spec.map_type for branch_spec in branch_specs],
-            "generation_target": generation_target,
-            "map_configurations": summaries,
-            "terminated_early": terminated_early,
-        },
+    elapsed_seconds = time.perf_counter() - run_start_time
+    print(
+        f"[Elapsed: {format_elapsed_mmss(elapsed_seconds)}] "
+        "Selected main-experiment map configurations finished.",
+        flush=True,
     )
-    logger.log("")
-    logger.log(f"Selected map-config summary written: {summary_path}")
-    logger.log_elapsed("Selected main-experiment map configurations finished.")
 
     return {
         "selected_map_configs": [branch_spec.map_type for branch_spec in branch_specs],
         "generation_target": generation_target,
-        "output_root": str(OUTPUTS_MAIN_EXPERIMENT_ROOT),
-        "log_path": str(log_path),
-        "summary_path": str(summary_path),
+        "output_root": str(OUTPUTS_MAIN_ROOT),
+        "terminal_logs_root": str(terminal_logs_root),
+        "terminal_log_paths": terminal_log_paths,
+        "log_path": terminal_log_paths[0] if len(terminal_log_paths) == 1 else None,
         "map_configurations": summaries,
         "terminated_early": terminated_early,
     }

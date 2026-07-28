@@ -14,8 +14,12 @@ class RefCaseSpec:
     image_path: str
     map_image_paths: list[str]
     agent_number: int
-    map_agent_numbers: dict[int, int]
     counted_runs_required: int
+    capacity_search_enabled: bool
+    capacity_agent_upper_bound: int
+    capacity_binary_search_max_downward_moves: int
+    capacity_attempts_per_agent_number: int
+    capacity_pass_criterion: str
     runtime_limit_seconds: float
     use_ecbs: bool
     ecbs_suboptimality: float
@@ -149,6 +153,7 @@ class RefComputationPayload:
     run_records: list[dict[str, Any]] = field(default_factory=list)
     aggregate: dict[str, Any] | None = None
     map_aggregates: list[dict[str, Any]] = field(default_factory=list)
+    capacity_searches: list[dict[str, Any]] = field(default_factory=list)
     discarded_attempts: list[dict[str, Any]] = field(default_factory=list)
     visualization_candidates: list[RefVisualizationCandidate] = field(default_factory=list)
     stop_summary: dict[str, Any] = field(default_factory=dict)

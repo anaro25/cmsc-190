@@ -12,6 +12,7 @@ from dev.experiments.branch_specs import BranchSpec
 from dev.paths import OUTPUTS_ROOT
 
 
+
 def format_elapsed_mmss(elapsed_seconds: float) -> str:
     total_seconds = max(0, int(round(elapsed_seconds)))
     minutes, seconds = divmod(total_seconds, 60)
@@ -50,6 +51,8 @@ class BufferedExperimentLogger:
             logger.log(message)
 
 
+
+
 def _build_execution_stage_name(*, recompute_mapf: bool, generation_target: str) -> str:
     if recompute_mapf:
         return "raw_data"
@@ -57,6 +60,8 @@ def _build_execution_stage_name(*, recompute_mapf: bool, generation_target: str)
 
 
 class BranchOutputManager:
+    """Compatibility output manager for the legacy branch-level visualization helpers."""
+
     def __init__(
         self,
         branch_spec: BranchSpec,
@@ -74,9 +79,6 @@ class BranchOutputManager:
         self.generation_target = str(generation_target)
 
         self.metadata_dir = self.branch_root / "metadata" / self.generation_target
-        self.records_dir = self.branch_root / "records" / "graphs"
-        self.aggregates_dir = self.branch_root / "aggregates" / "graphs"
-        self.graphs_dir = self.branch_root / "graphs" / "graphs"
         self.logs_dir = self.branch_root / "logs" / self.execution_stage_name
         self.visualizations_dir = self.branch_root / "visualizations"
 
@@ -89,12 +91,6 @@ class BranchOutputManager:
     def prepare_log_output(self) -> Path:
         self._reset_dir(self.logs_dir)
         return self.logs_dir / "experiment.log"
-
-    def clear_graphs_outputs(self) -> None:
-        self._reset_dir(self.metadata_dir)
-        self._reset_dir(self.records_dir)
-        self._reset_dir(self.aggregates_dir)
-        self._reset_dir(self.graphs_dir)
 
     def clear_visualization_outputs(self) -> None:
         self._reset_dir(self.metadata_dir)

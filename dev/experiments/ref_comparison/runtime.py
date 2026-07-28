@@ -11,7 +11,7 @@ from dev.core.composite_elements import Vertex
 from dev.experiments.ref_comparison.models import RefCaseSpec, RefMappingRunRecord, RefRunConfiguration
 from dev.inputs.dynamic_port.map_builder import obstacle_matrix_to_composite_base_map
 from dev.mapf.full.cbs_solver import solve_mapf_with_cbs
-from dev.mapf.full.mapf_low_level_astar import find_path_for_agent
+from dev.mapf.full.mapf_low_level_astar import LowLevelSearchTimeout, find_path_for_agent
 from dev.maps.classical_mapper import apply_classical_mapping
 from dev.maps.cyclic_mapper import apply_cyclic_mapping
 from dev.utils.log_symbols import AGENT_LOG_SYMBOL, TARGET_LOG_SYMBOL
@@ -270,11 +270,12 @@ def serialize_agents(agents: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
-def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_identifier: str, agents: list[dict[str, Any]], notes: str, map_index: int | None = None, map_number: int | None = None, map_label_value: str = "", agent_number: int | None = None) -> RefRunConfiguration:
+def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_identifier: str, agents: list[dict[str, Any]], notes: str, map_index: int | None = None, map_number: int | None = None, map_label_value: str = "", agent_number: int | None = None, run_config_tag: str | None = None) -> RefRunConfiguration:
     resolved_agent_number = int(agent_number if agent_number is not None else case_spec.agent_number)
     suffix = ""
     if map_number is not None:
         suffix = f".map_{int(map_number)}"
+    run_token = str(run_index) if run_config_tag is None else str(run_config_tag)
     return RefRunConfiguration(
         case_id=case_spec.case_id,
         experiment_mode=case_spec.experiment_mode,
@@ -282,7 +283,7 @@ def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_ident
         map_size=case_spec.map_size,
         agent_number=resolved_agent_number,
         run_index=run_index,
-        run_config_id=f"ref_run[{case_spec.case_id}{suffix}.{run_index}]",
+        run_config_id=f"ref_run[{case_spec.case_id}{suffix}.{run_token}]",
         map_identifier=map_identifier,
         paired_source=True,
         agents=serialize_agents(agents),
@@ -351,20 +352,34 @@ def _progress_callback_factory(logger: Any, label: str) -> Callable[[int], None]
 
 
 def _single_agent_solver_result(*, composite_map: list[list[Any]], agent: dict[str, Any], case_spec: RefCaseSpec) -> dict[str, Any]:
-    result = find_path_for_agent(
-        cyclic_map=composite_map,
-        agent_id=agent["id"],
-        start=agent["start"],
-        goal=agent["goal"],
-        constraints=[],
-        heuristic_weight=1.0,
-        true_static_shortest_path_distance=case_spec.true_static_shortest_path_distance,
-        tight_time_horizon=case_spec.tight_time_horizon,
-        agent_cohesion_enabled=False,
-        cohesion_reference_paths=None,
-        spawn_time=int(agent.get("spawn_time", 0) or 0),
-        return_diagnostics=True,
-    )
+    deadline = time.perf_counter() + max(0.0, float(case_spec.runtime_limit_seconds))
+    try:
+        result = find_path_for_agent(
+            cyclic_map=composite_map,
+            agent_id=agent["id"],
+            start=agent["start"],
+            goal=agent["goal"],
+            constraints=[],
+            heuristic_weight=1.0,
+            true_static_shortest_path_distance=case_spec.true_static_shortest_path_distance,
+            tight_time_horizon=case_spec.tight_time_horizon,
+            agent_cohesion_enabled=False,
+            cohesion_reference_paths=None,
+            spawn_time=int(agent.get("spawn_time", 0) or 0),
+            return_diagnostics=True,
+            deadline=deadline,
+        )
+    except LowLevelSearchTimeout:
+        return {
+            "status": "solver_timeout",
+            "paths_by_agent": None,
+            "num_conflicts_detected": 0,
+            "num_high_level_nodes_expanded": 0,
+            "solver_name": "A*",
+            "solver_suboptimality_factor": None,
+            "agent_cohesion_enabled": False,
+        }
+
     path = result.get("path")
     nodes_expanded = result.get("num_expanded_nodes")
     if path is None:
@@ -460,6 +475,7 @@ def build_mapping_record(
     solver_status: str | None,
     timing_repetitions: int = 1,
     timing_elapsed_samples_seconds: list[float] | None = None,
+    comparison_case: str = "reference_comparison_paired",
 ) -> RefMappingRunRecord:
     resolved_status = solver_status or "unknown_failure"
     paths_by_agent = None
@@ -492,7 +508,7 @@ def build_mapping_record(
         run_config_id=run_configuration.run_config_id,
         mapping_name=mapping_name,
         mapping_index=mapping_index,
-        comparison_case="reference_comparison_paired",
+        comparison_case=str(comparison_case),
         solver_name=solver_name,
         enhanced_cbs_enabled=(solver_name == "ECBS"),
         solver_suboptimality_factor=suboptimality,

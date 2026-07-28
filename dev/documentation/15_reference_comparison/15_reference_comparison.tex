@@ -73,9 +73,9 @@ to_generate = "graphs"
 # to_generate = "visualization"
 \end{lstlisting}
 
-If \texttt{to\_generate = "raw\_data"}, the selected reference case is executed and raw data is saved. If \texttt{to\_generate = "graphs"} or \texttt{to\_generate = "visualization"}, existing raw data is reused.
+If \texttt{to\_generate = "raw\_data"}, the selected reference case is executed, numerical raw data is saved, and the designated successful trajectories are written separately under \texttt{outputs\_ref\_comparison/frame\_by\_frame}. The single-agent case stores the first successful timing repetition for classical and cyclic in each of the three maps. The multi-agent case stores the first successful timing repetition for both mappings from the final repeated comparison at the discovered classical capacity. Capacity-search trials are not stored as frame-by-frame files.
 
-When \texttt{to\_generate = "visualization"}, visualization candidates are selected independently for each map number and mapping. Therefore, if solved candidates are available for all three port maps, the visualizer writes one visualization set per map type instead of keeping only the final successful map overall. The visualization phase also logs candidate selection, the current map and mapping being rendered, frame-writing stages, and final frame counts.
+If \texttt{to\_generate = "graphs"}, the numerical raw data is reused. If \texttt{to\_generate = "visualization"}, the solver is not executed and the numerical raw data is not read; the visualizer loads the saved frame-by-frame packages and generates the Pillow frames from them. The visualization phase logs the current map and mapping, frame-writing stages, and final frame counts.
 
 \section{Selectable Reference Cases}
 
@@ -86,19 +86,18 @@ The reference-comparison selector is:
 SELECTED_PORT_EXPERIMENT = "multi_agent"
 \end{lstlisting}
 
-Both selectable cases use the same three 50x50 maps. The single-agent case runs the three maps with one agent. The multi-agent case runs the three maps with a configurable agent count for each map. Older selector names such as \texttt{single\_agent\_x50} and \texttt{multi\_agent\_x50} are kept only as backward-compatible aliases.
+Both selectable cases use the same three 50x50 maps. The single-agent case runs the three maps with one agent. The multi-agent case performs an independent classical-capacity search for each map. Older selector names such as \texttt{single\_agent\_x50} and \texttt{multi\_agent\_x50} are kept only as backward-compatible aliases.
 
-The per-map multi-agent counts are selected in \texttt{dev/master\_config\_ref\_comparison.py}:
+The multi-agent search controls are configured in \texttt{dev/master\_config\_ref\_comparison.py}:
 
 \begin{lstlisting}
-MULTI_AGENT_REFERENCE_PORT_MAP_AGENT_NUMBERS = {
-    1: 10,
-    2: 10,
-    3: 10,
-}
+REFERENCE_CAPACITY_AGENT_UPPER_BOUND = 255
+REFERENCE_CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
+REFERENCE_CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 1
+REFERENCE_CAPACITY_PASS_CRITERION = "temp_pairwise"
 \end{lstlisting}
 
-The keys correspond to \texttt{port\_map\_1.png}, \texttt{port\_map\_2.png}, and \texttt{port\_map\_3.png}.
+Each map starts its limited binary search at 128 agents. Before any passing value is found, the search may continue descending to smaller left-child values. After the first pass, at most three additional child moves are allowed.
 
 \section{Single-Agent Reference Case}
 
@@ -133,9 +132,11 @@ Traditional A* with Classical Mapping
 With Cyclic Mapping
 \end{lstlisting}
 
-The multi-agent case uses the configured agent count for each port map. By default, maps 1, 2, and 3 each use 10 agents, but these values can be edited independently through \texttt{MULTI\_AGENT\_REFERENCE\_PORT\_MAP\_AGENT\_NUMBERS}. All agents share the same upper-right target cell and disappear after reaching it. Agents are released through two spawn cells: the upper neighbor and the right neighbor of the lower-left start cell. The solver supports explicit per-agent \texttt{spawn\_time}. Before an agent's spawn time, it does not occupy the map. At its spawn time, it appears at its assigned spawn cell.
+For each port map, the multi-agent case searches only the temporary pairwise classical capacity. A tested agent number passes when classical solves and cyclic also solves with lower halted time and fewer conflicts on the same deterministic setup. Each candidate agent number is tested once during capacity search. No independent cyclic-capacity search is performed.
 
-Each map and mapping is timed using three identical ECBS executions, controlled by \texttt{MULTI\_AGENT\_TIMING\_REPETITIONS = 3}. The stored runtime is the average of those three timing samples. The path-related values come from the representative deterministic solution.
+After the classical capacity is found, both classical and cyclic mapping are evaluated at that same agent number. All agents share the upper-right target cell and disappear after reaching it. Agents are released through two spawn cells: the upper neighbor and the right neighbor of the lower-left start cell. The solver supports explicit per-agent \texttt{spawn\_time}. Before an agent's spawn time, it does not occupy the map. At its spawn time, it appears at its assigned spawn cell.
+
+The final comparison for each map and mapping is timed using three identical ECBS executions, controlled by \texttt{MULTI\_AGENT\_TIMING\_REPETITIONS = 3}. The stored runtime is the average of those three timing samples. The path-related values come from the representative deterministic solution.
 
 The multi-agent case records:
 
@@ -146,7 +147,7 @@ The multi-agent case records:
     \item total turns.
 \end{itemize}
 
-When graph/data outputs are generated, the multi-agent table uses Map number as the first column. The reported path parameters are Running time, Average number of conflicts, Average number of turns, and Average total distance. The table uses Traditional A* with Classical Mapping, With Cyclic Mapping, and Percent Reduction/Gain as the main comparison headers. The Path parameters header includes the italicized subtitle note \textit{(averages are across all agents)}. The percent column is signed: negative values mean the cyclic value is lower than the classical value, while positive values mean the cyclic value is higher. The temporary individual cyclic-faster filter is disabled for the multi-agent reference case.
+When graph/data outputs are generated, the multi-agent table uses Map number as the first column. The reported path parameters are Running time, Average number of conflicts, Average number of turns, and Average total distance. The table uses Traditional A* with Classical Mapping, With Cyclic Mapping, and Percent Reduction/Gain as the main comparison headers. The Path parameters header includes the italicized subtitle note \textit{(averages are across all agents)}. The percent column is signed: negative values mean the cyclic value is lower than the classical value, while positive values mean the cyclic value is higher. The older post-sampling individual cyclic-faster filter is disabled for the multi-agent reference case; the stricter cyclic-faster-and-fewer-conflicts rule is instead applied directly during each capacity-search trial.
 
 For both single-agent and multi-agent reference cases, graph outputs are now metric-level summaries across the three maps rather than one graph per map. Each graph uses Map number on the x-axis and contains four points: Map 1, Map 2, Map 3, and Average. The Average point is computed from the three map-level values for the same metric and mapping. Only Map 1, Map 2, and Map 3 are connected by the horizontal series line; the Average point remains a standalone marker so it is not visually treated as a fourth input map. The single-agent graphs cover Running time, Number of nodes, Number of turns, and Total distance. The multi-agent graphs cover Running time, Average number of conflicts, Average number of turns, and Average total distance. The graph legends use Traditional A* with Classical Mapping and With Cyclic Mapping.
 
@@ -157,7 +158,7 @@ For the single-agent A* cases and for the multi-agent ECBS cases, the reference 
 Shared reference settings include:
 
 \begin{lstlisting}
-SHARED_TIME_LIMIT_SECONDS = 120.0
+SHARED_TIME_LIMIT_SECONDS = 60.0
 SHARED_ECBS_SUBOPTIMALITY = 3.0
 SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
 SHARED_TIGHT_TIME_HORIZON = False
@@ -198,6 +199,8 @@ Persisted raw reference data is stored under:
 \begin{lstlisting}
 dev/outputs_ref_comparison/raw_mapf_files/<case_id>/
 \end{lstlisting}
+
+For the multi-agent case, the raw payload and graph-record exports also include \texttt{capacity\_searches.json}. This file preserves every tested agent number, its pairwise pass or failure reasons, and the classical and cyclic trial metrics. The per-map discovered classical capacities are also written to \texttt{stop\_summary.json}.
 
 \section{Important Interpretation Notes}
 

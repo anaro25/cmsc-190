@@ -149,17 +149,35 @@ def _greedy_clearance_subset(candidates, num_vertices):
             chosen.append(vertex)
             if len(chosen) == num_vertices:
                 return chosen
-    return None
+    return chosen
 
 
-def _sample_dispersed_vertices(vertices, num_vertices, rng, role="candidate", deadline=None):
+def _sample_dispersed_vertices(
+    vertices,
+    num_vertices,
+    rng,
+    role="candidate",
+    deadline=None,
+    strict_8_neighbor_clearance=True,
+):
+    best_clearance_subset = []
     for _ in range(MAX_DISPERSED_SHUFFLE_ATTEMPTS):
         _raise_if_assignment_deadline_exceeded(deadline)
         shuffled = vertices[:]
         rng.shuffle(shuffled)
         chosen = _greedy_clearance_subset(shuffled, num_vertices)
-        if chosen is not None:
+        if len(chosen) == num_vertices:
             return chosen
+        if len(chosen) > len(best_clearance_subset):
+            best_clearance_subset = chosen
+
+    if not strict_8_neighbor_clearance:
+        chosen_set = set(best_clearance_subset)
+        remaining_vertices = [vertex for vertex in vertices if vertex not in chosen_set]
+        rng.shuffle(remaining_vertices)
+        needed = num_vertices - len(best_clearance_subset)
+        return best_clearance_subset + remaining_vertices[:needed]
+
     raise ValueError(
         f"Could not sample {num_vertices} dispersed {role} vertices with 8-neighbor clearance "
         f"after {MAX_DISPERSED_SHUFFLE_ATTEMPTS} shuffle attempts."
@@ -226,7 +244,15 @@ def _sample_single_vertices(vertices, num_vertices, rng, role="candidate"):
     return [shared_vertex for _ in range(num_vertices)]
 
 
-def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode, role="candidate", deadline=None):
+def _sample_vertex_subset(
+    vertices,
+    num_vertices,
+    rng,
+    distribution_mode,
+    role="candidate",
+    deadline=None,
+    strict_dispersed_8_neighbor_clearance=True,
+):
     if distribution_mode not in START_DISTRIBUTION_MODES:
         raise ValueError(f"Unsupported distribution_mode '{distribution_mode}'.")
     minimum_vertices = 1 if distribution_mode == "single" else num_vertices
@@ -239,7 +265,14 @@ def _sample_vertex_subset(vertices, num_vertices, rng, distribution_mode, role="
         return _sample_single_vertices(vertices, num_vertices, rng, role=role)
     if distribution_mode == "clustered":
         return _sample_clustered_vertices(vertices, num_vertices, rng, role=role, deadline=deadline)
-    return _sample_dispersed_vertices(vertices, num_vertices, rng, role=role, deadline=deadline)
+    return _sample_dispersed_vertices(
+        vertices,
+        num_vertices,
+        rng,
+        role=role,
+        deadline=deadline,
+        strict_8_neighbor_clearance=strict_dispersed_8_neighbor_clearance,
+    )
 
 
 def _resolve_single_goal(composite_map, starts, candidate_goals, rng, require_individual_reachability, deadline=None):
@@ -326,6 +359,7 @@ def sample_agent_start_goal_pairs(
     shared_goal=False,
     start_distribution_mode="dispersed",
     goal_distribution_mode="dispersed",
+    strict_dispersed_8_neighbor_clearance=True,
     clustered_start_goal_min_distance=None,
 ):
     """
@@ -341,7 +375,9 @@ def sample_agent_start_goal_pairs(
         * goal_distribution_mode="single" gives all agents the same literal target cell
         * start != goal for each agent
         * when require_individual_reachability=True, each assigned start-goal pair must be reachable
-        * dispersed sets respect 8-neighbor clearance internally
+        * dispersed sets prioritize 8-neighbor clearance internally
+        * when strict_dispersed_8_neighbor_clearance=True, that clearance is mandatory
+        * when strict_dispersed_8_neighbor_clearance=False, adjacent positions fill any remaining shortage
         * clustered sets form one connected cluster whose spacing is controlled by compact_clustering
         * when both starts and goals are clustered, clustered_start_goal_min_distance can keep the two clusters apart
     """
@@ -394,8 +430,13 @@ def sample_agent_start_goal_pairs(
             start_distribution_mode,
             role="start",
             deadline=assignment_deadline,
+            strict_dispersed_8_neighbor_clearance=strict_dispersed_8_neighbor_clearance,
         )
-        if start_distribution_mode == "dispersed" and not _subset_respects_clearance(starts):
+        if (
+            start_distribution_mode == "dispersed"
+            and strict_dispersed_8_neighbor_clearance
+            and not _subset_respects_clearance(starts)
+        ):
             continue
         if start_distribution_mode == "clustered" and not _subset_is_connected_cluster(starts):
             continue
@@ -432,11 +473,16 @@ def sample_agent_start_goal_pairs(
                 goal_distribution_mode,
                 role="goal",
                 deadline=assignment_deadline,
+                strict_dispersed_8_neighbor_clearance=strict_dispersed_8_neighbor_clearance,
             )
         except ValueError as exc:
             last_sampling_issue = str(exc)
             continue
-        if goal_distribution_mode == "dispersed" and not _subset_respects_clearance(goals):
+        if (
+            goal_distribution_mode == "dispersed"
+            and strict_dispersed_8_neighbor_clearance
+            and not _subset_respects_clearance(goals)
+        ):
             continue
         if goal_distribution_mode == "clustered" and not _subset_is_connected_cluster(goals):
             continue

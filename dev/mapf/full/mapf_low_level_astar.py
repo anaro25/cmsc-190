@@ -1,6 +1,7 @@
 
 import heapq
 import itertools
+import time
 from collections.abc import Mapping
 
 from dev.mapf.agent_cohesion import cohesion_penalty
@@ -9,6 +10,15 @@ from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_out
 
 
 _STATIC_TIGHT_HORIZON_MAX_SLACK = 64
+
+
+class LowLevelSearchTimeout(RuntimeError):
+    """Raised when a low-level A* search reaches the shared solver deadline."""
+
+
+def _raise_if_deadline_reached(deadline: float | None) -> None:
+    if deadline is not None and time.perf_counter() >= deadline:
+        raise LowLevelSearchTimeout("Low-level A* search reached the solver deadline.")
 
 
 def manhattan_vertex_distance(a, b):
@@ -207,6 +217,7 @@ def find_path_for_agent(
     cohesion_reference_paths: Mapping[int, list[tuple[int, int]]] | None = None,
     spawn_time: int = 0,
     return_diagnostics: bool = False,
+    deadline: float | None = None,
 ):
     """
     Find one agent's path using A* while respecting CBS constraints.
@@ -219,6 +230,7 @@ def find_path_for_agent(
         h_value       = estimated distance from a node to the target
         f_value       = g(n) + h(n), or g(n) + weight * h(n)
     """
+    _raise_if_deadline_reached(deadline)
     heuristic_weight = max(1.0, float(heuristic_weight))
     spawn_time = max(0, int(spawn_time or 0))
     agent_constraints = get_agent_constraints(constraints, agent_id)
@@ -236,7 +248,9 @@ def find_path_for_agent(
     # Some experiment settings use a precomputed true distance table.
     static_distance_lookup = {}
     if true_static_shortest_path_distance or tight_time_horizon:
+        _raise_if_deadline_reached(deadline)
         static_distance_lookup = _static_distance_lookup(cyclic_map, goal)
+        _raise_if_deadline_reached(deadline)
         start_goal_distance = static_distance_lookup.get(start)
         if start_goal_distance is None:
             if return_diagnostics:
@@ -293,6 +307,8 @@ def find_path_for_agent(
     )
 
     while OPEN:
+        _raise_if_deadline_reached(deadline)
+
         # From OPEN, select the node with the least f(n).
         _, _, _, _, selected_node = heapq.heappop(OPEN)
 

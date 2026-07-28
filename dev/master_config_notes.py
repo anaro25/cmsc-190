@@ -24,6 +24,13 @@
 #   In campus branches, this shared target is sampled only from the darker
 #   single-target marker cells in the selected target zone.
 #
+# strict_dispersed_8_neighbor_clearance (set independently in each map config)
+# - True: every dispersed set must keep all eight neighboring cells clear.
+#   Setup generation fails when the requested number cannot satisfy this rule.
+# - False: dispersed sampling first places as many mutually separated elements
+#   as possible, then uses remaining unique cells, including adjacent cells, only
+#   to fill a shortage. This is the default for all eight main map types.
+#
 # compact_clustering
 # - True: clustered sets are compact directly adjacent 8-neighbor-connected groups
 # - False: clustered sets are spaced groups whose members keep one empty cell of
@@ -44,19 +51,17 @@
 # A tested number passes when at least 1 out of 5 valid solver attempts finishes within 30 seconds.
 # The search starts at 128 and descends at most CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES child links.
 # setup_failed and unsolvable initial conditions are regenerated, with a cap of 5 generation attempts per solver attempt.
-# num_last_runs_to_visualize_jointly_successful controls how many of the final
-# jointly successful classical-cyclic paired runs receive Pillow frame output.
-# num_last_runs_to_visualize_independently_successful controls how many of the
-# final successful runs of each mapping are rendered independently.
+# Frame-by-frame persistence and visualization:
+# - to_generate = "raw_data" records numerical results and saves only two selected
+#   trajectories per exact main-experiment configuration: the final retained
+#   classical success at classical capacity and the final retained cyclic success
+#   at cyclic capacity.
+# - These packages are heavily compartmentalized under
+#   outputs_main/frame_by_frame/.
+# - to_generate = "visualization" performs no MAPF solving and does not read the
+#   numerical metrics package. It reads the selected frame_by_frame.pkl packages and
+#   generates the Pillow frames from them.
 #
-# When to_generate = "visualization", the renderer now creates BOTH versions:
-# - jointly_successful
-# - independently_successful
-#
-# Important: these visualization-selection controls are read from the current
-# master_config.py during visualization regeneration. They do not force a new
-# MAPF recomputation by themselves as long as compatible persisted raw data
-# already exists for the selected branch.
 # require_individual_reachbility
 #   Set this to "True" for branches whose maps are not manually generated. This
 #   verifies if the placement of each element satisfies "individual reachability".
@@ -89,20 +94,12 @@
 #   Project-level program-mode selector. Exactly one mode is active per run.
 #   "raw_data"      -> recompute raw MAPF data for the selected branch and replace it.
 #   "graphs"        -> regenerate structured outputs and graphs from saved raw MAPF data.
-#   "visualization" -> regenerate Pillow visualizations from saved raw MAPF data.
+#   "visualization" -> regenerate Pillow visualizations from saved frame-by-frame packages.
 #
 # Presentation outputs are latest-only. Regenerating logs, graphs/data, or
 # visualizations replaces the previous copy for that same purpose instead of
 # creating a new execution_xxxxxx_xxxxxx_xxxxxx folder.
 #
-# Raw MAPF data is stored per branch and is intentionally controlled manually.
-# Each branch now keeps a split raw-data directory with a manifest, metadata, and
-# per-condition files instead of one monolithic pickle. The program does not try
-# to validate whether the current code or configuration matches the saved raw data;
-# set to_generate="raw_data" when you want to replace it.
-# Visualization-selection controls such as
-# num_last_runs_to_visualize_jointly_successful and
-# num_last_runs_to_visualize_independently_successful are read from the current
-# master_config.py during visualization regeneration, so changing only those
-# does not require a fresh MAPF recomputation as long as saved raw data already
-# exists.
+# Numerical raw data and frame-by-frame data are stored separately. Regenerating
+# raw data for one exact map configuration replaces only that configuration's
+# frame-by-frame subtree and preserves other configurations.

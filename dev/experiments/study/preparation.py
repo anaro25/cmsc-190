@@ -197,6 +197,9 @@ def _sample_agents_for_branch(
                     allowed_goal_vertices=allowed_goal_vertices,
                     start_distribution_mode=branch_spec.start_distribution_mode,
                     goal_distribution_mode=branch_spec.goal_distribution_mode,
+                    strict_dispersed_8_neighbor_clearance=(
+                        branch_spec.strict_dispersed_8_neighbor_clearance
+                    ),
                     clustered_start_goal_min_distance=branch_spec.clustered_start_goal_min_distance,
                 )
                 return (
@@ -224,6 +227,9 @@ def _sample_agents_for_branch(
         allowed_goal_vertices=marker_goal_vertices or allowed_spawn_vertices,
         start_distribution_mode=branch_spec.start_distribution_mode,
         goal_distribution_mode=branch_spec.goal_distribution_mode,
+        strict_dispersed_8_neighbor_clearance=(
+            branch_spec.strict_dispersed_8_neighbor_clearance
+        ),
         clustered_start_goal_min_distance=branch_spec.clustered_start_goal_min_distance,
     )
     distance_note = (

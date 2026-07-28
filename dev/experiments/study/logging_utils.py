@@ -23,6 +23,10 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Active target type: {branch_spec.target_type_active}")
     logger.log(f"Start distribution mode: {branch_spec.start_distribution_mode}")
     logger.log(f"Goal distribution mode: {branch_spec.goal_distribution_mode}")
+    logger.log(
+        "Strict dispersed 8-neighbor clearance: "
+        f"{branch_spec.strict_dispersed_8_neighbor_clearance}"
+    )
     logger.log(f"Compact clustering: {branch_spec.compact_clustering}")
     logger.log(f"Clustering style: {branch_spec.clustering_style_name}")
     logger.log(f"Require individual reachability: {branch_spec.require_individual_reachability}")

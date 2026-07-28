@@ -4,28 +4,12 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage{amsmath,amssymb}
-\usepackage{booktabs}
-\usepackage{array}
 \usepackage{enumitem}
-\usepackage{longtable}
-\usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{listings}
 
-\hypersetup{
-    colorlinks=true,
-    linkcolor=blue,
-    urlcolor=blue
-}
-
-\lstset{
-    basicstyle=\ttfamily\small,
-    breaklines=true,
-    columns=fullflexible,
-    keepspaces=true,
-    frame=single
-}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,columns=fullflexible,keepspaces=true,frame=single}
 
 \title{Outputs, Records, and Visualization}
 \author{}
@@ -34,193 +18,152 @@
 \begin{document}
 \maketitle
 
-\section{Persisted Raw Data vs. Presentation Outputs}
-
-The project now distinguishes between:
-\begin{itemize}[leftmargin=2em]
-    \item \textbf{persisted raw MAPF data} under \texttt{dev/outputs/raw\_mapf\_files/<map\_type>/},
-    \item \textbf{presentation outputs} under \texttt{dev/outputs/<map\_type>/}.
-\end{itemize}
-
-The raw MAPF store is branch-local and survives across later runs. It is replaced only when \texttt{to\_generate="raw\_data"}. The presentation outputs can then be regenerated from that saved raw data without rerunning the expensive solver stage. Older branch-local roots that still live under \texttt{dev/raw\_mapf\_data/<map\_type>/} or \texttt{dev/raw\_mapf\_files/<map\_type>/} are migrated automatically into the new \texttt{outputs/raw\_mapf\_files} location when the branch is loaded.
-
-The persisted raw-data tree is intentionally split rather than packed into one giant pickle. Each branch root now contains a manifest and metadata files at the top level, plus one condition subfolder per reported agent number. Inside each condition folder, the aggregate summary, retained run configurations, retained run records, and successful visualization candidates are stored separately. This keeps larger experiment ranges much easier to inspect and replace.
-
-The active output manager still uses the same presentation-output families:
-\begin{itemize}[leftmargin=2em]
-    \item \texttt{metadata},
-    \item \texttt{records},
-    \item \texttt{aggregates},
-    \item \texttt{graphs},
-    \item \texttt{logs},
-    \item \texttt{visualizations}.
-\end{itemize}
-However, the presentation-output tree is now \emph{latest-only}. Each purpose keeps one current copy and a newer run overwrites that same location instead of creating a fresh \texttt{execution\_...} folder. A typical branch output root now contains paths such as:
-\begin{lstlisting}
-dev/outputs/<map_type>/
-    logs/
-        raw_data/
-            experiment.log
-        graphs/
-            experiment.log
-        visualization/
-            experiment.log
-    metadata/
-        graphs/
-            branch_spec.json
-            graph_generation_branch_spec.json
-            branch_stop_summary.json
-            shared_dynamic_state.json         # dynamic branches only
-        visualization/
-            visualization_selection_summary.json
-    records/
-        graphs/
-            run_configurations.json
-            run_configurations.csv
-            run_records.json
-            run_records.csv
-    aggregates/
-        graphs/
-            condition_summary.json
-            condition_summary.csv
-    graphs/
-        graphs/
-            ...
-    visualizations/
-        jointly_successful/
-        independently_successful/
-\end{lstlisting}
-
-\subsection{Persisted Raw-Data Layout}
-A typical persisted raw-data tree for one branch now has the rough form:
-\begin{lstlisting}
-dev/outputs/raw_mapf_files/<map_type>/
-    manifest.json
-    raw_mapf_data_summary.json
-    metadata/
-        branch_spec.json
-        branch_stop_summary.json
-        dynamic_state.pkl               # dynamic branches only
-        dynamic_state_metadata.json     # dynamic branches only
-    conditions/
-        condition_001__agent_number_010/
-            condition_aggregate.json
-            run_configurations.json
-            run_records.json
-            visualization_candidates/
-                index.json
-                0001__classical__....pkl
-                0002__cyclic__....pkl
-        ...
-\end{lstlisting}
-The condition folders contain only the retained reported data for that agent number. The visualization-candidate pickles store the frame-building ingredients for successful runs, while the index file keeps the selection order and filenames explicit.
-
-\section{Structured Files}
-
-When \texttt{to\_generate="graphs"}, the most important regenerated structured outputs inside the current \texttt{graphs/} folders are:
-\begin{itemize}[leftmargin=2em]
-    \item \texttt{metadata/graphs/branch\_spec.json},
-    \item \texttt{metadata/graphs/branch\_stop\_summary.json},
-    \item \texttt{metadata/graphs/shared\_dynamic\_state.json} for dynamic branches,
-    \item \texttt{records/graphs/run\_configurations.json} and \texttt{.csv},
-    \item \texttt{records/graphs/run\_records.json} and \texttt{.csv},
-    \item \texttt{aggregates/graphs/condition\_summary.json} and \texttt{.csv}.
-\end{itemize}
-
-The solver update makes two of those files more informative:
-\begin{itemize}[leftmargin=2em]
-    \item \texttt{branch\_spec.json} now records the effective solver family metadata for the whole branch run, including the active branch's ECBS bound when relevant,
-    \item \texttt{run\_records.json}/\texttt{.csv} now record per-run solver metadata such as CBS vs.\ ECBS and the active suboptimality factor when ECBS is enabled.
-\end{itemize}
-
-
-\section{Logging Behavior}
-
-The experiment logger writes each line both to the stage-specific log file and to stdout immediately. In practical terms, the periodic solver progress lines such as the 5-second classical/cyclic progress reports should now appear live during long runs instead of being buffered and dumped all at once later. The condition header now prints as \texttt{Condition n} rather than \texttt{Condition n/(total conditions)}, paired sampling attempts are separated by a blank line for readability, and the branch header no longer prints the full long list of planned agent numbers.
-
 \section{Generation Modes}
 
-The top-level manual control now has three modes:
+The main experiment now has two manual modes:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{to\_generate="raw\_data"}: recompute and save the raw MAPF solver payload only,
-    \item \texttt{to\_generate="graphs"}: regenerate structured files and metric graphs from the saved raw payload,
-    \item \texttt{to\_generate="visualization"}: regenerate Pillow visualization frames only.
+    \item \texttt{to\_generate="raw\_data"}: execute the solver, record numerical inspection files, automatically create an independent Results-ready metrics package for each selected configuration, and save only the designated successful frame-by-frame trajectories;
+    \item \texttt{to\_generate="visualization"}: read the separately persisted frame-by-frame packages and regenerate Pillow frames without executing MAPF or reading the numerical metrics package.
 \end{itemize}
 
-Because the project now treats graphs/data and Pillow frames as separate artifact families, one family may intentionally remain older than the other until the user chooses to regenerate it.
+The main experiment no longer has a \texttt{to\_generate="graphs"} mode and does not create PNG metric plots. The reference-comparison workflow remains separate and still supports its own \texttt{raw\_data}, \texttt{graphs}, and \texttt{visualization} modes.
 
-\section{Graphs}
+Numerical results and frame-by-frame trajectory data are deliberately separate artifact families. A visualization-only run therefore depends on the corresponding \texttt{frame\_by\_frame} files having already been generated by a raw-data run.
 
-\subsection{Graph X-Axis Domain}
+\section{Main-Experiment Outputs}
 
-When \texttt{to\_generate="graphs"} is run against already-saved raw MAPF data, the plotted metric values and the x-axis tick labels are both derived from the agent numbers that are actually present in the persisted branch records being graphed. The graphing layer still forces every such x-value to be labeled explicitly, so Matplotlib does not silently skip labels such as showing only \(2,4,6,\dots\).
+For every selected exact map configuration, the author-facing numerical inspection file is written under:
+\begin{lstlisting}
+dev/outputs_main/metrics_data_inspection/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>_evaluation.xml
+\end{lstlisting}
 
-This keeps regenerated graphs compact: if the current branch domain in \texttt{master\_config.py} extends far beyond the previously computed results, the x-axis no longer stretches across that unused range. Backward compatibility is preserved because older saved raw data remains readable without needing to recompute it under the newer domain.
+The program no longer writes a separate \texttt{<map\_config>\_raw\_data.json}.
 
-The plotting layer also computes compact vertical limits from the values that are actually drawn, with a small padding margin above and below the observed range. This avoids large empty regions when values are close while still preventing the extreme points from touching the frame. The runtime-limit reference line is no longer forced into every runtime graph; it is drawn only when at least one plotted runtime value reaches the configured limit.
+The same raw-data execution writes an independent Results-ready package for each selected exact map configuration:
+\begin{lstlisting}
+dev/outputs_main/metrics_data/
+    data_dictionary.csv
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            README.txt
+            configuration_metadata.csv
+            capacity_summary.csv
+            capacity_comparison.csv
+            capacity_search_tests.csv
+            capacity_search_run_records.csv
+            capacity_point_run_records.csv
+            capacity_point_summary.csv
+            paired_run_comparisons.csv
+            results_ready_comparisons.csv
+            <numbered_exact_map_configuration>_metrics_data.csv
+            metrics_package.json
+\end{lstlisting}
 
+The root-level \texttt{data\_dictionary.csv} is the only intentional project-level metrics file. The program does not create cumulative CSVs, a dataset manifest, a root reader guide, or a selected-map-configurations summary file. Running one map configuration updates only that configuration's package. Other configuration folders are neither scanned nor rebuilt. At the beginning of a raw-data run, obsolete root-level cumulative files from the previous design are removed automatically.
 
-The updated capacity-search protocol currently writes text-only raw-data and evaluation logs. Graph regeneration is intentionally marked as a later update for the new protocol, because the main output no longer consists of averaged metric curves over a long agent-number progression.
+The exact-configuration \texttt{\_metrics\_data.csv} is the primary compact table for Results writing. It contains the actual capacity agent numbers, classical and cyclic outcome counts and means at both capacity contexts, absolute and percentage changes, and interpretation flags. The companion files preserve capacity-search decisions, individual run records, paired same-initial-condition comparisons, solver and protocol metadata, variability summaries, seeds, and valid solved-run path counts. No PNG metric plots are produced in this tree.
 
-\section{How Detailed Capacity Values Are Reported}
+Terminal output is compartmentalized under:
+\begin{lstlisting}
+dev/outputs_main/terminal_logs/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            raw_data.log
+            visualization.log
+\end{lstlisting}
 
-For a reported capacity point:
+\subsection{Selected Frame-by-Frame Runs}
+
+A raw-data execution saves at most two trajectory packages for each of the thirty-two exact configurations:
 \begin{itemize}[leftmargin=2em]
-    \item halted time is written as the direct run value,
-    \item conflicts at halt is written as the direct run value,
-    \item total path length is written only when the run is successful.
+    \item the final retained successful classical run at the discovered classical capacity;
+    \item the final retained successful cyclic run at the discovered cyclic capacity.
 \end{itemize}
 
-The current main-experiment protocol keeps one successful capacity run per mapping and configuration. Therefore, the detailed logs do not add average lines for the main values.
+Intermediate capacity-search attempts and the cross-mapping comparison runs are not saved as frame-by-frame packages. The directory layout is:
+\begin{lstlisting}
+dev/outputs_main/frame_by_frame/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            shared_context/
+                shared_context.pkl
+                metadata.json
+            classical_capacity_<N>_agents/
+                classical/
+                    final_selected_successful_run/
+                        frame_by_frame.pkl
+                        metadata.json
+            cyclic_capacity_<N>_agents/
+                cyclic/
+                    final_selected_successful_run/
+                        frame_by_frame.pkl
+                        metadata.json
+            manifest.json
+\end{lstlisting}
+
+The shared context keeps the branch specification and, for dynamic branches, the time-varying map state only once. Each run package keeps the selected agents, solution paths, run configuration, and mapping-specific map information needed by the Pillow renderer. The JSON metadata and manifest make the selection and file locations readable without opening the pickle files.
+
+Recomputing one exact map configuration atomically replaces only that configuration's frame-by-frame subtree. Other map configurations remain intact.
+
+\section{Reference-Comparison Outputs}
+
+Reference numerical data remains under:
+\begin{lstlisting}
+dev/outputs_ref_comparison/raw_mapf_files/<case_id>/
+\end{lstlisting}
+
+The selected trajectories are stored separately by pathfinding mode:
+\begin{lstlisting}
+dev/outputs_ref_comparison/frame_by_frame/
+    single_agent_pf/
+        map_1/
+            classical/first_successful_run/
+            cyclic/first_successful_run/
+        map_2/
+        map_3/
+        manifest.json
+    multi_agent_pf/
+        map_1/
+            classical_capacity_<N>_agents/
+                classical/first_successful_run/
+                cyclic/first_successful_run/
+        map_2/
+        map_3/
+        manifest.json
+\end{lstlisting}
+
+Every terminal run folder contains \texttt{frame\_by\_frame.pkl} and \texttt{metadata.json}. For single-agent pathfinding, the stored package is the first successful timing repetition for each map and mapping. For multi-agent pathfinding, it is the first successful timing repetition from the final repeated comparison at that map's discovered classical capacity. Capacity-search trials are excluded.
+
+Recomputing the single-agent reference case replaces only \texttt{single\_agent\_pf}; recomputing the multi-agent case replaces only \texttt{multi\_agent\_pf}. The other mode remains intact.
 
 \section{Pillow Rendering Contract}
 
-When a run is selected for visualization, the renderer writes:
+When \texttt{to\_generate="visualization"}, the solver is not called. The renderer loads exactly the packages listed in the relevant frame-by-frame manifest and writes:
 \begin{itemize}[leftmargin=2em]
-    \item \texttt{config\_000}: obstacle-only view,
-    \item \texttt{config\_001}: showcase view with transitions,
-    \item \texttt{config\_002}: setup view with agents and targets,
-    \item \texttt{frame\_000}, \texttt{frame\_001}, \dots: the actual solution timeline.
+    \item \texttt{config\_000.png}: obstacle-only view;
+    \item \texttt{config\_001.png}: showcase view with transitions;
+    \item \texttt{config\_002.png}: setup view with agents and targets;
+    \item \texttt{frame\_000.png}, \texttt{frame\_001.png}, and so on: the actual solution timeline.
 \end{itemize}
 
-\section{Visualization Selection Policy}
+For dynamic branches, setup frames use a static setup map derived from the persisted static matrix, while execution frames use the persisted time-varying loop. Campus gray regions remain solver-blocked but may be drawn as visually free cells through the persisted or reconstructed render-only semantic mask.
 
-When \texttt{to\_generate="visualization"}, visualization selection is controlled by the current values in \texttt{master\_config.py}:
-\begin{itemize}[leftmargin=2em]
-    \item \texttt{num\_last\_runs\_to\_visualize\_jointly\_successful},
-    \item \texttt{num\_last\_runs\_to\_visualize\_independently\_successful}.
-\end{itemize}
+Main-experiment visualization output mirrors the selected capacity and mapping hierarchy under:
+\begin{lstlisting}
+dev/outputs_main/visualization/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            classical_capacity_<N>_agents/classical/final_selected_successful_run/
+            cyclic_capacity_<N>_agents/cyclic/final_selected_successful_run/
+            visualization_summary.json
+\end{lstlisting}
 
-As a result, changing only these selection controls no longer requires a fresh MAPF solve. The renderer reuses the persisted raw payload for the selected branch and applies the \emph{current} visualization-selection settings when deciding which successful runs to render.
+\section{Failure and Compatibility Behavior}
 
-Gray campus regions may be carried separately as render-only visually free vertices. When that semantic mask is present, the visualization pipeline now reconstructs the current gray-mask semantics from the branch image and applies them twice: it passes the visually free vertex set to the renderer and also builds a render-only composite-map copy in which those gray obstacle vertices are temporarily replaced by free-space cells for drawing. This keeps gray campus regions visibly white and open-looking in Pillow outputs while the solver still treats them as non-traversable. Because the reconstruction comes from the current branch image, older persisted raw MAPF stores can still be reused without recomputing solver-stage data.
+Each frame-by-frame store has an explicit format version. If the files are missing or incompatible, visualization mode raises an instruction to rerun the relevant case with \texttt{to\_generate="raw\_data"}. Writes use a temporary tree and an atomic subtree replacement so a failed write does not silently destroy the last valid saved copy.
 
-\subsection{Jointly Successful Variant}
-
-The code selects the last \(n\) run configurations for which both mappings were successful on the same paired configuration and writes them under a dedicated \texttt{jointly\_successful/} folder.
-
-\subsection{Independently Successful Variant}
-
-The code independently selects:
-\begin{itemize}[leftmargin=2em]
-    \item the last \(n\) successful classical runs,
-    \item the last \(n\) successful cyclic runs,
-\end{itemize}
-and writes them under a dedicated \texttt{independently\_successful/} folder.
-
-Both visualization variants are generated in one visualization-only execution, so the old rerun that flipped a boolean selection mode is no longer needed.
-
-
-\section{Visualization Logging Granularity}
-
-The visualization-only execution now emits more stopwatch updates while Pillow frames are being generated. The log records elapsed-time milestones after each selected mapping render, and jointly successful selections also record a completion milestone per selected run configuration. This makes long frame-generation stretches easier to monitor from both the terminal and the saved \texttt{experiment.log}. Visualization outputs are written directly under \texttt{visualizations/} rather than under an extra nested \texttt{visualization/} folder.
-
-\section{Dynamic Visualization Detail}
-
-For dynamic branches, setup frames are rendered from a static setup map derived from the branch's static matrix, while execution frames are rendered against the time-varying loop itself.
-
-\section{Why the Output Shape Matters}
-
-The JSON/CSV outputs are not just byproducts. They are effectively the machine-readable record of the experiment. Any update that changes naming, folder layout, or meaning of those files should be treated as a contract change, not a harmless refactor.
+The pickle files are internal project artifacts and should only be loaded from trusted experiment output directories. Their accompanying JSON metadata is intended for inspection, indexing, and troubleshooting.
 
 \end{document}

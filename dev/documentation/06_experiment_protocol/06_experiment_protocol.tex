@@ -127,7 +127,7 @@ Total path length is not part of the pass/fail rule. It remains a reported trade
 
 \section{Setup Availability and Sampling Ceiling}
 
-When setup generation fails, the tested value is marked as setup unavailable. This means the program could not produce the required number of starts and targets under the current sampling rules, such as dispersed placement with clearance.
+When setup generation fails, the tested value is marked as setup unavailable. This means the program could not produce the required number of starts and targets under the current sampling rules, such as dispersed placement with strict clearance enabled or insufficient unique cells even in relaxed mode.
 
 This is different from solver failure. A solver failure means a valid setup existed, but the solver did not satisfy the pass criterion. The log now records the reason for a failed tested value, such as \texttt{setup\_unavailable}, \texttt{solver\_fail}, \texttt{classical\_solver\_fail}, \texttt{cyclic\_solver\_fail}, or \texttt{temp\_fail}.
 

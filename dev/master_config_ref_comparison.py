@@ -35,14 +35,14 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 SINGLE_AGENT_TIMING_REPETITIONS = 5
 MULTI_AGENT_TIMING_REPETITIONS = 3
 
-# Multi-agent reference comparison agent counts per 50x50 port map.
-# Edit these values to choose how many agents are used for each map.
-# Keys correspond to inputs/reference_port_maps/port_map_<number>.png.
-MULTI_AGENT_REFERENCE_PORT_MAP_AGENT_NUMBERS: dict[int, int] = {
-    1: 17, # max good 17
-    2: 24, # max good 24 (max 40)
-    3: 11, # max good 11
-}
+# Multi-agent reference comparison capacity-search controls.
+# Each 50x50 reference port map searches only the classical capacity. A tested
+# agent number passes when classical solves and cyclic also solves with both
+# lower halted time and fewer conflicts on the exact same deterministic setup.
+REFERENCE_CAPACITY_AGENT_UPPER_BOUND = 255
+REFERENCE_CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
+REFERENCE_CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 1
+REFERENCE_CAPACITY_PASS_CRITERION = "temp_pairwise"
 
 # Controls the final cyclic-map cleanup step only for the reference comparison.
 # True preserves the full cyclic-mapping behavior used by the main experiment.
@@ -58,8 +58,8 @@ REMOVE_EXTRA_TRANSITIONS = False
 ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
 
 # Legacy cyclic-faster filter controls. The current reference-comparison cases
-# disable this filter because both single-agent and multi-agent cases use fixed
-# maps with repeated timing samples.
+# do not use the older repeated-sampling filter. Multi-agent capacity search now
+# applies the stricter pairwise criterion directly to each tested agent number.
 TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER = False
 TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED = 3
 TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20
@@ -71,14 +71,15 @@ TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20
 # Select exactly one program mode.
 # to_generate = "raw_data"       # recompute and save raw reference-comparison data
 to_generate = "graphs"          # regenerate graphs/data from saved raw data
-# to_generate = "visualization"  # regenerate visualizations from saved raw data
+# to_generate = "visualization"  # regenerate Pillow visualizations from saved frame_by_frame packages
 
 # Select exactly one reference-comparison execution target.
 # SELECTED_PORT_EXPERIMENT = "single_agent"
 SELECTED_PORT_EXPERIMENT = "multi_agent"
 
-# Visualization can be regenerated from saved raw data. Keeping this small
-# avoids generating unnecessarily large frame sets.
+# Kept for backward compatibility. The current raw-data phase saves exactly one
+# designated frame-by-frame run for every map/mapping pair, so visualization
+# generation no longer selects from a larger raw-data candidate pool.
 NUM_LAST_SUCCESSFUL_RUNS_TO_VISUALIZE_PER_MAPPING = 1
 
 
@@ -102,10 +103,11 @@ REFERENCE_COMPARISON_CASES: dict[str, dict[str, Any]] = {
         "display_name": "Reference Comparison: Multi Agent",
         "size_label": "x50",
         "map_size": 50,
-        # Fallback/default value used for legacy summaries. The actual multi-agent
-        # run for each port map uses the matching value in map_agent_numbers below.
-        "agent_number": MULTI_AGENT_REFERENCE_PORT_MAP_AGENT_NUMBERS.get(1, 10),
-        "map_agent_numbers": MULTI_AGENT_REFERENCE_PORT_MAP_AGENT_NUMBERS,
+        "capacity_search_enabled": True,
+        "capacity_agent_upper_bound": REFERENCE_CAPACITY_AGENT_UPPER_BOUND,
+        "capacity_binary_search_max_downward_moves": REFERENCE_CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES,
+        "capacity_attempts_per_agent_number": REFERENCE_CAPACITY_ATTEMPTS_PER_AGENT_NUMBER,
+        "capacity_pass_criterion": REFERENCE_CAPACITY_PASS_CRITERION,
         "counted_runs_required": 1,
         "multi_agent_timing_repetitions": MULTI_AGENT_TIMING_REPETITIONS,
         "filter_individual_runs_until_cyclic_faster": False,

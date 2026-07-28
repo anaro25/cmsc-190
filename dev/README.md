@@ -13,7 +13,80 @@ agent-number ranges, runtime limits, densities, thresholds, loop settings, start
 positioning modes, the global consecutive failed paired sampling limit, the
 project-wide `enhanced_CBS` solver toggle, and each branch's `ECBS_suboptimality`.
 
-Results are written under `dev/outputs_main_experiment/`, grouped by the selected exact map configurations.
+Results are written under `dev/outputs_main/`, grouped by the selected exact map configurations.
+
+Terminal output from the two main-experiment modes is compartmentalized under:
+
+```text
+dev/outputs_main/terminal_logs/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            raw_data.log
+            visualization.log
+```
+
+For example, the static-artificial dispersed/dispersed log is written under
+`1_static_artificial/1_static_artificial_dispersed_dispersed/`. Each mode rewrites only
+its own log file for that exact map configuration.
+
+When `to_generate = "raw_data"`, the program writes an author-facing inspection file and an independent Results-ready package for each selected exact map configuration:
+
+```text
+dev/outputs_main/metrics_data_inspection/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>_evaluation.xml
+
+dev/outputs_main/metrics_data/
+    data_dictionary.csv
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            README.txt
+            configuration_metadata.csv
+            capacity_summary.csv
+            capacity_comparison.csv
+            capacity_search_tests.csv
+            capacity_search_run_records.csv
+            capacity_point_run_records.csv
+            capacity_point_summary.csv
+            paired_run_comparisons.csv
+            results_ready_comparisons.csv
+            <numbered_exact_map_configuration>_metrics_data.csv
+            metrics_package.json
+```
+
+`data_dictionary.csv` is the only intentional project-level file in `metrics_data/`. The program does not create cumulative CSVs, a dataset manifest, or a root reader guide. Running or rerunning one map configuration updates only that configuration's folder; other map-configuration packages are not scanned, appended to, or rebuilt. At the start of a raw-data run, obsolete root-level cumulative files from the previous design are deleted automatically.
+
+The exact-configuration `_metrics_data.csv` is the primary compact Results table. Its companion files provide protocol context, actual capacity agent numbers, completion counts, descriptive statistics, paired differences, seeds, statuses, and capacity-search evidence. Blank metric values mean unavailable or not applicable rather than zero, and path statistics use solved runs only.
+
+The separate `<map_config>_raw_data.json` inspection file is no longer generated.
+
+The main experiment no longer has a `to_generate = "graphs"` mode and does not create PNG
+metric plots. The complete metrics package is produced during the same raw-data execution that
+runs the solver.
+
+When `to_generate = "raw_data"`, the program also saves only the designated successful
+trajectories under `dev/outputs_main/frame_by_frame/`:
+
+```text
+frame_by_frame/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            classical_capacity_<N>_agents/
+                classical/final_selected_successful_run/
+                    frame_by_frame.pkl
+                    metadata.json
+            cyclic_capacity_<N>_agents/
+                cyclic/final_selected_successful_run/
+                    frame_by_frame.pkl
+                    metadata.json
+            manifest.json
+```
+
+The classical package is the final retained successful classical run at classical capacity.
+The cyclic package is the final retained successful cyclic run at cyclic capacity. Intermediate
+capacity-search runs and cross-mapping comparative runs are not stored here. When
+`to_generate = "visualization"`, Pillow output is generated directly from these packages;
+the numerical metrics package is not used for visualization generation.
 
 ## Current orchestration path
 
@@ -30,10 +103,10 @@ The `study` package is split by responsibility:
 - `preparation.py` — build static and dynamic run contexts
 - `runtime.py` — solver execution, CBS/ECBS dispatch, seeds, and run record construction
 - `aggregation.py` — condition-level summaries
-- `plotting.py` — PNG graph generation
 - `io_utils.py` — structured output writing and experiment logging
 - `logging_utils.py` — console/file log formatting
-- `orchestrator.py` — jointly viable paired sampling, early stopping, and branch execution flow
+- `metrics_data_store.py` — Results-ready per-configuration packages, reader guides, and the project-level data dictionary
+- `orchestrator.py` — capacity search, paired capacity-point evaluation, and branch execution flow
 
 ## Current branches
 
@@ -78,16 +151,16 @@ For each planned agent number in the selected branch:
 4. If either mapping is `unsolvable`, the configuration is discarded and a newly sampled
    configuration is tried.
 5. The updated main experiment now writes text-only result logs under
-   `dev/outputs_main_experiment/data_log/`.
+   `dev/outputs_main/metrics_data_inspection/`.
 6. The path metric is now total path length over all agents, not average path length.
 
 The per-run runtime limit, 1-out-of-5 pass rule, and post-first-success binary-search downward-move limit come from `master_config.py`.
 
 ## Capacity comparison outputs
 
-For each selected exact map configuration, the program processes that configuration directly.
-Each configuration receives its own `_evaluation.xml` text log and a matching
-`_raw_data.json` file. The log contains the classical capacity point, the cyclic capacity point, one saved successful capacity run per mapping, paired comparative runs at both points, and condensed evaluations for halted time and conflicts. Because only one successful capacity run is retained, the detailed main-experiment log reports direct values rather than averages.
+For each selected exact map configuration, the program processes that configuration directly. Each configuration receives an `_evaluation.xml` inspection log and its own Results-ready metrics package. The compact `_metrics_data.csv` reports both mappings at the classical-origin and cyclic-origin capacity points, including actual agent numbers, outcome counts, means, changes, percentage changes, and interpretation flags. Companion CSVs preserve the capacity-search steps, retained attempts, capacity-point run records, paired same-initial-condition comparisons, descriptive statistics, solver/protocol metadata, and valid path-value counts.
+
+No project-level result file combines multiple map configurations. This keeps every configuration independent when different subsets are selected across program runs.
 
 ## Supplementary reference comparison
 
@@ -116,4 +189,4 @@ ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
 
 Set `REMOVE_EXTRA_TRANSITIONS` to `False` to skip only the redundant-transition elimination step while still preserving required connectivity restoration. Set `ADD_TRANSITIONS_BETWEEN_FREE_SPACES` to `True` to add a bidirectional transition between every adjacent pair of free cells after the cyclic-mapping cleanup steps. These toggles are only used by the reference-comparison workflow; the main experiment keeps its existing cyclic-mapping behavior.
 
-Reference outputs are written under `dev/outputs_ref_comparison/<case_id>/`, with persisted raw data under `dev/outputs_ref_comparison/raw_mapf_files/<case_id>/`. The reference comparison now uses three separate 50x50 port maps from `dev/inputs/reference_port_maps/`: `port_map_1.png`, `port_map_2.png`, and `port_map_3.png`. Their pixel meanings are: black (`#000000`) = normal obstacle, white (`#ffffff`) = free space, and light red (`#e8787a`) = invisible obstacle. Invisible obstacles are blocked logically during planning/solving but rendered as ordinary free space in MAPF visualizations; transition rendering is unchanged. The old orientation-based variants are no longer generated. The single-agent case compares traditional A* + classical mapping versus traditional A* + cyclic mapping on all three maps, using the lower-left-most free cell as the start and the upper-right-most free cell as the goal for each map. For each map and mapping, `SINGLE_AGENT_TIMING_REPETITIONS = 5` repeats the same deterministic A* setup five times and stores the average as `time_computation_halted_seconds`; path, node, turn, and distance metrics are taken from the same unchanged setup. The multi-agent case also runs all three maps and uses `MULTI_AGENT_TIMING_REPETITIONS = 3`. Its agent counts are selected per port map in `MULTI_AGENT_REFERENCE_PORT_MAP_AGENT_NUMBERS`, for example `{1: 10, 2: 10, 3: 10}` means map 1, map 2, and map 3 each use 10 agents. Each map keeps the same deterministic release/spawn rule and stores the average ECBS runtime per mapping; conflict, turn, and distance values are taken from the representative deterministic solution. The temporary individual cyclic-faster filter is disabled for both single-agent and multi-agent reference cases. When `to_generate = "graphs"`, each selected reference case writes a matplotlib-formatted summary table beside the generated graphs. The table has three sections, one for each map number. Single-agent tables report Running time, Number of nodes, Number of turns, and Total distance. Multi-agent tables report Running time, Average number of conflicts, Average number of turns, and Average total distance. In both tables, the mapping headers are `Traditional A* with Classical Mapping` and `With Cyclic Mapping`, and the final column is `Percent Reduction/Gain`, where negative values mean the cyclic value is lower than the classical value and positive values mean the cyclic value is higher. The graph outputs are metric-level summaries across maps: each metric has one graph with x-axis points for Map 1, Map 2, Map 3, and Average. Only the three map-specific points are connected by the horizontal trend line; the Average point is plotted as a standalone summary marker. Any sibling images containing manually colored path markings remain in the input directory for record-keeping, but the reference workflow does not read or import those markings. When `to_generate = "visualization"`, the reference-comparison visualizer selects successful runs independently per map number and mapping, so one classical/cyclic visualization set is produced for each available port map rather than only the last map overall. The visualization step also logs selection, per-map rendering progress, frame-writing stages, and final frame counts. All reference-comparison and main-experiment graphs set the vertical axis from the actually plotted values with a small padding margin, making close values easier to distinguish; the 30-second runtime-limit line is shown only on runtime graphs where at least one plotted value reaches that limit.
+Reference outputs are written under `dev/outputs_ref_comparison/<case_id>/`, with persisted numerical raw data under `dev/outputs_ref_comparison/raw_mapf_files/<case_id>/`. Selected trajectories are stored separately under `dev/outputs_ref_comparison/frame_by_frame/single_agent_pf/` and `dev/outputs_ref_comparison/frame_by_frame/multi_agent_pf/`. For each of the three maps, the single-agent case stores the first successful timing repetition for classical and cyclic. The multi-agent case stores the first successful timing repetition for both mappings from the final comparison at the discovered classical capacity. Capacity-search trials are not stored as frame-by-frame runs. `to_generate = "visualization"` reads these trajectory packages directly. The reference comparison now uses three separate 50x50 port maps from `dev/inputs/reference_port_maps/`: `port_map_1.png`, `port_map_2.png`, and `port_map_3.png`. Their pixel meanings are: black (`#000000`) = normal obstacle, white (`#ffffff`) = free space, and light red (`#e8787a`) = invisible obstacle. Invisible obstacles are blocked logically during planning/solving but rendered as ordinary free space in MAPF visualizations; transition rendering is unchanged. The old orientation-based variants are no longer generated. The single-agent case compares traditional A* + classical mapping versus traditional A* + cyclic mapping on all three maps, using the lower-left-most free cell as the start and the upper-right-most free cell as the goal for each map. For each map and mapping, `SINGLE_AGENT_TIMING_REPETITIONS = 5` repeats the same deterministic A* setup five times and stores the average as `time_computation_halted_seconds`; path, node, turn, and distance metrics are taken from the same unchanged setup. The multi-agent case also runs all three maps, but it no longer uses fixed per-map agent numbers. For each map, it performs a limited binary search over 1 to 255 agents and searches only the temporary pairwise classical capacity. A candidate is tested once and passes only when classical solves and cyclic also solves with both lower halted time and fewer conflicts on the exact same deterministic release schedule. The search starts at 128, continues downward until a first pass is found, and then allows at most three additional binary-search child moves. At the discovered classical capacity, both mappings are run with `MULTI_AGENT_TIMING_REPETITIONS = 3`; the stored runtime is the average of those three executions, while conflict, turn, and distance values come from the representative deterministic solution. No separate cyclic-capacity search is performed. When `to_generate = "graphs"`, each selected reference case writes a matplotlib-formatted summary table beside the generated graphs. The table has three sections, one for each map number. Single-agent tables report Running time, Number of nodes, Number of turns, and Total distance. Multi-agent tables report Running time, Average number of conflicts, Average number of turns, and Average total distance. In both tables, the mapping headers are `Traditional A* with Classical Mapping` and `With Cyclic Mapping`, and the final column is `Percent Reduction/Gain`, where negative values mean the cyclic value is lower than the classical value and positive values mean the cyclic value is higher. The graph outputs are metric-level summaries across maps: each metric has one graph with x-axis points for Map 1, Map 2, Map 3, and Average. Only the three map-specific points are connected by the horizontal trend line; the Average point is plotted as a standalone summary marker. Any sibling images containing manually colored path markings remain in the input directory for record-keeping, but the reference workflow does not read or import those markings. When `to_generate = "visualization"`, the reference-comparison visualizer selects successful runs independently per map number and mapping, so one classical/cyclic visualization set is produced for each available port map rather than only the last map overall. The visualization step also logs selection, per-map rendering progress, frame-writing stages, and final frame counts. All reference-comparison graphs set the vertical axis from the actually plotted values with a small padding margin, making close values easier to distinguish; the 30-second runtime-limit line is shown only on runtime graphs where at least one plotted value reaches that limit.

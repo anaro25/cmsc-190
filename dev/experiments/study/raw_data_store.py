@@ -188,7 +188,7 @@ class BranchRawDataStore:
             if backup_root.exists():
                 shutil.rmtree(backup_root)
 
-    def load_graphs_payload(self) -> dict[str, Any]:
+    def load_metrics_payload(self) -> dict[str, Any]:
         manifest = self._load_manifest()
         branch_spec = self._load_branch_spec(manifest)
         dynamic_state = self._load_dynamic_state(manifest)
@@ -236,7 +236,7 @@ class BranchRawDataStore:
         }
 
     def load(self) -> dict[str, Any]:
-        payload = self.load_graphs_payload()
+        payload = self.load_metrics_payload()
         payload.update(self.load_visualization_payload())
         return payload
 

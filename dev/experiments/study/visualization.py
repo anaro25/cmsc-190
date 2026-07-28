@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import shutil
 from collections import OrderedDict
 from pathlib import Path
 from typing import Any
@@ -594,3 +595,102 @@ def render_selected_visualizations(
 
     _write_visualization_summary(output_manager=output_manager, summary=summary, logger=logger)
     return summary
+
+
+def render_saved_frame_by_frame_packages(
+    *,
+    packages: list[dict[str, Any]],
+    output_root: Path,
+    logger: ExperimentLogger,
+) -> dict[str, Any]:
+    """Render exactly the main-experiment runs stored under frame_by_frame/."""
+    if output_root.exists():
+        shutil.rmtree(output_root)
+    output_root.mkdir(parents=True, exist_ok=True)
+
+    rendered_entries: list[dict[str, Any]] = []
+    ordered_packages = sorted(
+        packages,
+        key=lambda package: (
+            str(package.get("selection", {}).get("capacity_name", "")),
+            str(package.get("selection", {}).get("mapping_name", "")),
+        ),
+    )
+
+    for package_index, package in enumerate(ordered_packages, start=1):
+        selection = dict(package.get("selection") or {})
+        branch_spec = package.get("branch_spec")
+        dynamic_state = package.get("dynamic_state")
+        candidate = package.get("candidate")
+        if not isinstance(branch_spec, BranchSpec):
+            raise ValueError("Saved frame-by-frame package is missing a valid BranchSpec.")
+        if not isinstance(candidate, VisualizationCandidate):
+            raise ValueError("Saved frame-by-frame package is missing a valid VisualizationCandidate.")
+
+        capacity_dir_name = str(selection.get("capacity_directory") or "capacity_unknown")
+        mapping_name = str(selection.get("mapping_name") or candidate.mapping_name)
+        selection_dir_name = "final_selected_successful_run"
+        run_output_dir = output_root / capacity_dir_name / mapping_name / selection_dir_name
+        run_output_dir.mkdir(parents=True, exist_ok=True)
+
+        logger.log(
+            f"Rendering saved frame-by-frame package {package_index}/{len(ordered_packages)} | "
+            f"capacity={capacity_dir_name} | mapping={mapping_name} | "
+            f"run_config_id={candidate.run_configuration.run_config_id}"
+        )
+
+        classical_setup_map = None
+        cyclic_setup_map = None
+        if branch_spec.is_dynamic:
+            if not isinstance(dynamic_state, DynamicBranchState):
+                raise ValueError(
+                    "Dynamic saved frame-by-frame packages require the persisted DynamicBranchState."
+                )
+            classical_setup_map, cyclic_setup_map = build_static_only_setup_maps(
+                dynamic_state.static_matrix
+            )
+
+        static_visually_free_vertex_positions = _load_static_render_visually_free_vertices(
+            branch_spec
+        )
+        frames = _render_candidate(
+            branch_spec=branch_spec,
+            dynamic_state=dynamic_state,
+            candidate=candidate,
+            run_output_dir=run_output_dir,
+            classical_setup_map=classical_setup_map,
+            cyclic_setup_map=cyclic_setup_map,
+            static_visually_free_vertex_positions=static_visually_free_vertex_positions,
+        )
+        logger.log_elapsed(
+            f"Rendered saved {mapping_name} Pillow frames for "
+            f"{candidate.run_configuration.run_config_id} ({len(frames)} execution frame files)."
+        )
+        rendered_entries.append(
+            {
+                "capacity_name": selection.get("capacity_name"),
+                "capacity_directory": capacity_dir_name,
+                "mapping_name": mapping_name,
+                "agent_number": candidate.run_configuration.agent_number,
+                "run_config_id": candidate.run_configuration.run_config_id,
+                "run_index": candidate.run_configuration.run_index,
+                "frame_count": len(frames),
+                "output_dir": str(run_output_dir),
+            }
+        )
+
+    summary = {
+        "selection_source": "outputs_main/frame_by_frame",
+        "saved_package_count": len(packages),
+        "rendered_package_count": len(rendered_entries),
+        "visualization_root": str(output_root),
+        "rendered_entries": rendered_entries,
+        "notes": (
+            "Pillow visualizations were generated only from the final selected classical run "
+            "at classical capacity and the final selected cyclic run at cyclic capacity."
+        ),
+    }
+    write_json(output_root / "visualization_summary.json", summary)
+    logger.log(f"Visualization summary written: {output_root / 'visualization_summary.json'}")
+    return summary
+

@@ -70,8 +70,8 @@ CAPACITY_PASS_CRITERION = "temp_pairwise"
 SHARED_COUNTED_RUNS_REQUIRED = 1
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
 CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
-CAPACITY_AGENT_UPPER_BOUND = 15 # orig: 255
-CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
+CAPACITY_AGENT_UPPER_BOUND = 255
+CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 100 # Unlimited (set to high value)
 SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 3
 
 # When multiple map configurations are selected, ask after each completed
@@ -84,54 +84,54 @@ PROMPT_BEFORE_NEXT_MAP_CONFIG_TIMEOUT_SECONDS = 5.0
 # ===================================
 
 # Select exactly one program mode.
-to_generate = "raw_data"        # compute binary-search capacity data and text logs
-# to_generate = "graphs"        # generate graphs for the selected map configs from saved raw data
-# to_generate = "visualization" # generate visualizations for the selected map configs from saved raw data
+# to_generate = "raw_data"        # compute capacity data, Results-ready metrics packages, inspection files, and frame-by-frame packages
+to_generate = "visualization" # generate Pillow visualizations from saved frame_by_frame packages
 
 # Select one or more exact main-experiment map configurations. Uncomment only
 # the configurations that should be processed by the active to_generate mode.
 SELECTED_MAP_CONFIGS = [
-    # "static_artificial_dispersed_dispersed",
+    "static_artificial_dispersed_dispersed",
     # "static_artificial_dispersed_clustered",
     # "static_artificial_clustered_dispersed",
     # "static_artificial_clustered_clustered",
-    "dynamic_artificial_dispersed_dispersed",
+    # "dynamic_artificial_dispersed_dispersed",
     # "dynamic_artificial_dispersed_clustered",
-    "dynamic_artificial_clustered_dispersed",
+    # "dynamic_artificial_clustered_dispersed",
     # "dynamic_artificial_clustered_clustered",
 
     # "static_port_dispersed_dispersed",
-    "static_port_dispersed_clustered",
+    # "static_port_dispersed_clustered",
     # "static_port_clustered_dispersed",
     # "static_port_clustered_clustered",
-    "dynamic_port_dispersed_dispersed",
-    "dynamic_port_dispersed_clustered",
-    "dynamic_port_clustered_dispersed",
-    "dynamic_port_clustered_clustered",
+    # "dynamic_port_dispersed_dispersed",
+    # "dynamic_port_dispersed_clustered",
+    # "dynamic_port_clustered_dispersed",
+    # "dynamic_port_clustered_clustered",
 
     # "static_campus_area_1_dispersed_dispersed",
     # "static_campus_area_1_dispersed_single",
-    "static_campus_area_1_single_dispersed",
-    "static_campus_area_1_single_single",
+    # "static_campus_area_1_single_dispersed",
+    # "static_campus_area_1_single_single",
     # "dynamic_campus_area_1_dispersed_dispersed",
-    "dynamic_campus_area_1_dispersed_single",
-    "dynamic_campus_area_1_single_dispersed",
-    "dynamic_campus_area_1_single_single",
+    # "dynamic_campus_area_1_dispersed_single",
+    # "dynamic_campus_area_1_single_dispersed",
+    # "dynamic_campus_area_1_single_single",
 
-    "static_campus_area_2_dispersed_dispersed",
+    # "static_campus_area_2_dispersed_dispersed",
     # "static_campus_area_2_dispersed_single",
-    "static_campus_area_2_single_dispersed",
-    "static_campus_area_2_single_single",
+    # "static_campus_area_2_single_dispersed",
+    # "static_campus_area_2_single_single",
     # "dynamic_campus_area_2_dispersed_dispersed",
     # "dynamic_campus_area_2_dispersed_single",
-    "dynamic_campus_area_2_single_dispersed",
-    "dynamic_campus_area_2_single_single",
+    # "dynamic_campus_area_2_single_dispersed",
+    # "dynamic_campus_area_2_single_single",
 ]
 
 STATIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
     {
         "seed": 101,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": None,
@@ -159,6 +159,7 @@ DYNAMIC_ARTIFICIAL_CONFIG = _with_shared_runtime(
     {
         "seed": 151,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": None,
@@ -186,6 +187,7 @@ STATIC_PORT_CONFIG = _with_shared_runtime(
     {
         "seed": 201,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": None,
@@ -213,6 +215,7 @@ DYNAMIC_PORT_CONFIG = _with_shared_runtime(
     {
         "seed": 301,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": PORT_CLUSTERED_START_GOAL_MIN_DISTANCE,
@@ -240,6 +243,7 @@ STATIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
     {
         "seed": 401,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": None,
@@ -267,6 +271,7 @@ DYNAMIC_CAMPUS_AREA_1_CONFIG = _with_shared_runtime(
     {
         "seed": 501,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": None,
@@ -294,6 +299,7 @@ STATIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
     {
         "seed": 601,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": None,
@@ -321,6 +327,7 @@ DYNAMIC_CAMPUS_AREA_2_CONFIG = _with_shared_runtime(
     {
         "seed": 701,
         "agent_number_range": (1, CAPACITY_AGENT_UPPER_BOUND, 1),
+        "strict_dispersed_8_neighbor_clearance": False,
         "start_distribution_mode": "dispersed",
         "goal_distribution_mode": "dispersed",
         "clustered_start_goal_min_distance": None,

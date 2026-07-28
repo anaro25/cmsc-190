@@ -79,7 +79,7 @@ The assignment layer now exposes explicit distribution modes instead of a separa
     \item start distribution mode,
     \item goal distribution mode,
     \item optional distinct-zone campus sampling,
-    \item dispersed sets keep internal 8-neighbor separation while clustered sets follow the global \texttt{compact\_clustering} switch,
+    \item dispersed sets prioritize internal 8-neighbor separation, with strict enforcement controlled per map type by \texttt{strict\_dispersed\_8\_neighbor\_clearance}; relaxed mode fills any remaining shortage with unique adjacent cells, while clustered sets follow the global \texttt{compact\_clustering} switch,
     \item \texttt{single} target mode for many-to-one shared goals,
     \item one-to-one matching for dispersed and clustered targets, with optional individual reachability.
 \end{itemize}

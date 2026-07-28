@@ -13,6 +13,9 @@ from dev.experiments.ref_comparison.models import RefCaseSpec
 from dev.paths import OUTPUTS_REF_COMPARISON_ROOT, RAW_REF_COMPARISON_DATA_ROOT
 
 
+RAW_REFERENCE_FORMAT_VERSION = 2
+
+
 def format_elapsed_mmss(elapsed_seconds: float) -> str:
     total_seconds = max(0, int(round(elapsed_seconds)))
     minutes, seconds = divmod(total_seconds, 60)
@@ -118,12 +121,18 @@ class RefRawDataStore:
             shutil.rmtree(backup_root)
         temp_root.mkdir(parents=True, exist_ok=True)
 
+        # Numerical/raw experiment data is persisted separately from the selected
+        # frame-by-frame trajectory packages. Visualization regeneration must read
+        # outputs_ref_comparison/frame_by_frame rather than this payload.
+        numerical_payload = dict(payload)
+        numerical_payload.pop("visualization_candidates", None)
+
         payload_path = temp_root / "raw_reference_payload.pkl"
         with payload_path.open("wb") as handle:
-            pickle.dump(payload, handle, protocol=pickle.HIGHEST_PROTOCOL)
+            pickle.dump(numerical_payload, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
         manifest = {
-            "format_version": 1,
+            "format_version": RAW_REFERENCE_FORMAT_VERSION,
             "saved_at_utc": datetime.now(timezone.utc).isoformat(),
             "case_id": self.case_spec.case_id,
             "payload_path": payload_path.name,
@@ -138,7 +147,12 @@ class RefRawDataStore:
                 "experiment_mode": self.case_spec.experiment_mode,
                 "map_size": self.case_spec.map_size,
                 "agent_number": self.case_spec.agent_number,
-                "map_agent_numbers": {str(key): value for key, value in sorted(self.case_spec.map_agent_numbers.items())},
+                "capacity_search_enabled": self.case_spec.capacity_search_enabled,
+                "capacity_pass_criterion": self.case_spec.capacity_pass_criterion,
+                "capacity_agent_upper_bound": self.case_spec.capacity_agent_upper_bound,
+                "capacity_binary_search_max_downward_moves": self.case_spec.capacity_binary_search_max_downward_moves,
+                "map_classical_capacities": dict(payload.get("stop_summary", {}).get("map_classical_capacities", {})),
+                "capacity_searches_count": len(payload.get("capacity_searches", [])),
                 "run_configurations_count": len(payload.get("run_configurations", [])),
                 "run_records_count": len(payload.get("run_records", [])),
                 "discarded_attempts_count": len(payload.get("discarded_attempts", [])),
@@ -170,6 +184,15 @@ class RefRawDataStore:
             raise FileNotFoundError(
                 "No persisted reference-comparison raw data exists for "
                 f"case '{self.case_spec.case_id}'. Set to_generate = \"raw_data\" first."
+            )
+        with self.manifest_path.open("r", encoding="utf-8") as handle:
+            manifest = json.load(handle)
+        format_version = int(manifest.get("format_version", 0) or 0)
+        if format_version != RAW_REFERENCE_FORMAT_VERSION:
+            raise ValueError(
+                "The persisted reference-comparison raw data uses an incompatible format "
+                f"(found {format_version}, expected {RAW_REFERENCE_FORMAT_VERSION}). "
+                "Set to_generate = \"raw_data\" to recompute it with the current capacity-search workflow."
             )
         with self.payload_path.open("rb") as handle:
             return pickle.load(handle)

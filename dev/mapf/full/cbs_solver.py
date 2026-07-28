@@ -3,7 +3,7 @@ import itertools
 import time
 from typing import Any
 
-from dev.mapf.full.mapf_low_level_astar import find_path_for_agent
+from dev.mapf.full.mapf_low_level_astar import LowLevelSearchTimeout, find_path_for_agent
 
 
 DEFAULT_ECBS_SUBOPTIMALITY_FACTOR = 1.5
@@ -324,6 +324,7 @@ def _replan_static_agent(
     tight_time_horizon=False,
     agent_cohesion_enabled=False,
     cohesion_reference_paths=None,
+    deadline=None,
 ):
     """Run the low-level A* search for one agent."""
     return find_path_for_agent(
@@ -338,6 +339,7 @@ def _replan_static_agent(
         tight_time_horizon=tight_time_horizon,
         agent_cohesion_enabled=agent_cohesion_enabled,
         cohesion_reference_paths=cohesion_reference_paths,
+        deadline=deadline,
     )
 
 
@@ -384,11 +386,19 @@ def build_cbs_failure(
 
 
 
-def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback):
+def maybe_report_elapsed_time(
+    start_time,
+    next_report_seconds,
+    progress_callback,
+    *,
+    max_report_seconds=None,
+):
     if progress_callback is None:
         return next_report_seconds
 
     elapsed_seconds = time.perf_counter() - start_time
+    if max_report_seconds is not None:
+        elapsed_seconds = min(elapsed_seconds, max(0.0, float(max_report_seconds)))
 
     while elapsed_seconds >= next_report_seconds:
         progress_callback(next_report_seconds)
@@ -398,8 +408,8 @@ def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback
 
 
 
-def _has_reached_runtime_limit(start_time, max_runtime_seconds):
-    return time.perf_counter() - start_time > max_runtime_seconds
+def _has_reached_runtime_limit(deadline):
+    return time.perf_counter() >= deadline
 
 
 # ---------------------------------------------------------------------------
@@ -490,6 +500,7 @@ def _solve_mapf_with_cbs_style(
        node is selected.
     """
     start_time = time.perf_counter()
+    deadline = start_time + max(0.0, float(max_runtime_seconds))
     next_report_seconds = PROGRESS_REPORT_INTERVAL_SECONDS
     agents_by_id = _agent_lookup(agents)
 
@@ -505,9 +516,10 @@ def _solve_mapf_with_cbs_style(
             start_time,
             next_report_seconds,
             progress_callback,
+            max_report_seconds=max_runtime_seconds,
         )
 
-        if _has_reached_runtime_limit(start_time, max_runtime_seconds):
+        if _has_reached_runtime_limit(deadline):
             return build_cbs_failure(
                 "solver_timeout",
                 0,
@@ -517,16 +529,27 @@ def _solve_mapf_with_cbs_style(
                 agent_cohesion_enabled=agent_cohesion_enabled,
             )
 
-        path = _replan_static_agent(
-            composite_map,
-            agent,
-            root_constraints,
-            heuristic_weight=heuristic_weight,
-            true_static_shortest_path_distance=true_static_shortest_path_distance,
-            tight_time_horizon=tight_time_horizon,
-            agent_cohesion_enabled=agent_cohesion_enabled,
-            cohesion_reference_paths=root_paths,
-        )
+        try:
+            path = _replan_static_agent(
+                composite_map,
+                agent,
+                root_constraints,
+                heuristic_weight=heuristic_weight,
+                true_static_shortest_path_distance=true_static_shortest_path_distance,
+                tight_time_horizon=tight_time_horizon,
+                agent_cohesion_enabled=agent_cohesion_enabled,
+                cohesion_reference_paths=root_paths,
+                deadline=deadline,
+            )
+        except LowLevelSearchTimeout:
+            return build_cbs_failure(
+                "solver_timeout",
+                0,
+                0,
+                solver_name=solver_name,
+                solver_suboptimality_factor=suboptimality_factor,
+                agent_cohesion_enabled=agent_cohesion_enabled,
+            )
 
         if path is None:
             return build_cbs_failure(
@@ -571,9 +594,10 @@ def _solve_mapf_with_cbs_style(
             start_time,
             next_report_seconds,
             progress_callback,
+            max_report_seconds=max_runtime_seconds,
         )
 
-        if _has_reached_runtime_limit(start_time, max_runtime_seconds):
+        if _has_reached_runtime_limit(deadline):
             return build_cbs_failure(
                 "solver_timeout",
                 num_conflicts_detected,
@@ -626,9 +650,10 @@ def _solve_mapf_with_cbs_style(
                 start_time,
                 next_report_seconds,
                 progress_callback,
+                max_report_seconds=max_runtime_seconds,
             )
 
-            if _has_reached_runtime_limit(start_time, max_runtime_seconds):
+            if _has_reached_runtime_limit(deadline):
                 return build_cbs_failure(
                     "solver_timeout",
                     num_conflicts_detected,
@@ -649,16 +674,27 @@ def _solve_mapf_with_cbs_style(
 
             # Only the newly constrained agent has to replan. The other paths
             # are copied from the parent node.
-            new_path = _replan_static_agent(
-                composite_map,
-                constrained_agent,
-                child_constraints,
-                heuristic_weight=heuristic_weight,
-                true_static_shortest_path_distance=true_static_shortest_path_distance,
-                tight_time_horizon=tight_time_horizon,
-                agent_cohesion_enabled=agent_cohesion_enabled,
-                cohesion_reference_paths=current_node["paths"],
-            )
+            try:
+                new_path = _replan_static_agent(
+                    composite_map,
+                    constrained_agent,
+                    child_constraints,
+                    heuristic_weight=heuristic_weight,
+                    true_static_shortest_path_distance=true_static_shortest_path_distance,
+                    tight_time_horizon=tight_time_horizon,
+                    agent_cohesion_enabled=agent_cohesion_enabled,
+                    cohesion_reference_paths=current_node["paths"],
+                    deadline=deadline,
+                )
+            except LowLevelSearchTimeout:
+                return build_cbs_failure(
+                    "solver_timeout",
+                    num_conflicts_detected,
+                    num_high_level_nodes_expanded,
+                    solver_name=solver_name,
+                    solver_suboptimality_factor=suboptimality_factor,
+                    agent_cohesion_enabled=agent_cohesion_enabled,
+                )
 
             if new_path is None:
                 # This child represents an impossible branch, so skip it.

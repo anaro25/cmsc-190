@@ -1,0 +1,17 @@
+========================================================================================
+Selected exact main-experiment map configuration 1 of 1:
+  static_artificial_dispersed_dispersed — Static Artificial / Dispersed-Dispersed
+to_generate: visualization
+Metrics-data-inspection root: D:\projects\cmsc-190\dev\outputs_main\metrics_data_inspection
+Metrics-data root: D:\projects\cmsc-190\dev\outputs_main\metrics_data
+Frame-by-frame root: D:\projects\cmsc-190\dev\outputs_main\frame_by_frame
+Terminal log: D:\projects\cmsc-190\dev\outputs_main\terminal_logs\1_static_artificial\1_static_artificial_dispersed_dispersed\visualization.log
+========================================================================================
+Loaded saved frame-by-frame packages for Pillow visualization generation | count=2 | root=D:\projects\cmsc-190\dev\outputs_main\frame_by_frame\1_static_artificial\1_static_artificial_dispersed_dispersed
+Rendering saved frame-by-frame package 1/2 | capacity=classical_capacity_163_agents | mapping=classical | run_config_id=run[0.0.1.8.802000]
+[Elapsed: 00m 11s] Rendered saved classical Pillow frames for run[0.0.1.8.802000] (56 execution frame files).
+Rendering saved frame-by-frame package 2/2 | capacity=cyclic_capacity_191_agents | mapping=cyclic | run_config_id=run[0.0.1.8.800000]
+[Elapsed: 00m 20s] Rendered saved cyclic Pillow frames for run[0.0.1.8.800000] (46 execution frame files).
+Visualization summary written: D:\projects\cmsc-190\dev\outputs_main\visualization\1_static_artificial\1_static_artificial_dispersed_dispersed\visualization_summary.json
+
+[Elapsed: 00m 20s] static_artificial_dispersed_dispersed visualization finished.

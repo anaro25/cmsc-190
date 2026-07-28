@@ -1,5 +1,6 @@
 import heapq
 import itertools
+import time
 from collections.abc import Mapping
 
 from dev.mapf.agent_cohesion import cohesion_penalty
@@ -14,6 +15,15 @@ REMOVED = object()
 
 
 _DYNAMIC_TIGHT_HORIZON_MINIMUM = 20
+
+
+class TimeExpandedSearchTimeout(RuntimeError):
+    """Raised when time-expanded A* reaches the shared solver deadline."""
+
+
+def _raise_if_deadline_reached(deadline: float | None) -> None:
+    if deadline is not None and time.perf_counter() >= deadline:
+        raise TimeExpandedSearchTimeout("Time-expanded A* reached the solver deadline.")
 
 
 def manhattan_vertex_distance(a, b):
@@ -122,7 +132,9 @@ def find_time_expanded_path_for_agent(
     tight_time_horizon=False,
     agent_cohesion_enabled=False,
     cohesion_reference_paths: Mapping[int, list[tuple[int, int]]] | None = None,
+    deadline: float | None = None,
 ):
+    _raise_if_deadline_reached(deadline)
     heuristic_weight = max(1.0, float(heuristic_weight))
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
@@ -134,7 +146,9 @@ def find_time_expanded_path_for_agent(
     latest_constraint_time = get_latest_constraint_time(agent_constraints)
     static_distance_lookup = {}
     if true_static_shortest_path_distance or tight_time_horizon:
+        _raise_if_deadline_reached(deadline)
         static_distance_lookup = get_true_static_distances_for_dynamic_map(mapped_loop, goal)
+        _raise_if_deadline_reached(deadline)
         start_goal_distance = static_distance_lookup.get(start)
         if start_goal_distance is None:
             return None
@@ -174,6 +188,7 @@ def find_time_expanded_path_for_agent(
     g_score = {start_state: 0}
 
     while open_heap:
+        _raise_if_deadline_reached(deadline)
         _, _, current_g, _, current_state = heapq.heappop(open_heap)
         current_position, current_time = current_state
 

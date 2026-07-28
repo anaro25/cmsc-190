@@ -61,7 +61,6 @@ class BranchSpec:
     prompt_before_next_map_config_timeout_seconds: float
     num_last_runs_to_visualize_jointly_successful: int
     num_last_runs_to_visualize_independently_successful: int
-    path_length_graph_enabled: bool
     is_dynamic: bool
     category_map_type: str
     category_index: int
@@ -72,6 +71,7 @@ class BranchSpec:
     data_log_file_stem: str
     start_distribution_mode: str = "dispersed"
     goal_distribution_mode: str = "dispersed"
+    strict_dispersed_8_neighbor_clearance: bool = True
     clustered_start_goal_min_distance: int | None = None
     require_individual_reachability: bool = False
     zone_relationship_mode: str = "none"
@@ -330,7 +330,6 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         prompt_before_next_map_config_timeout_seconds=float(config.get("prompt_before_next_map_config_timeout_seconds", 6.0)),
         num_last_runs_to_visualize_jointly_successful=int(config.get("num_last_runs_to_visualize_jointly_successful", 0)),
         num_last_runs_to_visualize_independently_successful=int(config.get("num_last_runs_to_visualize_independently_successful", 0)),
-        path_length_graph_enabled=bool(config.get("path_length_graph_enabled", True)),
         is_dynamic=is_dynamic,
         category_map_type=category_map_type,
         category_index=category_index,
@@ -341,6 +340,9 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         data_log_file_stem=data_log_file_stem,
         start_distribution_mode=str(config.get("start_distribution_mode", "dispersed")),
         goal_distribution_mode=str(config.get("goal_distribution_mode", "dispersed")),
+        strict_dispersed_8_neighbor_clearance=bool(
+            config.get("strict_dispersed_8_neighbor_clearance", True)
+        ),
         clustered_start_goal_min_distance=_int_or_none(config.get("clustered_start_goal_min_distance")),
         require_individual_reachability=bool(config.get("require_individual_reachability", False)),
         zone_relationship_mode=str(config.get("zone_relationship_mode", "none")),

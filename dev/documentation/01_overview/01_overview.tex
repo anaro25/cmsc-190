@@ -97,12 +97,12 @@ After an agent reaches its goal, it is treated as absent from later timesteps fo
 At present, the code is best understood as a generalized branch runner with specialized preparation logic and one manual persistence layer:
 \begin{enumerate}[leftmargin=2em]
     \item resolve exact branch specifications from \texttt{SELECTED\_MAP\_CONFIGS} in \texttt{master\_config.py},
-    \item optionally recompute branch-local raw MAPF data and save it under \texttt{dev/outputs/raw\_mapf\_files/<map\_type>/},
     \item prepare either a fresh static run context or a shared dynamic branch state,
-    \item sample run configurations condition by condition,
-    \item solve each retained configuration under both mappings using the currently selected global solver family,
-    \item save the raw branch result payload,
-    \item optionally regenerate either graphs/data outputs or Pillow visualizations from the saved raw payload.
+    \item sample and solve the capacity-search and comparative configurations under both mappings,
+    \item write the author-facing evaluation text under \texttt{metrics\_data\_inspection},
+    \item automatically write an independent exact-configuration Results-ready package under \texttt{metrics\_data},
+    \item save the designated successful trajectories under \texttt{frame\_by\_frame},
+    \item optionally regenerate Pillow visualizations from those frame-by-frame packages.
 \end{enumerate}
 
 \section{What This Project Already Assumes}
@@ -115,7 +115,7 @@ The current project implicitly assumes the following classical MAPF conditions u
     \item offline planning with full knowledge of the dynamic loop,
     \item vertex and edge conflict detection,
     \item one unique goal per agent for dispersed and clustered target modes, or one shared target cell for campus single-target mode,
-    \item dispersed sets avoid internal 8-neighbor adjacency, while clustered sets are controlled by the global \texttt{compact\_clustering} switch: compact directly adjacent clusters when \texttt{True}, and connected one-cell-gap clusters when \texttt{False}.
+    \item dispersed sets prioritize internal 8-neighbor clearance. The per-map \texttt{strict\_dispersed\_8\_neighbor\_clearance} toggle makes this mandatory when \texttt{True}; when \texttt{False}, adjacent unique cells are used only after separated placement can no longer fill the requested set. Clustered sets are controlled by the global \texttt{compact\_clustering} switch: compact directly adjacent clusters when \texttt{True}, and connected one-cell-gap clusters when \texttt{False}.
 \end{itemize}
 
 \end{document}

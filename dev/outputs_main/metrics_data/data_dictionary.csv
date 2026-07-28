@@ -1,0 +1,42 @@
+file_name,field_name,definition,unit_or_type,missing_value_interpretation
+all,schema_version,Version of the metrics-data output schema.,number,Always populated.
+all,map_config,Exact main-experiment map-configuration identifier.,text,Always populated.
+configuration_metadata.csv,map_category,Static/dynamic map category before arrangement suffixes.,text,Always populated.
+configuration_metadata.csv,map_family,"Artificial, port, campus_area_1, or campus_area_2 family.",text,Always populated.
+configuration_metadata.csv,study_context,Traditional MAPF or campus crowd-simulation grouping.,text,Always populated.
+configuration_metadata.csv,environment_type,Static or dynamic environment.,text,Always populated.
+configuration_metadata.csv,agent_arrangement,Exact agent/start arrangement mode.,text,Always populated.
+configuration_metadata.csv,target_arrangement,Exact target/goal arrangement mode.,text,Always populated.
+configuration_metadata.csv and results_ready_comparisons.csv,strict_dispersed_8_neighbor_clearance,Whether dispersed starts and targets must strictly maintain 8-neighbor clearance instead of using adjacent unique cells as a shortage fallback.,yes/no,Always populated.
+configuration_metadata.csv,broad_agent_arrangement,Dispersed or compact cross-attribute class.,text,Always populated.
+configuration_metadata.csv,broad_target_arrangement,Dispersed or compact cross-attribute class.,text,Always populated.
+configuration_metadata.csv,runtime_limit_seconds,Per-mapping solver runtime limit.,seconds,Always populated.
+configuration_metadata.csv,capacity_pass_criterion,Configured rule for accepting a tested agent number.,text,Always populated.
+capacity_comparison.csv,classical_protocol_capacity_agent_number,Highest tested agent number accepted for classical capacity search.,agents,0 means no accepted tested value.
+capacity_comparison.csv,cyclic_protocol_capacity_agent_number,Highest tested agent number accepted for cyclic capacity search.,agents,0 means no accepted tested value.
+capacity_comparison.csv,cyclic_minus_classical_capacity,Cyclic capacity minus classical capacity.,agents,Blank only if comparison unavailable.
+capacity_comparison.csv,cyclic_capacity_percent_change_from_classical,"Capacity percentage change, using classical as denominator.",percent,Blank when classical capacity is zero/unavailable.
+capacity_search_tests.csv,tested_agent_number,Agent number evaluated at one binary-search-style step.,agents,Always populated per row.
+capacity_search_tests.csv,passed,Whether the tested value satisfied the configured criterion.,yes/no,Always populated.
+capacity_search_tests.csv,failure_reason,Program classification for a failed test.,text,Blank for passed tests.
+capacity_search_run_records.csv,qualifying_capacity_success,Whether the primary run was retained as a qualifying success for that tested value.,yes/no,Always populated.
+capacity_point_run_records.csv,capacity_label,Whether results are evaluated at classical-origin or cyclic-origin protocol capacity.,text,Always populated.
+capacity_point_run_records.csv,capacity_agent_number,Actual agent number represented by the capacity context.,agents,0 means no accepted capacity.
+capacity_point_run_records.csv,result_category,"Successful, unfinished, or another program result classification.",text,Always populated when a run exists.
+capacity_point_run_records.csv,time_computation_halted_seconds,Elapsed computation time when the solver halted.,seconds,Blank only if the record itself lacks time.
+capacity_point_run_records.csv,num_conflicts_detected_at_halt,Conflicts detected when computation halted.,conflicts,Blank when unavailable; never assume zero.
+capacity_point_run_records.csv,total_path_length,Sum of all agent path lengths.,grid-step path length,Blank for unfinished/unsolved runs.
+capacity_point_summary.csv,run_record_count,Number of records summarized in the mapping/capacity group.,runs,Zero means no records were available.
+capacity_point_summary.csv,successful_run_count,Number of successful records in the group.,runs,Zero is a tested count.
+capacity_point_summary.csv,unfinished_run_count,Number of runtime-limited unfinished records in the group.,runs,Zero is a tested count.
+capacity_point_summary.csv,path_value_count_solved_runs_only,Number of solved runs contributing to path statistics.,runs,Zero means no valid path values.
+capacity_point_summary.csv,time_mean_seconds,Arithmetic mean halted time across available group records.,seconds,Blank when no time values exist.
+capacity_point_summary.csv,conflicts_mean,Arithmetic mean conflicts at halt across available group records.,conflicts,Blank when no conflict values exist.
+capacity_point_summary.csv,total_path_length_mean,Arithmetic mean total path length across solved records only.,grid-step path length,Blank when no solved path values exist.
+paired_run_comparisons.csv,same_initial_conditions,Whether both mappings were matched by run_config_id.,yes/incomplete_pair,Incomplete pair means one side is missing.
+paired_run_comparisons.csv,cyclic_time_percent_change_from_classical,Paired cyclic time percentage change relative to classical.,percent,Blank when classical time is zero/unavailable.
+paired_run_comparisons.csv,cyclic_conflicts_percent_change_from_classical,Paired cyclic conflicts percentage change relative to classical.,percent,Blank when classical conflicts are zero/unavailable.
+paired_run_comparisons.csv,cyclic_total_path_length_percent_change_from_classical,Paired cyclic path-length percentage change relative to classical.,percent,Blank unless both runs solved and classical path is nonzero.
+results_ready_comparisons.csv,lower_time_mapping,Mapping with lower mean halted time in the capacity context.,classical/cyclic/same/unavailable,Unavailable when either mean is missing.
+results_ready_comparisons.csv,lower_conflicts_mapping,Mapping with lower mean conflicts in the capacity context.,classical/cyclic/same/unavailable,Unavailable when either mean is missing.
+results_ready_comparisons.csv,path_tradeoff_direction,"Whether cyclic mean total path length is longer, shorter, same, or unavailable.",text,Unavailable when either path mean is missing.

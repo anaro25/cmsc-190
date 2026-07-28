@@ -9,6 +9,6 @@ __pycache__/
 # /dev/outputs_ref_comparison/
 
 # other root files
-/dev.zip
-# /output_guide_software_project.txt
-# /zip_software_project.bat
+#/dev.zip
+#/output_guide_software_project.txt
+#/zip_software_project.bat

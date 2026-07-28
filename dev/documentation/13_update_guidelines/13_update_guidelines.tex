@@ -46,7 +46,7 @@ When modifying current behavior, the safest order of inspection is:
     \item the relevant solver modules under \texttt{mapf/},
     \item \texttt{experiments/study/orchestrator.py},
     \item \texttt{experiments/study/raw\_data\_store.py} if persisted raw-data behavior changes,
-    \item \texttt{experiments/study/aggregation.py}, \texttt{plotting.py}, and \texttt{visualization.py} if outputs also change.
+    \item \texttt{experiments/study/aggregation.py}, \texttt{io\_utils.py}, and \texttt{visualization.py} if outputs also change.
 \end{enumerate}
 
 \section{Invariants Worth Preserving}
@@ -90,9 +90,9 @@ The new \texttt{true\_static\_shortest\_path\_distance} and \texttt{tight\_time\
 \end{itemize}
 
 \subsection{Output Contract}
-Downstream reading, analysis, or prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to the solver metadata fields written into branch specs and run records. The presentation-output tree is now latest-only across runs: each purpose writes back into one stable location such as \texttt{logs/computation/}, \texttt{records/graphs\_and\_data/}, or \texttt{visualizations/}. A newer run intentionally clears and replaces the previous contents for that same purpose, so do not quietly reintroduce accumulating \texttt{execution\_...} folders.
+Downstream reading, analysis, or LLM prompting may depend on the current output tree and JSON/CSV file names. Renaming those outputs should be treated as a deliberate interface change. The same applies to solver metadata, capacity definitions, outcome classifications, and run-record fields. Main-experiment numerical inspection files belong under \texttt{metrics\_data\_inspection/}. The Results-ready package belongs under \texttt{metrics\_data/<category>/<exact\_configuration>/}, and its primary compact CSV must retain the \texttt{\_metrics\_data.csv} suffix. The root-level \texttt{data\_dictionary.csv} is the only intentional project-level metrics file. Result data must remain inside exact-configuration folders, and one configuration run must not rebuild another configuration's files.
 
-The graphing layer now has a compact-axis contract: the plotted points come from persisted raw MAPF data, and the x-axis tick labels must be the actual agent numbers present in that plotted payload rather than the full current branch domain from \texttt{master\_config.py}. The practical consequence is that graph regeneration should continue to read older saved data without stretching the axis to newly configured but uncomputed values. If this behavior changes, update \texttt{experiments/study/orchestrator.py} and \texttt{experiments/study/plotting.py} together, and document whether the change is still backward compatible with existing raw MAPF stores.
+The metrics package is part of the \texttt{raw\_data} transaction. Updates to raw payload shape or metric definitions should keep \texttt{experiments/study/orchestrator.py}, \texttt{experiments/study/metrics\_data\_store.py}, and \texttt{experiments/study/io\_utils.py} aligned. Preserve the rules that blank values are not zeros, total path length summarizes solved runs only, capacity is protocol-based, and paired rows are matched by \texttt{run\_config\_id}. Do not reintroduce a separate main-experiment graph mode or PNG metric generation unless the experiment-output contract is intentionally changed again.
 
 Visualization logging now includes elapsed-time milestones during Pillow frame generation itself, not just before and after the whole visualization stage. Static campus visualization regeneration also reconstructs gray render-only cells from the current campus semantic image instead of relying on persisted raw MAPF payloads, so backward compatibility with older raw stores now depends partly on keeping that image-based reconstruction path intact. If either behavior changes, keep \texttt{experiments/study/visualization.py} aligned with the logger interface in \texttt{experiments/study/io\_utils.py}.
 
@@ -141,7 +141,7 @@ Sampling logic is branch-sensitive. Before changing it, check:
     \item whether the branch expects \texttt{dispersed}, \texttt{clustered}, or \texttt{single} goal placement,
     \item whether the branch requires starts and goals to occupy different campus zones,
     \item whether the allowed start and goal vertices come from an image-semantic mask,
-    \item whether the branch should enforce dispersed 8-neighbor separation or clustered placement, and if clustered placement is active whether the project-wide \texttt{compact\_clustering} toggle should imply compact adjacency or connected one-cell-gap spacing.
+    \item whether the branch should strictly enforce dispersed 8-neighbor separation through \texttt{strict\_dispersed\_8\_neighbor\_clearance}, or use relaxed dispersed placement that fills shortages with unique adjacent cells; and if clustered placement is active whether the project-wide \texttt{compact\_clustering} toggle should imply compact adjacency or connected one-cell-gap spacing.
 \end{itemize}
 
 \section{A Good Mental Rule}
