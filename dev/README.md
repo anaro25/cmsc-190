@@ -13,80 +13,90 @@ agent-number ranges, runtime limits, densities, thresholds, loop settings, start
 positioning modes, the global consecutive failed paired sampling limit, the
 project-wide `enhanced_CBS` solver toggle, and each branch's `ECBS_suboptimality`.
 
-Results are written under `dev/outputs_main/`, grouped by the selected exact map configurations.
-
-Terminal output from the two main-experiment modes is compartmentalized under:
+Results are written under `dev/outputs_main/`, with each exact map configuration owning all of its artifact folders:
 
 ```text
-dev/outputs_main/terminal_logs/
+dev/outputs_main/
     <numbered_map_category>/
         <numbered_exact_map_configuration>/
-            raw_data.log
-            visualization.log
+            frame_by_frame/
+            metrics_data/
+            metrics_data_inspection/
+            terminal_logs/
+            visualization/
+    project_level_files/
+        data_dictionary.csv
+        readme.txt
 ```
 
-For example, the static-artificial dispersed/dispersed log is written under
-`1_static_artificial/1_static_artificial_dispersed_dispersed/`. Each mode rewrites only
-its own log file for that exact map configuration.
+The program generates `data_dictionary.csv` during a raw-data run. It does not generate or rewrite `readme.txt`; that file is reserved for manual project-level notes. At startup, the program automatically migrates the previous artifact-first layout into this map-config-first structure. The migration is idempotent and refuses to overwrite different files when both layouts contain conflicting copies.
 
-When `to_generate = "raw_data"`, the program writes an author-facing inspection file and an independent Results-ready package for each selected exact map configuration:
+Terminal output from the two main-experiment modes is written inside the selected exact configuration:
 
 ```text
-dev/outputs_main/metrics_data_inspection/
-    <numbered_map_category>/
-        <numbered_exact_map_configuration>_evaluation.xml
-
-dev/outputs_main/metrics_data/
-    data_dictionary.csv
+dev/outputs_main/
     <numbered_map_category>/
         <numbered_exact_map_configuration>/
-            README.txt
-            configuration_metadata.csv
-            capacity_summary.csv
-            capacity_comparison.csv
-            capacity_search_tests.csv
-            capacity_search_run_records.csv
-            capacity_point_run_records.csv
-            capacity_point_summary.csv
-            paired_run_comparisons.csv
-            results_ready_comparisons.csv
-            <numbered_exact_map_configuration>_metrics_data.csv
-            metrics_package.json
+            terminal_logs/
+                raw_data.log
+                visualization.log
 ```
 
-`data_dictionary.csv` is the only intentional project-level file in `metrics_data/`. The program does not create cumulative CSVs, a dataset manifest, or a root reader guide. Running or rerunning one map configuration updates only that configuration's folder; other map-configuration packages are not scanned, appended to, or rebuilt. At the start of a raw-data run, obsolete root-level cumulative files from the previous design are deleted automatically.
+Each mode rewrites only its own log file for that exact map configuration.
+
+When `to_generate = "raw_data"`, the program writes an author-facing inspection file and an independent Results-ready package inside the same exact configuration:
+
+```text
+dev/outputs_main/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            metrics_data_inspection/
+                <numbered_exact_map_configuration>_evaluation.xml
+            metrics_data/
+                README.txt
+                configuration_metadata.csv
+                capacity_summary.csv
+                capacity_comparison.csv
+                capacity_search_tests.csv
+                capacity_search_run_records.csv
+                capacity_point_run_records.csv
+                capacity_point_summary.csv
+                paired_run_comparisons.csv
+                results_ready_comparisons.csv
+                <numbered_exact_map_configuration>_metrics_data.csv
+                metrics_package.json
+```
 
 The exact-configuration `_metrics_data.csv` is the primary compact Results table. Its companion files provide protocol context, actual capacity agent numbers, completion counts, descriptive statistics, paired differences, seeds, statuses, and capacity-search evidence. Blank metric values mean unavailable or not applicable rather than zero, and path statistics use solved runs only.
 
 The separate `<map_config>_raw_data.json` inspection file is no longer generated.
 
-The main experiment no longer has a `to_generate = "graphs"` mode and does not create PNG
-metric plots. The complete metrics package is produced during the same raw-data execution that
-runs the solver.
+The main experiment no longer has a `to_generate = "graphs"` mode and does not create PNG metric plots. The complete metrics package is produced during the same raw-data execution that runs the solver.
 
-When `to_generate = "raw_data"`, the program also saves only the designated successful
-trajectories under `dev/outputs_main/frame_by_frame/`:
+When `to_generate = "raw_data"`, the program also saves only the designated successful trajectories inside the exact configuration's `frame_by_frame/` folder:
 
 ```text
-frame_by_frame/
+dev/outputs_main/
     <numbered_map_category>/
         <numbered_exact_map_configuration>/
-            classical_capacity_<N>_agents/
-                classical/final_selected_successful_run/
-                    frame_by_frame.pkl
+            frame_by_frame/
+                shared_context/
+                    shared_context.pkl
                     metadata.json
-            cyclic_capacity_<N>_agents/
-                cyclic/final_selected_successful_run/
-                    frame_by_frame.pkl
-                    metadata.json
-            manifest.json
+                classical_capacity_<N>_agents/
+                    classical/final_selected_successful_run/
+                        frame_by_frame.pkl
+                        metadata.json
+                cyclic_capacity_<N>_agents/
+                    cyclic/final_selected_successful_run/
+                        frame_by_frame.pkl
+                        metadata.json
+                manifest.json
 ```
 
-The classical package is the final retained successful classical run at classical capacity.
-The cyclic package is the final retained successful cyclic run at cyclic capacity. Intermediate
-capacity-search runs and cross-mapping comparative runs are not stored here. When
-`to_generate = "visualization"`, Pillow output is generated directly from these packages;
-the numerical metrics package is not used for visualization generation.
+The classical package is the final retained successful classical run at classical capacity. The cyclic package is the final retained successful cyclic run at cyclic capacity. Intermediate capacity-search runs and cross-mapping comparative runs are not stored here. When `to_generate = "visualization"`, Pillow output is generated directly from these packages; the numerical metrics package is not used for visualization generation. The rendered files are written beside the other artifacts under the same exact configuration's `visualization/` folder.
+
+Before a selected configuration begins a new `raw_data` run, the program deletes that configuration's existing `visualization/` folder and stale `terminal_logs/visualization.log`. This prevents older visualizations from being mistaken for output based on the newly regenerated raw data. Unselected configurations are not affected.
 
 ## Current orchestration path
 
@@ -151,7 +161,7 @@ For each planned agent number in the selected branch:
 4. If either mapping is `unsolvable`, the configuration is discarded and a newly sampled
    configuration is tried.
 5. The updated main experiment now writes text-only result logs under
-   `dev/outputs_main/metrics_data_inspection/`.
+   the selected exact configuration's `metrics_data_inspection/` folder.
 6. The path metric is now total path length over all agents, not average path length.
 
 The per-run runtime limit, 1-out-of-5 pass rule, and post-first-success binary-search downward-move limit come from `master_config.py`.

@@ -680,7 +680,7 @@ def render_saved_frame_by_frame_packages(
         )
 
     summary = {
-        "selection_source": "outputs_main/frame_by_frame",
+        "selection_source": "outputs_main/<map_category>/<exact_map_config>/frame_by_frame",
         "saved_package_count": len(packages),
         "rendered_package_count": len(rendered_entries),
         "visualization_root": str(output_root),

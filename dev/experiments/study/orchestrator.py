@@ -14,8 +14,15 @@ from dev.experiments.study.io_utils import (
     write_csv,
 )
 from dev.experiments.study.logging_utils import log_branch_header, log_dynamic_state, log_mapping_record
+from dev.experiments.study.main_output_layout import (
+    PROJECT_LEVEL_FILES_ROOT,
+    get_main_config_artifact_dir,
+    get_main_config_root,
+    invalidate_main_config_visualization_outputs,
+    migrate_legacy_main_output_layout,
+)
 from dev.experiments.study.metrics_data_store import (
-    prepare_metrics_data_root,
+    prepare_project_level_files_root,
     write_metrics_data_package,
 )
 from dev.experiments.study.models import DynamicBranchState, MappingRunRecord, PreparedRunContext
@@ -1113,10 +1120,9 @@ def _compute_single_configuration(
     logger.log("=" * 88)
     log_branch_header(logger, branch_spec)
 
-    metrics_inspection_dir = (
-        OUTPUTS_MAIN_ROOT
-        / "metrics_data_inspection"
-        / branch_spec.data_log_category_dir_name
+    metrics_inspection_dir = get_main_config_artifact_dir(
+        branch_spec,
+        "metrics_data_inspection",
     )
     metrics_inspection_dir.mkdir(parents=True, exist_ok=True)
     data_log_path = metrics_inspection_dir / f"{branch_spec.data_log_file_stem}_evaluation.xml"
@@ -1194,7 +1200,7 @@ def _compute_single_configuration(
     metrics_package_summary = write_metrics_data_package(
         branch_spec=branch_spec,
         payload=raw_payload,
-        metrics_data_root=OUTPUTS_MAIN_ROOT / "metrics_data",
+        metrics_data_dir=get_main_config_artifact_dir(branch_spec, "metrics_data"),
     )
     metrics_data_dir = Path(metrics_package_summary["metrics_data_dir"])
     metrics_csv_path = Path(metrics_package_summary["primary_results_csv_path"])
@@ -1365,12 +1371,7 @@ def _generate_single_configuration_visualizations(
 ) -> dict[str, Any]:
     frame_by_frame_store = MainExperimentFrameByFrameStore(branch_spec)
     packages = frame_by_frame_store.load_packages()
-    visualization_root = (
-        OUTPUTS_MAIN_ROOT
-        / "visualization"
-        / branch_spec.data_log_category_dir_name
-        / branch_spec.data_log_file_stem
-    )
+    visualization_root = get_main_config_artifact_dir(branch_spec, "visualization")
     logger.log(
         "Loaded saved frame-by-frame packages for Pillow visualization generation | "
         f"count={len(packages)} | root={frame_by_frame_store.config_root}"
@@ -1395,10 +1396,7 @@ def _selected_map_config_terminal_log_path(
     generation_target: str,
 ) -> Path:
     return (
-        OUTPUTS_MAIN_ROOT
-        / "terminal_logs"
-        / branch_spec.data_log_category_dir_name
-        / branch_spec.data_log_file_stem
+        get_main_config_artifact_dir(branch_spec, "terminal_logs")
         / f"{generation_target}.log"
     )
 
@@ -1415,21 +1413,11 @@ def run_selected_experiment(
         raise ValueError("No map configurations were selected in SELECTED_MAP_CONFIGS.")
 
     run_start_time = time.perf_counter() if program_start_time is None else program_start_time
-    terminal_logs_root = OUTPUTS_MAIN_ROOT / "terminal_logs"
-    terminal_logs_root.mkdir(parents=True, exist_ok=True)
+    migration_summary = migrate_legacy_main_output_layout()
 
-    metrics_data_root = OUTPUTS_MAIN_ROOT / "metrics_data"
-    metrics_root_summary: dict[str, Any] | None = None
+    project_level_summary: dict[str, Any] | None = None
     if generation_target == "raw_data":
-        metrics_root_summary = prepare_metrics_data_root(metrics_data_root)
-
-    metrics_inspection_root = OUTPUTS_MAIN_ROOT / "metrics_data_inspection"
-    metrics_inspection_root.mkdir(parents=True, exist_ok=True)
-    removed_general_summaries: list[str] = []
-    for obsolete_summary in metrics_inspection_root.glob("selected_map_configs_*_summary.json"):
-        if obsolete_summary.is_file():
-            obsolete_summary.unlink()
-            removed_general_summaries.append(str(obsolete_summary))
+        project_level_summary = prepare_project_level_files_root(PROJECT_LEVEL_FILES_ROOT)
 
     print("=" * 88, flush=True)
     print("Selected exact main-experiment map configurations:", flush=True)
@@ -1437,20 +1425,24 @@ def run_selected_experiment(
         print(f"  {index}. {branch_spec.map_type} — {branch_spec.display_name}", flush=True)
     print(f"to_generate: {generation_target}", flush=True)
     print(f"Map configurations to process: {len(branch_specs)}", flush=True)
-    print(
-        f"Metrics-data-inspection root: {OUTPUTS_MAIN_ROOT / 'metrics_data_inspection'}",
-        flush=True,
-    )
-    print(f"Metrics-data root: {OUTPUTS_MAIN_ROOT / 'metrics_data'}", flush=True)
-    print(f"Frame-by-frame root: {OUTPUTS_MAIN_ROOT / 'frame_by_frame'}", flush=True)
-    print(f"Terminal-log root: {terminal_logs_root}", flush=True)
-    removed_general_files = list(removed_general_summaries)
-    if metrics_root_summary is not None:
+    print(f"Main output root: {OUTPUTS_MAIN_ROOT}", flush=True)
+    print(f"Project-level files root: {PROJECT_LEVEL_FILES_ROOT}", flush=True)
+    if migration_summary.get("migrated"):
         print(
-            f"Project-level data dictionary: {metrics_root_summary['data_dictionary_path']}",
+            "Migrated legacy outputs_main layout | "
+            f"moved={len(migration_summary.get('moved_paths', []))} | "
+            f"rewritten_path_references="
+            f"{len(migration_summary.get('rewritten_path_reference_files', []))} | "
+            f"removed_obsolete={len(migration_summary.get('removed_obsolete_paths', []))}",
             flush=True,
         )
-        removed_general_files.extend(metrics_root_summary.get("removed_obsolete_files", []))
+    removed_general_files = list(migration_summary.get("removed_obsolete_paths", []))
+    if project_level_summary is not None:
+        print(
+            f"Project-level data dictionary: {project_level_summary['data_dictionary_path']}",
+            flush=True,
+        )
+        removed_general_files.extend(project_level_summary.get("removed_obsolete_files", []))
     if removed_general_files:
         print(f"Removed obsolete project-level output files: {len(removed_general_files)}", flush=True)
     print("=" * 88, flush=True)
@@ -1473,16 +1465,33 @@ def run_selected_experiment(
         )
         logger.log(f"  {branch_spec.map_type} — {branch_spec.display_name}")
         logger.log(f"to_generate: {generation_target}")
+        logger.log(f"Map-configuration output root: {get_main_config_root(branch_spec)}")
         logger.log(
-            f"Metrics-data-inspection root: "
-            f"{OUTPUTS_MAIN_ROOT / 'metrics_data_inspection'}"
+            "Metrics-data-inspection root: "
+            f"{get_main_config_artifact_dir(branch_spec, 'metrics_data_inspection')}"
         )
-        logger.log(f"Metrics-data root: {OUTPUTS_MAIN_ROOT / 'metrics_data'}")
-        logger.log(f"Frame-by-frame root: {OUTPUTS_MAIN_ROOT / 'frame_by_frame'}")
+        logger.log(
+            f"Metrics-data root: {get_main_config_artifact_dir(branch_spec, 'metrics_data')}"
+        )
+        logger.log(
+            f"Frame-by-frame root: {get_main_config_artifact_dir(branch_spec, 'frame_by_frame')}"
+        )
         logger.log(f"Terminal log: {terminal_log_path}")
         logger.log("=" * 88)
 
         if generation_target == "raw_data":
+            removed_visualization_paths = invalidate_main_config_visualization_outputs(branch_spec)
+            if removed_visualization_paths:
+                logger.log(
+                    "Deleted obsolete visualization outputs before raw-data regeneration:"
+                )
+                for removed_path in removed_visualization_paths:
+                    logger.log(f"  {removed_path}")
+            else:
+                logger.log(
+                    "No existing visualization outputs needed deletion before raw-data regeneration."
+                )
+
             resolved_seed_base = branch_spec.seed_base if seed_base is None else seed_base
             summary = _compute_single_configuration(
                 branch_spec=branch_spec,
@@ -1517,11 +1526,15 @@ def run_selected_experiment(
         flush=True,
     )
 
+    terminal_log_roots = sorted({str(Path(path).parent) for path in terminal_log_paths})
     return {
         "selected_map_configs": [branch_spec.map_type for branch_spec in branch_specs],
         "generation_target": generation_target,
         "output_root": str(OUTPUTS_MAIN_ROOT),
-        "terminal_logs_root": str(terminal_logs_root),
+        "project_level_files_root": str(PROJECT_LEVEL_FILES_ROOT),
+        "output_layout_migration": migration_summary,
+        "terminal_logs_root": terminal_log_roots[0] if len(terminal_log_roots) == 1 else None,
+        "terminal_log_roots": terminal_log_roots,
         "terminal_log_paths": terminal_log_paths,
         "log_path": terminal_log_paths[0] if len(terminal_log_paths) == 1 else None,
         "map_configurations": summaries,

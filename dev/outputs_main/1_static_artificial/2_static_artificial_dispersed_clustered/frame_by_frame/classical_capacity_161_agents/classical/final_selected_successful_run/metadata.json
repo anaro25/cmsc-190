@@ -1,0 +1,20 @@
+{
+  "format_version": 1,
+  "saved_at_utc": "2026-07-29T05:21:45.772827+00:00",
+  "experiment_family": "main_experiment",
+  "selection_rule": "final selected successful run at the mapping's own capacity",
+  "map_config": "static_artificial_dispersed_clustered",
+  "category_map_type": "static_artificial",
+  "category_directory": "1_static_artificial",
+  "config_directory": "2_static_artificial_dispersed_clustered",
+  "capacity_name": "classical_capacity",
+  "capacity_directory": "classical_capacity_161_agents",
+  "agent_number": 161,
+  "mapping_name": "classical",
+  "run_config_id": "run[0.0.2.8.802000]",
+  "run_index": 802000,
+  "solver_status": "solved",
+  "frame_count": 52,
+  "is_dynamic": false,
+  "package_file": "frame_by_frame.pkl"
+}

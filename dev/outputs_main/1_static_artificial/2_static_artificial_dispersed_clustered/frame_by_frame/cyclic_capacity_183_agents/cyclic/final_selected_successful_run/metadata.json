@@ -1,0 +1,20 @@
+{
+  "format_version": 1,
+  "saved_at_utc": "2026-07-29T05:21:45.772827+00:00",
+  "experiment_family": "main_experiment",
+  "selection_rule": "final selected successful run at the mapping's own capacity",
+  "map_config": "static_artificial_dispersed_clustered",
+  "category_map_type": "static_artificial",
+  "category_directory": "1_static_artificial",
+  "config_directory": "2_static_artificial_dispersed_clustered",
+  "capacity_name": "cyclic_capacity",
+  "capacity_directory": "cyclic_capacity_183_agents",
+  "agent_number": 183,
+  "mapping_name": "cyclic",
+  "run_config_id": "run[0.0.2.8.803000]",
+  "run_index": 803000,
+  "solver_status": "solved",
+  "frame_count": 46,
+  "is_dynamic": false,
+  "package_file": "frame_by_frame.pkl"
+}

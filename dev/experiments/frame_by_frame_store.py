@@ -12,11 +12,9 @@ from typing import Any, Iterable
 from dev.experiments.branch_specs import BranchSpec
 from dev.experiments.ref_comparison.models import RefCaseSpec, RefVisualizationCandidate
 from dev.experiments.study.io_utils import write_json
+from dev.experiments.study.main_output_layout import get_main_config_artifact_dir
 from dev.experiments.study.models import DynamicBranchState, VisualizationCandidate
-from dev.paths import (
-    FRAME_BY_FRAME_MAIN_EXPERIMENT_ROOT,
-    FRAME_BY_FRAME_REF_COMPARISON_ROOT,
-)
+from dev.paths import FRAME_BY_FRAME_REF_COMPARISON_ROOT
 
 
 FRAME_BY_FRAME_FORMAT_VERSION = 1
@@ -361,11 +359,10 @@ class MainExperimentFrameByFrameStore:
 
     def __init__(self, branch_spec: BranchSpec, *, root: Path | None = None):
         self.branch_spec = branch_spec
-        self.root = Path(root) if root is not None else FRAME_BY_FRAME_MAIN_EXPERIMENT_ROOT
         self.config_root = (
-            self.root
-            / branch_spec.data_log_category_dir_name
-            / branch_spec.data_log_file_stem
+            Path(root)
+            if root is not None
+            else get_main_config_artifact_dir(branch_spec, "frame_by_frame")
         )
         self.manifest_path = self.config_root / FRAME_BY_FRAME_MANIFEST_FILENAME
 

@@ -32,46 +32,66 @@ Numerical results and frame-by-frame trajectory data are deliberately separate a
 
 \section{Main-Experiment Outputs}
 
+The main-experiment output tree is organized by map category and exact map configuration first. Every configuration owns its numerical, trajectory, log, and rendering subdirectories:
+\begin{lstlisting}
+dev/outputs_main/
+    <numbered_map_category>/
+        <numbered_exact_map_configuration>/
+            frame_by_frame/
+            metrics_data/
+            metrics_data_inspection/
+            terminal_logs/
+            visualization/
+    project_level_files/
+        data_dictionary.csv
+        readme.txt
+\end{lstlisting}
+
+The program generates \texttt{data\_dictionary.csv} during a raw-data run. It does not generate or rewrite \texttt{readme.txt}; that file is reserved for manually maintained project-level notes.
+
+At startup, the program automatically migrates the previous artifact-first layout into this map-config-first layout. Existing configuration artifacts are merged into their new locations, known obsolete project-level files are removed, and different files are never silently overwritten when both layouts already contain data.
+
 For every selected exact map configuration, the author-facing numerical inspection file is written under:
 \begin{lstlisting}
-dev/outputs_main/metrics_data_inspection/
+dev/outputs_main/
     <numbered_map_category>/
-        <numbered_exact_map_configuration>_evaluation.xml
+        <numbered_exact_map_configuration>/
+            metrics_data_inspection/
+                <numbered_exact_map_configuration>_evaluation.xml
 \end{lstlisting}
 
 The program no longer writes a separate \texttt{<map\_config>\_raw\_data.json}.
 
-The same raw-data execution writes an independent Results-ready package for each selected exact map configuration:
+The same raw-data execution writes an independent Results-ready package under the exact configuration's \texttt{metrics\_data} directory:
 \begin{lstlisting}
-dev/outputs_main/metrics_data/
-    data_dictionary.csv
+dev/outputs_main/
     <numbered_map_category>/
         <numbered_exact_map_configuration>/
-            README.txt
-            configuration_metadata.csv
-            capacity_summary.csv
-            capacity_comparison.csv
-            capacity_search_tests.csv
-            capacity_search_run_records.csv
-            capacity_point_run_records.csv
-            capacity_point_summary.csv
-            paired_run_comparisons.csv
-            results_ready_comparisons.csv
-            <numbered_exact_map_configuration>_metrics_data.csv
-            metrics_package.json
+            metrics_data/
+                README.txt
+                configuration_metadata.csv
+                capacity_summary.csv
+                capacity_comparison.csv
+                capacity_search_tests.csv
+                capacity_search_run_records.csv
+                capacity_point_run_records.csv
+                capacity_point_summary.csv
+                paired_run_comparisons.csv
+                results_ready_comparisons.csv
+                <numbered_exact_map_configuration>_metrics_data.csv
+                metrics_package.json
 \end{lstlisting}
-
-The root-level \texttt{data\_dictionary.csv} is the only intentional project-level metrics file. The program does not create cumulative CSVs, a dataset manifest, a root reader guide, or a selected-map-configurations summary file. Running one map configuration updates only that configuration's package. Other configuration folders are neither scanned nor rebuilt. At the beginning of a raw-data run, obsolete root-level cumulative files from the previous design are removed automatically.
 
 The exact-configuration \texttt{\_metrics\_data.csv} is the primary compact table for Results writing. It contains the actual capacity agent numbers, classical and cyclic outcome counts and means at both capacity contexts, absolute and percentage changes, and interpretation flags. The companion files preserve capacity-search decisions, individual run records, paired same-initial-condition comparisons, solver and protocol metadata, variability summaries, seeds, and valid solved-run path counts. No PNG metric plots are produced in this tree.
 
-Terminal output is compartmentalized under:
+Terminal output is stored beside the other artifacts for the same configuration:
 \begin{lstlisting}
-dev/outputs_main/terminal_logs/
+dev/outputs_main/
     <numbered_map_category>/
         <numbered_exact_map_configuration>/
-            raw_data.log
-            visualization.log
+            terminal_logs/
+                raw_data.log
+                visualization.log
 \end{lstlisting}
 
 \subsection{Selected Frame-by-Frame Runs}
@@ -84,23 +104,24 @@ A raw-data execution saves at most two trajectory packages for each of the thirt
 
 Intermediate capacity-search attempts and the cross-mapping comparison runs are not saved as frame-by-frame packages. The directory layout is:
 \begin{lstlisting}
-dev/outputs_main/frame_by_frame/
+dev/outputs_main/
     <numbered_map_category>/
         <numbered_exact_map_configuration>/
-            shared_context/
-                shared_context.pkl
-                metadata.json
-            classical_capacity_<N>_agents/
-                classical/
-                    final_selected_successful_run/
-                        frame_by_frame.pkl
-                        metadata.json
-            cyclic_capacity_<N>_agents/
-                cyclic/
-                    final_selected_successful_run/
-                        frame_by_frame.pkl
-                        metadata.json
-            manifest.json
+            frame_by_frame/
+                shared_context/
+                    shared_context.pkl
+                    metadata.json
+                classical_capacity_<N>_agents/
+                    classical/
+                        final_selected_successful_run/
+                            frame_by_frame.pkl
+                            metadata.json
+                cyclic_capacity_<N>_agents/
+                    cyclic/
+                        final_selected_successful_run/
+                            frame_by_frame.pkl
+                            metadata.json
+                manifest.json
 \end{lstlisting}
 
 The shared context keeps the branch specification and, for dynamic branches, the time-varying map state only once. Each run package keeps the selected agents, solution paths, run configuration, and mapping-specific map information needed by the Pillow renderer. The JSON metadata and manifest make the selection and file locations readable without opening the pickle files.
@@ -150,14 +171,15 @@ When \texttt{to\_generate="visualization"}, the solver is not called. The render
 
 For dynamic branches, setup frames use a static setup map derived from the persisted static matrix, while execution frames use the persisted time-varying loop. Campus gray regions remain solver-blocked but may be drawn as visually free cells through the persisted or reconstructed render-only semantic mask.
 
-Main-experiment visualization output mirrors the selected capacity and mapping hierarchy under:
+Main-experiment visualization output mirrors the selected capacity and mapping hierarchy inside the exact configuration's \texttt{visualization} directory:
 \begin{lstlisting}
-dev/outputs_main/visualization/
+dev/outputs_main/
     <numbered_map_category>/
         <numbered_exact_map_configuration>/
-            classical_capacity_<N>_agents/classical/final_selected_successful_run/
-            cyclic_capacity_<N>_agents/cyclic/final_selected_successful_run/
-            visualization_summary.json
+            visualization/
+                classical_capacity_<N>_agents/classical/final_selected_successful_run/
+                cyclic_capacity_<N>_agents/cyclic/final_selected_successful_run/
+                visualization_summary.json
 \end{lstlisting}
 
 \section{Failure and Compatibility Behavior}

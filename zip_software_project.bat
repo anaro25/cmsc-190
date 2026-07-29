@@ -11,7 +11,7 @@ if not exist "%DEST_DIR%" mkdir "%DEST_DIR%"
 if exist "%ZIP_PATH%" del /f /q "%ZIP_PATH%"
 
 tar.exe ^
-    --exclude="outputs_main_experiment" ^
+    --exclude="outputs_main" ^
     --exclude="outputs_ref_comparison" ^
     --exclude="__pycache__" ^
     -a -c -f "%ZIP_PATH%" ^

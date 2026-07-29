@@ -57,7 +57,7 @@
 #   classical success at classical capacity and the final retained cyclic success
 #   at cyclic capacity.
 # - These packages are heavily compartmentalized under
-#   outputs_main/frame_by_frame/.
+#   outputs_main/<map_category>/<exact_map_config>/frame_by_frame/.
 # - to_generate = "visualization" performs no MAPF solving and does not read the
 #   numerical metrics package. It reads the selected frame_by_frame.pkl packages and
 #   generates the Pillow frames from them.

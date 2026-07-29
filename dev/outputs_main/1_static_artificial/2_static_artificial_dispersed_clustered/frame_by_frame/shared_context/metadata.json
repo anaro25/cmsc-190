@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "saved_at_utc": "2026-07-29T05:21:45.772827+00:00",
+  "map_config": "static_artificial_dispersed_clustered",
+  "is_dynamic": false,
+  "has_dynamic_state": false,
+  "shared_context_file": "shared_context.pkl",
+  "note": "Shared once by both selected mapping-capacity trajectory packages."
+}

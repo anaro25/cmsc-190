@@ -846,23 +846,25 @@ def _package_payload(
 
 OBSOLETE_PROJECT_LEVEL_METRICS_FILE_NAMES = (
     "dataset_manifest.json",
-    "README.txt",
 )
 
 
-def prepare_metrics_data_root(metrics_data_root: Path) -> dict[str, Any]:
-    """Retain only the intentional project-level data dictionary."""
-    metrics_data_root.mkdir(parents=True, exist_ok=True)
+def prepare_project_level_files_root(project_level_files_root: Path) -> dict[str, Any]:
+    """Write the generated project-level data dictionary without touching readme.txt."""
+    project_level_files_root.mkdir(parents=True, exist_ok=True)
 
     removed_files: list[str] = []
-    candidates = list(metrics_data_root.glob("main_experiment_*.csv"))
-    candidates.extend(metrics_data_root / name for name in OBSOLETE_PROJECT_LEVEL_METRICS_FILE_NAMES)
+    candidates = list(project_level_files_root.glob("main_experiment_*.csv"))
+    candidates.extend(
+        project_level_files_root / name
+        for name in OBSOLETE_PROJECT_LEVEL_METRICS_FILE_NAMES
+    )
     for candidate in candidates:
         if candidate.is_file():
             candidate.unlink()
             removed_files.append(str(candidate))
 
-    data_dictionary_path = metrics_data_root / "data_dictionary.csv"
+    data_dictionary_path = project_level_files_root / "data_dictionary.csv"
     write_csv(data_dictionary_path, _data_dictionary_rows())
     return {
         "data_dictionary_path": str(data_dictionary_path),
@@ -874,13 +876,9 @@ def write_metrics_data_package(
     *,
     branch_spec: BranchSpec,
     payload: dict[str, Any],
-    metrics_data_root: Path,
+    metrics_data_dir: Path,
 ) -> dict[str, Any]:
-    config_dir = (
-        metrics_data_root
-        / branch_spec.data_log_category_dir_name
-        / branch_spec.data_log_file_stem
-    )
+    config_dir = Path(metrics_data_dir)
     config_dir.mkdir(parents=True, exist_ok=True)
 
     metadata = _configuration_metadata(branch_spec, payload)

@@ -71,7 +71,8 @@ SHARED_COUNTED_RUNS_REQUIRED = 1
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
 CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
 CAPACITY_AGENT_UPPER_BOUND = 255
-CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 100 # Unlimited (set to high value)
+# CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 100 # Unlimited (set to high value)
+CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 5 # (agent nums separated by 4 steps)
 SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 3
 
 # When multiple map configurations are selected, ask after each completed
@@ -84,16 +85,18 @@ PROMPT_BEFORE_NEXT_MAP_CONFIG_TIMEOUT_SECONDS = 5.0
 # ===================================
 
 # Select exactly one program mode.
-# to_generate = "raw_data"        # compute capacity data, Results-ready metrics packages, inspection files, and frame-by-frame packages
-to_generate = "visualization" # generate Pillow visualizations from saved frame_by_frame packages
+to_generate = "raw_data"        # compute capacity data, metrics, inspection files,
+#                                 # and frame-by-frame packages; first delete the selected
+#                                 # config's obsolete visualization outputs
+# to_generate = "visualization" # generate Pillow visualizations from saved frame_by_frame packages
 
 # Select one or more exact main-experiment map configurations. Uncomment only
 # the configurations that should be processed by the active to_generate mode.
 SELECTED_MAP_CONFIGS = [
-    "static_artificial_dispersed_dispersed",
+    # "static_artificial_dispersed_dispersed",
     # "static_artificial_dispersed_clustered",
-    # "static_artificial_clustered_dispersed",
-    # "static_artificial_clustered_clustered",
+    "static_artificial_clustered_dispersed",
+    "static_artificial_clustered_clustered",
     # "dynamic_artificial_dispersed_dispersed",
     # "dynamic_artificial_dispersed_clustered",
     # "dynamic_artificial_clustered_dispersed",
