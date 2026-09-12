@@ -12,15 +12,12 @@ from typing import Any
 from dev.experiments.ref_comparison.models import RefCaseSpec
 from dev.paths import OUTPUTS_REF_COMPARISON_ROOT, RAW_REF_COMPARISON_DATA_ROOT
 
-
-RAW_REFERENCE_FORMAT_VERSION = 3
-
+RAW_REFERENCE_FORMAT_VERSION = 4
 
 def format_elapsed_mmss(elapsed_seconds: float) -> str:
     total_seconds = max(0, int(round(elapsed_seconds)))
     minutes, seconds = divmod(total_seconds, 60)
     return f"{minutes:02d}m {seconds:02d}s"
-
 
 class RefExperimentLogger:
     def __init__(self, output_path: Path, *, start_time: float | None = None):
@@ -40,18 +37,15 @@ class RefExperimentLogger:
     def log_elapsed(self, milestone: str) -> None:
         self.log(f"[Elapsed: {format_elapsed_mmss(self.elapsed_seconds())}] {milestone}")
 
-
 def _reset_dir(path: Path) -> None:
     if path.exists():
         shutil.rmtree(path)
     path.mkdir(parents=True, exist_ok=True)
 
-
 def _execution_stage_name(*, recompute_mapf: bool, generation_target: str) -> str:
     if recompute_mapf:
         return "raw_data"
     return str(generation_target)
-
 
 class RefCaseOutputManager:
     def __init__(self, case_spec: RefCaseSpec, *, generation_target: str, recompute_mapf: bool):
@@ -84,12 +78,10 @@ class RefCaseOutputManager:
         _reset_dir(self.metadata_dir)
         _reset_dir(self.visualizations_dir)
 
-
 def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
         json.dump(payload, handle, indent=2, ensure_ascii=False)
-
 
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -102,7 +94,6 @@ def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
-
 
 class RefRawDataStore:
     def __init__(self, case_spec: RefCaseSpec):
@@ -121,9 +112,6 @@ class RefRawDataStore:
             shutil.rmtree(backup_root)
         temp_root.mkdir(parents=True, exist_ok=True)
 
-        # Numerical/raw experiment data is persisted separately from the selected
-        # frame-by-frame trajectory packages. Visualization regeneration must read
-        # outputs_ref_comparison/frame_by_frame rather than this payload.
         numerical_payload = dict(payload)
         numerical_payload.pop("visualization_candidates", None)
 
@@ -147,15 +135,10 @@ class RefRawDataStore:
                 "experiment_mode": self.case_spec.experiment_mode,
                 "map_size": self.case_spec.map_size,
                 "agent_number": self.case_spec.agent_number,
-                "capacity_search_enabled": self.case_spec.capacity_search_enabled,
-                "capacity_pass_criterion": self.case_spec.capacity_pass_criterion,
-                "capacity_attempts_per_agent_number": self.case_spec.capacity_attempts_per_agent_number,
-                "capacity_successful_runs_required": self.case_spec.capacity_successful_runs_required,
-                "capacity_agent_range": "1..F per map",
+                "capacity_search_enabled": False,
+                "agent_count_protocol": payload.get("stop_summary", {}).get("agent_count_protocol"),
+                "map_agent_numbers": dict(payload.get("stop_summary", {}).get("map_agent_numbers", {})),
                 "map_traversable_cell_counts": dict(payload.get("stop_summary", {}).get("map_traversable_cell_counts", {})),
-                "map_classical_capacities": dict(payload.get("stop_summary", {}).get("map_classical_capacities", {})),
-                "map_cyclic_capacities": dict(payload.get("stop_summary", {}).get("map_cyclic_capacities", {})),
-                "capacity_searches_count": len(payload.get("capacity_searches", [])),
                 "run_configurations_count": len(payload.get("run_configurations", [])),
                 "run_records_count": len(payload.get("run_records", [])),
                 "discarded_attempts_count": len(payload.get("discarded_attempts", [])),
@@ -195,7 +178,7 @@ class RefRawDataStore:
             raise ValueError(
                 "The persisted reference-comparison raw data uses an incompatible format "
                 f"(found {format_version}, expected {RAW_REFERENCE_FORMAT_VERSION}). "
-                "Set to_generate = \"raw_data\" to recompute it with the current capacity-search workflow."
+                "Set to_generate = \"raw_data\" to recompute it with the current fixed map-specific agent-count workflow."
             )
         with self.payload_path.open("rb") as handle:
             return pickle.load(handle)

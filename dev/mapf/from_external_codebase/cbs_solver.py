@@ -5,16 +5,13 @@ from typing import Any
 
 from dev.mapf.mapf_low_level_astar import find_path_for_agent
 
-
 DEFAULT_ECBS_SUBOPTIMALITY_FACTOR = 1.5
-
 
 def _resolve_ecbs_suboptimality_factor(suboptimality_factor: float | None) -> float:
     value = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR if suboptimality_factor is None else float(suboptimality_factor)
     if value < 1.0:
         raise ValueError("ECBS suboptimality factor must be greater than or equal to 1.0")
     return value
-
 
 def get_path_position(path, time_step):
     """
@@ -25,10 +22,8 @@ def get_path_position(path, time_step):
         return path[time_step]
     return None
 
-
 def compute_solution_cost(paths_by_agent):
     return sum(len(path) - 1 for path in paths_by_agent.values())
-
 
 def detect_first_conflict(paths_by_agent):
     """
@@ -85,7 +80,6 @@ def detect_first_conflict(paths_by_agent):
             if reverse_edge in transitions:
                 other_agent_id = transitions[reverse_edge]
 
-                # Ignore both agents waiting in place.
                 if prev_position != current_position:
                     return {
                         "type": "edge",
@@ -97,7 +91,6 @@ def detect_first_conflict(paths_by_agent):
             transitions[edge] = agent_id
 
     return None
-
 
 def count_all_conflicts(paths_by_agent):
     if not paths_by_agent:
@@ -136,7 +129,6 @@ def count_all_conflicts(paths_by_agent):
             transitions[edge] = agent_id
 
     return total_conflicts
-
 
 def split_conflict_into_constraints(conflict):
     agent_a, agent_b = conflict["agents"]
@@ -180,7 +172,6 @@ def split_conflict_into_constraints(conflict):
         },
     ]
 
-
 def make_constraint_signature(constraints):
     normalized = []
 
@@ -203,7 +194,6 @@ def make_constraint_signature(constraints):
 
     return tuple(sorted(normalized))
 
-
 def make_cbs_node(constraints, paths_by_agent):
     return {
         "constraints": constraints,
@@ -211,7 +201,6 @@ def make_cbs_node(constraints, paths_by_agent):
         "cost": compute_solution_cost(paths_by_agent),
         "secondary_key": count_all_conflicts(paths_by_agent),
     }
-
 
 def build_cbs_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None):
     return {
@@ -222,7 +211,6 @@ def build_cbs_failure(reason, num_conflicts_detected, num_high_level_nodes_expan
         "solver_name": solver_name,
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
     }
-
 
 def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback):
     if progress_callback is None:
@@ -236,7 +224,6 @@ def maybe_report_elapsed_time(start_time, next_report_seconds, progress_callback
 
     return next_report_seconds
 
-
 def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None):
     return {
         "status": "solved",
@@ -247,10 +234,8 @@ def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
     }
 
-
 def _agent_lookup(agents):
     return {agent["id"]: agent for agent in agents}
-
 
 def _replan_static_agent(
     composite_map,
@@ -271,7 +256,6 @@ def _replan_static_agent(
         true_static_shortest_path_distance=true_static_shortest_path_distance,
         tight_time_horizon=tight_time_horizon,
     )
-
 
 def _solve_mapf_with_vanilla_cbs(
     composite_map,
@@ -413,7 +397,6 @@ def _solve_mapf_with_vanilla_cbs(
         solver_name="CBS",
     )
 
-
 def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float, *, suboptimality_factor: float):
     cost_bound = suboptimality_factor * best_cost
     eligible = [
@@ -426,11 +409,9 @@ def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float
     _, _, node_id, node = min(eligible)
     return node_id, node
 
-
 def _clean_open_heap(open_heap, active_nodes):
     while open_heap and open_heap[0][2] not in active_nodes:
         heapq.heappop(open_heap)
-
 
 def _solve_mapf_with_ecbs(
     composite_map,
@@ -589,7 +570,6 @@ def _solve_mapf_with_ecbs(
         solver_name="ECBS",
         solver_suboptimality_factor=suboptimality_factor,
     )
-
 
 def solve_mapf_with_cbs(
     composite_map,

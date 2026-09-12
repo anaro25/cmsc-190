@@ -8,18 +8,14 @@ from dev.mapf.agent_cohesion import cohesion_penalty
 from dev.mapf.low_level_guidance import get_true_static_distances_for_static_map
 from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
 
-
 _STATIC_TIGHT_HORIZON_MAX_SLACK = 64
-
 
 class LowLevelSearchTimeout(RuntimeError):
     """Raised when a low-level A* search reaches the shared solver deadline."""
 
-
 def _raise_if_deadline_reached(deadline: float | None) -> None:
     if deadline is not None and time.perf_counter() >= deadline:
         raise LowLevelSearchTimeout("Low-level A* search reached the solver deadline.")
-
 
 def manhattan_vertex_distance(a, b):
     """
@@ -32,11 +28,9 @@ def manhattan_vertex_distance(a, b):
     vertical_distance = abs(a[1] - b[1]) // 2
     return horizontal_distance + vertical_distance
 
-
 def get_agent_constraints(constraints, agent_id):
     """Keep only the CBS constraints that apply to this specific agent."""
     return [constraint for constraint in constraints if constraint["agent"] == agent_id]
-
 
 def violates_vertex_constraint(agent_constraints, position, time_step):
     """
@@ -49,7 +43,6 @@ def violates_vertex_constraint(agent_constraints, position, time_step):
         if constraint["position"] == position and constraint["time"] == time_step:
             return True
     return False
-
 
 def violates_edge_constraint(agent_constraints, from_position, to_position, time_step):
     """
@@ -69,7 +62,6 @@ def violates_edge_constraint(agent_constraints, from_position, to_position, time
             return True
     return False
 
-
 def get_latest_constraint_time(agent_constraints, *, spawn_time=0):
     """
     The disappearing-agent model lets the agent disappear after reaching its goal.
@@ -86,7 +78,6 @@ def get_latest_constraint_time(agent_constraints, *, spawn_time=0):
     if not relevant_constraint_times:
         return int(spawn_time)
     return max([int(spawn_time)] + relevant_constraint_times)
-
 
 def reconstruct_path(parent_of_node, target_node, *, spawn_time=0):
     """
@@ -109,14 +100,11 @@ def reconstruct_path(parent_of_node, target_node, *, spawn_time=0):
         return [None for _ in range(int(spawn_time))] + path
     return path
 
-
 def _static_distance_lookup(cyclic_map, goal):
     return get_true_static_distances_for_static_map(cyclic_map, goal)
 
-
 def _cell_is_free_space(cell):
     return getattr(cell, "name", None) == "FREE_SPACE"
-
 
 def count_adjacent_free_vertices(cyclic_map, position):
     """Count nearby free vertices without changing directed transition rules."""
@@ -133,7 +121,6 @@ def count_adjacent_free_vertices(cyclic_map, position):
             count += 1
     return count
 
-
 def _find_h_value(position, goal, *, true_static_shortest_path_distance, static_distance_lookup):
     """
     Find h(n), the estimated remaining distance to the goal.
@@ -145,7 +132,6 @@ def _find_h_value(position, goal, *, true_static_shortest_path_distance, static_
         return static_distance_lookup.get(position, float("inf"))
     return manhattan_vertex_distance(position, goal)
 
-
 def _find_f_value(g_value, h_value, heuristic_weight):
     """
     Standard A*:          f(n) = g(n) + h(n)
@@ -154,7 +140,6 @@ def _find_f_value(g_value, h_value, heuristic_weight):
     When heuristic_weight is 1.0, this is the ordinary A* formula.
     """
     return g_value + (heuristic_weight * h_value)
-
 
 def _add_node_to_OPEN(
     OPEN,
@@ -181,7 +166,6 @@ def _add_node_to_OPEN(
     priority_value = f_value + float(soft_cohesion_penalty)
     heapq.heappush(OPEN, (priority_value, soft_cohesion_penalty, h_value, next(insertion_counter), node))
 
-
 def _resolve_time_horizon(
     *,
     cyclic_map,
@@ -202,7 +186,6 @@ def _resolve_time_horizon(
 
     slack = max(8, min(_STATIC_TIGHT_HORIZON_MAX_SLACK, max(1, num_free_vertices // 6)))
     return max(20, latest_constraint_time + base_goal_distance + slack)
-
 
 def find_path_for_agent(
     cyclic_map,
@@ -235,17 +218,13 @@ def find_path_for_agent(
     spawn_time = max(0, int(spawn_time or 0))
     agent_constraints = get_agent_constraints(constraints, agent_id)
 
-    # If the start itself is forbidden at the release/spawn time, no path is possible.
-    # If the start itself is forbidden at the release/spawn time, no path is possible.
     if violates_vertex_constraint(agent_constraints, start, spawn_time):
         if return_diagnostics:
             return {"path": None, "num_expanded_nodes": 0}
         return None
 
-
     latest_constraint_time = get_latest_constraint_time(agent_constraints, spawn_time=spawn_time)
 
-    # Some experiment settings use a precomputed true distance table.
     static_distance_lookup = {}
     if true_static_shortest_path_distance or tight_time_horizon:
         _raise_if_deadline_reached(deadline)
@@ -266,8 +245,6 @@ def find_path_for_agent(
         tight_time_horizon=tight_time_horizon,
     )
 
-    # Iteration 0 in the hand solution:
-    # OPEN initially contains the agent's node, while CLOSED is empty.
     OPEN = []
     CLOSED = set()
     insertion_counter = itertools.count()
@@ -309,36 +286,27 @@ def find_path_for_agent(
     while OPEN:
         _raise_if_deadline_reached(deadline)
 
-        # From OPEN, select the node with the least f(n).
         _, _, _, _, selected_node = heapq.heappop(OPEN)
 
-        # The same node can enter OPEN more than once if a better parent is found.
-        # If it was already explored, skip the duplicate entry.
         if selected_node in CLOSED:
             continue
 
         selected_position, selected_time = selected_node
         selected_g = g_score[selected_node]
 
-        # Move the selected node to CLOSED.
         CLOSED.add(selected_node)
 
-        # In A*, we check whether the selected node is the target node.
-        # We stop only when the target is selected from OPEN, not merely seen.
         if selected_position == goal and selected_time >= latest_constraint_time:
             final_path = reconstruct_path(parent_of_node, selected_node, spawn_time=spawn_time)
             if return_diagnostics:
                 return {"path": final_path, "num_expanded_nodes": len(CLOSED)}
             return final_path
 
-        # Do not keep expanding forever in time.
         if selected_time >= max_time_horizon:
             continue
 
         next_time = selected_time + 1
 
-        # Add neighbors of the selected node to OPEN.
-        # The wait action means the agent may stay on the same position for one timestep.
         neighboring_positions = list(get_outgoing_neighbors(cyclic_map, selected_position))
         neighboring_positions.append(selected_position)
 
@@ -354,8 +322,7 @@ def find_path_for_agent(
             ):
                 continue
 
-            # If a true-distance table exists, positions missing from the table
-            # cannot reach the goal under the static movement rules.
+            # Missing entries cannot reach the goal under static movement.
             if static_distance_lookup:
                 static_distance = static_distance_lookup.get(neighbor_position)
                 if static_distance is None:
@@ -367,11 +334,8 @@ def find_path_for_agent(
             if neighbor_node in CLOSED:
                 continue
 
-            # Moving to a neighbor costs 1 timestep.
             tentative_g = selected_g + 1
 
-            # If we already know an equal or better way to reach this node,
-            # there is no need to update it.
             if tentative_g >= g_score.get(neighbor_node, float("inf")):
                 continue
 
@@ -403,7 +367,6 @@ def find_path_for_agent(
                 ),
             )
 
-    # OPEN became empty, so all reachable possibilities were exhausted.
     if return_diagnostics:
         return {"path": None, "num_expanded_nodes": len(CLOSED)}
     return None

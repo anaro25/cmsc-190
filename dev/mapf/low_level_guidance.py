@@ -5,13 +5,11 @@ from typing import Iterable
 
 from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
 
-
 _STATIC_INCOMING_CACHE: dict[int, dict[tuple[int, int], tuple[tuple[int, int], ...]]] = {}
 _STATIC_DISTANCE_CACHE: dict[tuple[int, tuple[int, int]], dict[tuple[int, int], int]] = {}
 _DYNAMIC_INCOMING_CACHE: dict[int, dict[tuple[int, int], tuple[tuple[int, int], ...]]] = {}
 _DYNAMIC_DISTANCE_CACHE: dict[tuple[int, tuple[int, int]], dict[tuple[int, int], int]] = {}
 _DYNAMIC_STATIC_FREE_COUNT_CACHE: dict[int, int] = {}
-
 
 def _build_incoming_neighbors_from_graph(
     free_vertices: Iterable[tuple[int, int]],
@@ -23,7 +21,6 @@ def _build_incoming_neighbors_from_graph(
         for neighbor in neighbor_provider(vertex):
             incoming.setdefault(neighbor, set()).add(vertex)
     return {vertex: tuple(sorted(parents)) for vertex, parents in incoming.items()}
-
 
 def _static_incoming_neighbors(cyclic_map) -> dict[tuple[int, int], tuple[tuple[int, int], ...]]:
     cache_key = id(cyclic_map)
@@ -38,7 +35,6 @@ def _static_incoming_neighbors(cyclic_map) -> dict[tuple[int, int], tuple[tuple[
     )
     _STATIC_INCOMING_CACHE[cache_key] = incoming
     return incoming
-
 
 def _dynamic_incoming_neighbors(mapped_loop) -> dict[tuple[int, int], tuple[tuple[int, int], ...]]:
     cache_key = id(mapped_loop)
@@ -63,7 +59,6 @@ def _dynamic_incoming_neighbors(mapped_loop) -> dict[tuple[int, int], tuple[tupl
     _DYNAMIC_STATIC_FREE_COUNT_CACHE[cache_key] = len(static_free_vertices)
     return incoming
 
-
 def _reverse_bfs_distances(
     incoming_neighbors: dict[tuple[int, int], tuple[tuple[int, int], ...]],
     goal: tuple[int, int],
@@ -77,14 +72,13 @@ def _reverse_bfs_distances(
     while queue:
         current = queue.popleft()
         current_distance = distances[current]
-        for parent in incoming_neighbors.get(current, ()):  # reverse graph traversal
+        for parent in incoming_neighbors.get(current, ()):
             if parent in distances:
                 continue
             distances[parent] = current_distance + 1
             queue.append(parent)
 
     return distances
-
 
 def get_true_static_distances_for_static_map(
     cyclic_map,
@@ -99,7 +93,6 @@ def get_true_static_distances_for_static_map(
     _STATIC_DISTANCE_CACHE[cache_key] = distances
     return distances
 
-
 def get_true_static_distances_for_dynamic_map(
     mapped_loop,
     goal: tuple[int, int],
@@ -112,7 +105,6 @@ def get_true_static_distances_for_dynamic_map(
     distances = _reverse_bfs_distances(_dynamic_incoming_neighbors(mapped_loop), goal)
     _DYNAMIC_DISTANCE_CACHE[cache_key] = distances
     return distances
-
 
 def get_dynamic_static_free_vertex_count(mapped_loop) -> int:
     cache_key = id(mapped_loop)

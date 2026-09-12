@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 
 from dev.experiments.frame_by_frame_store import ReferenceFrameByFrameStore
 from dev.experiments.ref_comparison.aggregation import build_reference_aggregate
 from dev.experiments.ref_comparison.io_utils import RefCaseOutputManager, RefExperimentLogger, RefRawDataStore, write_csv, write_json
-from dev.experiments.ref_comparison.models import RefCaseSpec, RefConditionAggregate, RefMappingRunRecord, RefRunConfiguration, RefVisualizationCandidate
+from dev.experiments.ref_comparison.models import RefCaseSpec, RefConditionAggregate, RefMappingRunRecord, RefVisualizationCandidate
 from dev.experiments.ref_comparison.plotting import generate_reference_graphs
 from dev.experiments.ref_comparison.runtime import (
     build_multi_agent_spawn_sequence,
@@ -20,6 +19,7 @@ from dev.experiments.ref_comparison.runtime import (
 from dev.experiments.ref_comparison.visualization import render_reference_visualizations
 from dev.master_config_ref_comparison import (
     ADD_TRANSITIONS_BETWEEN_FREE_SPACES,
+    MULTI_AGENT_AGENT_NUMBERS_BY_MAP,
     REFERENCE_COMPARISON_CASES,
     REMOVE_EXTRA_TRANSITIONS,
     SELECTED_PORT_EXPERIMENT,
@@ -34,7 +34,6 @@ from dev.master_config_ref_comparison import (
 )
 
 VALID_GENERATION_TARGETS = {"raw_data", "graphs", "visualization"}
-
 
 def _build_case_spec(case_id: str) -> RefCaseSpec:
     if case_id not in REFERENCE_COMPARISON_CASES:
@@ -78,7 +77,7 @@ def _build_case_spec(case_id: str) -> RefCaseSpec:
         notes=(
             "Tang-inspired single-agent reference case. Both sides use the project traditional A* solver; the classical side uses classical mapping and the cyclic side uses cyclic mapping. The three configured 50x50 port maps are evaluated together. For each map, runtime is averaged over repeated identical A* executions. The cyclic-faster temporary filter is deliberately disabled."
             if experiment_mode == "single_agent"
-            else "Tang-inspired multi-agent reference case. Classical and cyclic capacities are searched independently over 1..F traversable cells. Each tested agent number uses five runs and passes with at least three solver successes. Each mapping is then evaluated at its own discovered capacity, with runtime averaged over three identical ECBS executions."
+            else "Tang-inspired multi-agent reference case. Each reference map uses the manuscript's fixed map-specific agent count (Map 1: 17, Map 2: 24, Map 3: 11). The same agent count and shared initial condition are used for classical and cyclic mapping, with runtime averaged over three identical ECBS executions per mapping."
         ),
     )
 
@@ -88,17 +87,14 @@ def _selected_case_ids() -> list[str]:
         raise ValueError(f"Unknown SELECTED_PORT_EXPERIMENT '{SELECTED_PORT_EXPERIMENT}'. Available: {available}")
     return list(SELECTED_PORT_EXPERIMENT_CASES[SELECTED_PORT_EXPERIMENT])
 
-
 def _resolve_generation_target() -> str:
     generation_target = str(to_generate)
     if generation_target not in VALID_GENERATION_TARGETS:
         raise ValueError("to_generate must be one of 'raw_data', 'graphs', or 'visualization'.")
     return generation_target
 
-
 def _should_recompute_raw_mapf(generation_target: str) -> bool:
     return generation_target == "raw_data"
-
 
 def _log_case_header(logger: RefExperimentLogger, case_spec: RefCaseSpec) -> None:
     logger.log("=" * 88)
@@ -115,13 +111,15 @@ def _log_case_header(logger: RefExperimentLogger, case_spec: RefCaseSpec) -> Non
         logger.log(f"single_agent_timing_repetitions: {case_spec.single_agent_timing_repetitions}")
     if case_spec.experiment_mode == "multi_agent":
         logger.log(f"multi_agent_timing_repetitions: {case_spec.multi_agent_timing_repetitions}")
-        logger.log(f"capacity_search_enabled: {case_spec.capacity_search_enabled}")
-        logger.log(f"capacity_pass_criterion: {case_spec.capacity_pass_criterion}")
-        logger.log("capacity_agent_range: 1..F (derived separately for each reference map)")
-        logger.log(f"capacity_attempts_per_agent_number: {case_spec.capacity_attempts_per_agent_number}")
-        logger.log(f"capacity_successful_runs_required: {case_spec.capacity_successful_runs_required}")
-        logger.log("capacity_search_mappings: classical and cyclic independently")
-        logger.log("capacity_search_early_stop_after_first_success: disabled")
+        logger.log("capacity_search_enabled: False")
+        logger.log(
+            "shared_agent_numbers_by_map: "
+            + ", ".join(
+                f"Map {map_number}={agent_number}"
+                for map_number, agent_number in sorted(MULTI_AGENT_AGENT_NUMBERS_BY_MAP.items())
+            )
+        )
+        logger.log("mapping_pairing: same agent count and initial condition for classical and cyclic")
         logger.log("agent_cohesion_enabled: False")
     logger.log(f"runtime_limit_seconds: {case_spec.runtime_limit_seconds}")
     logger.log(f"true_static_shortest_path_distance: {case_spec.true_static_shortest_path_distance}")
@@ -155,268 +153,8 @@ def _append_visualization_candidate(
         )
     )
 
-
 def _format_timing_samples(samples: list[float]) -> str:
     return ", ".join(f"{sample:.4f}" for sample in samples)
-
-
-@dataclass
-class _RefCapacityTrial:
-    mapping_name: str
-    agent_number: int
-    passed: bool
-    success_count: int
-    attempt_slots_evaluated: int
-    failure_reason: str | None
-    reasons: list[str]
-    run_configurations: list[RefRunConfiguration]
-    records: list[RefMappingRunRecord]
-
-    def to_summary(self) -> dict:
-        attempts: list[dict] = []
-        record_by_id = {record.run_config_id: record for record in self.records}
-        for run_configuration in self.run_configurations:
-            record = record_by_id.get(run_configuration.run_config_id)
-            attempts.append(
-                {
-                    "run_configuration": run_configuration.to_dict(),
-                    "record": record.to_dict() if record is not None else None,
-                }
-            )
-        return {
-            "mapping_name": self.mapping_name,
-            "agent_number": self.agent_number,
-            "passed": self.passed,
-            "success_count": self.success_count,
-            "attempts_evaluated": self.attempt_slots_evaluated,
-            "solver_runs_completed": len(self.records),
-            "failure_reason": self.failure_reason,
-            "reasons": list(self.reasons),
-            "attempts": attempts,
-        }
-
-
-@dataclass
-class _RefCapacitySearchResult:
-    mapping_name: str
-    candidate_maximum: int
-    best_agent_number: int
-    tested_trials: list[_RefCapacityTrial]
-    search_trace: list[dict]
-
-    def to_summary(self) -> dict:
-        return {
-            "mapping_name": self.mapping_name,
-            "pass_criterion": "solver_success",
-            "candidate_maximum": self.candidate_maximum,
-            "best_agent_number": self.best_agent_number,
-            "tested_agent_numbers": [trial.to_summary() for trial in self.tested_trials],
-            "search_trace": list(self.search_trace),
-        }
-
-
-def _validate_reference_capacity_config(case_spec: RefCaseSpec) -> None:
-    if not case_spec.capacity_search_enabled:
-        raise ValueError("Multi-agent reference comparison requires capacity_search_enabled=True.")
-    if case_spec.capacity_pass_criterion != "solver_success":
-        raise ValueError("Reference capacity_pass_criterion must be 'solver_success'.")
-    if case_spec.capacity_attempts_per_agent_number != 5:
-        raise ValueError("Reference capacity search must evaluate exactly five runs per tested agent number.")
-    if case_spec.capacity_successful_runs_required != 3:
-        raise ValueError("Reference capacity search must require at least three successful runs out of five.")
-
-
-def _test_reference_capacity_candidate(
-    *,
-    case_spec: RefCaseSpec,
-    map_context: dict,
-    mapping_name: str,
-    agent_number: int,
-    search_step_index: int,
-    logger: RefExperimentLogger,
-) -> _RefCapacityTrial:
-    if mapping_name not in {"classical", "cyclic"}:
-        raise ValueError(f"Unsupported reference capacity mapping '{mapping_name}'.")
-
-    max_attempts = int(case_spec.capacity_attempts_per_agent_number)
-    required_successes = int(case_spec.capacity_successful_runs_required)
-    logger.log("")
-    logger.log(
-        f"    Testing N={agent_number} for {mapping_name} reference capacity | "
-        f"pass_rule={required_successes}/{max_attempts} successful solver runs within "
-        f"{case_spec.runtime_limit_seconds:.0f}s; all five run slots are evaluated"
-    )
-
-    run_configurations: list[RefRunConfiguration] = []
-    records: list[RefMappingRunRecord] = []
-    reasons: list[str] = []
-    success_count = 0
-
-    for attempt_index in range(1, max_attempts + 1):
-        try:
-            agents = build_multi_agent_spawn_sequence(
-                case_spec,
-                map_context,
-                agent_number=agent_number,
-                mapping_name=mapping_name,
-            )
-            run_configuration = build_run_configuration(
-                case_spec=case_spec,
-                run_index=attempt_index - 1,
-                map_identifier=map_context["map_identifier"],
-                agents=agents,
-                agent_number=agent_number,
-                notes=(
-                    f"reference capacity-search run {attempt_index}/{max_attempts} for {mapping_name}; "
-                    "capacity success depends only on this mapping returning a valid solution within the time limit"
-                ),
-                map_index=map_context["map_index"],
-                map_number=map_context["map_number"],
-                map_label_value=map_context["map_label"],
-                run_config_tag=f"capacity_{mapping_name}_step_{search_step_index}_attempt_{attempt_index}",
-                paired_source=False,
-            )
-        except Exception as exc:
-            reason = f"attempt_{attempt_index}:setup_unavailable:{type(exc).__name__}:{exc}"
-            reasons.append(reason)
-            logger.log(f"      Run {attempt_index}/{max_attempts}: setup unavailable ({type(exc).__name__}: {exc})")
-            continue
-
-        run_configurations.append(run_configuration)
-        solver_result, elapsed_seconds, solver_status = execute_mapping(
-            case_spec=case_spec,
-            composite_map=map_context[f"{mapping_name}_map"],
-            agents=agents,
-            mapping_name=mapping_name,
-            logger=logger,
-        )
-        record = build_mapping_record(
-            case_spec=case_spec,
-            run_configuration=run_configuration,
-            mapping_name=mapping_name,
-            solver_result=solver_result,
-            elapsed_seconds=elapsed_seconds,
-            solver_status=solver_status,
-            comparison_case=f"capacity_search_{mapping_name}",
-        )
-        records.append(record)
-        if record.solved_run:
-            success_count += 1
-        else:
-            reasons.append(f"attempt_{attempt_index}:{record.result_category}")
-        logger.log(
-            f"      Run {attempt_index}/{max_attempts}: {record.result_category} | "
-            f"t={record.time_computation_halted_seconds:.4f}s | "
-            f"conflicts={record.num_conflicts_detected_at_halt}"
-        )
-
-    passed = success_count >= required_successes
-    if passed:
-        failure_reason = None
-    elif not records:
-        failure_reason = "setup_unavailable"
-    else:
-        failure_reason = "solver_fail"
-
-    logger.log(
-        f"    Result for N={agent_number} | mapping={mapping_name} | passed={passed} | "
-        f"successful={success_count}/{max_attempts} | run_slots_evaluated={max_attempts} | "
-        f"failure_reason={failure_reason or 'none'}"
-    )
-    return _RefCapacityTrial(
-        mapping_name=mapping_name,
-        agent_number=agent_number,
-        passed=passed,
-        success_count=success_count,
-        attempt_slots_evaluated=max_attempts,
-        failure_reason=failure_reason,
-        reasons=reasons,
-        run_configurations=run_configurations,
-        records=records,
-    )
-
-
-def _run_reference_capacity_search(
-    *,
-    case_spec: RefCaseSpec,
-    map_context: dict,
-    mapping_name: str,
-    capacity_upper_bound: int,
-    logger: RefExperimentLogger,
-) -> _RefCapacitySearchResult:
-    _validate_reference_capacity_config(case_spec)
-    if mapping_name not in {"classical", "cyclic"}:
-        raise ValueError(f"Unsupported reference capacity mapping '{mapping_name}'.")
-    if int(capacity_upper_bound) < 1:
-        raise ValueError("Reference capacity search requires at least one traversable cell (F >= 1).")
-
-    low = 1
-    high = int(capacity_upper_bound)
-    best_agent_number = 0
-    tested_trials: list[_RefCapacityTrial] = []
-    search_trace: list[dict] = []
-    search_step_index = 0
-
-    logger.log("")
-    logger.log("-" * 88)
-    logger.log(
-        f"{mapping_name.title()} reference capacity search started | map={map_context['map_label']} | "
-        f"criterion=solver_success | range=1..{high} (F={high}) | "
-        f"runs_per_candidate={case_spec.capacity_attempts_per_agent_number} | "
-        f"successes_required={case_spec.capacity_successful_runs_required}"
-    )
-    logger.log("-" * 88)
-
-    while low <= high:
-        midpoint = (low + high) // 2
-        search_step_index += 1
-        low_before = low
-        high_before = high
-        trial = _test_reference_capacity_candidate(
-            case_spec=case_spec,
-            map_context=map_context,
-            mapping_name=mapping_name,
-            agent_number=midpoint,
-            search_step_index=search_step_index,
-            logger=logger,
-        )
-        tested_trials.append(trial)
-        search_trace.append(
-            {
-                "step": search_step_index,
-                "low_before": low_before,
-                "high_before": high_before,
-                "tested_agent_number": midpoint,
-                "pass_criterion": "solver_success",
-                "passed": trial.passed,
-                "success_count": trial.success_count,
-                "attempts_required": case_spec.capacity_attempts_per_agent_number,
-                "failure_reason": trial.failure_reason,
-            }
-        )
-
-        if trial.passed:
-            best_agent_number = midpoint
-            low = midpoint + 1
-            logger.log(f"    N={midpoint} passed; moving to search interval {low}..{high}.")
-        else:
-            high = midpoint - 1
-            logger.log(
-                f"    N={midpoint} failed (reason={trial.failure_reason or 'unknown'}); "
-                f"moving to search interval {low}..{high}."
-            )
-
-    logger.log(
-        f"{mapping_name.title()} reference capacity search finished | map={map_context['map_label']} | "
-        f"N_max={best_agent_number} | tested_agent_numbers={len(tested_trials)}"
-    )
-    return _RefCapacitySearchResult(
-        mapping_name=mapping_name,
-        candidate_maximum=int(capacity_upper_bound),
-        best_agent_number=best_agent_number,
-        tested_trials=tested_trials,
-        search_trace=search_trace,
-    )
 
 def _compute_single_agent_case(case_spec: RefCaseSpec, logger: RefExperimentLogger) -> dict:
     timing_repetitions = max(1, int(case_spec.single_agent_timing_repetitions))
@@ -544,15 +282,16 @@ def _compute_single_agent_case(case_spec: RefCaseSpec, logger: RefExperimentLogg
         "stop_summary": stop_summary,
     }
 
-
 def _compute_multi_agent_case(case_spec: RefCaseSpec, logger: RefExperimentLogger) -> dict:
     timing_repetitions = max(1, int(case_spec.multi_agent_timing_repetitions))
-    _validate_reference_capacity_config(case_spec)
     logger.log(
         "Preparing multi-agent reference maps across the three configured port maps. "
-        "Each map searches classical and cyclic capacities independently over 1..F, "
-        "using five runs per tested agent number and a three-success majority. "
-        f"Each mapping is then measured at its own capacity with {timing_repetitions} timing repetitions."
+        "Each map uses the manuscript's fixed shared agent count for both mappings: "
+        + ", ".join(
+            f"Map {map_number}={agent_number}"
+            for map_number, agent_number in sorted(MULTI_AGENT_AGENT_NUMBERS_BY_MAP.items())
+        )
+        + f". Each mapping uses {timing_repetitions} identical timing repetitions."
     )
 
     classical_records: list[RefMappingRunRecord] = []
@@ -561,203 +300,143 @@ def _compute_multi_agent_case(case_spec: RefCaseSpec, logger: RefExperimentLogge
     run_records: list[dict] = []
     visualization_candidates: list[RefVisualizationCandidate] = []
     map_aggregates: list[dict] = []
-    capacity_searches: list[dict] = []
-    map_classical_capacities: dict[str, int] = {}
-    map_cyclic_capacities: dict[str, int] = {}
+    map_agent_numbers: dict[str, int] = {}
     map_traversable_cell_counts: dict[str, int] = {}
 
     for map_index in range(len(case_spec.map_image_paths)):
         map_context = build_reference_maps(case_spec, map_index=map_index)
+        map_number = int(map_context["map_number"])
+        map_key = str(map_number)
         traversable_cell_count = int(map_context["traversable_cell_count"])
-        map_key = str(map_context["map_number"])
         map_traversable_cell_counts[map_key] = traversable_cell_count
+
+        if map_number not in MULTI_AGENT_AGENT_NUMBERS_BY_MAP:
+            raise ValueError(
+                f"No fixed multi-agent reference count is configured for Map {map_number}. "
+                "Update MULTI_AGENT_AGENT_NUMBERS_BY_MAP in master_config_ref_comparison.py."
+            )
+        agent_number = int(MULTI_AGENT_AGENT_NUMBERS_BY_MAP[map_number])
+        if agent_number <= 0:
+            raise ValueError(f"Configured agent count for Map {map_number} must be positive. Found {agent_number}.")
+        map_agent_numbers[map_key] = agent_number
+
         logger.log(
-            f"Map {map_context['map_number']}/{len(case_spec.map_image_paths)} | "
+            f"Map {map_number}/{len(case_spec.map_image_paths)} | "
             f"map_identifier={map_context['map_identifier']} | dimensions={map_context['rows']}x{map_context['cols']} | "
-            f"F={traversable_cell_count} traversable cells | image_path={map_context['image_path']}"
+            f"F={traversable_cell_count} traversable cells | shared_agent_number={agent_number} | "
+            f"image_path={map_context['image_path']}"
         )
 
-        classical_search = _run_reference_capacity_search(
+        agents = build_multi_agent_spawn_sequence(
+            case_spec,
+            map_context,
+            agent_number=agent_number,
+            mapping_name=None,
+        )
+        run_configuration = build_run_configuration(
             case_spec=case_spec,
-            map_context=map_context,
+            run_index=map_index,
+            map_identifier=map_context["map_identifier"],
+            agents=agents,
+            agent_number=agent_number,
+            notes=(
+                f"shared manuscript reference count N={agent_number} for both mappings; "
+                "classical and cyclic use the same starts, shared upper-right target, and fixed release/spawn times; "
+                f"runtime is averaged over {timing_repetitions} identical repetitions per mapping"
+            ),
+            map_index=map_context["map_index"],
+            map_number=map_number,
+            map_label_value=map_context["map_label"],
+            run_config_tag="shared_agent_count_final",
+            paired_source=True,
+        )
+        logger.log(
+            f"Shared final measurement | Map {map_number} | N={agent_number} | "
+            f"run_config_id={run_configuration.run_config_id}"
+        )
+
+        classical_result, classical_elapsed, classical_status, classical_samples, classical_statuses = execute_mapping_with_timing_repetitions(
+            case_spec=case_spec,
+            composite_map=map_context["classical_map"],
+            agents=agents,
             mapping_name="classical",
-            capacity_upper_bound=traversable_cell_count,
             logger=logger,
+            repetitions=timing_repetitions,
         )
-        cyclic_search = _run_reference_capacity_search(
+        classical_record = build_mapping_record(
             case_spec=case_spec,
-            map_context=map_context,
+            run_configuration=run_configuration,
+            mapping_name="classical",
+            solver_result=classical_result,
+            elapsed_seconds=classical_elapsed,
+            solver_status=classical_status,
+            timing_repetitions=timing_repetitions,
+            timing_elapsed_samples_seconds=classical_samples,
+            comparison_case="shared_map_agent_count",
+        )
+
+        cyclic_result, cyclic_elapsed, cyclic_status, cyclic_samples, cyclic_statuses = execute_mapping_with_timing_repetitions(
+            case_spec=case_spec,
+            composite_map=map_context["cyclic_map"],
+            agents=agents,
             mapping_name="cyclic",
-            capacity_upper_bound=traversable_cell_count,
             logger=logger,
+            repetitions=timing_repetitions,
         )
-        classical_capacity = int(classical_search.best_agent_number)
-        cyclic_capacity = int(cyclic_search.best_agent_number)
-        map_classical_capacities[map_key] = classical_capacity
-        map_cyclic_capacities[map_key] = cyclic_capacity
-        capacity_searches.append(
-            {
-                "map_index": map_context["map_index"],
-                "map_number": map_context["map_number"],
-                "map_label": map_context["map_label"],
-                "map_identifier": map_context["map_identifier"],
-                "traversable_cell_count": traversable_cell_count,
-                "classical_capacity_search": classical_search.to_summary(),
-                "cyclic_capacity_search": cyclic_search.to_summary(),
-            }
+        cyclic_record = build_mapping_record(
+            case_spec=case_spec,
+            run_configuration=run_configuration,
+            mapping_name="cyclic",
+            solver_result=cyclic_result,
+            elapsed_seconds=cyclic_elapsed,
+            solver_status=cyclic_status,
+            timing_repetitions=timing_repetitions,
+            timing_elapsed_samples_seconds=cyclic_samples,
+            comparison_case="shared_map_agent_count",
         )
 
-        map_classical_records: list[RefMappingRunRecord] = []
-        map_cyclic_records: list[RefMappingRunRecord] = []
+        if len(set(classical_statuses)) > 1:
+            logger.log(f"  Warning: repeated classical timings produced differing statuses | {classical_statuses}")
+        if len(set(cyclic_statuses)) > 1:
+            logger.log(f"  Warning: repeated cyclic timings produced differing statuses | {cyclic_statuses}")
+        logger.log(
+            f"  Paired result | N={agent_number} | "
+            f"classical={classical_record.result_category}, avg_t={classical_record.time_computation_halted_seconds:.4f}s, "
+            f"conflicts={classical_record.num_conflicts_detected_at_halt}, samples=[{_format_timing_samples(classical_samples)}] | "
+            f"cyclic={cyclic_record.result_category}, avg_t={cyclic_record.time_computation_halted_seconds:.4f}s, "
+            f"conflicts={cyclic_record.num_conflicts_detected_at_halt}, samples=[{_format_timing_samples(cyclic_samples)}]"
+        )
 
-        if classical_capacity > 0:
-            classical_agents = build_multi_agent_spawn_sequence(
-                case_spec,
-                map_context,
-                agent_number=classical_capacity,
-                mapping_name="classical",
-            )
-            classical_run_configuration = build_run_configuration(
-                case_spec=case_spec,
-                run_index=map_index,
-                map_identifier=map_context["map_identifier"],
-                agents=classical_agents,
-                agent_number=classical_capacity,
-                notes=(
-                    f"classical mapping evaluated at its independently discovered capacity N={classical_capacity}; "
-                    "agents share the upper-right target and use fixed release/spawn times from the upper and right "
-                    "neighbors of the lower-left start cell; "
-                    f"runtime is averaged over {timing_repetitions} identical repetitions"
-                ),
-                map_index=map_context["map_index"],
-                map_number=map_context["map_number"],
-                map_label_value=map_context["map_label"],
-                run_config_tag="classical_capacity_final",
-                paired_source=False,
-            )
-            logger.log(
-                f"Final classical measurement at N_classical_capacity={classical_capacity} | "
-                f"run_config_id={classical_run_configuration.run_config_id}"
-            )
-            classical_result, classical_elapsed, classical_status, classical_samples, classical_statuses = execute_mapping_with_timing_repetitions(
-                case_spec=case_spec,
-                composite_map=map_context["classical_map"],
-                agents=classical_agents,
-                mapping_name="classical",
-                logger=logger,
-                repetitions=timing_repetitions,
-            )
-            classical_record = build_mapping_record(
-                case_spec=case_spec,
-                run_configuration=classical_run_configuration,
-                mapping_name="classical",
-                solver_result=classical_result,
-                elapsed_seconds=classical_elapsed,
-                solver_status=classical_status,
-                timing_repetitions=timing_repetitions,
-                timing_elapsed_samples_seconds=classical_samples,
-                comparison_case="classical_at_classical_capacity",
-            )
-            if len(set(classical_statuses)) > 1:
-                logger.log(f"  Warning: repeated classical timings produced differing statuses | {classical_statuses}")
-            logger.log(
-                f"  Classical final result | N={classical_capacity} | "
-                f"result={classical_record.result_category}, avg_t={classical_record.time_computation_halted_seconds:.4f}s, "
-                f"conflicts={classical_record.num_conflicts_detected_at_halt}, samples=[{_format_timing_samples(classical_samples)}]"
-            )
-            run_configurations.append(classical_run_configuration.to_dict())
-            run_records.append(classical_record.to_dict())
-            classical_records.append(classical_record)
-            map_classical_records.append(classical_record)
-            _append_visualization_candidate(
-                candidates=visualization_candidates,
-                case_spec=case_spec,
-                run_configuration=classical_run_configuration,
-                mapping_name="classical",
-                agents=classical_agents,
-                solver_result=classical_result,
-                composite_map=map_context["classical_map"],
-            )
-        else:
-            logger.log(f"No passing classical capacity was found for {map_context['map_label']}.")
+        run_configurations.append(run_configuration.to_dict())
+        run_records.extend([classical_record.to_dict(), cyclic_record.to_dict()])
+        classical_records.append(classical_record)
+        cyclic_records.append(cyclic_record)
 
-        if cyclic_capacity > 0:
-            cyclic_agents = build_multi_agent_spawn_sequence(
-                case_spec,
-                map_context,
-                agent_number=cyclic_capacity,
-                mapping_name="cyclic",
-            )
-            cyclic_run_configuration = build_run_configuration(
-                case_spec=case_spec,
-                run_index=map_index,
-                map_identifier=map_context["map_identifier"],
-                agents=cyclic_agents,
-                agent_number=cyclic_capacity,
-                notes=(
-                    f"cyclic mapping evaluated at its independently discovered capacity N={cyclic_capacity}; "
-                    "agents share the upper-right target and use fixed release/spawn times from the upper and right "
-                    "neighbors of the lower-left start cell; "
-                    f"runtime is averaged over {timing_repetitions} identical repetitions"
-                ),
-                map_index=map_context["map_index"],
-                map_number=map_context["map_number"],
-                map_label_value=map_context["map_label"],
-                run_config_tag="cyclic_capacity_final",
-                paired_source=False,
-            )
-            logger.log(
-                f"Final cyclic measurement at N_cyclic_capacity={cyclic_capacity} | "
-                f"run_config_id={cyclic_run_configuration.run_config_id}"
-            )
-            cyclic_result, cyclic_elapsed, cyclic_status, cyclic_samples, cyclic_statuses = execute_mapping_with_timing_repetitions(
-                case_spec=case_spec,
-                composite_map=map_context["cyclic_map"],
-                agents=cyclic_agents,
-                mapping_name="cyclic",
-                logger=logger,
-                repetitions=timing_repetitions,
-            )
-            cyclic_record = build_mapping_record(
-                case_spec=case_spec,
-                run_configuration=cyclic_run_configuration,
-                mapping_name="cyclic",
-                solver_result=cyclic_result,
-                elapsed_seconds=cyclic_elapsed,
-                solver_status=cyclic_status,
-                timing_repetitions=timing_repetitions,
-                timing_elapsed_samples_seconds=cyclic_samples,
-                comparison_case="cyclic_at_cyclic_capacity",
-            )
-            if len(set(cyclic_statuses)) > 1:
-                logger.log(f"  Warning: repeated cyclic timings produced differing statuses | {cyclic_statuses}")
-            logger.log(
-                f"  Cyclic final result | N={cyclic_capacity} | "
-                f"result={cyclic_record.result_category}, avg_t={cyclic_record.time_computation_halted_seconds:.4f}s, "
-                f"conflicts={cyclic_record.num_conflicts_detected_at_halt}, samples=[{_format_timing_samples(cyclic_samples)}]"
-            )
-            run_configurations.append(cyclic_run_configuration.to_dict())
-            run_records.append(cyclic_record.to_dict())
-            cyclic_records.append(cyclic_record)
-            map_cyclic_records.append(cyclic_record)
-            _append_visualization_candidate(
-                candidates=visualization_candidates,
-                case_spec=case_spec,
-                run_configuration=cyclic_run_configuration,
-                mapping_name="cyclic",
-                agents=cyclic_agents,
-                solver_result=cyclic_result,
-                composite_map=map_context["cyclic_map"],
-            )
-        else:
-            logger.log(f"No passing cyclic capacity was found for {map_context['map_label']}.")
+        _append_visualization_candidate(
+            candidates=visualization_candidates,
+            case_spec=case_spec,
+            run_configuration=run_configuration,
+            mapping_name="classical",
+            agents=agents,
+            solver_result=classical_result,
+            composite_map=map_context["classical_map"],
+        )
+        _append_visualization_candidate(
+            candidates=visualization_candidates,
+            case_spec=case_spec,
+            run_configuration=run_configuration,
+            mapping_name="cyclic",
+            agents=agents,
+            solver_result=cyclic_result,
+            composite_map=map_context["cyclic_map"],
+        )
 
         aggregate = build_reference_aggregate(
             case_spec=case_spec,
-            classical_records=map_classical_records,
-            cyclic_records=map_cyclic_records,
+            classical_records=[classical_record],
+            cyclic_records=[cyclic_record],
             map_index=map_context["map_index"],
-            map_number=map_context["map_number"],
+            map_number=map_number,
             map_label=map_context["map_label"],
         )
         map_aggregates.append(aggregate.to_dict())
@@ -767,39 +446,20 @@ def _compute_multi_agent_case(case_spec: RefCaseSpec, logger: RefExperimentLogge
         classical_records=classical_records,
         cyclic_records=cyclic_records,
     )
-    maps_without_classical_capacity = [key for key, value in map_classical_capacities.items() if int(value) <= 0]
-    maps_without_cyclic_capacity = [key for key, value in map_cyclic_capacities.items() if int(value) <= 0]
-    total_capacity_run_slots = 0
-    for entry in capacity_searches:
-        for mapping_key in ("classical_capacity_search", "cyclic_capacity_search"):
-            for trial in entry[mapping_key]["tested_agent_numbers"]:
-                total_capacity_run_slots += int(trial.get("attempts_evaluated", 0))
-
-    missing_capacity_parts: list[str] = []
-    if maps_without_classical_capacity:
-        missing_capacity_parts.append("classical:" + ",".join(maps_without_classical_capacity))
-    if maps_without_cyclic_capacity:
-        missing_capacity_parts.append("cyclic:" + ",".join(maps_without_cyclic_capacity))
-
     stop_summary = {
         "case_id": case_spec.case_id,
+        "retained_pairs": len(run_configurations),
         "retained_mapping_results": len(run_records),
-        "attempts_used": total_capacity_run_slots,
-        "completed_counted_quota": not missing_capacity_parts,
+        "attempts_used": len(run_configurations),
+        "completed_counted_quota": len(run_configurations) == len(case_spec.map_image_paths),
         "filter_individual_runs_until_cyclic_faster": False,
         "discarded_attempts_count": 0,
         "num_reference_maps": len(case_spec.map_image_paths),
         "multi_agent_timing_repetitions": timing_repetitions,
-        "capacity_search_mappings": "classical_and_cyclic_independent",
-        "capacity_pass_criterion": case_spec.capacity_pass_criterion,
-        "capacity_agent_range": "1..F per map",
-        "capacity_attempts_per_agent_number": case_spec.capacity_attempts_per_agent_number,
-        "capacity_successful_runs_required": case_spec.capacity_successful_runs_required,
-        "capacity_search_early_stop_after_first_success": False,
+        "agent_count_protocol": "fixed_map_specific_shared_between_mappings",
+        "map_agent_numbers": map_agent_numbers,
         "map_traversable_cell_counts": map_traversable_cell_counts,
-        "map_classical_capacities": map_classical_capacities,
-        "map_cyclic_capacities": map_cyclic_capacities,
-        "stop_reason": None if not missing_capacity_parts else "no_passing_capacity_for_" + ";".join(missing_capacity_parts),
+        "stop_reason": None,
     }
     return {
         "case_spec": case_spec,
@@ -807,7 +467,6 @@ def _compute_multi_agent_case(case_spec: RefCaseSpec, logger: RefExperimentLogge
         "run_records": run_records,
         "aggregate": overall_aggregate.to_dict(),
         "map_aggregates": map_aggregates,
-        "capacity_searches": capacity_searches,
         "discarded_attempts": [],
         "visualization_candidates": visualization_candidates,
         "stop_summary": stop_summary,
@@ -818,14 +477,12 @@ def _compute_reference_case(case_spec: RefCaseSpec, logger: RefExperimentLogger)
         return _compute_single_agent_case(case_spec, logger)
     return _compute_multi_agent_case(case_spec, logger)
 
-
 def _write_graphs_outputs(*, case_spec: RefCaseSpec, raw_payload: dict, output_manager: RefCaseOutputManager, logger: RefExperimentLogger) -> list[Path]:
     output_manager.clear_graphs_outputs()
     run_configurations = list(raw_payload.get("run_configurations", []))
     run_records = list(raw_payload.get("run_records", []))
     aggregate_payload = dict(raw_payload.get("aggregate") or {})
     map_aggregates_payload = list(raw_payload.get("map_aggregates", []))
-    capacity_searches = list(raw_payload.get("capacity_searches", []))
     discarded_attempts = list(raw_payload.get("discarded_attempts", []))
     stop_summary = dict(raw_payload.get("stop_summary", {}))
 
@@ -833,7 +490,6 @@ def _write_graphs_outputs(*, case_spec: RefCaseSpec, raw_payload: dict, output_m
     write_json(output_manager.metadata_dir / "stop_summary.json", stop_summary)
     write_json(output_manager.records_dir / "run_configurations.json", run_configurations)
     write_json(output_manager.records_dir / "run_records.json", run_records)
-    write_json(output_manager.records_dir / "capacity_searches.json", capacity_searches)
     write_json(output_manager.records_dir / "discarded_attempts.json", discarded_attempts)
     write_json(output_manager.aggregates_dir / "condition_summary.json", aggregate_payload)
     if map_aggregates_payload:
@@ -852,7 +508,6 @@ def _write_graphs_outputs(*, case_spec: RefCaseSpec, raw_payload: dict, output_m
         logger.log(f"  - {path}")
     return graph_paths
 
-
 def _write_visualization_outputs(
     *,
     frame_by_frame_store: ReferenceFrameByFrameStore,
@@ -864,8 +519,7 @@ def _write_visualization_outputs(
     summary = render_reference_visualizations(
         candidates=candidates,
         output_root=output_manager.visualizations_dir,
-        # The frame-by-frame store already contains exactly the designated first
-        # successful run for each map/mapping pair.
+
         num_last_successful_runs_per_mapping=1,
         progress_logger=logger.log,
     )
@@ -876,7 +530,6 @@ def _write_visualization_outputs(
         f"available_candidates={summary.get('available_candidates', 0)}"
     )
     return summary
-
 
 def run_reference_case(case_spec: RefCaseSpec, *, generation_target: str, program_start_time: float | None = None) -> dict:
     recompute_raw_mapf = _should_recompute_raw_mapf(generation_target)
@@ -950,7 +603,6 @@ def run_reference_case(case_spec: RefCaseSpec, *, generation_target: str, progra
         "raw_payload_used_for_generation": raw_payload_used,
         "frame_by_frame_used_for_generation": frame_by_frame_used,
     }
-
 
 def run_selected_ref_comparison(*, program_start_time: float | None = None) -> dict:
     generation_target = _resolve_generation_target()

@@ -22,7 +22,6 @@ def map_label(map_number: int | None) -> str:
         return ""
     return f"Map {int(map_number)}"
 
-
 def load_reference_port_obstacle_data(image_path: str | Path) -> dict[str, Any]:
     """Load a normalized black/white reference port map.
 
@@ -57,7 +56,6 @@ def load_reference_port_obstacle_data(image_path: str | Path) -> dict[str, Any]:
             matrix.append(row)
     return {"obstacle_matrix": matrix}
 
-
 def load_exact_black_white_obstacle_matrix(image_path: str | Path) -> list[list[int]]:
     """Load a normalized reference map using 1=free and 0=obstacle."""
     return load_reference_port_obstacle_data(image_path)["obstacle_matrix"]
@@ -65,14 +63,12 @@ def load_exact_black_white_obstacle_matrix(image_path: str | Path) -> list[list[
 def _composite_vertex_for_cell(row: int, col: int) -> tuple[int, int]:
     return (2 * row, 2 * col)
 
-
 def _assert_free_vertex(composite_map: list[list[Any]], vertex: tuple[int, int], label: str) -> None:
     row, col = vertex
     if row < 0 or row >= len(composite_map) or col < 0 or col >= len(composite_map[row]):
         raise ValueError(f"{label} vertex {vertex} is outside the composite map.")
     if composite_map[row][col] != Vertex.FREE_SPACE:
         raise ValueError(f"{label} vertex {vertex} is not free space.")
-
 
 def build_reference_maps(case_spec: RefCaseSpec, *, map_index: int = 0) -> dict[str, Any]:
     map_paths = list(case_spec.map_image_paths or [case_spec.image_path])
@@ -135,7 +131,6 @@ def build_reference_maps(case_spec: RefCaseSpec, *, map_index: int = 0) -> dict[
         "map_identifier": f"reference_port_map_{map_number}",
     }
 
-
 def _build_agent(agent_id: int, start: tuple[int, int], goal: tuple[int, int], *, spawn_time: int = 0) -> dict[str, Any]:
     return {
         "id": agent_id,
@@ -146,10 +141,8 @@ def _build_agent(agent_id: int, start: tuple[int, int], goal: tuple[int, int], *
         "spawn_time": int(spawn_time),
     }
 
-
 def build_single_agent(case_spec: RefCaseSpec, map_context: dict[str, Any]) -> list[dict[str, Any]]:
     return [_build_agent(0, map_context["lower_left_start"], map_context["upper_right_goal"], spawn_time=0)]
-
 
 def _path_position(path: list[Any], time_step: int) -> Any:
     if time_step < 0:
@@ -158,7 +151,6 @@ def _path_position(path: list[Any], time_step: int) -> Any:
         return path[time_step]
     return None
 
-
 def _spawn_cell_is_available(*, spawn_vertex: tuple[int, int], proposed_spawn_time: int, reservation_paths: list[list[Any]]) -> bool:
     for path in reservation_paths:
         if _path_position(path, proposed_spawn_time) == spawn_vertex:
@@ -166,7 +158,6 @@ def _spawn_cell_is_available(*, spawn_vertex: tuple[int, int], proposed_spawn_ti
         if _path_position(path, proposed_spawn_time + 1) == spawn_vertex:
             return False
     return True
-
 
 def build_multi_agent_spawn_sequence(case_spec: RefCaseSpec, map_context: dict[str, Any], *, agent_number: int | None = None, mapping_name: str | None = None) -> list[dict[str, Any]]:
     requested_agent_number = int(agent_number if agent_number is not None else case_spec.agent_number)
@@ -236,7 +227,6 @@ def build_multi_agent_spawn_sequence(case_spec: RefCaseSpec, map_context: dict[s
         )
     return agents
 
-
 def serialize_agents(agents: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [
         {
@@ -247,7 +237,6 @@ def serialize_agents(agents: list[dict[str, Any]]) -> list[dict[str, Any]]:
         }
         for agent in agents
     ]
-
 
 def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_identifier: str, agents: list[dict[str, Any]], notes: str, map_index: int | None = None, map_number: int | None = None, map_label_value: str = "", agent_number: int | None = None, run_config_tag: str | None = None, paired_source: bool = True) -> RefRunConfiguration:
     resolved_agent_number = int(agent_number if agent_number is not None else case_spec.agent_number)
@@ -272,10 +261,8 @@ def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_ident
         notes=notes,
     )
 
-
 def _active_positions(path: list[Any]) -> list[tuple[int, int]]:
     return [position for position in path if position is not None]
-
 
 def path_movement_length(path: list[Any]) -> int:
     active_positions = _active_positions(path)
@@ -283,12 +270,10 @@ def path_movement_length(path: list[Any]) -> int:
         return 0
     return max(0, len(active_positions) - 1)
 
-
 def total_path_length(paths_by_agent: dict[int, list[Any]] | None) -> int | None:
     if not paths_by_agent:
         return None
     return sum(path_movement_length(path) for path in paths_by_agent.values())
-
 
 def count_turns_for_path(path: list[Any]) -> int:
     active_positions = _active_positions(path)
@@ -305,12 +290,10 @@ def count_turns_for_path(path: list[Any]) -> int:
         previous_direction = direction
     return turns
 
-
 def total_turns(paths_by_agent: dict[int, list[Any]] | None) -> int | None:
     if not paths_by_agent:
         return None
     return sum(count_turns_for_path(path) for path in paths_by_agent.values())
-
 
 def categorize_solver_status(solver_status: str | None) -> tuple[str, bool, bool]:
     if solver_status == "solved":
@@ -323,12 +306,10 @@ def categorize_solver_status(solver_status: str | None) -> tuple[str, bool, bool
         return "setup_failed", False, False
     return "setup_failed", False, False
 
-
 def _progress_callback_factory(logger: Any, label: str) -> Callable[[int], None]:
     def callback(elapsed_seconds: int) -> None:
         logger.log(f"    {label} progress: {max(0, elapsed_seconds):.2f}s")
     return callback
-
 
 def _single_agent_solver_result(*, composite_map: list[list[Any]], agent: dict[str, Any], case_spec: RefCaseSpec) -> dict[str, Any]:
     deadline = time.perf_counter() + max(0.0, float(case_spec.runtime_limit_seconds))
@@ -381,7 +362,6 @@ def _single_agent_solver_result(*, composite_map: list[list[Any]], agent: dict[s
         "agent_cohesion_enabled": False,
     }
 
-
 def execute_mapping(*, case_spec: RefCaseSpec, composite_map: list[list[Any]], agents: list[dict[str, Any]], mapping_name: str, logger: Any) -> tuple[dict[str, Any] | None, float, str]:
     label = f"{case_spec.case_id} {mapping_name}"
     start_time = time.perf_counter()
@@ -405,7 +385,6 @@ def execute_mapping(*, case_spec: RefCaseSpec, composite_map: list[list[Any]], a
     except Exception as exc:  # pragma: no cover
         elapsed_seconds = time.perf_counter() - start_time
         return None, elapsed_seconds, f"exception:{type(exc).__name__}:{exc}"
-
 
 def execute_mapping_with_timing_repetitions(
     *,
@@ -433,16 +412,12 @@ def execute_mapping_with_timing_repetitions(
         elapsed_samples.append(elapsed_seconds)
         status_samples.append(solver_status)
 
-        # The reference setup is deterministic for both single-agent and multi-agent
-        # cases, so path-related values should be identical across timing repeats.
-        # Prefer a solved run as the representative source of path, conflict, node,
-        # turn, and distance metrics if one exists.
         if representative_result is None or (representative_status != "solved" and solver_status == "solved"):
+            # Use a solved repeat as the source for path-related metrics.
             representative_result = solver_result
             representative_status = solver_status
 
     return representative_result, mean(elapsed_samples), representative_status, elapsed_samples, status_samples
-
 
 def build_mapping_record(
     *,

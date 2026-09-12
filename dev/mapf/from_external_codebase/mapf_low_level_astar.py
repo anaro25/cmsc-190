@@ -4,9 +4,7 @@ import itertools
 from dev.mapf.low_level_guidance import get_true_static_distances_for_static_map
 from dev.navigation.cyclic_grid_navigation import get_all_free_vertices, get_outgoing_neighbors
 
-
 _STATIC_TIGHT_HORIZON_MAX_SLACK = 64
-
 
 def manhattan_vertex_distance(a, b):
     """
@@ -15,10 +13,8 @@ def manhattan_vertex_distance(a, b):
     """
     return (abs(a[0] - b[0]) + abs(a[1] - b[1])) // 2
 
-
 def get_agent_constraints(constraints, agent_id):
     return [constraint for constraint in constraints if constraint["agent"] == agent_id]
-
 
 def violates_vertex_constraint(agent_constraints, position, time_step):
     for constraint in agent_constraints:
@@ -27,7 +23,6 @@ def violates_vertex_constraint(agent_constraints, position, time_step):
         if constraint["position"] == position and constraint["time"] == time_step:
             return True
     return False
-
 
 def violates_edge_constraint(agent_constraints, from_position, to_position, time_step):
     """
@@ -44,12 +39,10 @@ def violates_edge_constraint(agent_constraints, from_position, to_position, time
             return True
     return False
 
-
 def get_latest_constraint_time(agent_constraints):
     if not agent_constraints:
         return 0
     return max(constraint["time"] for constraint in agent_constraints)
-
 
 def reconstruct_path(came_from, end_state):
     path = []
@@ -63,16 +56,13 @@ def reconstruct_path(came_from, end_state):
     path.reverse()
     return path
 
-
 def _static_distance_lookup(cyclic_map, goal):
     return get_true_static_distances_for_static_map(cyclic_map, goal)
-
 
 def _heuristic_value(position, goal, *, true_static_shortest_path_distance, static_distance_lookup):
     if true_static_shortest_path_distance:
         return static_distance_lookup.get(position, float("inf"))
     return manhattan_vertex_distance(position, goal)
-
 
 def _resolve_time_horizon(
     *,
@@ -90,7 +80,6 @@ def _resolve_time_horizon(
 
     slack = max(8, min(_STATIC_TIGHT_HORIZON_MAX_SLACK, max(1, num_free_vertices // 6)))
     return max(20, latest_constraint_time + base_goal_distance + slack)
-
 
 def find_path_for_agent(
     cyclic_map,
@@ -181,7 +170,7 @@ def find_path_for_agent(
         next_time = current_time + 1
 
         candidate_positions = list(get_outgoing_neighbors(cyclic_map, current_position))
-        candidate_positions.append(current_position)  # wait action
+        candidate_positions.append(current_position)
 
         for next_position in candidate_positions:
             if violates_vertex_constraint(agent_constraints, next_position, next_time):

@@ -16,7 +16,6 @@ from dev.experiments.study.main_output_layout import get_main_config_artifact_di
 from dev.experiments.study.models import DynamicBranchState, VisualizationCandidate
 from dev.paths import FRAME_BY_FRAME_REF_COMPARISON_ROOT
 
-
 FRAME_BY_FRAME_FORMAT_VERSION = 1
 FRAME_BY_FRAME_FILENAME = "frame_by_frame.pkl"
 FRAME_BY_FRAME_METADATA_FILENAME = "metadata.json"
@@ -25,16 +24,13 @@ SHARED_CONTEXT_DIR_NAME = "shared_context"
 SHARED_CONTEXT_FILENAME = "shared_context.pkl"
 SHARED_CONTEXT_METADATA_FILENAME = "metadata.json"
 
-
 def _saved_at_utc() -> str:
     return datetime.now(timezone.utc).isoformat()
-
 
 def _frame_count_from_solver_result(solver_result: dict[str, Any] | None) -> int:
     paths_by_agent = (solver_result or {}).get("paths_by_agent") or {}
     lengths = [len(path) for path in paths_by_agent.values() if path is not None]
     return max(lengths, default=0)
-
 
 def _has_successful_paths(solver_result: dict[str, Any] | None) -> bool:
     return bool(
@@ -43,13 +39,11 @@ def _has_successful_paths(solver_result: dict[str, Any] | None) -> bool:
         and solver_result.get("paths_by_agent")
     )
 
-
 def _is_retryable_windows_filesystem_error(exc: OSError) -> bool:
     return (
         isinstance(exc, PermissionError)
         or getattr(exc, "winerror", None) in {5, 32, 33}
     )
-
 
 def _rename_tree_with_retry(
     source: Path,
@@ -81,7 +75,6 @@ def _rename_tree_with_retry(
         "A Windows process may still have a file or directory handle open."
     ) from last_error
 
-
 def _remove_tree_with_retry(
     path: Path,
     *,
@@ -104,7 +97,6 @@ def _remove_tree_with_retry(
             time.sleep(delay_seconds)
             delay_seconds *= 2
     return not path.exists()
-
 
 def _atomic_replace_tree(final_root: Path, build_tree: Any) -> None:
     """Build a replacement tree and promote it without risking the last valid tree."""
@@ -189,13 +181,11 @@ def _atomic_replace_tree(final_root: Path, build_tree: Any) -> None:
             stacklevel=2,
         )
 
-
 def _write_package(run_root: Path, package: dict[str, Any], metadata: dict[str, Any]) -> None:
     run_root.mkdir(parents=True, exist_ok=True)
     with (run_root / FRAME_BY_FRAME_FILENAME).open("wb") as handle:
         pickle.dump(package, handle, protocol=pickle.HIGHEST_PROTOCOL)
     write_json(run_root / FRAME_BY_FRAME_METADATA_FILENAME, metadata)
-
 
 def _read_package(path: Path) -> dict[str, Any]:
     with path.open("rb") as handle:
@@ -211,7 +201,6 @@ def _read_package(path: Path) -> dict[str, Any]:
         )
     return package
 
-
 class ReferenceFrameByFrameStore:
     """Persist only the designated successful reference-comparison trajectories."""
 
@@ -225,8 +214,7 @@ class ReferenceFrameByFrameStore:
         self.manifest_path = self.mode_root / FRAME_BY_FRAME_MANIFEST_FILENAME
 
     def save(self, candidates: Iterable[RefVisualizationCandidate]) -> dict[str, Any]:
-        # The computation phase already provides only final-comparison candidates.
-        # Keep the first successful candidate for each map/mapping pair defensively.
+
         selected_by_key: dict[tuple[int, str], RefVisualizationCandidate] = {}
         for candidate in candidates:
             if not _has_successful_paths(candidate.solver_result):
@@ -352,7 +340,6 @@ class ReferenceFrameByFrameStore:
                 raise ValueError(f"Malformed reference frame-by-frame candidate: {package_path}")
             candidates.append(candidate)
         return candidates
-
 
 class MainExperimentFrameByFrameStore:
     """Persist the two designated main-experiment capacity trajectories per config."""

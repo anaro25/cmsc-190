@@ -4,7 +4,6 @@ import json
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
-
 @dataclass
 class RunConfiguration:
     branch_id: str
@@ -26,7 +25,6 @@ class RunConfiguration:
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
-
 
 @dataclass
 class MappingRunRecord:
@@ -64,8 +62,7 @@ class MappingRunRecord:
 
     @property
     def average_path_length(self) -> float | None:
-        # Backward-compatible alias for older graph/aggregation helpers.
-        # The value now represents total path length over all agents.
+
         return self.total_path_length
 
     def to_dict(self) -> dict[str, Any]:
@@ -74,7 +71,6 @@ class MappingRunRecord:
             payload["initial_condition_spec"], ensure_ascii=False
         )
         return payload
-
 
 @dataclass
 class ConditionAggregate:
@@ -113,7 +109,6 @@ class ConditionAggregate:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
-
 @dataclass
 class PreparedRunContext:
     run_configuration: RunConfiguration
@@ -121,7 +116,6 @@ class PreparedRunContext:
     base_map: list[list[Any]] | None = None
     classical_map: list[list[Any]] | None = None
     cyclic_map: list[list[Any]] | None = None
-
 
 @dataclass
 class DynamicBranchState:
@@ -139,7 +133,6 @@ class DynamicBranchState:
     single_target_vertices_by_id: dict[int, set[tuple[int, int]]] = field(default_factory=dict)
     visually_free_vertices: set[tuple[int, int]] = field(default_factory=set)
 
-
 @dataclass
 class VisualizationCandidate:
     mapping_name: str
@@ -147,7 +140,6 @@ class VisualizationCandidate:
     agents: list[dict[str, Any]]
     solver_result: dict[str, Any]
     composite_map: list[list[Any]] | None = None
-
 
 @dataclass
 class SamplingConditionResult:

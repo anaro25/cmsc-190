@@ -13,7 +13,6 @@ from dev.mapf.mapf_logger import (
 )
 from dev.mapf.metrics import summarize_mapf_result
 
-
 def _active_category_map_type() -> str:
     """Best-effort compatibility for older direct runner entry points."""
     selected = [str(item).strip() for item in SELECTED_MAP_CONFIGS if str(item).strip()]
@@ -25,27 +24,21 @@ def _active_category_map_type() -> str:
             return category_map_type
     return next(iter(BRANCH_USER_CONFIGS))
 
-
 PROGRESS_LOG_INTERVAL_SECONDS = 5
-
 
 def current_ecbs_suboptimality_factor():
     return float(BRANCH_USER_CONFIGS[_active_category_map_type()].get("ECBS_suboptimality", 1.5))
 
-
 def current_true_static_shortest_path_distance_enabled():
-    # Main experiment uses Manhattan distance, as specified in the manuscript.
-    return False
 
+    return False
 
 def current_tight_time_horizon_enabled():
     return bool(BRANCH_USER_CONFIGS[_active_category_map_type()].get("tight_time_horizon", False))
 
-
 def current_agent_cohesion_enabled():
-    # The main experiment does not use crowd-spreading/cohesion guidance.
-    return False
 
+    return False
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
     mapping_output_dir = Path(output_root) / mapping_name / map_name
@@ -54,7 +47,6 @@ def clear_previous_mapping_run(map_name, mapping_name, output_root):
         shutil.rmtree(mapping_output_dir)
 
     mapping_output_dir.mkdir(parents=True, exist_ok=True)
-
 
 def format_path_length(value):
     if value is None:
@@ -65,11 +57,9 @@ def format_path_length(value):
 
     return f"{value:.2f}"
 
-
 def print_mapping_header(mapping_name, context_label):
     title = f"{mapping_name.upper()} | {context_label}"
     print(f"=== {title} ===")
-
 
 def print_mapping_summary(summary):
     if not summary["solved"]:
@@ -80,7 +70,6 @@ def print_mapping_summary(summary):
     print(f"Number of conflicts detected: {summary['num_conflicts_detected']}")
     print(f"Average path length: {format_path_length(summary['average_path_length'])}")
 
-
 def build_run_result(agents, solved_result, frames):
     return {
         "agents": agents,
@@ -89,7 +78,6 @@ def build_run_result(agents, solved_result, frames):
         "num_conflicts_detected": solved_result["num_conflicts_detected"],
         "num_high_level_nodes_expanded": solved_result["num_high_level_nodes_expanded"],
     }
-
 
 def solve_single_mapf_instance(
     composite_map,
@@ -114,14 +102,12 @@ def solve_single_mapf_instance(
         agent_cohesion_enabled=(current_agent_cohesion_enabled() if agent_cohesion_enabled is None else bool(agent_cohesion_enabled)),
     )
 
-
 def build_elapsed_time_reporter(interval_seconds=PROGRESS_LOG_INTERVAL_SECONDS):
     def report(elapsed_seconds):
         if elapsed_seconds > 0 and elapsed_seconds % interval_seconds == 0:
             print(f"{elapsed_seconds}...")
 
     return report
-
 
 def print_bad_setup_message(result):
     status = result["status"]
@@ -134,7 +120,6 @@ def print_bad_setup_message(result):
         print("[Failed: assignment not solved]")
 
     print(f"Number of conflicts detected: {result['num_conflicts_detected']}")
-
 
 def run_single_mapf_for_map(
     map_name,
@@ -231,7 +216,6 @@ def run_single_mapf_for_map(
     print_mapping_summary(summary=summary)
 
     return run_result
-
 
 def run_single_mapf_for_selected_map(
     mapping_name,

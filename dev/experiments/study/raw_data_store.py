@@ -13,9 +13,7 @@ from dev.experiments.branch_specs import BranchSpec
 from dev.experiments.study.io_utils import write_json
 from dev.paths import LEGACY_RAW_MAPF_DATA_ROOTS, RAW_MAPF_DATA_ROOT
 
-
 RAW_MAPF_DATA_FORMAT_VERSION = 2
-
 
 class BranchRawDataStore:
     def __init__(self, branch_spec: BranchSpec):
@@ -315,10 +313,6 @@ class BranchRawDataStore:
                     legacy_visualization_limit
                 )
 
-        # Older persisted branch_spec.json files may contain metadata fields that
-        # no longer exist in the current BranchSpec dataclass. Ignore those
-        # legacy extras so saved raw MAPF data can still be reused when
-        # to_generate is not "raw_data".
         valid_branch_spec_keys = {field.name for field in fields(BranchSpec)}
         branch_spec_payload = {
             key: value

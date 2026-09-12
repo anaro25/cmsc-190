@@ -7,10 +7,8 @@ from dev.experiments.ref_comparison.models import RefCaseSpec, RefConditionAggre
 
 T = TypeVar("T", int, float)
 
-
 def _count(records: list[RefMappingRunRecord], result_category: str) -> int:
     return sum(record.result_category == result_category for record in records)
-
 
 def _average(records: list[RefMappingRunRecord], getter: Callable[[RefMappingRunRecord], T | None], *, solved_only: bool = False) -> float | None:
     values: list[float] = []
@@ -25,15 +23,13 @@ def _average(records: list[RefMappingRunRecord], getter: Callable[[RefMappingRun
         return None
     return mean(values)
 
-
 def _aggregate_agent_number(case_spec: RefCaseSpec, records: list[RefMappingRunRecord]) -> int:
     del case_spec
     agent_numbers = {int(record.agent_number) for record in records}
     if len(agent_numbers) == 1:
         return next(iter(agent_numbers))
-    # Zero explicitly means that no single agent count represents this aggregate.
-    return 0
 
+    return 0
 
 def build_reference_aggregate(
     *,

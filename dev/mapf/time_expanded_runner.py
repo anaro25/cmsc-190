@@ -11,7 +11,6 @@ from dev.mapf.mapf_logger_dynamic import (
 from dev.mapf.metrics import summarize_mapf_result
 from dev.mapf.time_expanded_cbs import solve_time_expanded_mapf_with_cbs
 
-
 def _active_category_map_type() -> str:
     """Best-effort compatibility for older direct runner entry points."""
     selected = [str(item).strip() for item in SELECTED_MAP_CONFIGS if str(item).strip()]
@@ -23,27 +22,21 @@ def _active_category_map_type() -> str:
             return category_map_type
     return next(iter(BRANCH_USER_CONFIGS))
 
-
 PROGRESS_LOG_INTERVAL_SECONDS = 5
-
 
 def current_ecbs_suboptimality_factor():
     return float(BRANCH_USER_CONFIGS[_active_category_map_type()].get("ECBS_suboptimality", 1.5))
 
-
 def current_true_static_shortest_path_distance_enabled():
-    # Main experiment uses Manhattan distance, as specified in the manuscript.
-    return False
 
+    return False
 
 def current_tight_time_horizon_enabled():
     return bool(BRANCH_USER_CONFIGS[_active_category_map_type()].get("tight_time_horizon", False))
 
-
 def current_agent_cohesion_enabled():
-    # The main experiment does not use crowd-spreading/cohesion guidance.
-    return False
 
+    return False
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):
     mapping_output_dir = Path(output_root) / mapping_name / map_name
@@ -51,13 +44,11 @@ def clear_previous_mapping_run(map_name, mapping_name, output_root):
         shutil.rmtree(mapping_output_dir)
     mapping_output_dir.mkdir(parents=True, exist_ok=True)
 
-
 def build_elapsed_time_reporter(interval_seconds=PROGRESS_LOG_INTERVAL_SECONDS):
     def report(elapsed_seconds):
         if elapsed_seconds > 0 and elapsed_seconds % interval_seconds == 0:
             print(f"{elapsed_seconds}...")
     return report
-
 
 def format_path_length(value):
     if value is None:
@@ -66,10 +57,8 @@ def format_path_length(value):
         return str(int(value))
     return f"{value:.2f}"
 
-
 def print_mapping_header(mapping_name, context_label):
     print(f"=== {mapping_name.upper()} | {context_label} ===")
-
 
 def print_mapping_summary(summary):
     if not summary["solved"]:
@@ -78,7 +67,6 @@ def print_mapping_summary(summary):
     print("[Success]")
     print(f"Number of conflicts detected: {summary['num_conflicts_detected']}")
     print(f"Average path length: {format_path_length(summary['average_path_length'])}")
-
 
 def print_bad_setup_message(result):
     status = result["status"]
@@ -89,7 +77,6 @@ def print_bad_setup_message(result):
     else:
         print("[Failed: assignment not solved]")
     print(f"Number of conflicts detected: {result['num_conflicts_detected']}")
-
 
 def run_time_expanded_mapf_for_loop(
     map_name,

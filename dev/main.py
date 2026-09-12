@@ -3,7 +3,7 @@ from __future__ import annotations
 import time
 
 
-# Select exactly one experiment family.
+# Experiment to run.
 # SELECTED_EXPERIMENT = "ref_comparison"
 SELECTED_EXPERIMENT = "main_experiment"
 
@@ -25,7 +25,7 @@ def main() -> None:
             "SELECTED_EXPERIMENT must be either 'main_experiment' or 'ref_comparison'."
         )
 
-    print("===========================\n" * 25)  # not shown in log files
+    print("===========================\n" * 25)
 
 
 if __name__ == "__main__":

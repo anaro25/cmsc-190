@@ -2,24 +2,13 @@ from __future__ import annotations
 
 from typing import Mapping
 
-
-# The campus crowd behavior is intentionally soft. It changes the order in
-# which A* prefers candidate nodes, but it does not add any transition that is
-# not already present in the selected mapping. This means the agents still obey
-# classical/cyclic transitions and CBS constraints.
 DEFAULT_COHESION_FACTOR = 0.35
 
-# Composite-map vertices are stored two array cells apart. One movement step is
-# therefore usually a raw coordinate difference of 2.
+# Composite-map vertices are two array cells apart.
 VERTEX_STEP = 2
 
-# Only apply the stronger anti-snake rule in open places. In narrow corridors or
-# bottlenecks, forcing spreading is usually impossible and only slows the search.
 OPEN_AREA_FREE_NEIGHBOR_THRESHOLD = 3
 
-# Look a little before and after the candidate timestep. A single-file crowd is
-# often not literally on the same cell at the same time; it is usually one agent
-# following the recent trail of another agent.
 TRAIL_TIME_OFFSETS = (-2, -1, 0, 1, 2)
 
 try:
@@ -27,14 +16,12 @@ try:
 except Exception:  # pragma: no cover - fallback for isolated imports
     CONFIGURED_COHESION_FACTOR = DEFAULT_COHESION_FACTOR
 
-
 def get_configured_cohesion_factor() -> float:
     """Return the editable crowd-spreading strength from master_config.py."""
     try:
         return max(0.0, float(CONFIGURED_COHESION_FACTOR))
     except (TypeError, ValueError):
         return DEFAULT_COHESION_FACTOR
-
 
 def get_path_position(path: list[tuple[int, int]], time_step: int) -> tuple[int, int] | None:
     """Return a path position under the disappearing-agent model."""
@@ -44,14 +31,12 @@ def get_path_position(path: list[tuple[int, int]], time_step: int) -> tuple[int,
         return path[time_step]
     return None
 
-
 def vertex_distance_steps(a: tuple[int, int], b: tuple[int, int] | tuple[float, float]) -> float:
     """
     Composite-map vertices are stored two grid cells apart, so raw coordinate
     distance is divided by 2 to express the value in movement steps.
     """
     return (abs(a[0] - b[0]) + abs(a[1] - b[1])) / float(VERTEX_STEP)
-
 
 def reference_positions_at_time(
     reference_paths: Mapping[int, list[tuple[int, int]]] | None,
@@ -71,7 +56,6 @@ def reference_positions_at_time(
         if position is not None:
             positions.append(position)
     return positions
-
 
 def _resolve_primary_axis(
     position: tuple[int, int],
@@ -103,7 +87,6 @@ def _resolve_primary_axis(
 
     return None
 
-
 def _is_same_travel_line(
     position: tuple[int, int],
     other_position: tuple[int, int],
@@ -117,11 +100,9 @@ def _is_same_travel_line(
         return position[0] == other_position[0]
     return position[0] == other_position[0] or position[1] == other_position[1]
 
-
 def _trail_time_weight(time_offset: int) -> float:
     """Nearby timesteps matter more than farther timesteps."""
     return 1.0 / (1.0 + abs(time_offset))
-
 
 def crowd_spreading_penalty(
     position: tuple[int, int],
@@ -176,9 +157,7 @@ def crowd_spreading_penalty(
         for other_position in other_positions:
             distance = vertex_distance_steps(position, other_position)
 
-            # Never make actual same-time collision handling depend on this. CBS
-            # constraints are still responsible for legality. This only changes
-            # which legal alternatives A* tries first.
+            # CBS handles legality; this score only changes A* preference.
             if distance == 0:
                 penalty += 1.50 * time_weight
                 continue
@@ -189,9 +168,7 @@ def crowd_spreading_penalty(
             if not _is_same_travel_line(position, other_position, primary_axis=primary_axis):
                 continue
 
-            # This is the main anti-snake rule: in open areas, do not prefer the
-            # exact same lane immediately behind or ahead of already planned
-            # agents. One and two movement steps are the most visible snake cases.
+            # Penalize nearby reuse of the same trail.
             if distance <= 1.0:
                 penalty += 1.25 * time_weight
             elif distance <= 2.0:
@@ -201,8 +178,6 @@ def crowd_spreading_penalty(
 
     return resolved_weight * penalty
 
-
-# Backwards-compatible name used by older files in the project. The mechanism is
-# no longer a center-of-mass attraction; it is an anti-trail spreading preference.
+# Older files still use this name.
 def cohesion_penalty(*args, **kwargs) -> float:
     return crowd_spreading_penalty(*args, **kwargs)

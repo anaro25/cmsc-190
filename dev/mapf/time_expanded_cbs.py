@@ -5,9 +5,7 @@ from typing import Any
 
 from dev.mapf.time_expanded_astar import TimeExpandedSearchTimeout, find_time_expanded_path_for_agent
 
-
 DEFAULT_ECBS_SUBOPTIMALITY_FACTOR = 1.5
-
 
 def _resolve_ecbs_suboptimality_factor(suboptimality_factor: float | None) -> float:
     value = DEFAULT_ECBS_SUBOPTIMALITY_FACTOR if suboptimality_factor is None else float(suboptimality_factor)
@@ -15,16 +13,13 @@ def _resolve_ecbs_suboptimality_factor(suboptimality_factor: float | None) -> fl
         raise ValueError("ECBS suboptimality factor must be greater than or equal to 1.0")
     return value
 
-
 def get_path_position(path, time_step):
     if time_step < len(path):
         return path[time_step]
     return None
 
-
 def compute_solution_cost(paths_by_agent):
     return sum(len(path) - 1 for path in paths_by_agent.values())
-
 
 def detect_first_conflict(paths_by_agent):
     if not paths_by_agent:
@@ -34,8 +29,7 @@ def detect_first_conflict(paths_by_agent):
     max_time = max(len(path) for path in paths_by_agent.values())
 
     for time_step in range(max_time):
-        # Single-cell agent layouts intentionally allow shared release at t=0.
-        # Vertex conflicts are enforced from t=1 onward.
+
         if time_step > 0:
             occupied_positions = {}
             for agent_id in agent_ids:
@@ -52,6 +46,7 @@ def detect_first_conflict(paths_by_agent):
                     }
                 occupied_positions[position] = agent_id
 
+        # Single-cell layouts may share the start at t=0.
         if time_step == 0:
             continue
 
@@ -75,7 +70,6 @@ def detect_first_conflict(paths_by_agent):
             transitions[edge] = agent_id
 
     return None
-
 
 def count_all_conflicts(paths_by_agent):
     if not paths_by_agent:
@@ -116,7 +110,6 @@ def count_all_conflicts(paths_by_agent):
 
     return total_conflicts
 
-
 def split_conflict_into_constraints(conflict):
     agent_a, agent_b = conflict["agents"]
     if conflict["type"] == "vertex":
@@ -134,7 +127,6 @@ def split_conflict_into_constraints(conflict):
         {"agent": agent_b, "type": "edge", "from": to_a, "to": from_a, "time": time_step},
     ]
 
-
 def make_constraint_signature(constraints):
     normalized = []
     for constraint in constraints:
@@ -144,7 +136,6 @@ def make_constraint_signature(constraints):
             normalized.append((constraint["agent"], "edge", constraint["from"], constraint["to"], constraint["time"]))
     return tuple(sorted(normalized))
 
-
 def make_cbs_node(constraints, paths_by_agent):
     return {
         "constraints": constraints,
@@ -152,7 +143,6 @@ def make_cbs_node(constraints, paths_by_agent):
         "cost": compute_solution_cost(paths_by_agent),
         "secondary_key": count_all_conflicts(paths_by_agent),
     }
-
 
 def build_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None, agent_cohesion_enabled=False):
     return {
@@ -164,7 +154,6 @@ def build_failure(reason, num_conflicts_detected, num_high_level_nodes_expanded,
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
         "agent_cohesion_enabled": bool(agent_cohesion_enabled),
     }
-
 
 def maybe_report_elapsed_time(
     start_time,
@@ -183,7 +172,6 @@ def maybe_report_elapsed_time(
         next_report_seconds += 5
     return next_report_seconds
 
-
 def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level_nodes_expanded, *, solver_name, solver_suboptimality_factor=None, agent_cohesion_enabled=False):
     return {
         "status": "solved",
@@ -194,7 +182,6 @@ def _build_solver_success(paths_by_agent, num_conflicts_detected, num_high_level
         "solver_suboptimality_factor": None if solver_name == "CBS" else solver_suboptimality_factor,
         "agent_cohesion_enabled": bool(agent_cohesion_enabled),
     }
-
 
 def _replan_dynamic_agent(
     mapped_loop,
@@ -221,7 +208,6 @@ def _replan_dynamic_agent(
         cohesion_reference_paths=cohesion_reference_paths,
         deadline=deadline,
     )
-
 
 def _solve_time_expanded_with_vanilla_cbs(
     mapped_loop,
@@ -327,11 +313,9 @@ def _solve_time_expanded_with_vanilla_cbs(
 
     return build_failure("no_solution", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="CBS", agent_cohesion_enabled=agent_cohesion_enabled)
 
-
 def _clean_open_heap(open_heap, active_nodes):
     while open_heap and open_heap[0][2] not in active_nodes:
         heapq.heappop(open_heap)
-
 
 def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float, *, suboptimality_factor: float):
     cost_bound = suboptimality_factor * best_cost
@@ -344,7 +328,6 @@ def _select_focal_node(active_nodes: dict[int, dict[str, Any]], best_cost: float
         return None, None
     _, _, node_id, node = min(eligible)
     return node_id, node
-
 
 def _solve_time_expanded_with_ecbs(
     mapped_loop,
@@ -473,7 +456,6 @@ def _solve_time_expanded_with_ecbs(
             heapq.heappush(open_heap, (child["cost"], child["secondary_key"], child_node_id))
 
     return build_failure("no_solution", num_conflicts_detected, num_high_level_nodes_expanded, solver_name="ECBS", solver_suboptimality_factor=suboptimality_factor, agent_cohesion_enabled=agent_cohesion_enabled)
-
 
 def solve_time_expanded_mapf_with_cbs(
     mapped_loop,

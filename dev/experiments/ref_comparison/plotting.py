@@ -23,9 +23,7 @@ CYCLIC_EQUAL_CONNECTOR_COLOR = "gray"
 CLASSICAL_PRESENTATION_LABEL = "Traditional A* with Classical Mapping"
 CYCLIC_PRESENTATION_LABEL = "With Cyclic Mapping"
 
-
 MetricGetter = Callable[[RefConditionAggregate], float | None]
-
 
 def _connector_color(classical_value: float, cyclic_value: float, *, lower_is_better: bool) -> str:
     if math.isnan(classical_value) or math.isnan(cyclic_value):
@@ -35,17 +33,14 @@ def _connector_color(classical_value: float, cyclic_value: float, *, lower_is_be
     cyclic_is_better = cyclic_value < classical_value if lower_is_better else cyclic_value > classical_value
     return CYCLIC_BETTER_CONNECTOR_COLOR if cyclic_is_better else CYCLIC_WORSE_CONNECTOR_COLOR
 
-
 def _connector_linestyle(classical_value: float, cyclic_value: float, *, lower_is_better: bool) -> str:
     if math.isnan(classical_value) or math.isnan(cyclic_value) or classical_value == cyclic_value:
         return "-"
     cyclic_is_better = cyclic_value < classical_value if lower_is_better else cyclic_value > classical_value
     return "-" if cyclic_is_better else "--"
 
-
 def _value_or_nan(value: float | None) -> float:
     return math.nan if value is None else float(value)
-
 
 def _mean_or_nan(values: list[float]) -> float:
     finite_values = [float(value) for value in values if not math.isnan(float(value))]
@@ -53,12 +48,10 @@ def _mean_or_nan(values: list[float]) -> float:
         return math.nan
     return float(mean(finite_values))
 
-
 def _per_agent(value: float | None, agent_number: int) -> float | None:
     if value is None:
         return None
     return float(value) / max(1, int(agent_number))
-
 
 def _display_metric(value: float | None, *, integer_like: bool = False, time_like: bool = False) -> str:
     if value is None or math.isnan(float(value)):
@@ -72,12 +65,10 @@ def _display_metric(value: float | None, *, integer_like: bool = False, time_lik
         return f"{numeric_value:.3f}".rstrip("0").rstrip(".")
     return f"{numeric_value:.3f}".rstrip("0").rstrip(".")
 
-
 def _safe_metric(value: float | None, *, default: float | None = None) -> float | None:
     if value is None:
         return default
     return float(value)
-
 
 def _percent_reduction_gain(classical_value: float | None, cyclic_value: float | None) -> str:
     """Return signed percent change from classical to cyclic.
@@ -95,7 +86,6 @@ def _percent_reduction_gain(classical_value: float | None, cyclic_value: float |
     percent_change = ((cyclic_value - classical_value) / classical_value) * 100.0
     return f"{percent_change:+.1f}%"
 
-
 def _sorted_map_aggregates(map_aggregates: list[RefConditionAggregate]) -> list[RefConditionAggregate]:
     return sorted(
         list(map_aggregates),
@@ -106,12 +96,10 @@ def _sorted_map_aggregates(map_aggregates: list[RefConditionAggregate]) -> list[
         ),
     )
 
-
 def _series_with_average(map_aggregates: list[RefConditionAggregate], getter: MetricGetter) -> list[float]:
     values = [_value_or_nan(getter(aggregate)) for aggregate in map_aggregates]
     values.append(_mean_or_nan(values))
     return values
-
 
 def _x_labels_with_average(map_aggregates: list[RefConditionAggregate]) -> list[str]:
     labels: list[str] = []
@@ -120,7 +108,6 @@ def _x_labels_with_average(map_aggregates: list[RefConditionAggregate]) -> list[
         labels.append(f"Map {map_number}")
     labels.append("Average")
     return labels
-
 
 def _annotate_point(axes: plt.Axes, x_value: int, y_value: float, offset: tuple[int, int]) -> None:
     if math.isnan(y_value):
@@ -135,7 +122,6 @@ def _annotate_point(axes: plt.Axes, x_value: int, y_value: float, offset: tuple[
         fontsize=8,
     )
 
-
 def _finite_values(*series: list[float]) -> list[float]:
     values: list[float] = []
     for value_series in series:
@@ -147,7 +133,6 @@ def _finite_values(*series: list[float]) -> list[float]:
             if math.isfinite(numeric_value):
                 values.append(numeric_value)
     return values
-
 
 def _apply_compact_y_limits(axes: plt.Axes, values: list[float], *, padding_ratio: float = 0.14) -> None:
     finite_values = _finite_values(values)
@@ -171,7 +156,6 @@ def _apply_compact_y_limits(axes: plt.Axes, values: list[float], *, padding_rati
     if lower_limit == upper_limit:
         upper_limit = lower_limit + 1.0
     axes.set_ylim(lower_limit, upper_limit)
-
 
 def plot_reference_metric_by_map(
     *,
@@ -218,8 +202,6 @@ def plot_reference_metric_by_map(
     map_specific_classical_values = classical_values[:-1]
     map_specific_cyclic_values = cyclic_values[:-1]
 
-    # Connect only the actual map points. The Average point is plotted as a
-    # standalone summary marker so it is not visually treated as a fourth map.
     axes.plot(
         map_specific_x_values,
         map_specific_classical_values,
@@ -285,7 +267,6 @@ def plot_reference_metric_by_map(
     figure.savefig(output_path, dpi=150)
     plt.close(figure)
 
-
 def _summary_rows_for_map(case_spec: RefCaseSpec, aggregate: RefConditionAggregate) -> list[list[str]]:
     map_label_value = str(aggregate.map_number if aggregate.map_number is not None else aggregate.map_label or "")
     if case_spec.experiment_mode == "single_agent":
@@ -310,7 +291,6 @@ def _summary_rows_for_map(case_spec: RefCaseSpec, aggregate: RefConditionAggrega
         ["", "Average number of turns", _display_metric(classical_avg_turns), _display_metric(cyclic_avg_turns), _percent_reduction_gain(classical_avg_turns, cyclic_avg_turns)],
         ["", "Average total distance", _display_metric(classical_avg_distance), _display_metric(cyclic_avg_distance), _percent_reduction_gain(classical_avg_distance, cyclic_avg_distance)],
     ]
-
 
 def generate_map_summary_table(*, case_spec: RefCaseSpec, map_aggregates: list[RefConditionAggregate], output_path: Path) -> None:
     rows: list[list[str]] = []
@@ -347,7 +327,6 @@ def generate_map_summary_table(*, case_spec: RefCaseSpec, map_aggregates: list[R
             cell.set_height(0.062)
             cell.visible_edges = ""
 
-    # Simulate merged cells for each map-number block.
     for block_index, aggregate in enumerate(sorted_aggregates):
         block_start = 1 + block_index * total_block_rows
         block_mid = block_start + 1
@@ -356,7 +335,6 @@ def generate_map_summary_table(*, case_spec: RefCaseSpec, map_aggregates: list[R
         display_value = str(aggregate.map_number if aggregate.map_number is not None else aggregate.map_label or "")
         table[(block_mid, 0)].get_text().set_text(display_value)
 
-    # Add bottom border to the last row of each map block for separation.
     for block_index in range(len(sorted_aggregates)):
         last_row = 1 + ((block_index + 1) * total_block_rows) - 1
         for col in range(len(columns)):
@@ -365,7 +343,6 @@ def generate_map_summary_table(*, case_spec: RefCaseSpec, map_aggregates: list[R
     output_path.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close(figure)
-
 
 def generate_reference_graphs(case_spec: RefCaseSpec, aggregate: RefConditionAggregate, graphs_dir: Path, *, map_aggregates: list[RefConditionAggregate] | None = None) -> list[Path]:
     graph_paths: list[Path] = []

@@ -1,5 +1,4 @@
 
-# Constraint Tree Node
 
 class ConstraintTreeNode:
     def __init__(self, constraints, paths):
@@ -15,9 +14,6 @@ class ConstraintTreeNode:
 
         return total_cost
 
-
-# Main CBS Solver
-
 def cbs_solver(agents, starts, goals, graph):
     """
     This is the main flow of CBS.
@@ -28,11 +24,6 @@ def cbs_solver(agents, starts, goals, graph):
         2. the path of each agent under those constraints
         3. the total cost of all paths
     """
-
-    # Step 1:
-    # Create the root node.
-    # The root node has no constraints yet.
-    # This means each agent plans independently.
 
     root_constraints = []
 
@@ -54,38 +45,16 @@ def cbs_solver(agents, starts, goals, graph):
         paths=root_paths
     )
 
-    # OPEN contains the leaf nodes of the Constraint Tree
-    # that still need to be checked.
     OPEN = [root_node]
-
-    # Step 2:
-    # Keep expanding the Constraint Tree until a conflict-free
-    # solution is found.
 
     while OPEN:
 
-        # Step 3:
-        # Select the leaf node with the least total path cost.
-
         current_node = select_node_with_lowest_cost(OPEN)
-
-        # Step 4:
-        # Check if the paths in the current node have conflicts.
 
         conflict = find_first_conflict(current_node.paths)
 
-        # If there is no conflict, then the current node already
-        # contains the final solution.
-
         if conflict is None:
             return current_node.paths
-
-        # Step 5:
-        # If a conflict is found between two agents, split the
-        # current node into two child nodes.
-
-        # Child node 1 constrains agent i.
-        # Child node 2 constrains agent j.
 
         agent_i = conflict.agent_i
         agent_j = conflict.agent_j
@@ -110,16 +79,10 @@ def cbs_solver(agents, starts, goals, graph):
             graph=graph
         )
 
-        # The child nodes are added back to OPEN.
-        # Later, CBS will again select the leaf node with the
-        # least total path cost.
         OPEN.append(child_1)
         OPEN.append(child_2)
 
     return None
-
-
-# Creating Child Nodes
 
 def create_child_node(
     parent_node,
@@ -166,9 +129,6 @@ def create_child_node(
 
     return child_node
 
-
-# Conflict Checking
-
 def find_first_conflict(paths):
     """
     This checks if any two agents conflict with each other.
@@ -196,7 +156,6 @@ def find_first_conflict(paths):
                 i_previous = get_position(paths[agent_i], time - 1)
                 j_previous = get_position(paths[agent_j], time - 1)
 
-                # Vertex conflict
                 if i_current == j_current:
                     return Conflict(
                         kind="vertex",
@@ -206,7 +165,6 @@ def find_first_conflict(paths):
                         location=i_current
                     )
 
-                # Edge conflict
                 if i_previous == j_current and j_previous == i_current:
                     return Conflict(
                         kind="edge",
@@ -217,9 +175,6 @@ def find_first_conflict(paths):
                     )
 
     return None
-
-
-# Constraints
 
 def make_constraint(agent, conflict):
     """
@@ -248,9 +203,6 @@ def make_constraint(agent, conflict):
             "blocked_edge": conflict.location
         }
 
-
-# Helper Functions
-
 def select_node_with_lowest_cost(OPEN):
     """
     CBS always expands the leaf node with the least total path cost.
@@ -261,7 +213,6 @@ def select_node_with_lowest_cost(OPEN):
     OPEN.remove(best_node)
 
     return best_node
-
 
 class Conflict:
     def __init__(self, kind, agent_i, agent_j, time, location):

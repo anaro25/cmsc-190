@@ -11,16 +11,13 @@ from dev.mapf.full.cbs_solver import solve_mapf_with_cbs
 from dev.mapf.time_expanded_cbs import compute_solution_cost as compute_dynamic_solution_cost
 from dev.mapf.time_expanded_cbs import solve_time_expanded_mapf_with_cbs
 
-
 COUNTED_RESULT_CATEGORIES = {"successful", "unfinished"}
-
 
 def build_progress_callback(logger: ExperimentLogger, label: str) -> Callable[[int], None]:
     def callback(elapsed_seconds: int) -> None:
         logger.log(f"    {label} progress: {max(0, elapsed_seconds):.2f}s")
 
     return callback
-
 
 def compute_total_path_length(
     paths_by_agent: dict[int, list[tuple[int, int]]], *, dynamic: bool
@@ -33,14 +30,12 @@ def compute_total_path_length(
         else compute_static_solution_cost(paths_by_agent)
     )
 
-
 def seed_for(*parts: Any) -> int:
     text = "|".join(str(part) for part in parts)
     total = 0
     for index, character in enumerate(text, start=1):
         total = (total + index * ord(character)) % (2**31 - 1)
     return total or 1
-
 
 def categorize_solver_status(solver_status: str | None) -> tuple[str, bool, bool]:
     if solver_status == "solved":
@@ -54,7 +49,6 @@ def categorize_solver_status(solver_status: str | None) -> tuple[str, bool, bool
     if solver_status and solver_status.startswith("exception"):
         return "setup_failed", False, False
     return "setup_failed", False, False
-
 
 def build_mapping_record(
     *,
@@ -130,7 +124,6 @@ def build_mapping_record(
         initial_condition_spec=run_configuration.starts_and_goals,
     )
 
-
 def run_static_mapping(
     *,
     composite_map: list[list[Any]],
@@ -159,7 +152,6 @@ def run_static_mapping(
     except Exception as exc:  # pragma: no cover
         elapsed_seconds = time.perf_counter() - start
         return None, elapsed_seconds, f"exception:{type(exc).__name__}:{exc}"
-
 
 def run_dynamic_mapping(
     *,

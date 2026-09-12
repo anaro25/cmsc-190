@@ -25,11 +25,9 @@ from dev.mapf.mapf_logger_dynamic import (
     write_dynamic_showcase_frame,
 )
 
-
 def _slugify(text: str) -> str:
     compact = re.sub(r"[^A-Za-z0-9._-]+", "_", text).strip("._-")
     return compact or "run"
-
 
 def _mask_to_composite_positions(mask: list[list[bool]]) -> set[tuple[int, int]]:
     positions: set[tuple[int, int]] = set()
@@ -39,7 +37,6 @@ def _mask_to_composite_positions(mask: list[list[bool]]) -> set[tuple[int, int]]
                 positions.add((2 * row_index, 2 * column_index))
     return positions
 
-
 def _load_static_render_visually_free_vertices(
     branch_spec: BranchSpec,
 ) -> set[tuple[int, int]] | None:
@@ -48,10 +45,6 @@ def _load_static_render_visually_free_vertices(
     if branch_spec.image_path is None:
         return None
 
-    # This helper is intentionally permissive for static campus rendering.
-    # Visualization-only executions may be driven from persisted raw MAPF data
-    # whose stored BranchSpec can lag behind the current code/config. In that
-    # case, render-only gray-campus handling must still work for older payloads.
     likely_campus_semantic_image = (
         branch_spec.spawnable_cell_mode == "zone_colors_only"
         or branch_spec.zone_relationship_mode == "distinct_campus_zones"
@@ -67,13 +60,11 @@ def _load_static_render_visually_free_vertices(
             resize_longest_side=branch_spec.image_resize_longest_side,
         )
     except ValueError:
-        # If the image is not a campus-semantic image after all, fall back to
-        # the default renderer behavior instead of breaking visualization.
+
         return None
 
     visually_free_vertices = _mask_to_composite_positions(campus_semantics["gray_mask"])
     return visually_free_vertices or None
-
 
 def _build_render_only_composite_map(
     composite_map: list[list[Any]],
@@ -91,7 +82,6 @@ def _build_render_only_composite_map(
         if render_only_map[row_index][column_index] == Vertex.OBSTACLE:
             render_only_map[row_index][column_index] = Vertex.FREE_SPACE
     return render_only_map
-
 
 def _render_static_mapping(
     *,
@@ -137,7 +127,6 @@ def _render_static_mapping(
         visually_free_vertex_positions=visually_free_vertex_positions,
         nest_by_map=False,
     )
-
 
 def _render_dynamic_mapping(
     *,
@@ -191,7 +180,6 @@ def _render_dynamic_mapping(
         nest_by_map=False,
     )
 
-
 def _render_candidate(
     *,
     branch_spec: BranchSpec,
@@ -232,7 +220,6 @@ def _render_candidate(
         visually_free_vertex_positions=static_visually_free_vertex_positions,
     )
 
-
 def _build_joint_groups(
     all_candidates: list[VisualizationCandidate],
 ) -> list[dict[str, VisualizationCandidate]]:
@@ -244,8 +231,6 @@ def _build_joint_groups(
         for group in grouped.values()
         if "classical" in group and "cyclic" in group
     ]
-
-
 
 def _empty_selection_section(*, selection_mode: str, num_last_runs_to_visualize: int, output_root: Path) -> dict[str, Any]:
     return {
@@ -259,7 +244,6 @@ def _empty_selection_section(*, selection_mode: str, num_last_runs_to_visualize:
         "notes": "",
     }
 
-
 def _write_visualization_summary(
     *,
     output_manager: BranchOutputManager,
@@ -269,7 +253,6 @@ def _write_visualization_summary(
     summary_path = output_manager.metadata_dir / "visualization_selection_summary.json"
     write_json(summary_path, summary)
     logger.log(f"Visualization summary written to {summary_path}")
-
 
 def _render_jointly_successful_visualizations(
     *,
@@ -400,7 +383,6 @@ def _render_jointly_successful_visualizations(
     )
     return section
 
-
 def _render_independently_successful_visualizations(
     *,
     branch_spec: BranchSpec,
@@ -511,7 +493,6 @@ def _render_independently_successful_visualizations(
     )
     return section
 
-
 def render_selected_visualizations(
     *,
     branch_spec: BranchSpec,
@@ -595,7 +576,6 @@ def render_selected_visualizations(
 
     _write_visualization_summary(output_manager=output_manager, summary=summary, logger=logger)
     return summary
-
 
 def render_saved_frame_by_frame_packages(
     *,

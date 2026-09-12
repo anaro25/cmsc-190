@@ -5,13 +5,11 @@ from dev.core.composite_elements import (
     VerticalTransition,
 )
 
-
 AGENT_LOG_SYMBOL = "■"
 TARGET_LOG_SYMBOL = "▲"
 
-
 def convert_element_to_log_symbol(element):
-    # Agent / target overlays
+
     if element == AGENT_LOG_SYMBOL or element == TARGET_LOG_SYMBOL:
         return element
 

@@ -38,7 +38,6 @@ def _with_shared_runtime(config: dict[str, Any]) -> dict[str, Any]:
     return payload
 
 
-# Shared constants for the updated main experiment.
 enhanced_CBS = True
 compact_clustering = True
 PORT_CLUSTERED_START_GOAL_MIN_DISTANCE = 20
@@ -47,39 +46,26 @@ SHARED_TIME_LIMIT_SECONDS = 30.0
 SHARED_ECBS_SUBOPTIMALITY = 3.0
 SHARED_TIGHT_TIME_HORIZON = False
 
-# Capacity-search protocol constants.
-# Each mapping is tested independently. A tested agent number is accepted only
-# when at least three of exactly five runs solve within the runtime limit. The
-# binary-search upper bound is derived from F, the number of traversable cells
-# in the selected base map, rather than from a fixed numeric ceiling.
+# Capacity search settings.
 CAPACITY_PASS_CRITERION = "solver_success"
 
 SHARED_COUNTED_RUNS_REQUIRED = 1
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
 CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 3
-# Retained only for the legacy agent_number_range metadata; capacity search does
-# not use this value as its upper bound.
+# Kept for old agent_number_range values.
 CAPACITY_AGENT_UPPER_BOUND = 255
-CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 100 # Unlimited (set to high value)
+CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 100  # effectively unlimited
 SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 3
 
-# When multiple map configurations are selected, ask after each completed
-# configuration whether to continue. Enter 1 to continue or 0 to terminate
-# early. If there is no response before the timeout, the program continues
-# automatically so unattended runs are not blocked.
+# Ask before moving to the next selected map config.
 PROMPT_BEFORE_NEXT_MAP_CONFIG = True
 PROMPT_BEFORE_NEXT_MAP_CONFIG_TIMEOUT_SECONDS = 5.0
 
-# ===================================
+# Program mode.
+# to_generate = "raw_data"
+to_generate = "visualization"
 
-# Select exactly one program mode.
-# to_generate = "raw_data"        # compute capacity data, metrics, inspection files,
-#                                 # and frame-by-frame packages; first delete the selected
-#                                 # config's obsolete visualization outputs
-to_generate = "visualization" # generate Pillow visualizations from saved frame_by_frame packages
-
-# Select one or more exact main-experiment map configurations. Uncomment only
-# the configurations that should be processed by the active to_generate mode.
+# Map configs to run.
 SELECTED_MAP_CONFIGS = [
     "static_artificial_dispersed_dispersed",
     # "static_artificial_dispersed_clustered",

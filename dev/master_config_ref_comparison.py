@@ -17,10 +17,6 @@ def _reference_port_image_paths() -> list[str]:
     return [_reference_port_image_path(map_number) for map_number in REFERENCE_PORT_MAP_NUMBERS]
 
 
-# ---------------------------------------------------------------------------
-# Shared constants for the supplementary Tang-inspired reference comparison.
-# The main experiment remains configured in master_config.py.
-# ---------------------------------------------------------------------------
 
 CONSECUTIVE_FAILED_PAIRED_SAMPLING_ATTEMPTS_LIMIT = 15
 enhanced_CBS = True
@@ -33,44 +29,32 @@ SHARED_COUNTED_RUNS_REQUIRED = 5
 SINGLE_AGENT_TIMING_REPETITIONS = 5
 MULTI_AGENT_TIMING_REPETITIONS = 3
 
-# Multi-agent reference capacity follows the manuscript protocol. Classical
-# and cyclic capacities are searched independently. Each tested agent number
-# is evaluated exactly five times and passes when at least three runs solve
-# within the configured time limit. The upper bound is derived at runtime from
-# F, the number of traversable cells in the selected reference map.
-REFERENCE_CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
-REFERENCE_CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 3
-REFERENCE_CAPACITY_PASS_CRITERION = "solver_success"
+# Use the same fixed agent count for both mappings on each map.
+MULTI_AGENT_AGENT_NUMBERS_BY_MAP = {
+    1: 17,
+    2: 24,
+    3: 11,
+}
 
-# Reference comparison uses the same cyclic-map post-processing variant as the
-# main experiment: redundant bidirectional transitions are reduced before
-# required connectivity is restored, and no final all-free-space transition
-# expansion is applied.
+# Match the cyclic post-processing used by the main experiment.
 REMOVE_EXTRA_TRANSITIONS = True
 ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
 
-# Legacy cyclic-faster filter controls. The current reference-comparison cases
-# do not use the older repeated-sampling filter.
+# Old filter settings kept for compatibility.
 TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER = False
 TEMPORARY_INDIVIDUAL_CYCLIC_FASTER_RUNS_REQUIRED = 3
 TEMPORARY_FILTER_INDIVIDUAL_RUNS_UNTIL_CYCLIC_FASTER_MAX_ATTEMPTS = 20
 
-# ---------------------------------------------------------------------------
-# Program workflow, intentionally parallel to the main experiment.
-# ---------------------------------------------------------------------------
+# Program mode.
+# to_generate = "raw_data"
+to_generate = "graphs"
+# to_generate = "visualization"
 
-# Select exactly one program mode.
-# to_generate = "raw_data"       # recompute and save raw reference-comparison data
-to_generate = "graphs"          # regenerate graphs/data from saved raw data
-# to_generate = "visualization"  # regenerate Pillow visualizations from saved frame_by_frame packages
-
-# Select exactly one reference-comparison execution target.
+# Reference experiment to run.
 # SELECTED_PORT_EXPERIMENT = "single_agent"
 SELECTED_PORT_EXPERIMENT = "multi_agent"
 
-# Kept for backward compatibility. The current raw-data phase saves exactly one
-# designated frame-by-frame run for every map/mapping result, so visualization
-# generation no longer selects from a larger raw-data candidate pool.
+# Kept for older code that still reads this setting.
 NUM_LAST_SUCCESSFUL_RUNS_TO_VISUALIZE_PER_MAPPING = 1
 
 
@@ -94,10 +78,7 @@ REFERENCE_COMPARISON_CASES: dict[str, dict[str, Any]] = {
         "display_name": "Reference Comparison: Multi Agent",
         "size_label": "x50",
         "map_size": 50,
-        "capacity_search_enabled": True,
-        "capacity_attempts_per_agent_number": REFERENCE_CAPACITY_ATTEMPTS_PER_AGENT_NUMBER,
-        "capacity_successful_runs_required": REFERENCE_CAPACITY_SUCCESSFUL_RUNS_REQUIRED,
-        "capacity_pass_criterion": REFERENCE_CAPACITY_PASS_CRITERION,
+        "capacity_search_enabled": False,
         "counted_runs_required": 1,
         "multi_agent_timing_repetitions": MULTI_AGENT_TIMING_REPETITIONS,
         "filter_individual_runs_until_cyclic_faster": False,
@@ -110,8 +91,7 @@ REFERENCE_COMPARISON_CASES: dict[str, dict[str, Any]] = {
 SELECTED_PORT_EXPERIMENT_CASES: dict[str, list[str]] = {
     "single_agent": ["single_agent"],
     "multi_agent": ["multi_agent"],
-    # Backward-compatible aliases for older config values. The reference
-    # comparison now uses only 50x50 port_map_1..port_map_3 for both modes.
+    # Older config names still accepted.
     "single_agent_x20": ["single_agent"],
     "single_agent_x50": ["single_agent"],
     "multi_agent_x20": ["multi_agent"],
