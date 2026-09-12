@@ -142,6 +142,14 @@ def _configuration_metadata(
     payload: dict[str, Any],
 ) -> dict[str, Any]:
     dynamic_metadata = payload.get("dynamic_state_metadata") or {}
+    capacity_search = payload.get("capacity_search") or {}
+    classical_search = capacity_search.get("classical") or {}
+    cyclic_search = capacity_search.get("cyclic") or {}
+    candidate_maximum = (
+        classical_search.get("candidate_maximum")
+        or cyclic_search.get("candidate_maximum")
+        or branch_spec.capacity_agent_upper_bound
+    )
     map_family = _map_family(branch_spec.category_map_type)
     return {
         "schema_version": METRICS_DATA_SCHEMA_VERSION,
@@ -196,7 +204,7 @@ def _configuration_metadata(
         "cohesion_factor": branch_spec.cohesion_factor,
         "runtime_limit_seconds": branch_spec.runtime_limit_seconds,
         "capacity_candidate_minimum": 1,
-        "capacity_candidate_maximum": branch_spec.capacity_agent_upper_bound,
+        "capacity_candidate_maximum": candidate_maximum,
         "capacity_attempts_per_agent_number": branch_spec.capacity_attempts_per_agent_number,
         "capacity_successful_runs_required": branch_spec.capacity_successful_runs_required,
         "capacity_pass_criterion": branch_spec.capacity_pass_criterion,
@@ -206,7 +214,7 @@ def _configuration_metadata(
         "path_metric_definition": "total path length over all agents for solved runs only",
         "time_metric_definition": "time computation halted in seconds; includes the runtime-limit value for unfinished counted runs",
         "conflict_metric_definition": "number of conflicts detected when computation halted",
-        "capacity_definition": "highest tested agent number accepted by the configured capacity-search protocol",
+        "capacity_definition": "highest tested agent number with at least three successful solver runs out of five; candidate range is 1..F traversable cells",
         "notes": branch_spec.notes,
     }
 
@@ -222,10 +230,7 @@ def _capacity_searches(payload: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
 
 def _effective_capacity_criterion(configured: str, mapping_name: str) -> str:
-    if configured == "temp_pairwise":
-        return "temp_classical" if mapping_name == "classical" else "temp_cyclic"
-    if configured == "temp_cyclic":
-        return "solver_success" if mapping_name == "classical" else "temp_cyclic"
+    del configured, mapping_name
     return "solver_success"
 
 
@@ -446,28 +451,28 @@ def _capacity_point_groups(payload: dict[str, Any]) -> list[tuple[str, str, str,
     comparative = payload.get("comparative_runs") or {}
     return [
         (
-            "temp_classical_capacity",
+            "classical_capacity",
             "classical",
             "capacity_origin_mapping",
             list(searches["classical"].get("best_successful_attempts") or []),
         ),
         (
-            "temp_classical_capacity",
+            "classical_capacity",
             "cyclic",
             "paired_comparative_mapping",
-            list(comparative.get("cyclic_at_temp_classical_capacity") or []),
+            list(comparative.get("cyclic_at_classical_capacity") or []),
         ),
         (
-            "temp_cyclic_capacity",
+            "cyclic_capacity",
             "cyclic",
             "capacity_origin_mapping",
             list(searches["cyclic"].get("best_successful_attempts") or []),
         ),
         (
-            "temp_cyclic_capacity",
+            "cyclic_capacity",
             "classical",
             "paired_comparative_mapping",
-            list(comparative.get("classical_at_temp_cyclic_capacity") or []),
+            list(comparative.get("classical_at_cyclic_capacity") or []),
         ),
     ]
 
@@ -475,8 +480,8 @@ def _capacity_point_groups(payload: dict[str, Any]) -> list[tuple[str, str, str,
 def _capacity_agent_numbers(payload: dict[str, Any]) -> dict[str, int]:
     searches = _capacity_searches(payload)
     return {
-        "temp_classical_capacity": int(searches["classical"].get("best_agent_number") or 0),
-        "temp_cyclic_capacity": int(searches["cyclic"].get("best_agent_number") or 0),
+        "classical_capacity": int(searches["classical"].get("best_agent_number") or 0),
+        "cyclic_capacity": int(searches["cyclic"].get("best_agent_number") or 0),
     }
 
 
@@ -492,7 +497,7 @@ def _capacity_point_run_rows(
             base.update(
                 {
                     "capacity_label": capacity_label,
-                    "capacity_origin_mapping": "classical" if capacity_label == "temp_classical_capacity" else "cyclic",
+                    "capacity_origin_mapping": "classical" if capacity_label == "classical_capacity" else "cyclic",
                     "capacity_agent_number": capacities[capacity_label],
                     "comparison_role": role,
                     "expected_mapping_name": expected_mapping,
@@ -527,7 +532,7 @@ def _capacity_point_summary_rows(
                 "map_family": metadata["map_family"],
                 "layout_key": metadata["layout_key"],
                 "capacity_label": capacity_label,
-                "capacity_origin_mapping": "classical" if capacity_label == "temp_classical_capacity" else "cyclic",
+                "capacity_origin_mapping": "classical" if capacity_label == "classical_capacity" else "cyclic",
                 "capacity_agent_number": capacities[capacity_label],
                 "mapping_name": expected_mapping,
                 "comparison_role": role,
@@ -575,13 +580,13 @@ def _paired_comparison_rows(
     capacities = _capacity_agent_numbers(payload)
     contexts = [
         (
-            "temp_classical_capacity",
+            "classical_capacity",
             list(searches["classical"].get("best_successful_attempts") or []),
-            list(comparative.get("cyclic_at_temp_classical_capacity") or []),
+            list(comparative.get("cyclic_at_classical_capacity") or []),
         ),
         (
-            "temp_cyclic_capacity",
-            list(comparative.get("classical_at_temp_cyclic_capacity") or []),
+            "cyclic_capacity",
+            list(comparative.get("classical_at_cyclic_capacity") or []),
             list(searches["cyclic"].get("best_successful_attempts") or []),
         ),
     ]
@@ -608,7 +613,7 @@ def _paired_comparison_rows(
                     "map_family": metadata["map_family"],
                     "layout_key": metadata["layout_key"],
                     "capacity_label": capacity_label,
-                    "capacity_origin_mapping": "classical" if capacity_label == "temp_classical_capacity" else "cyclic",
+                    "capacity_origin_mapping": "classical" if capacity_label == "classical_capacity" else "cyclic",
                     "capacity_agent_number": capacities[capacity_label],
                     "pair_order": pair_order,
                     "run_config_id": run_config_id,
@@ -653,7 +658,7 @@ def _results_ready_rows(
         by_context.setdefault(row["capacity_label"], {})[row["mapping_name"]] = row
 
     rows: list[dict[str, Any]] = []
-    for capacity_label in ("temp_classical_capacity", "temp_cyclic_capacity"):
+    for capacity_label in ("classical_capacity", "cyclic_capacity"):
         context = by_context.get(capacity_label, {})
         classical = context.get("classical", {})
         cyclic = context.get("cyclic", {})
@@ -680,7 +685,7 @@ def _results_ready_rows(
                 "broad_agent_arrangement": metadata["broad_agent_arrangement"],
                 "broad_target_arrangement": metadata["broad_target_arrangement"],
                 "capacity_label": capacity_label,
-                "capacity_origin_mapping": "classical" if capacity_label == "temp_classical_capacity" else "cyclic",
+                "capacity_origin_mapping": "classical" if capacity_label == "classical_capacity" else "cyclic",
                 "capacity_agent_number": classical.get("capacity_agent_number") or cyclic.get("capacity_agent_number"),
                 "classical_protocol_capacity_agent_number": capacity_comparison["classical_protocol_capacity_agent_number"],
                 "cyclic_protocol_capacity_agent_number": capacity_comparison["cyclic_protocol_capacity_agent_number"],

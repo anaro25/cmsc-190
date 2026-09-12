@@ -45,32 +45,25 @@ A setup-generation failure is logged separately as unavailable input for that te
 
 \section{Capacity Values Reported}
 
-The classical-side search now reports temp classical capacity:
+Classical and cyclic mapping now have independent capacities. For a mapping $m$,
 \[
-N_{\text{temp classical}} = \text{highest tested agent number where classical solves and cyclic performs better than classical}.
+N_{\mathrm{cap},m} = \text{highest tested agent number that passes the success rule for mapping } m.
 \]
 
-The cyclic-side search reports temp cyclic capacity:
-\[
-N_{\text{temp cyclic}} = \text{highest tested agent number where cyclic solves and performs better than classical}.
-\]
-
-Both values are controlled by:
-
+The main experiment uses:
 \begin{lstlisting}
-CAPACITY_PASS_CRITERION = "temp_pairwise"
+CAPACITY_PASS_CRITERION = "solver_success"
 \end{lstlisting}
 
-If this is changed to \texttt{"temp\_cyclic"}, only the cyclic-side search uses the temp criterion and the classical-side search reverts to solver success. If this is changed to \texttt{"solver\_success"}, both mappings pass if they solve within the time limit.
+Cyclic superiority over classical mapping is not part of the capacity definition. Classical capacity depends only on classical solver success, and cyclic capacity depends only on cyclic solver success.
 
 \section{Limited Binary-Search Capacity Testing}
 
-The tested range is fixed at:
+For each configuration, the tested range is:
 \[
-1 \leq N \leq 255.
+1 \leq N \leq F,
 \]
-
-The values are treated as nodes of a complete binary search tree whose root is 128. A pass moves the search to the right child. A failure moves the search to the left child.
+where $F$ is the number of traversable cells in the final binary base map. The binary-search midpoint is therefore derived from the current interval rather than from a fixed upper bound of 255. A pass moves the search upward; a failure moves it downward.
 
 The search does not continue until a leaf node after it has already found a passing agent number. However, the downward-move limit is not enforced while no passing value has been found yet. This prevents the search from incorrectly reporting zero capacity merely because the first viable agent number is below 16.
 
@@ -78,13 +71,9 @@ The search does not continue until a leaf node after it has already found a pass
 CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
 \end{lstlisting}
 
-For example, if the search has not found any passing value yet, it may continue down the left side:
+If the search has not found any passing value yet, it may continue down the left side using successive midpoints of the current interval. The first tested midpoint therefore depends on $F$ rather than being fixed at 128.
 
-\begin{lstlisting}
-128 -> 64 -> 32 -> 16 -> 8 -> 4 -> 2 -> 1
-\end{lstlisting}
-
-Once the first passing value has been found, the configured limit is applied to the following child moves. With the default value of three, the search may take at most three additional downward child moves after the first success.
+Once the first passing value has been found, the configured downward-move limit is applied to the following child moves.
 
 \section{Backtracking Behavior}
 
@@ -92,52 +81,27 @@ There is no separate manual backtracking phase. During traversal, the program st
 
 \section{Pass/Fail Rule for a Tested Agent Number}
 
-Each tested agent number permits up to five solver attempts. The current count rule remains:
+Every tested agent number uses five run slots:
 
 \begin{lstlisting}
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
-CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
+CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 3
 SHARED_TIME_LIMIT_SECONDS = 30.0
 \end{lstlisting}
 
-Thus, only one accepted run is needed for the tested value to pass. The number of attempts and the required number of successes are still configurable in \texttt{master\_config.py}.
+A tested value passes only when at least three of the five runs for that mapping return a valid solution within the configured time limit. The program evaluates all five run slots. Setup-generation failure in a slot does not count as a success.
 
-For the classical-side search, a classical run is accepted only if:
-
-\begin{enumerate}[leftmargin=2em]
-    \item setup generation succeeds;
-    \item classical mapping solves within the time limit;
-    \item cyclic mapping is run on the same generated setup;
-    \item cyclic mapping also solves;
-    \item cyclic has lower time computation halted than classical;
-    \item cyclic has lower number of conflicts at halt than classical.
-\end{enumerate}
-
-For the cyclic-side search, a cyclic run is accepted only if:
-
-\begin{enumerate}[leftmargin=2em]
-    \item setup generation succeeds;
-    \item cyclic mapping solves within the time limit;
-    \item classical mapping is run on the same generated setup;
-    \item cyclic has lower time computation halted than classical;
-    \item cyclic has lower number of conflicts at halt than classical.
-\end{enumerate}
-
-Total path length is not part of the pass/fail rule. It remains a reported tradeoff because cyclic mapping is expected to sometimes produce longer paths.
+For the classical-side search, only the classical solver result determines whether that run succeeds. For the cyclic-side search, only the cyclic solver result determines whether that run succeeds. No pairwise time or conflict comparison is part of this capacity pass/fail rule.
 
 \section{Setup Availability and Sampling Ceiling}
 
 When setup generation fails, the tested value is marked as setup unavailable. This means the program could not produce the required number of starts and targets under the current sampling rules, such as dispersed placement with strict clearance enabled or insufficient unique cells even in relaxed mode.
 
-This is different from solver failure. A solver failure means a valid setup existed, but the solver did not satisfy the pass criterion. The log now records the reason for a failed tested value, such as \texttt{setup\_unavailable}, \texttt{solver\_fail}, \texttt{classical\_solver\_fail}, \texttt{cyclic\_solver\_fail}, or \texttt{temp\_fail}.
+This is different from solver failure. A solver failure means a valid setup existed, but the tested mapping did not return a valid solution within the configured time limit. The log records the failed run slots and the resulting success count for the tested value.
 
-\section{Saved Capacity Runs and Comparative Runs}
+\section{Saved Capacity Runs}
 
-Because the current rule needs only one accepted run, the program keeps one accepted run at each discovered capacity point.
-
-At \(N_{\text{temp classical}}\), the accepted classical-side run is compared with cyclic mapping on the same initial condition. At \(N_{\text{temp cyclic}}\), the accepted cyclic-side run is compared with classical mapping on the same initial condition.
-
-This gives paired evidence at the two important capacity points while avoiding averages over multiple successful capacity runs.
+The capacity decision is based on the three-of-five success rule above. Successful run records used by the existing downstream output path are retained from the accepted capacity test; this correction does not otherwise redefine the project's separate metric-aggregation protocol.
 
 \section{Logging Expectations}
 

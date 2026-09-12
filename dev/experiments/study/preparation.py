@@ -101,7 +101,7 @@ def _single_target_vertices_for_goal_mode(
 
 
 def _binary_matrix_from_spawn_mask(spawn_mask: list[list[bool]]) -> list[list[int]]:
-    return [[0 if is_spawnable else 1 for is_spawnable in row] for row in spawn_mask]
+    return [[1 if is_spawnable else 0 for is_spawnable in row] for row in spawn_mask]
 
 
 def _mask_to_matrix_positions(mask: list[list[bool]]) -> set[tuple[int, int]]:
@@ -114,7 +114,7 @@ def _mask_to_matrix_positions(mask: list[list[bool]]) -> set[tuple[int, int]]:
 
 
 def _count_free_components(matrix: list[list[int]]) -> int:
-    free_cells = list(iter_free_cells(matrix))
+    free_cells = list(iter_free_cells(matrix, free_value=1))
     if not free_cells:
         return 0
 
@@ -134,7 +134,7 @@ def _count_free_components(matrix: list[list[int]]) -> int:
             for next_row, next_col in ((row - 1, col), (row + 1, col), (row, col - 1), (row, col + 1)):
                 if next_row < 0 or next_row >= rows or next_col < 0 or next_col >= cols:
                     continue
-                if matrix[next_row][next_col] != 0:
+                if matrix[next_row][next_col] != 1:
                     continue
                 neighbor = (next_row, next_col)
                 if neighbor in visited:
@@ -262,7 +262,7 @@ def fallback_build_dynamic_loop(
         (r, c)
         for r in range(rows)
         for c in range(cols)
-        if base_matrix[r][c] == 0 and (eligible_dynamic_cells is None or (r, c) in eligible_dynamic_cells)
+        if base_matrix[r][c] == 1 and (eligible_dynamic_cells is None or (r, c) in eligible_dynamic_cells)
     ]
     if target_dynamic_cells <= 0 or not free_cells:
         return [[row[:] for row in base_matrix] for _ in range(max(1, loop_length))]
@@ -282,11 +282,11 @@ def fallback_build_dynamic_loop(
             if len(chosen) >= target_dynamic_cells:
                 break
             proposal = chosen | {cell}
-            if frame_is_valid(base_matrix, proposal):
+            if frame_is_valid(base_matrix, proposal, free_value=1):
                 chosen = proposal
         if not chosen and target_dynamic_cells > 0:
             chosen = set(candidates[: min(target_dynamic_cells, len(candidates))])
-        frames.append(apply_dynamic_cells(base_matrix, chosen))
+        frames.append(apply_dynamic_cells(base_matrix, chosen, free_value=1))
     return frames
 
 
@@ -348,9 +348,10 @@ def prepare_static_run_context(
             campus_semantics = load_campus_semantic_masks(
                 image_path=branch_spec.image_path,
                 resize_longest_side=branch_spec.image_resize_longest_side,
+                free_value=1,
             )
             obstacle_matrix = campus_semantics["traversable_matrix"]
-            base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix)
+            base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix, free_value=1)
             allowed_spawn_vertices = _filter_free_vertex_positions(
                 base_map,
                 _spawn_mask_to_composite_positions(campus_semantics["zone_spawn_mask"]),
@@ -373,8 +374,9 @@ def prepare_static_run_context(
                 image_path=branch_spec.image_path,
                 threshold=branch_spec.image_threshold,
                 resize_longest_side=branch_spec.image_resize_longest_side,
+                free_value=1,
             )
-            base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix)
+            base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix, free_value=1)
             allowed_spawn_vertices = None
             zone_vertices_by_id = {}
             single_target_vertices_by_id = {}
@@ -446,6 +448,7 @@ def prepare_dynamic_branch_state(
         campus_semantics = load_campus_semantic_masks(
             image_path=branch_spec.image_path,
             resize_longest_side=branch_spec.image_resize_longest_side,
+            free_value=1,
         )
         raw_obstacle_matrix = campus_semantics["traversable_matrix"]
         spawn_mask = campus_semantics["zone_spawn_mask"]
@@ -476,12 +479,13 @@ def prepare_dynamic_branch_state(
             obstacle_ratio=branch_spec.static_obstacle_density or 0.35,
             rng=random.Random(schedule_seed),
         )
-        raw_obstacle_matrix = composite_base_map_to_obstacle_matrix(artificial_base_map)
+        raw_obstacle_matrix = composite_base_map_to_obstacle_matrix(artificial_base_map, free_value=1)
     else:
         raw_obstacle_matrix = load_port_obstacle_matrix(
             image_path=branch_spec.image_path,
             threshold=branch_spec.image_threshold,
             resize_longest_side=branch_spec.image_resize_longest_side,
+            free_value=1,
         )
 
     raw_rows = len(raw_obstacle_matrix)
@@ -492,7 +496,7 @@ def prepare_dynamic_branch_state(
     raw_free_components = _count_free_components(raw_obstacle_matrix)
     _log(
         logger,
-        f"  Traversable-space diagnostic | free_cells={sum(cell == 0 for row in raw_obstacle_matrix for cell in row)} | connected_components={raw_free_components}",
+        f"  Traversable-space diagnostic | free_cells={sum(cell == 1 for row in raw_obstacle_matrix for cell in row)} | connected_components={raw_free_components}",
     )
 
     if branch_spec.dynamic_generation_cell_mode == "pure_white_only":
@@ -505,7 +509,7 @@ def prepare_dynamic_branch_state(
         generation_free_components = _count_free_components(generation_source_matrix)
         _log(
             logger,
-            f"  Pure-white traversable-space diagnostic | free_cells={sum(cell == 0 for row in generation_source_matrix for cell in row)} | connected_components={generation_free_components}",
+            f"  Pure-white traversable-space diagnostic | free_cells={sum(cell == 1 for row in generation_source_matrix for cell in row)} | connected_components={generation_free_components}",
         )
         _log(
             logger,
@@ -541,6 +545,7 @@ def prepare_dynamic_branch_state(
             obstacle_matrix=generation_source_matrix,
             target_density=branch_spec.dynamic_target_static_obstacle_density,
             seed=schedule_seed,
+            free_value=1,
         )
         _log(logger, "  Static obstacle density preprocessing completed.")
 
@@ -555,6 +560,7 @@ def prepare_dynamic_branch_state(
             seed=schedule_seed,
             progress_callback=(logger.log if logger is not None else None),
             eligible_dynamic_cells=eligible_dynamic_cells,
+            free_value=1,
         )
     except RuntimeError as exc:
         generation_mode = "scattered_fallback"
@@ -572,7 +578,7 @@ def prepare_dynamic_branch_state(
         _log(logger, "  Scattered fallback dynamic loop generation completed.")
 
     _log(logger, "  Building mapped loop representations for classical and cyclic mappings...")
-    classical_loop, cyclic_loop = build_mapped_loop(dynamic_loop_frames)
+    classical_loop, cyclic_loop = build_mapped_loop(dynamic_loop_frames, free_value=1)
     _log(logger, "  Shared mapped loop representations completed.")
     _log(logger, "  Building shared assignment map from the classical loop...")
     assignment_map = get_shared_assignment_map(classical_loop)
@@ -681,3 +687,46 @@ def prepare_dynamic_run_context(
         classical_map=None,
         cyclic_map=None,
     )
+
+
+def count_capacity_traversable_cells(
+    *,
+    branch_spec: BranchSpec,
+    dynamic_state: DynamicBranchState | None = None,
+) -> int:
+    """Return F, the number of traversable cells used by main capacity search.
+
+    Main-experiment binary matrices follow the manuscript convention:
+    1 = traversable/free and 0 = blocked/obstacle. For dynamic branches, F is
+    measured on the prepared static base matrix before temporary dynamic
+    obstacles are overlaid.
+    """
+    if dynamic_state is not None:
+        return sum(cell == 1 for row in dynamic_state.static_matrix for cell in row)
+
+    if branch_spec.image_path is None:
+        rows = branch_spec.base_rows or 25
+        cols = branch_spec.base_cols or 25
+        total_vertices = rows * cols
+        obstacle_ratio = branch_spec.static_obstacle_density
+        if obstacle_ratio is None:
+            obstacle_ratio = 0.40
+        target_obstacle_count = int(total_vertices * float(obstacle_ratio))
+        return max(0, total_vertices - target_obstacle_count)
+
+    if branch_spec.spawnable_cell_mode == "zone_colors_only":
+        campus_semantics = load_campus_semantic_masks(
+            image_path=branch_spec.image_path,
+            resize_longest_side=branch_spec.image_resize_longest_side,
+            free_value=1,
+        )
+        matrix = campus_semantics["traversable_matrix"]
+    else:
+        matrix = load_port_obstacle_matrix(
+            image_path=branch_spec.image_path,
+            threshold=branch_spec.image_threshold,
+            resize_longest_side=branch_spec.image_resize_longest_side,
+            free_value=1,
+        )
+
+    return sum(cell == 1 for row in matrix for cell in row)

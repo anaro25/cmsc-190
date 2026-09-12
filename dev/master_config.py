@@ -24,14 +24,12 @@ def _with_shared_runtime(config: dict[str, Any]) -> dict[str, Any]:
         "counted_runs_required": SHARED_COUNTED_RUNS_REQUIRED,
         "capacity_successful_runs_required": CAPACITY_SUCCESSFUL_RUNS_REQUIRED,
         "capacity_attempts_per_agent_number": CAPACITY_ATTEMPTS_PER_AGENT_NUMBER,
-        "capacity_agent_upper_bound": CAPACITY_AGENT_UPPER_BOUND,
         "capacity_binary_search_max_downward_moves": CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES,
         "capacity_pass_criterion": CAPACITY_PASS_CRITERION,
         "setup_generation_attempt_cap_per_solver_attempt": SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT,
         "prompt_before_next_map_config": PROMPT_BEFORE_NEXT_MAP_CONFIG,
         "prompt_before_next_map_config_timeout_seconds": PROMPT_BEFORE_NEXT_MAP_CONFIG_TIMEOUT_SECONDS,
         "ECBS_suboptimality": SHARED_ECBS_SUBOPTIMALITY,
-        "true_static_shortest_path_distance": SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE,
         "tight_time_horizon": SHARED_TIGHT_TIME_HORIZON,
         "num_last_runs_to_visualize_jointly_successful": 3,
         "num_last_runs_to_visualize_independently_successful": 3,
@@ -45,31 +43,22 @@ enhanced_CBS = True
 compact_clustering = True
 PORT_CLUSTERED_START_GOAL_MIN_DISTANCE = 20
 
-# Agent cohesion is enabled for campus branches and Dynamic Port only.
-# Static Port and artificial branches remain normal MAPF branches without cohesion.
-agent_cohesion: bool = True
-cohesion_factor: float = 1.0
-
 SHARED_TIME_LIMIT_SECONDS = 30.0
 SHARED_ECBS_SUBOPTIMALITY = 3.0
-SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
 SHARED_TIGHT_TIME_HORIZON = False
 
 # Capacity-search protocol constants.
-# Valid values:
-#   "solver_success"       -> each mapping passes if it solves within the time limit.
-#   "temp_cyclic"    -> classical uses solver capacity, while cyclic passes only
-#                             when it solves and beats classical on the same setup in
-#                             time computation halted and conflicts at halt.
-#   "temp_pairwise"  -> both capacity searches use the temp criterion:
-#                             classical passes only when classical solves and cyclic
-#                             beats it on the same setup; cyclic passes only when cyclic
-#                             solves and beats classical on the same setup.
-CAPACITY_PASS_CRITERION = "temp_pairwise"
+# Each mapping is tested independently. A tested agent number is accepted only
+# when at least three of exactly five runs solve within the runtime limit. The
+# binary-search upper bound is derived from F, the number of traversable cells
+# in the selected base map, rather than from a fixed numeric ceiling.
+CAPACITY_PASS_CRITERION = "solver_success"
 
 SHARED_COUNTED_RUNS_REQUIRED = 1
 CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
-CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 1
+CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 3
+# Retained only for the legacy agent_number_range metadata; capacity search does
+# not use this value as its upper bound.
 CAPACITY_AGENT_UPPER_BOUND = 255
 CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 100 # Unlimited (set to high value)
 SETUP_GENERATION_ATTEMPT_CAP_PER_SOLVER_ATTEMPT = 3

@@ -128,9 +128,9 @@ Campus Crowd Simulation exact configurations are generated from Campus Area 1/2 
 
 ## Capacity-search protocol
 
-The main experiment now uses limited binary-search capacity testing instead of incrementing through an agent-number range. For each layout configuration, classical and cyclic mapping are searched independently from 1 to 255 agents. A tested agent number passes when at least 1 out of up to 5 valid solver attempts finishes within the 30-second limit. The search starts at 128. If no passing agent number has been found yet, the search may continue descending to smaller left-child values below the normal depth limit. After the first pass is found, the search follows at most 3 additional downward child moves, so difficult configurations can still test values below 16 without allowing an unbounded search. Setup-failed or unsolvable initial conditions are regenerated, with a safety cap of 5 generation attempts per solver attempt.
+The main experiment uses limited binary-search capacity testing instead of incrementing through an agent-number range. For each layout configuration, classical and cyclic mapping are searched independently over `1..F`, where `F` is the number of traversable cells in the final binary base map. Every tested agent number uses five run slots and passes only when at least three of the five runs solve within the 30-second limit. Setup-generation failures remain failed run slots rather than evidence of solver success.
 
-The highest passed tested value along the limited traversal is reported as the mapping capacity for that configuration.
+The highest passed tested value along the traversal is reported as that mapping's capacity. Classical capacity depends only on classical success, and cyclic capacity depends only on cyclic success; cyclic superiority is not part of the capacity criterion.
 
 ## Global solver toggle
 

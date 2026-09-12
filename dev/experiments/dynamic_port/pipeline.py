@@ -31,15 +31,25 @@ def _clear_terminal_screen():
         print("\n" * 100, end="")
 
 
-def matrix_to_obstacle_frame(matrix, treat_dynamic_as_obstacle=True):
-    obstacle_values = (1, 2) if treat_dynamic_as_obstacle else (1,)
-    obstacle_matrix = [[1 if cell in obstacle_values else 0 for cell in row] for row in matrix]
-    return obstacle_matrix_to_composite_base_map(obstacle_matrix)
+def matrix_to_obstacle_frame(matrix, treat_dynamic_as_obstacle=True, *, free_value=0):
+    obstacle_value = 0 if free_value == 1 else 1
+    obstacle_matrix = []
+    for row in matrix:
+        converted_row = []
+        for cell in row:
+            if cell == free_value:
+                converted_row.append(free_value)
+            elif cell == 2 and not treat_dynamic_as_obstacle:
+                converted_row.append(free_value)
+            else:
+                converted_row.append(obstacle_value)
+        obstacle_matrix.append(converted_row)
+    return obstacle_matrix_to_composite_base_map(obstacle_matrix, free_value=free_value)
 
 
-def build_mapped_loop(base_dynamic_frames):
+def build_mapped_loop(base_dynamic_frames, *, free_value=0):
     unmapped_frames = {
-        f"frame_{index:03d}": matrix_to_obstacle_frame(frame, treat_dynamic_as_obstacle=True)
+        f"frame_{index:03d}": matrix_to_obstacle_frame(frame, treat_dynamic_as_obstacle=True, free_value=free_value)
         for index, frame in enumerate(base_dynamic_frames)
     }
     classical_frames_dict = apply_classical_mapping(unmapped_frames)
@@ -50,8 +60,8 @@ def build_mapped_loop(base_dynamic_frames):
     return classical_loop, cyclic_loop
 
 
-def build_static_only_setup_maps(static_matrix):
-    static_base = matrix_to_obstacle_frame(static_matrix, treat_dynamic_as_obstacle=False)
+def build_static_only_setup_maps(static_matrix, *, free_value=0):
+    static_base = matrix_to_obstacle_frame(static_matrix, treat_dynamic_as_obstacle=False, free_value=free_value)
     classical_setup = apply_classical_mapping({"setup": static_base})["setup"]
     cyclic_setup = apply_cyclic_mapping({"setup": static_base})["setup"]
     return classical_setup, cyclic_setup

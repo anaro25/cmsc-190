@@ -27,6 +27,7 @@ from dev.experiments.study.metrics_data_store import (
 )
 from dev.experiments.study.models import DynamicBranchState, MappingRunRecord, PreparedRunContext
 from dev.experiments.study.preparation import (
+    count_capacity_traversable_cells,
     prepare_dynamic_branch_state,
     prepare_dynamic_run_context,
     prepare_static_run_context,
@@ -76,6 +77,7 @@ class AgentNumberTestResult:
 @dataclass
 class CapacitySearchResult:
     mapping_name: str
+    candidate_maximum: int
     best_agent_number: int
     best_successful_attempts: list[SolverAttempt]
     tested_agent_numbers: list[AgentNumberTestResult]
@@ -138,9 +140,7 @@ def _execute_mapping(
             logger=logger,
             label=label,
             solver_suboptimality_factor=branch_spec.solver_suboptimality_factor,
-            true_static_shortest_path_distance=branch_spec.true_static_shortest_path_distance,
             tight_time_horizon=branch_spec.tight_time_horizon,
-            agent_cohesion_enabled=branch_spec.agent_cohesion_enabled,
         )
 
     composite_map = prepared_context.classical_map if mapping_name == "classical" else prepared_context.cyclic_map
@@ -153,9 +153,7 @@ def _execute_mapping(
         logger=logger,
         label=label,
         solver_suboptimality_factor=branch_spec.solver_suboptimality_factor,
-        true_static_shortest_path_distance=branch_spec.true_static_shortest_path_distance,
         tight_time_horizon=branch_spec.tight_time_horizon,
-        agent_cohesion_enabled=branch_spec.agent_cohesion_enabled,
     )
 
 
@@ -364,108 +362,23 @@ def _run_valid_solver_attempt(
 
 
 def _effective_pass_criterion(branch_spec: BranchSpec, mapping_name: str) -> str:
+    del mapping_name
     configured = str(branch_spec.capacity_pass_criterion)
-    valid_criteria = {"solver_success", "temp_cyclic", "temp_pairwise"}
-    if configured not in valid_criteria:
+    if configured != "solver_success":
         raise ValueError(
-            "capacity_pass_criterion must be one of "
-            "'solver_success', 'temp_cyclic', or 'temp_pairwise'."
+            "The main experiment capacity search must use solver_success so each mapping's "
+            "capacity depends only on that mapping solving within the runtime limit."
         )
-    if configured == "solver_success":
-        return "solver_success"
-    if configured == "temp_cyclic":
-        return "temp_cyclic" if mapping_name == "cyclic" else "solver_success"
-    if mapping_name == "classical":
-        return "temp_classical"
-    return "temp_cyclic"
+    return "solver_success"
 
 
 def _criterion_description(criterion: str, *, required_successes: int, max_attempts: int, time_limit_seconds: float) -> str:
-    if criterion == "temp_classical":
-        return (
-            f"{required_successes}/{max_attempts} temp classical-origin run(s): classical must solve within "
-            f"{time_limit_seconds:.0f}s, and cyclic must solve and have lower halted time and lower "
-            "conflicts than classical on the same generated setup"
-        )
-    if criterion == "temp_cyclic":
-        return (
-            f"{required_successes}/{max_attempts} temp cyclic-origin run(s): cyclic must solve within "
-            f"{time_limit_seconds:.0f}s and have lower halted time and lower conflicts than classical "
-            "on the same generated setup"
-        )
-    return f"{required_successes}/{max_attempts} successful within {time_limit_seconds:.0f}s"
-
-
-def _run_paired_mapping_on_context(
-    *,
-    branch_spec: BranchSpec,
-    dynamic_state: DynamicBranchState | None,
-    prepared_context: PreparedRunContext,
-    mapping_name: str,
-    comparison_case: str,
-    logger: ExperimentLogger,
-) -> SolverAttempt:
-    solver_result, elapsed_seconds, solver_status = _execute_mapping(
-        branch_spec=branch_spec,
-        dynamic_state=dynamic_state,
-        prepared_context=prepared_context,
-        mapping_name=mapping_name,
-        logger=logger,
+    if criterion != "solver_success":
+        raise ValueError(f"Unsupported main-experiment capacity criterion: {criterion}")
+    return (
+        f"{required_successes}/{max_attempts} successful runs within {time_limit_seconds:.0f}s; "
+        "all five run slots are evaluated"
     )
-    record = build_mapping_record(
-        run_configuration=prepared_context.run_configuration,
-        mapping_name=mapping_name,
-        comparison_case=comparison_case,
-        runtime_limit_seconds=branch_spec.runtime_limit_seconds,
-        solver_name=(solver_result or {}).get("solver_name", branch_spec.solver_name),
-        enhanced_cbs_enabled=branch_spec.enhanced_cbs_enabled,
-        solver_suboptimality_factor=(solver_result or {}).get(
-            "solver_suboptimality_factor",
-            branch_spec.solver_suboptimality_factor,
-        ),
-        solver_result=solver_result,
-        elapsed_seconds=elapsed_seconds,
-        solver_status=solver_status,
-        paired_run=True,
-        dynamic=branch_spec.is_dynamic,
-    )
-    log_mapping_record(logger, record)
-    return SolverAttempt(
-        prepared_context=prepared_context,
-        record=record,
-        solver_result=solver_result,
-        generation_attempts_used=0,
-    )
-
-
-def _conflict_value_for_comparison(record: MappingRunRecord) -> int | None:
-    return record.num_conflicts_detected_at_halt
-
-
-def _is_cyclic_temp(
-    *,
-    cyclic_record: MappingRunRecord,
-    classical_record: MappingRunRecord,
-) -> tuple[bool, list[str]]:
-    reasons: list[str] = []
-    if not cyclic_record.solved_run:
-        reasons.append("cyclic_not_successful")
-    if classical_record.result_category not in COUNTED_RESULT_CATEGORIES:
-        reasons.append(f"classical_not_counted:{classical_record.result_category}")
-
-    cyclic_time = cyclic_record.time_computation_halted_seconds
-    classical_time = classical_record.time_computation_halted_seconds
-    if not (cyclic_time < classical_time):
-        reasons.append("cyclic_time_not_lower")
-
-    cyclic_conflicts = _conflict_value_for_comparison(cyclic_record)
-    classical_conflicts = _conflict_value_for_comparison(classical_record)
-    if cyclic_conflicts is None or classical_conflicts is None:
-        reasons.append("conflicts_unavailable")
-    elif not (cyclic_conflicts < classical_conflicts):
-        reasons.append("cyclic_conflicts_not_lower")
-
-    return not reasons, reasons
 
 
 def _classify_failure_reason(
@@ -476,14 +389,8 @@ def _classify_failure_reason(
 ) -> str:
     if not attempts and invalid_generation_cap_exhausted:
         return "setup_unavailable"
-    if criterion == "temp_classical":
-        if not any(attempt.record.solved_run for attempt in attempts):
-            return "classical_solver_fail"
-        return "temp_fail"
-    if criterion == "temp_cyclic":
-        if not any(attempt.record.solved_run for attempt in attempts):
-            return "cyclic_solver_fail"
-        return "temp_fail"
+    if criterion != "solver_success":
+        raise ValueError(f"Unsupported main-experiment capacity criterion: {criterion}")
     return "solver_fail"
 
 
@@ -498,7 +405,6 @@ def _test_agent_number_for_mapping(
     logger: ExperimentLogger,
 ) -> AgentNumberTestResult:
     attempts: list[SolverAttempt] = []
-    comparison_attempts: list[SolverAttempt] = []
     successful_attempts: list[SolverAttempt] = []
     trace: list[dict[str, Any]] = []
     invalid_attempt_count = 0
@@ -506,6 +412,12 @@ def _test_agent_number_for_mapping(
     max_attempts = int(branch_spec.capacity_attempts_per_agent_number)
     required_successes = int(branch_spec.capacity_successful_runs_required)
     criterion = _effective_pass_criterion(branch_spec, mapping_name)
+
+    if max_attempts != 5 or required_successes != 3:
+        raise ValueError(
+            "The main experiment requires exactly five capacity runs per tested agent number "
+            "and at least three successful runs to pass."
+        )
 
     logger.log("")
     logger.log(
@@ -520,14 +432,7 @@ def _test_agent_number_for_mapping(
         logger=logger,
     )
 
-    solver_attempt_index = 0
-    while solver_attempt_index < max_attempts:
-        remaining_attempts_including_current = max_attempts - solver_attempt_index
-        if len(successful_attempts) + remaining_attempts_including_current < required_successes:
-            break
-        if len(successful_attempts) >= required_successes:
-            break
-
+    for solver_attempt_index in range(max_attempts):
         attempt, invalid_trace = _run_valid_solver_attempt(
             branch_spec=branch_spec,
             dynamic_state=dynamic_state,
@@ -541,6 +446,7 @@ def _test_agent_number_for_mapping(
         )
         invalid_attempt_count += len(invalid_trace)
         trace.extend(invalid_trace)
+
         if attempt is None:
             invalid_generation_cap_exhausted = True
             trace.append(
@@ -551,74 +457,14 @@ def _test_agent_number_for_mapping(
                 }
             )
             logger.log(
-                f"      Generation cap exhausted for one solver attempt | mapping={mapping_name} | "
-                f"agent_number={agent_number} | cap={branch_spec.setup_generation_attempt_cap_per_solver_attempt}"
+                f"      Generation cap exhausted for run slot {solver_attempt_index + 1}/{max_attempts} | "
+                f"mapping={mapping_name} | agent_number={agent_number}; this slot is not a success."
             )
-            break
+            continue
 
         attempts.append(attempt)
-        if criterion in {"temp_classical", "temp_cyclic"}:
-            if attempt.record.result_category == "successful":
-                comparison_mapping_name = "cyclic" if mapping_name == "classical" else "classical"
-                comparison_case = (
-                    "temp_capacity_cyclic_comparison"
-                    if comparison_mapping_name == "cyclic"
-                    else "temp_capacity_classical_comparison"
-                )
-                logger.log(
-                    f"      Temp-capacity comparison | running {comparison_mapping_name} on "
-                    f"the same setup before accepting this {mapping_name} success"
-                )
-                comparison_attempt = _run_paired_mapping_on_context(
-                    branch_spec=branch_spec,
-                    dynamic_state=dynamic_state,
-                    prepared_context=attempt.prepared_context,
-                    mapping_name=comparison_mapping_name,
-                    comparison_case=comparison_case,
-                    logger=logger,
-                )
-                comparison_attempts.append(comparison_attempt)
-                if mapping_name == "cyclic":
-                    cyclic_record = attempt.record
-                    classical_record = comparison_attempt.record
-                else:
-                    cyclic_record = comparison_attempt.record
-                    classical_record = attempt.record
-                temp_pass, reasons = _is_cyclic_temp(
-                    cyclic_record=cyclic_record,
-                    classical_record=classical_record,
-                )
-                trace.append(
-                    {
-                        "kind": "temp_capacity_evaluation",
-                        "solver_attempt_index": solver_attempt_index + 1,
-                        "primary_mapping_name": mapping_name,
-                        "comparison_mapping_name": comparison_mapping_name,
-                        "temp_pass": temp_pass,
-                        "reasons": reasons,
-                        "cyclic_time": cyclic_record.time_computation_halted_seconds,
-                        "classical_time": classical_record.time_computation_halted_seconds,
-                        "cyclic_conflicts": cyclic_record.num_conflicts_detected_at_halt,
-                        "classical_conflicts": classical_record.num_conflicts_detected_at_halt,
-                    }
-                )
-                logger.log(
-                    f"      Temp-capacity evaluation | passed={temp_pass} | "
-                    f"reasons={','.join(reasons) if reasons else 'none'}"
-                )
-                if temp_pass:
-                    successful_attempts.append(attempt)
-            else:
-                trace.append(
-                    {
-                        "kind": "temp_capacity_evaluation_skipped",
-                        "solver_attempt_index": solver_attempt_index + 1,
-                        "reason": f"{mapping_name}_result_category={attempt.record.result_category}",
-                    }
-                )
-        elif attempt.record.result_category == "successful":
+        if attempt.record.result_category == "successful":
             successful_attempts.append(attempt)
-        solver_attempt_index += 1
 
     passed = len(successful_attempts) >= required_successes
     failure_reason = None if passed else _classify_failure_reason(
@@ -628,7 +474,8 @@ def _test_agent_number_for_mapping(
     )
     logger.log(
         f"    Result for N={agent_number} | mapping={mapping_name} | criterion={criterion} | "
-        f"passed={passed} | successful={len(successful_attempts)} | counted_attempts={len(attempts)} | "
+        f"passed={passed} | successful={len(successful_attempts)}/{max_attempts} | "
+        f"solver_runs_completed={len(attempts)} | run_slots_evaluated={max_attempts} | "
         f"invalid_regenerated={invalid_attempt_count} | failure_reason={failure_reason or 'none'}"
     )
     logger.log_elapsed(f"Finished tested agent number N={agent_number} for {mapping_name}")
@@ -645,7 +492,7 @@ def _test_agent_number_for_mapping(
         invalid_generation_cap_exhausted=invalid_generation_cap_exhausted,
         attempts=attempts,
         successful_attempts=successful_attempts[:required_successes],
-        comparison_attempts=comparison_attempts,
+        comparison_attempts=[],
         trace=trace,
     )
 
@@ -655,11 +502,14 @@ def _run_capacity_search(
     branch_spec: BranchSpec,
     dynamic_state: DynamicBranchState | None,
     mapping_name: str,
+    capacity_upper_bound: int,
     seed_base: int,
     logger: ExperimentLogger,
 ) -> CapacitySearchResult:
     low = 1
-    high = int(branch_spec.capacity_agent_upper_bound)
+    high = int(capacity_upper_bound)
+    if high < 1:
+        raise ValueError("Capacity search requires at least one traversable cell (F >= 1).")
     max_downward_moves = max(0, int(branch_spec.capacity_binary_search_max_downward_moves))
     current_depth = 0
     downward_moves_after_first_success = 0
@@ -673,12 +523,7 @@ def _run_capacity_search(
     logger.log("")
     logger.log("-" * 88)
     search_criterion = _effective_pass_criterion(branch_spec, mapping_name)
-    if search_criterion == "temp_classical":
-        search_label = "Temp classical capacity search"
-    elif search_criterion == "temp_cyclic":
-        search_label = "Temp cyclic capacity search"
-    else:
-        search_label = "Solver capacity search"
+    search_label = f"{mapping_name.title()} capacity search"
     logger.log(
         f"{search_label} started | mapping={mapping_name} | criterion={search_criterion} | range=1..{high} | "
         f"max_downward_moves_after_first_success={max_downward_moves}"
@@ -750,6 +595,7 @@ def _run_capacity_search(
     )
     return CapacitySearchResult(
         mapping_name=mapping_name,
+        candidate_maximum=int(capacity_upper_bound),
         best_agent_number=best_agent_number,
         best_successful_attempts=best_successful_attempts,
         tested_agent_numbers=tested_agent_numbers,
@@ -971,9 +817,9 @@ def _build_configuration_log_text(
     lines: list[str] = []
     lines.append(category_title)
     lines.append(f"    {branch_spec.layout_label}")
-    lines.append(f"        N_temp_classical_capacity: {classical_search.best_agent_number}")
-    lines.append(f"        N_temp_cyclic_capacity: {cyclic_search.best_agent_number}")
-    lines.append("        Temp capacity criterion: the primary mapping must solve, and cyclic must solve and have lower halted time and lower conflicts than classical on the same setup")
+    lines.append(f"        N_classical_capacity: {classical_search.best_agent_number}")
+    lines.append(f"        N_cyclic_capacity: {cyclic_search.best_agent_number}")
+    lines.append("        Capacity criterion: each mapping is tested independently; a tested N passes with at least 3 successful runs out of 5 within the runtime limit")
     lines.append("")
 
     classical_baseline = _records_from_attempts(classical_search.best_successful_attempts)
@@ -981,12 +827,12 @@ def _build_configuration_log_text(
     cyclic_baseline = _records_from_attempts(cyclic_search.best_successful_attempts)
     classical_comparative = _records_from_attempts(classical_at_cyclic)
 
-    lines.append("        Under temp classical capacity (N_temp_classical_capacity)")
+    lines.append("        Under classical capacity (N_classical_capacity)")
     _append_metric_block(
         lines,
         metric_title="Time computation halted (secs)",
-        baseline_title="Stats of classical at temp classical capacity",
-        comparative_title="Stats of cyclic at temp classical capacity",
+        baseline_title="Stats of classical at classical capacity",
+        comparative_title="Stats of cyclic at classical capacity",
         baseline_records=classical_baseline,
         comparative_records=cyclic_comparative,
         metric="time",
@@ -994,8 +840,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Number of conflicts at halt",
-        baseline_title="Stats of classical at temp classical capacity",
-        comparative_title="Stats of cyclic at temp classical capacity",
+        baseline_title="Stats of classical at classical capacity",
+        comparative_title="Stats of cyclic at classical capacity",
         baseline_records=classical_baseline,
         comparative_records=cyclic_comparative,
         metric="conflicts",
@@ -1003,8 +849,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Total path length",
-        baseline_title="Stats of classical at temp classical capacity",
-        comparative_title="Stats of cyclic at temp classical capacity",
+        baseline_title="Stats of classical at classical capacity",
+        comparative_title="Stats of cyclic at classical capacity",
         baseline_records=classical_baseline,
         comparative_records=cyclic_comparative,
         metric="path",
@@ -1015,12 +861,12 @@ def _build_configuration_log_text(
         comparative_records=cyclic_comparative,
     )
 
-    lines.append("        Under temp cyclic capacity (N_temp_cyclic_capacity)")
+    lines.append("        Under cyclic capacity (N_cyclic_capacity)")
     _append_metric_block(
         lines,
         metric_title="Time computation halted (secs)",
-        baseline_title="Stats of cyclic at temp cyclic capacity",
-        comparative_title="Stats of classical at temp cyclic capacity",
+        baseline_title="Stats of cyclic at cyclic capacity",
+        comparative_title="Stats of classical at cyclic capacity",
         baseline_records=cyclic_baseline,
         comparative_records=classical_comparative,
         metric="time",
@@ -1028,8 +874,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Number of conflicts at halt",
-        baseline_title="Stats of cyclic at temp cyclic capacity",
-        comparative_title="Stats of classical at temp cyclic capacity",
+        baseline_title="Stats of cyclic at cyclic capacity",
+        comparative_title="Stats of classical at cyclic capacity",
         baseline_records=cyclic_baseline,
         comparative_records=classical_comparative,
         metric="conflicts",
@@ -1037,8 +883,8 @@ def _build_configuration_log_text(
     _append_metric_block(
         lines,
         metric_title="Total path length",
-        baseline_title="Stats of cyclic at temp cyclic capacity",
-        comparative_title="Stats of classical at temp cyclic capacity",
+        baseline_title="Stats of cyclic at cyclic capacity",
+        comparative_title="Stats of classical at cyclic capacity",
         baseline_records=cyclic_baseline,
         comparative_records=classical_comparative,
         metric="path",
@@ -1088,6 +934,7 @@ def _test_to_summary(test_result: AgentNumberTestResult) -> dict[str, Any]:
 def _search_to_summary(search_result: CapacitySearchResult) -> dict[str, Any]:
     return {
         "mapping_name": search_result.mapping_name,
+        "candidate_maximum": search_result.candidate_maximum,
         "best_agent_number": search_result.best_agent_number,
         "best_successful_attempts": [_attempt_to_summary(attempt) for attempt in search_result.best_successful_attempts],
         "search_trace": search_result.search_trace,
@@ -1141,10 +988,19 @@ def _compute_single_configuration(
         )
         log_dynamic_state(logger, branch_spec, dynamic_state)
 
+    capacity_upper_bound = count_capacity_traversable_cells(
+        branch_spec=branch_spec,
+        dynamic_state=dynamic_state,
+    )
+    logger.log(
+        f"Capacity-search candidate range derived from traversable cells: 1..{capacity_upper_bound} (F={capacity_upper_bound})"
+    )
+
     classical_search = _run_capacity_search(
         branch_spec=branch_spec,
         dynamic_state=dynamic_state,
         mapping_name="classical",
+        capacity_upper_bound=capacity_upper_bound,
         seed_base=seed_base,
         logger=logger,
     )
@@ -1152,6 +1008,7 @@ def _compute_single_configuration(
         branch_spec=branch_spec,
         dynamic_state=dynamic_state,
         mapping_name="cyclic",
+        capacity_upper_bound=capacity_upper_bound,
         seed_base=seed_base,
         logger=logger,
     )
@@ -1161,7 +1018,7 @@ def _compute_single_configuration(
         dynamic_state=dynamic_state,
         baseline_mapping_name="classical",
         comparative_mapping_name="cyclic",
-        capacity_label="temp_classical_capacity",
+        capacity_label="classical_capacity",
         baseline_successful_attempts=classical_search.best_successful_attempts,
         logger=logger,
     )
@@ -1170,7 +1027,7 @@ def _compute_single_configuration(
         dynamic_state=dynamic_state,
         baseline_mapping_name="cyclic",
         comparative_mapping_name="classical",
-        capacity_label="temp_cyclic_capacity",
+        capacity_label="cyclic_capacity",
         baseline_successful_attempts=cyclic_search.best_successful_attempts,
         logger=logger,
     )
@@ -1192,8 +1049,8 @@ def _compute_single_configuration(
             "cyclic": _search_to_summary(cyclic_search),
         },
         "comparative_runs": {
-            "cyclic_at_temp_classical_capacity": [_attempt_to_summary(attempt) for attempt in cyclic_at_classical],
-            "classical_at_temp_cyclic_capacity": [_attempt_to_summary(attempt) for attempt in classical_at_cyclic],
+            "cyclic_at_classical_capacity": [_attempt_to_summary(attempt) for attempt in cyclic_at_classical],
+            "classical_at_cyclic_capacity": [_attempt_to_summary(attempt) for attempt in classical_at_cyclic],
         },
         "data_log_path": str(data_log_path),
     }
@@ -1237,8 +1094,8 @@ def _compute_single_configuration(
         "map_type": branch_spec.map_type,
         "category_map_type": branch_spec.category_map_type,
         "layout_key": branch_spec.layout_key,
-        "n_temp_classical_capacity": classical_search.best_agent_number,
-        "n_temp_cyclic_capacity": cyclic_search.best_agent_number,
+        "n_classical_capacity": classical_search.best_agent_number,
+        "n_cyclic_capacity": cyclic_search.best_agent_number,
         "n_classical_max": classical_search.best_agent_number,
         "n_cyclic_max": cyclic_search.best_agent_number,
         "data_log_path": str(data_log_path),

@@ -47,10 +47,11 @@
 # - "none": starts and goals may be sampled from the same allowed pool
 # - "distinct_campus_zones": starts and goals must come from different campus zones
 #
-# The main experiment now uses limited binary-search capacity testing over 1..255 agents.
-# A tested number passes when at least 1 out of 5 valid solver attempts finishes within 30 seconds.
-# The search starts at 128 and descends at most CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES child links.
-# setup_failed and unsolvable initial conditions are regenerated, with a cap of 5 generation attempts per solver attempt.
+# The main experiment uses limited binary-search capacity testing over 1..F agents,
+# where F is the number of traversable cells in the final binary base map.
+# Classical and cyclic capacities are searched independently. A tested number passes
+# only when at least 3 out of exactly 5 run slots solve within 30 seconds.
+# Setup-generation failures occupy failed run slots rather than counting as successes.
 # Frame-by-frame persistence and visualization:
 # - to_generate = "raw_data" records numerical results and saves only two selected
 #   trajectories per exact main-experiment configuration: the final retained
@@ -77,12 +78,9 @@
 #   Keep this at 1.0 or above. The whole project still uses one global solver
 #   family at a time, but each branch stores its own editable ECBS factor.
 #
-# true_static_shortest_path_distance
-#   Branch-level low-level-planner toggle.
-#   False -> keep the original Manhattan-style heuristic.
-#   True  -> use the exact shortest-path distance on the branch's static graph
-#            as the low-level A* heuristic. Dynamic branches compute this on the
-#            shared mapped loop while ignoring time-varying obstacle occupancy.
+# Main-experiment low-level heuristic
+#   The main experiment uses Manhattan distance for low-level A* guidance.
+#   Graph-aware static shortest-path distance is not enabled in main branches.
 #
 # tight_time_horizon
 #   Branch-level low-level-planner toggle.

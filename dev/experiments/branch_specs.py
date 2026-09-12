@@ -4,7 +4,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from dev.master_config import BRANCH_USER_CONFIGS, agent_cohesion, cohesion_factor, compact_clustering, enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, compact_clustering, enhanced_CBS
 
 
 AgentNumberRange = tuple[int, int, int]
@@ -149,19 +149,6 @@ def _is_campus_branch(map_type: str, config: dict[str, Any]) -> bool:
     return "campus" in map_type or str(config.get("map_family", "")) == "campus_crowd_simulation"
 
 
-def _branch_supports_agent_cohesion(map_type: str, config: dict[str, Any]) -> bool:
-    return _is_campus_branch(map_type, config) or map_type == "dynamic_port"
-
-
-def _resolved_cohesion_factor() -> float:
-    if not agent_cohesion:
-        return 0.0
-    try:
-        return max(0.0, float(cohesion_factor))
-    except (TypeError, ValueError):
-        return 0.0
-
-
 def _cluster_description() -> str:
     if compact_clustering:
         return "one compact directly adjacent 8-neighbor-connected group"
@@ -238,10 +225,9 @@ def _notes_for_branch(
     assignment_description = _assignment_cardinality_description(goal_mode)
 
     capacity_note = (
-        "Updated main experiment: this layout uses independent binary-search capacity testing from 1 to 255 for "
-        "classical and cyclic mapping. The search may keep descending below the normal depth limit until it finds at least one passing agent number; after the first pass, further descent is limited by the configured maximum downward moves. "
-        "The default paired-temp capacity criterion accepts a tested value only when the primary mapping solves and cyclic mapping beats classical mapping on the same setup in time computation halted and conflicts at halt. "
-        "For the classical-side search, this means classical must solve and cyclic must still outperform it on that classical-origin setup. For the cyclic-side search, cyclic must solve and outperform classical on that cyclic-origin setup. "
+        "Updated main experiment: classical and cyclic capacities are searched independently. "
+        "The candidate range is 1 through F, where F is the number of traversable cells in the selected base map. "
+        "Each tested agent number is evaluated in exactly five runs and passes only when at least three runs solve within the runtime limit. "
         "The program still runs paired comparative tests at the discovered capacity points."
     )
 
@@ -321,10 +307,10 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         runtime_limit_seconds=float(config["time_limit_seconds"]),
         counted_runs_required=int(config["counted_runs_required"]),
         capacity_attempts_per_agent_number=int(config.get("capacity_attempts_per_agent_number", 5)),
-        capacity_successful_runs_required=int(config.get("capacity_successful_runs_required", 1)),
-        capacity_agent_upper_bound=int(config.get("capacity_agent_upper_bound", 255)),
+        capacity_successful_runs_required=int(config.get("capacity_successful_runs_required", 3)),
+        capacity_agent_upper_bound=int(config.get("capacity_agent_upper_bound", 0)),
         capacity_binary_search_max_downward_moves=int(config.get("capacity_binary_search_max_downward_moves", 3)),
-        capacity_pass_criterion=str(config.get("capacity_pass_criterion", "temp_pairwise")),
+        capacity_pass_criterion="solver_success",
         setup_generation_attempt_cap_per_solver_attempt=int(config.get("setup_generation_attempt_cap_per_solver_attempt", 5)),
         prompt_before_next_map_config=bool(config.get("prompt_before_next_map_config", True)),
         prompt_before_next_map_config_timeout_seconds=float(config.get("prompt_before_next_map_config_timeout_seconds", 6.0)),
@@ -363,10 +349,10 @@ def _build_single_branch_spec(map_type: str, config: dict[str, Any]) -> BranchSp
         solver_name=solver_name,
         enhanced_cbs_enabled=enhanced_cbs_enabled,
         solver_suboptimality_factor=solver_suboptimality_factor,
-        true_static_shortest_path_distance=bool(config.get("true_static_shortest_path_distance", False)),
+        true_static_shortest_path_distance=False,
         tight_time_horizon=bool(config.get("tight_time_horizon", False)),
-        agent_cohesion_enabled=bool(agent_cohesion) if _branch_supports_agent_cohesion(category_map_type, config) else False,
-        cohesion_factor=_resolved_cohesion_factor() if _branch_supports_agent_cohesion(category_map_type, config) else 0.0,
+        agent_cohesion_enabled=False,
+        cohesion_factor=0.0,
         notes=_notes_for_branch(
             map_type=category_map_type,
             config=config,

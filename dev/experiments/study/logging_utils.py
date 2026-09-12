@@ -35,14 +35,12 @@ def log_branch_header(logger: ExperimentLogger, branch_spec: BranchSpec) -> None
     logger.log(f"Enhanced CBS enabled: {branch_spec.enhanced_cbs_enabled}")
     if branch_spec.solver_suboptimality_factor is not None:
         logger.log(f"Solver suboptimality factor: {branch_spec.solver_suboptimality_factor:.2f}")
-    logger.log(f"True static shortest-path heuristic: {branch_spec.true_static_shortest_path_distance}")
+    logger.log("Low-level heuristic: Manhattan distance")
     logger.log(f"Tight time horizon: {branch_spec.tight_time_horizon}")
-    logger.log(f"Agent cohesion enabled: {branch_spec.agent_cohesion_enabled}")
-    logger.log(f"Cohesion factor: {branch_spec.cohesion_factor:.2f}")
     logger.log(f"Seed: {branch_spec.seed_base}")
     logger.log(f"Capacity attempts per tested agent number: {branch_spec.capacity_attempts_per_agent_number}")
     logger.log(f"Required successful runs per tested agent number: {branch_spec.capacity_successful_runs_required}")
-    logger.log(f"Capacity-search upper bound: {branch_spec.capacity_agent_upper_bound}")
+    logger.log("Capacity-search upper bound: derived at runtime from F (traversable-cell count)")
     logger.log(f"Binary-search max downward moves after first success: {branch_spec.capacity_binary_search_max_downward_moves}")
     logger.log(f"Setup/unsolvable regeneration cap per solver attempt: {branch_spec.setup_generation_attempt_cap_per_solver_attempt}")
     logger.log(f"Runtime limit per run: {branch_spec.runtime_limit_seconds:.2f}s")
@@ -59,8 +57,8 @@ def log_dynamic_state(
     rows = len(dynamic_state.static_matrix)
     cols = len(dynamic_state.static_matrix[0]) if rows else 0
     total_cells = max(1, rows * cols)
-    raw_static_count = sum(cell == 1 for row in dynamic_state.raw_obstacle_matrix for cell in row)
-    static_count = sum(cell == 1 for row in dynamic_state.static_matrix for cell in row)
+    raw_static_count = sum(cell == 0 for row in dynamic_state.raw_obstacle_matrix for cell in row)
+    static_count = sum(cell == 0 for row in dynamic_state.static_matrix for cell in row)
     dynamic_count = (
         sum(cell == 2 for row in dynamic_state.dynamic_loop_frames[0] for cell in row)
         if dynamic_state.dynamic_loop_frames

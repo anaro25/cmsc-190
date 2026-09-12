@@ -1,7 +1,7 @@
 import shutil
 from pathlib import Path
 
-from dev.master_config import BRANCH_USER_CONFIGS, SELECTED_MAP_CONFIGS, agent_cohesion, enhanced_CBS
+from dev.master_config import BRANCH_USER_CONFIGS, SELECTED_MAP_CONFIGS, enhanced_CBS
 from dev.mapf.mapf_logger_dynamic import (
     write_dynamic_mapf_frames,
     write_dynamic_setup_frame,
@@ -32,7 +32,8 @@ def current_ecbs_suboptimality_factor():
 
 
 def current_true_static_shortest_path_distance_enabled():
-    return bool(BRANCH_USER_CONFIGS[_active_category_map_type()].get("true_static_shortest_path_distance", False))
+    # Main experiment uses Manhattan distance, as specified in the manuscript.
+    return False
 
 
 def current_tight_time_horizon_enabled():
@@ -40,8 +41,8 @@ def current_tight_time_horizon_enabled():
 
 
 def current_agent_cohesion_enabled():
-    category_map_type = _active_category_map_type()
-    return bool(agent_cohesion) and ("campus" in category_map_type or category_map_type == "dynamic_port")
+    # The main experiment does not use crowd-spreading/cohesion guidance.
+    return False
 
 
 def clear_previous_mapping_run(map_name, mapping_name, output_root):

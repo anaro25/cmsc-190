@@ -18,13 +18,14 @@ CAMPUS_WHITE_RGB = (255, 255, 255)
 CAMPUS_BLACK_RGB = (0, 0, 0)
 
 
-def _binarize_pixel(value, threshold=127):
+def _binarize_pixel(value, threshold=127, *, free_value=0):
+    obstacle_value = 0 if free_value == 1 else 1
     if isinstance(value, int):
-        return 1 if value <= threshold else 0
+        return obstacle_value if value <= threshold else free_value
 
     if isinstance(value, tuple):
         grayscale = int(round(sum(value[:3]) / 3))
-        return 1 if grayscale <= threshold else 0
+        return obstacle_value if grayscale <= threshold else free_value
 
     raise TypeError(f"Unsupported pixel value: {value!r}")
 
@@ -39,19 +40,17 @@ def _is_pure_white_pixel(value):
     raise TypeError(f"Unsupported pixel value: {value!r}")
 
 
-def build_fallback_port_matrix(rows=25, cols=25):
-    """
-    1 = obstacle, 0 = free space.
-    Creates a 25x25 port-like yard with rectangular blocks and lanes.
-    """
-    grid = [[0 for _ in range(cols)] for _ in range(rows)]
+def build_fallback_port_matrix(rows=25, cols=25, *, free_value=0):
+    """Create a 25x25 port-like yard using the requested binary convention."""
+    obstacle_value = 0 if free_value == 1 else 1
+    grid = [[free_value for _ in range(cols)] for _ in range(rows)]
 
     for r in range(rows):
-        grid[r][0] = 1
-        grid[r][-1] = 1
+        grid[r][0] = obstacle_value
+        grid[r][-1] = obstacle_value
     for c in range(cols):
-        grid[0][c] = 1
-        grid[-1][c] = 1
+        grid[0][c] = obstacle_value
+        grid[-1][c] = obstacle_value
 
     obstacle_rectangles = [
         (2, 2, 5, 5),
@@ -70,15 +69,15 @@ def build_fallback_port_matrix(rows=25, cols=25):
     for r0, c0, r1, c1 in obstacle_rectangles:
         for r in range(r0, r1 + 1):
             for c in range(c0, c1 + 1):
-                grid[r][c] = 1
+                grid[r][c] = obstacle_value
 
     for r in range(1, rows - 1):
-        grid[r][7] = 0
-        grid[r][13] = 0
-        grid[r][19] = 0
+        grid[r][7] = free_value
+        grid[r][13] = free_value
+        grid[r][19] = free_value
     for c in range(1, cols - 1):
-        grid[7][c] = 0
-        grid[13][c] = 0
+        grid[7][c] = free_value
+        grid[13][c] = free_value
 
     return grid
 
@@ -105,13 +104,13 @@ def _load_resized_images(image_path, resize_longest_side=None):
         return rgb_image, grayscale_image
 
 
-def load_port_obstacle_matrix(image_path, threshold=127, resize_longest_side=None):
+def load_port_obstacle_matrix(image_path, threshold=127, resize_longest_side=None, *, free_value=0):
     _, grayscale_image = _load_resized_images(
         image_path=image_path,
         resize_longest_side=resize_longest_side,
     )
     if grayscale_image is None:
-        return build_fallback_port_matrix()
+        return build_fallback_port_matrix(free_value=free_value)
 
     width, height = grayscale_image.size
     pixels = grayscale_image.load()
@@ -120,7 +119,7 @@ def load_port_obstacle_matrix(image_path, threshold=127, resize_longest_side=Non
     for y in range(height):
         row = []
         for x in range(width):
-            row.append(_binarize_pixel(pixels[x, y], threshold=threshold))
+            row.append(_binarize_pixel(pixels[x, y], threshold=threshold, free_value=free_value))
         matrix.append(row)
 
     return matrix
@@ -187,13 +186,13 @@ def _classify_campus_pixel(value, tolerance=8):
     )
 
 
-def load_campus_semantic_masks(image_path, resize_longest_side=None, color_tolerance=8):
+def load_campus_semantic_masks(image_path, resize_longest_side=None, color_tolerance=8, *, free_value=0):
     rgb_image, _ = _load_resized_images(
         image_path=image_path,
         resize_longest_side=resize_longest_side,
     )
     if rgb_image is None:
-        fallback = build_fallback_port_matrix()
+        fallback = build_fallback_port_matrix(free_value=free_value)
         zone_id_matrix = []
         single_target_id_matrix = []
         traversable_matrix = []
@@ -210,8 +209,9 @@ def load_campus_semantic_masks(image_path, resize_longest_side=None, color_toler
             zone_id_row = []
             single_target_id_row = []
             for cell in row:
-                is_free = cell == 0
-                traversable_row.append(0 if is_free else 1)
+                is_free = cell == free_value
+                obstacle_value = 0 if free_value == 1 else 1
+                traversable_row.append(free_value if is_free else obstacle_value)
                 zone_row.append(is_free)
                 single_target_row.append(False)
                 walkway_row.append(False)
@@ -256,7 +256,8 @@ def load_campus_semantic_masks(image_path, resize_longest_side=None, color_toler
         single_target_id_row = []
         for x in range(width):
             pixel_type, zone_id, is_single_target_marker = _classify_campus_pixel(pixels[x, y], tolerance=color_tolerance)
-            traversable_row.append(0 if pixel_type in {"zone", "walkway"} else 1)
+            obstacle_value = 0 if free_value == 1 else 1
+            traversable_row.append(free_value if pixel_type in {"zone", "walkway"} else obstacle_value)
             zone_row.append(pixel_type == "zone")
             single_target_row.append(is_single_target_marker)
             walkway_row.append(pixel_type == "walkway")

@@ -548,7 +548,7 @@ def render_selected_visualizations(
     if branch_spec.is_dynamic:
         if dynamic_state is None:
             raise ValueError("dynamic_state is required for dynamic visualization rendering")
-        classical_setup_map, cyclic_setup_map = build_static_only_setup_maps(dynamic_state.static_matrix)
+        classical_setup_map, cyclic_setup_map = build_static_only_setup_maps(dynamic_state.static_matrix, free_value=1)
 
     jointly_successful_root = output_manager.visualizations_dir / "jointly_successful"
     independently_successful_root = output_manager.visualizations_dir / "independently_successful"
@@ -647,7 +647,7 @@ def render_saved_frame_by_frame_packages(
                     "Dynamic saved frame-by-frame packages require the persisted DynamicBranchState."
                 )
             classical_setup_map, cyclic_setup_map = build_static_only_setup_maps(
-                dynamic_state.static_matrix
+                dynamic_state.static_matrix, free_value=1
             )
 
         static_visually_free_vertex_positions = _load_static_render_visually_free_vertices(

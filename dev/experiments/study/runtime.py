@@ -139,9 +139,7 @@ def run_static_mapping(
     logger: ExperimentLogger,
     label: str,
     solver_suboptimality_factor: float | None = None,
-    true_static_shortest_path_distance: bool = False,
     tight_time_horizon: bool = False,
-    agent_cohesion_enabled: bool = False,
 ) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
@@ -152,9 +150,9 @@ def run_static_mapping(
             progress_callback=build_progress_callback(logger, label),
             use_ecbs=bool(enhanced_CBS),
             ecbs_suboptimality_factor=solver_suboptimality_factor,
-            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            true_static_shortest_path_distance=False,
             tight_time_horizon=tight_time_horizon,
-            agent_cohesion_enabled=agent_cohesion_enabled,
+            agent_cohesion_enabled=False,
         )
         elapsed_seconds = time.perf_counter() - start
         return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")
@@ -171,9 +169,7 @@ def run_dynamic_mapping(
     logger: ExperimentLogger,
     label: str,
     solver_suboptimality_factor: float | None = None,
-    true_static_shortest_path_distance: bool = False,
     tight_time_horizon: bool = False,
-    agent_cohesion_enabled: bool = False,
 ) -> tuple[dict[str, Any] | None, float, str]:
     start = time.perf_counter()
     try:
@@ -184,9 +180,9 @@ def run_dynamic_mapping(
             progress_callback=build_progress_callback(logger, label),
             use_ecbs=bool(enhanced_CBS),
             ecbs_suboptimality_factor=solver_suboptimality_factor,
-            true_static_shortest_path_distance=true_static_shortest_path_distance,
+            true_static_shortest_path_distance=False,
             tight_time_horizon=tight_time_horizon,
-            agent_cohesion_enabled=agent_cohesion_enabled,
+            agent_cohesion_enabled=False,
         )
         elapsed_seconds = time.perf_counter() - start
         return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")

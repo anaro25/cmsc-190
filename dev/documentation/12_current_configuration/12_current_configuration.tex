@@ -41,7 +41,7 @@ The current top-level controls in \texttt{master\_config.py} are:
     \item output target: \texttt{to\_generate="raw\_data"},
     \item solver family: \texttt{enhanced\_CBS=True}, so the active solver family is ECBS,
     \item global clustering toggle: \texttt{compact\_clustering=True},
-    \item agent cohesion toggle: \texttt{agent\_cohesion=True}.
+    \item main-experiment crowd cohesion/spreading: disabled and removed from main solver execution.
 \end{itemize}
 
 \section{Shared Capacity-Search Constants}
@@ -50,13 +50,13 @@ The current shared values are:
 \begin{itemize}[leftmargin=2em]
     \item \texttt{SHARED\_TIME\_LIMIT\_SECONDS=30.0},
     \item \texttt{SHARED\_ECBS\_SUBOPTIMALITY=3.0},
-    \item \texttt{SHARED\_TRUE\_STATIC\_SHORTEST\_PATH\_DISTANCE=True},
+    \item main-experiment low-level heuristic: Manhattan distance,
     \item \texttt{SHARED\_TIGHT\_TIME\_HORIZON=False},
     \item \texttt{SHARED\_COUNTED\_RUNS\_REQUIRED=1},
-    \item \texttt{CAPACITY\_PASS\_CRITERION="temp\_cyclic"},
+    \item \texttt{CAPACITY\_PASS\_CRITERION="solver\_success"},
     \item \texttt{CAPACITY\_ATTEMPTS\_PER\_AGENT\_NUMBER=5},
-    \item \texttt{CAPACITY\_SUCCESSFUL\_RUNS\_REQUIRED=1},
-    \item \texttt{CAPACITY\_AGENT\_UPPER\_BOUND=255},
+    \item \texttt{CAPACITY\_SUCCESSFUL\_RUNS\_REQUIRED=3},
+    \item capacity-search upper bound: $F$, the traversable-cell count of the final binary base map,
     \item \texttt{CAPACITY\_BINARY\_SEARCH\_MAX\_DOWNWARD\_MOVES=3},
     \item \texttt{SETUP\_GENERATION\_ATTEMPT\_CAP\_PER\_SOLVER\_ATTEMPT=5}.
 \end{itemize}
@@ -85,6 +85,6 @@ category & important notes \\
 
 \section{Interpretation Advice}
 
-This file is a snapshot, not a substitute for \texttt{master\_config.py}. The important current design fact is that the project now uses limited binary-search capacity testing with paired temp criteria. The classical-side search reports the highest tested agent number where classical solves and cyclic still beats classical on the same setup. The cyclic-side search reports the highest tested agent number where cyclic solves and beats classical on the same setup. In both cases, the temp comparison uses time computation halted and conflicts at halt. The downward-move limit is enforced only after the search has found at least one passing agent number, so configurations whose first viable values are below 16 can still be tested. The count rule is still one accepted run out of five attempts, so the detailed main-experiment logs report direct run values rather than averages over three successful runs. The program also prompts the user before proceeding to the next map configuration.
+This file is a snapshot, not a substitute for \texttt{master\_config.py}. The main experiment searches classical and cyclic capacities independently. Each search is bounded by the number of traversable cells $F$ in the final binary base map, and a tested agent number passes only with at least three successful solver runs out of five. Cyclic superiority over classical mapping is not used to define capacity. Main-experiment low-level A* guidance uses Manhattan distance, and the crowd cohesion/spreading feature is disabled and removed from main solver execution. The program also prompts the user before proceeding to the next map configuration.
 
 \end{document}

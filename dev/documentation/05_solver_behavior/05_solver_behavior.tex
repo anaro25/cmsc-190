@@ -89,22 +89,14 @@ where $L$ is the loop length.
 
 The same global toggle is respected here as well, so dynamic branches also switch together between vanilla CBS and ECBS rather than maintaining a separate branch-specific solver choice. The selected branch's \texttt{ECBS\_suboptimality} value is passed into the time-expanded ECBS path in the same way as the static solver.
 
-\section{Branch-Level Low-Level Guidance Toggles}
+\section{Main-Experiment Low-Level Guidance}
 
-Each branch now also stores two low-level-planning booleans in \texttt{master\_config.py}:
+The main experiment uses Manhattan distance as the low-level A* heuristic for both classical and cyclic mapping. Graph-aware static shortest-path distance is not used in main-experiment branches.
+
+The remaining branch-local low-level-planning boolean in \texttt{master\_config.py} is:
 \begin{lstlisting}
-true_static_shortest_path_distance = ...
 tight_time_horizon = ...
 \end{lstlisting}
-
-These are branch-local rather than global.
-
-\subsection*{\texttt{true\_static\_shortest\_path\_distance}}
-When this is \texttt{False}, the project keeps the older Manhattan-style low-level heuristic.
-When this is \texttt{True}, the low-level planner uses the exact shortest-path distance on the branch's static movement graph as the heuristic.
-
-For static branches, that graph is the composite map itself.
-For dynamic branches, the helper code derives a static graph from the shared mapped loop while ignoring time-varying obstacle occupancy. In practice, this means the heuristic follows the static corridor structure rather than merely geometric proximity.
 
 \subsection*{\texttt{tight\_time\_horizon}}
 When this is \texttt{False}, the project keeps the older, more conservative finite horizon rule.
