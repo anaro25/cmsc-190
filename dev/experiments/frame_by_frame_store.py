@@ -245,7 +245,7 @@ class ReferenceFrameByFrameStore:
                 map_dir_name = f"map_{map_number}"
                 if self.case_spec.experiment_mode == "multi_agent":
                     capacity_dir_name = (
-                        f"classical_capacity_{int(candidate.run_configuration.agent_number):03d}_agents"
+                        f"{mapping_name}_capacity_{int(candidate.run_configuration.agent_number):03d}_agents"
                     )
                     relative_run_root = (
                         Path(map_dir_name)
@@ -307,7 +307,7 @@ class ReferenceFrameByFrameStore:
                     "experiment_mode": self.case_spec.experiment_mode,
                     "case_id": self.case_spec.case_id,
                     "layout": (
-                        "map / classical capacity / mapping / first successful run"
+                        "map / mapping capacity / mapping / first successful run"
                         if self.case_spec.experiment_mode == "multi_agent"
                         else "map / mapping / first successful run"
                     ),

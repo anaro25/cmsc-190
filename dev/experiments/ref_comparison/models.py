@@ -16,9 +16,8 @@ class RefCaseSpec:
     agent_number: int
     counted_runs_required: int
     capacity_search_enabled: bool
-    capacity_agent_upper_bound: int
-    capacity_binary_search_max_downward_moves: int
     capacity_attempts_per_agent_number: int
+    capacity_successful_runs_required: int
     capacity_pass_criterion: str
     runtime_limit_seconds: float
     use_ecbs: bool
@@ -27,8 +26,6 @@ class RefCaseSpec:
     tight_time_horizon: bool
     remove_extra_transitions: bool
     add_transitions_between_free_spaces: bool
-    agent_cohesion_enabled: bool
-    cohesion_factor: float
     filter_individual_runs_until_cyclic_faster: bool
     filter_individual_runs_until_cyclic_faster_max_attempts: int | None
     single_agent_timing_repetitions: int = 1
@@ -106,6 +103,8 @@ class RefConditionAggregate:
     size_label: str
     map_size: int
     agent_number: int
+    classical_agent_number: int
+    cyclic_agent_number: int
     counted_runs_required: int
     paired_run_configurations: int
     num_classical_counted_runs: int
@@ -143,7 +142,6 @@ class RefVisualizationCandidate:
     agents: list[dict[str, Any]]
     solver_result: dict[str, Any]
     composite_map: list[list[Any]]
-    visually_free_vertex_positions: set[tuple[int, int]] | None = None
 
 
 @dataclass

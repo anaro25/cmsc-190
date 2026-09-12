@@ -27,12 +27,11 @@ def _average(records: list[RefMappingRunRecord], getter: Callable[[RefMappingRun
 
 
 def _aggregate_agent_number(case_spec: RefCaseSpec, records: list[RefMappingRunRecord]) -> int:
+    del case_spec
     agent_numbers = {int(record.agent_number) for record in records}
     if len(agent_numbers) == 1:
         return next(iter(agent_numbers))
-    # A cross-map multi-agent aggregate can combine different discovered
-    # classical capacities. Zero explicitly means that no single agent count
-    # represents the overall aggregate; each map aggregate keeps its own count.
+    # Zero explicitly means that no single agent count represents this aggregate.
     return 0
 
 
@@ -51,6 +50,8 @@ def build_reference_aggregate(
         size_label=case_spec.size_label,
         map_size=case_spec.map_size,
         agent_number=_aggregate_agent_number(case_spec, classical_records + cyclic_records),
+        classical_agent_number=_aggregate_agent_number(case_spec, classical_records),
+        cyclic_agent_number=_aggregate_agent_number(case_spec, cyclic_records),
         counted_runs_required=case_spec.counted_runs_required,
         paired_run_configurations=min(len(classical_records), len(cyclic_records)),
         num_classical_counted_runs=sum(record.counted_run for record in classical_records),
@@ -77,6 +78,6 @@ def build_reference_aggregate(
         notes=(
             f"Single-agent reference case: cyclic-faster filtering is disabled; runtime values use {int(case_spec.single_agent_timing_repetitions)} repeated timing samples per map."
             if case_spec.experiment_mode == "single_agent"
-            else f"Multi-agent reference case: each map is evaluated at its discovered temporary pairwise classical capacity; runtime values use {int(case_spec.multi_agent_timing_repetitions)} repeated timing samples per mapping at that capacity."
+            else f"Multi-agent reference case: classical and cyclic mapping are each evaluated at their independently discovered capacities; runtime values use {int(case_spec.multi_agent_timing_repetitions)} repeated timing samples per mapping."
         ),
     )

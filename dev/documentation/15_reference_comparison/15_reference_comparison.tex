@@ -31,7 +31,7 @@ dev/inputs/reference_port_maps/port_map_2.png
 dev/inputs/reference_port_maps/port_map_3.png
 \end{lstlisting}
 
-These reference images use three cell colors: pure black pixels are normal obstacles, pure white pixels are free spaces, and light-red pixels (\texttt{\#e8787a}) are invisible obstacles. Invisible obstacles are handled as blocked cells during path planning and solving, but they are rendered as ordinary free space in MAPF visualizations. The transition visualizations are unchanged. The older orientation-based variants are no longer generated. The program now treats the three input files as the three map cases directly.
+These reference images are normalized to two ordinary cell colors: pure black pixels are obstacles and pure white pixels are free spaces. The former light-red ``invisible obstacle'' pixels have been converted to ordinary white/free cells, and the reference workflow no longer has a special invisible-obstacle pathfinding or visualization rule. The internal binary matrix follows the manuscript convention, with $1$ for traversable/free cells and $0$ for blocked/obstacle cells. The older orientation-based variants are no longer generated. The program treats the three input files as the three map cases directly.
 
 The input directory may still contain sibling images with manually colored path markings, but those images are kept only as archived inputs. The reference-comparison program does not read those markings and does not import any manually traced path.
 
@@ -52,16 +52,14 @@ dev/master_config_ref_comparison.py
 
 This keeps the main \texttt{master\_config.py} untouched.
 
-The reference configuration also includes local toggles for optional cyclic-map transition-processing steps:
+The reference comparison now uses the same cyclic-map post-processing variant as the main experiment:
 
 \begin{lstlisting}
-REMOVE_EXTRA_TRANSITIONS = False
+REMOVE_EXTRA_TRANSITIONS = True
 ADD_TRANSITIONS_BETWEEN_FREE_SPACES = False
 \end{lstlisting}
 
-When \texttt{REMOVE\_EXTRA\_TRANSITIONS} is \texttt{True}, cyclic mapping uses the same full transition-reduction behavior as the main experiment. When this value is \texttt{False}, cyclic mapping skips only the redundant-transition elimination step while still preserving required connectivity restoration. This makes it possible to test a less radically reduced cyclic map only in the reference comparison.
-
-When \texttt{ADD\_TRANSITIONS\_BETWEEN\_FREE\_SPACES} is \texttt{True}, the reference workflow applies one more final step after the cyclic-mapping cleanup steps: it scans the entire map, finds every adjacent pair of free cells, and places a bidirectional transition between them. This option is useful for testing an even less restrictive mapping when the reduced cyclic map produces impractical routes. This option is also reference-comparison-only and does not affect the main experiment.
+Redundant bidirectional transitions are reduced before required connectivity is restored, and no final all-free-space transition expansion is applied. The reference experiment therefore no longer uses a separate cyclic-map post-processing variant.
 
 \section{Reference Workflow}
 
@@ -73,7 +71,7 @@ to_generate = "graphs"
 # to_generate = "visualization"
 \end{lstlisting}
 
-If \texttt{to\_generate = "raw\_data"}, the selected reference case is executed, numerical raw data is saved, and the designated successful trajectories are written separately under \texttt{outputs\_ref\_comparison/frame\_by\_frame}. The single-agent case stores the first successful timing repetition for classical and cyclic in each of the three maps. The multi-agent case stores the first successful timing repetition for both mappings from the final repeated comparison at the discovered classical capacity. Capacity-search trials are not stored as frame-by-frame files.
+If \texttt{to\_generate = "raw\_data"}, the selected reference case is executed, numerical raw data is saved, and the designated successful trajectories are written separately under \texttt{outputs\_ref\_comparison/frame\_by\_frame}. The single-agent case stores the first successful timing repetition for classical and cyclic in each of the three maps. The multi-agent case stores one final successful trajectory for classical at its discovered classical capacity and one for cyclic at its discovered cyclic capacity. Capacity-search trials are not stored as frame-by-frame files.
 
 If \texttt{to\_generate = "graphs"}, the numerical raw data is reused. If \texttt{to\_generate = "visualization"}, the solver is not executed and the numerical raw data is not read; the visualizer loads the saved frame-by-frame packages and generates the Pillow frames from them. The visualization phase logs the current map and mapping, frame-writing stages, and final frame counts.
 
@@ -86,18 +84,17 @@ The reference-comparison selector is:
 SELECTED_PORT_EXPERIMENT = "multi_agent"
 \end{lstlisting}
 
-Both selectable cases use the same three 50x50 maps. The single-agent case runs the three maps with one agent. The multi-agent case performs an independent classical-capacity search for each map. Older selector names such as \texttt{single\_agent\_x50} and \texttt{multi\_agent\_x50} are kept only as backward-compatible aliases.
+Both selectable cases use the same three 50x50 maps. The single-agent case runs the three maps with one agent. The multi-agent case performs separate classical and cyclic capacity searches for each map. Older selector names such as \texttt{single\_agent\_x50} and \texttt{multi\_agent\_x50} are kept only as backward-compatible aliases.
 
 The multi-agent search controls are configured in \texttt{dev/master\_config\_ref\_comparison.py}:
 
 \begin{lstlisting}
-REFERENCE_CAPACITY_AGENT_UPPER_BOUND = 255
-REFERENCE_CAPACITY_BINARY_SEARCH_MAX_DOWNWARD_MOVES = 3
-REFERENCE_CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 1
-REFERENCE_CAPACITY_PASS_CRITERION = "temp_pairwise"
+REFERENCE_CAPACITY_ATTEMPTS_PER_AGENT_NUMBER = 5
+REFERENCE_CAPACITY_SUCCESSFUL_RUNS_REQUIRED = 3
+REFERENCE_CAPACITY_PASS_CRITERION = "solver_success"
 \end{lstlisting}
 
-Each map starts its limited binary search at 128 agents. Before any passing value is found, the search may continue descending to smaller left-child values. After the first pass, at most three additional child moves are allowed.
+For each reference map, the candidate interval is $1\ldots F$, where $F$ is the number of traversable cells in that normalized map. Every tested agent number uses exactly five run slots and passes when at least three runs solve within the runtime limit. Classical and cyclic are judged independently. The binary search continues until the remaining numerical interval is resolved; there is no post-success early-stop move limit.
 
 \section{Single-Agent Reference Case}
 
@@ -132,9 +129,9 @@ Traditional A* with Classical Mapping
 With Cyclic Mapping
 \end{lstlisting}
 
-For each port map, the multi-agent case searches only the temporary pairwise classical capacity. A tested agent number passes when classical solves and cyclic also solves with lower halted time and fewer conflicts on the same deterministic setup. Each candidate agent number is tested once during capacity search. No independent cyclic-capacity search is performed.
+For each port map, the multi-agent case searches classical capacity and cyclic capacity independently. A tested agent number passes for a mapping only when that mapping produces at least three successful solver runs out of five within the time limit. Runtime or conflict superiority over the other mapping is not part of the capacity definition, and the setup generation for one mapping does not require the other mapping to solve.
 
-After the classical capacity is found, both classical and cyclic mapping are evaluated at that same agent number. All agents share the upper-right target cell and disappear after reaching it. Agents are released through two spawn cells: the upper neighbor and the right neighbor of the lower-left start cell. The solver supports explicit per-agent \texttt{spawn\_time}. Before an agent's spawn time, it does not occupy the map. At its spawn time, it appears at its assigned spawn cell.
+After both searches finish, classical mapping is evaluated at its discovered classical capacity and cyclic mapping is evaluated at its discovered cyclic capacity. All agents share the upper-right target cell and disappear after reaching it. Agents are released through two spawn cells: the upper neighbor and the right neighbor of the lower-left start cell. The solver supports explicit per-agent \texttt{spawn\_time}. Before an agent's spawn time, it does not occupy the map. At its spawn time, it appears at its assigned spawn cell.
 
 The final comparison for each map and mapping is timed using three identical ECBS executions, controlled by \texttt{MULTI\_AGENT\_TIMING\_REPETITIONS = 3}. The stored runtime is the average of those three timing samples. The path-related values come from the representative deterministic solution.
 
@@ -147,26 +144,22 @@ The multi-agent case records:
     \item total turns.
 \end{itemize}
 
-When graph/data outputs are generated, the multi-agent table uses Map number as the first column. The reported path parameters are Running time, Average number of conflicts, Average number of turns, and Average total distance. The table uses Traditional A* with Classical Mapping, With Cyclic Mapping, and Percent Reduction/Gain as the main comparison headers. The Path parameters header includes the italicized subtitle note \textit{(averages are across all agents)}. The percent column is signed: negative values mean the cyclic value is lower than the classical value, while positive values mean the cyclic value is higher. The older post-sampling individual cyclic-faster filter is disabled for the multi-agent reference case; the stricter cyclic-faster-and-fewer-conflicts rule is instead applied directly during each capacity-search trial.
+When graph/data outputs are generated, the multi-agent table uses Map number as the first column. The reported path parameters are Running time, Average number of conflicts, Average number of turns, and Average total distance. The table uses Traditional A* with Classical Mapping, With Cyclic Mapping, and Percent Reduction/Gain as the main comparison headers. The Path parameters header includes the italicized subtitle note \textit{(averages are across all agents)}. Per-agent quantities use the corresponding mapping's own discovered capacity as the divisor. The percent column is signed: negative values mean the cyclic value is lower than the classical value, while positive values mean the cyclic value is higher. Cyclic-faster filtering is not used in capacity search.
 
 For both single-agent and multi-agent reference cases, graph outputs are now metric-level summaries across the three maps rather than one graph per map. Each graph uses Map number on the x-axis and contains four points: Map 1, Map 2, Map 3, and Average. The Average point is computed from the three map-level values for the same metric and mapping. Only Map 1, Map 2, and Map 3 are connected by the horizontal series line; the Average point remains a standalone marker so it is not visually treated as a fourth input map. The single-agent graphs cover Running time, Number of nodes, Number of turns, and Total distance. The multi-agent graphs cover Running time, Average number of conflicts, Average number of turns, and Average total distance. The graph legends use Traditional A* with Classical Mapping and With Cyclic Mapping.
 
 \section{Heuristic and Solver Settings}
 
-For the single-agent A* cases and for the multi-agent ECBS cases, the reference comparison keeps the project's current true static shortest-path distance heuristic instead of using Manhattan distance. The Tang reference is therefore used mainly for the map style and the lower-left to upper-right setup, not for continuous movement, interpolation, smoothing, or Manhattan-only heuristic behavior.
+For both single-agent A* and multi-agent ECBS reference cases, low-level guidance uses Manhattan distance, matching the manuscript. Graph-aware true static shortest-path distance is disabled. The crowd-spreading/cohesion priority is also removed from the reference comparison.
 
 Shared reference settings include:
 
 \begin{lstlisting}
 SHARED_TIME_LIMIT_SECONDS = 60.0
 SHARED_ECBS_SUBOPTIMALITY = 3.0
-SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = True
+SHARED_TRUE_STATIC_SHORTEST_PATH_DISTANCE = False
 SHARED_TIGHT_TIME_HORIZON = False
-agent_cohesion = True
-cohesion_factor = 1.0
 \end{lstlisting}
-
-Agent cohesion applies to the multi-agent reference case. It is inactive for the single-agent case.
 
 \section{Output Layout}
 
@@ -200,7 +193,7 @@ Persisted raw reference data is stored under:
 dev/outputs_ref_comparison/raw_mapf_files/<case_id>/
 \end{lstlisting}
 
-For the multi-agent case, the raw payload and graph-record exports also include \texttt{capacity\_searches.json}. This file preserves every tested agent number, its pairwise pass or failure reasons, and the classical and cyclic trial metrics. The per-map discovered classical capacities are also written to \texttt{stop\_summary.json}.
+For the multi-agent case, the raw payload and graph-record exports also include \texttt{capacity\_searches.json}. This file preserves every tested agent number, the five mapping-specific run slots, the success count, and the resulting pass or failure decision for both classical and cyclic searches. The per-map traversable-cell counts and the separately discovered classical and cyclic capacities are also written to \texttt{stop\_summary.json}.
 
 \section{Important Interpretation Notes}
 

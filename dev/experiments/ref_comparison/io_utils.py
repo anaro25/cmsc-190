@@ -13,7 +13,7 @@ from dev.experiments.ref_comparison.models import RefCaseSpec
 from dev.paths import OUTPUTS_REF_COMPARISON_ROOT, RAW_REF_COMPARISON_DATA_ROOT
 
 
-RAW_REFERENCE_FORMAT_VERSION = 2
+RAW_REFERENCE_FORMAT_VERSION = 3
 
 
 def format_elapsed_mmss(elapsed_seconds: float) -> str:
@@ -149,9 +149,12 @@ class RefRawDataStore:
                 "agent_number": self.case_spec.agent_number,
                 "capacity_search_enabled": self.case_spec.capacity_search_enabled,
                 "capacity_pass_criterion": self.case_spec.capacity_pass_criterion,
-                "capacity_agent_upper_bound": self.case_spec.capacity_agent_upper_bound,
-                "capacity_binary_search_max_downward_moves": self.case_spec.capacity_binary_search_max_downward_moves,
+                "capacity_attempts_per_agent_number": self.case_spec.capacity_attempts_per_agent_number,
+                "capacity_successful_runs_required": self.case_spec.capacity_successful_runs_required,
+                "capacity_agent_range": "1..F per map",
+                "map_traversable_cell_counts": dict(payload.get("stop_summary", {}).get("map_traversable_cell_counts", {})),
                 "map_classical_capacities": dict(payload.get("stop_summary", {}).get("map_classical_capacities", {})),
+                "map_cyclic_capacities": dict(payload.get("stop_summary", {}).get("map_cyclic_capacities", {})),
                 "capacity_searches_count": len(payload.get("capacity_searches", [])),
                 "run_configurations_count": len(payload.get("run_configurations", [])),
                 "run_records_count": len(payload.get("run_records", [])),

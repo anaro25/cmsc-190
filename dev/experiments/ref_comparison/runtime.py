@@ -17,30 +17,22 @@ from dev.maps.cyclic_mapper import apply_cyclic_mapping
 from dev.utils.log_symbols import AGENT_LOG_SYMBOL, TARGET_LOG_SYMBOL
 
 COUNTED_RESULT_CATEGORIES = {"successful", "unfinished"}
-INVISIBLE_OBSTACLE_COLOR = (232, 120, 122)  # #e8787a
-
-
 def map_label(map_number: int | None) -> str:
     if map_number is None:
         return ""
     return f"Map {int(map_number)}"
 
 
-def _composite_positions_for_cells(cells: set[tuple[int, int]]) -> set[tuple[int, int]]:
-    return {(2 * row, 2 * col) for row, col in cells}
-
-
 def load_reference_port_obstacle_data(image_path: str | Path) -> dict[str, Any]:
-    """Load a reference port map with support for invisible obstacles.
+    """Load a normalized black/white reference port map.
 
-    Pixel meaning for reference-comparison maps:
-    - black (#000000): normal obstacle
+    Reference assets use only ordinary obstacle/free-space pixels:
+    - black (#000000): obstacle
     - white (#ffffff): free space
-    - light red (#e8787a): invisible obstacle
 
-    Invisible obstacles are blocked in the logical matrix, but their vertex
-    positions are returned separately so visualizations can render them as
-    ordinary free space.
+    The former light-red ``invisible obstacle`` class is intentionally not
+    supported. Those cells are normalized to ordinary white/free cells in the
+    bundled reference-map assets.
     """
     image_path = Path(image_path)
     with Image.open(image_path) as image:
@@ -48,41 +40,27 @@ def load_reference_port_obstacle_data(image_path: str | Path) -> dict[str, Any]:
         width, height = rgb_image.size
         pixels = rgb_image.load()
         matrix: list[list[int]] = []
-        invisible_cells: set[tuple[int, int]] = set()
         for y in range(height):
             row: list[int] = []
             for x in range(width):
                 value = pixels[x, y]
                 if value == (0, 0, 0):
-                    row.append(1)
-                elif value == (255, 255, 255):
                     row.append(0)
-                elif value == INVISIBLE_OBSTACLE_COLOR:
+                elif value == (255, 255, 255):
                     row.append(1)
-                    invisible_cells.add((y, x))
                 else:
                     raise ValueError(
-                        "Reference port maps must contain only pure black obstacle pixels, "
-                        "pure white free-space pixels, and light-red invisible-obstacle pixels "
-                        f"(#e8787a). Found {value} at {(x, y)} in {image_path}."
+                        "Reference port maps must contain only pure black obstacle pixels "
+                        "and pure white free-space pixels. "
+                        f"Found {value} at {(x, y)} in {image_path}."
                     )
             matrix.append(row)
-    invisible_vertices = _composite_positions_for_cells(invisible_cells)
-    return {
-        "obstacle_matrix": matrix,
-        "invisible_obstacle_cells": invisible_cells,
-        "invisible_obstacle_vertices": invisible_vertices,
-    }
+    return {"obstacle_matrix": matrix}
 
 
 def load_exact_black_white_obstacle_matrix(image_path: str | Path) -> list[list[int]]:
-    """Backward-compatible loader name for reference port maps.
-
-    The reference-comparison maps now also allow light-red invisible obstacles,
-    which are logically encoded as obstacles in the returned matrix.
-    """
+    """Load a normalized reference map using 1=free and 0=obstacle."""
     return load_reference_port_obstacle_data(image_path)["obstacle_matrix"]
-
 
 def _composite_vertex_for_cell(row: int, col: int) -> tuple[int, int]:
     return (2 * row, 2 * col)
@@ -107,7 +85,6 @@ def build_reference_maps(case_spec: RefCaseSpec, *, map_index: int = 0) -> dict[
     image_path = Path(map_paths[map_index])
     obstacle_data = load_reference_port_obstacle_data(image_path)
     obstacle_matrix = obstacle_data["obstacle_matrix"]
-    invisible_obstacle_vertices = obstacle_data["invisible_obstacle_vertices"]
     rows = len(obstacle_matrix)
     cols = len(obstacle_matrix[0]) if rows else 0
     if rows != case_spec.map_size or cols != case_spec.map_size:
@@ -116,7 +93,7 @@ def build_reference_maps(case_spec: RefCaseSpec, *, map_index: int = 0) -> dict[
             f"but got {rows}x{cols} in {image_path}."
         )
 
-    base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix)
+    base_map = obstacle_matrix_to_composite_base_map(obstacle_matrix, free_value=1)
     classical_map = apply_classical_mapping({"map": base_map})["map"]
     cyclic_map = apply_cyclic_mapping(
         {"map": base_map},
@@ -150,8 +127,7 @@ def build_reference_maps(case_spec: RefCaseSpec, *, map_index: int = 0) -> dict[
         "lower_left_start": lower_left,
         "upper_right_goal": upper_right,
         "spawn_vertices": [upper_neighbor_of_start, right_neighbor_of_start],
-        "invisible_obstacle_vertices": invisible_obstacle_vertices,
-        "invisible_obstacle_count": len(invisible_obstacle_vertices),
+        "traversable_cell_count": sum(cell == 1 for row in obstacle_matrix for cell in row),
         "map_index": map_index,
         "map_number": map_number,
         "map_label": label,
@@ -192,7 +168,7 @@ def _spawn_cell_is_available(*, spawn_vertex: tuple[int, int], proposed_spawn_ti
     return True
 
 
-def build_multi_agent_spawn_sequence(case_spec: RefCaseSpec, map_context: dict[str, Any], *, agent_number: int | None = None) -> list[dict[str, Any]]:
+def build_multi_agent_spawn_sequence(case_spec: RefCaseSpec, map_context: dict[str, Any], *, agent_number: int | None = None, mapping_name: str | None = None) -> list[dict[str, Any]]:
     requested_agent_number = int(agent_number if agent_number is not None else case_spec.agent_number)
     if requested_agent_number <= 0:
         raise ValueError(f"Requested multi-agent reference agent count must be positive. Found {requested_agent_number}.")
@@ -217,32 +193,35 @@ def build_multi_agent_spawn_sequence(case_spec: RefCaseSpec, map_context: dict[s
                 continue
 
             agent = _build_agent(next_spawn_index, spawn_vertex, goal, spawn_time=proposed_spawn_time)
-            classical_nominal_path = find_path_for_agent(
-                map_context["classical_map"],
-                agent["id"],
-                agent["start"],
-                agent["goal"],
-                [],
-                true_static_shortest_path_distance=case_spec.true_static_shortest_path_distance,
-                tight_time_horizon=case_spec.tight_time_horizon,
-                spawn_time=proposed_spawn_time,
-            )
-            cyclic_nominal_path = find_path_for_agent(
-                map_context["cyclic_map"],
-                agent["id"],
-                agent["start"],
-                agent["goal"],
-                [],
-                true_static_shortest_path_distance=case_spec.true_static_shortest_path_distance,
-                tight_time_horizon=case_spec.tight_time_horizon,
-                spawn_time=proposed_spawn_time,
-            )
-            if classical_nominal_path is None or cyclic_nominal_path is None:
+            if mapping_name is None:
+                mapping_names = ("classical", "cyclic")
+            else:
+                if mapping_name not in {"classical", "cyclic"}:
+                    raise ValueError(f"Unsupported reference mapping_name '{mapping_name}'.")
+                mapping_names = (mapping_name,)
+
+            nominal_paths: list[list[Any]] = []
+            valid_for_requested_mapping = True
+            for nominal_mapping_name in mapping_names:
+                nominal_path = find_path_for_agent(
+                    map_context[f"{nominal_mapping_name}_map"],
+                    agent["id"],
+                    agent["start"],
+                    agent["goal"],
+                    [],
+                    true_static_shortest_path_distance=case_spec.true_static_shortest_path_distance,
+                    tight_time_horizon=case_spec.tight_time_horizon,
+                    spawn_time=proposed_spawn_time,
+                )
+                if nominal_path is None:
+                    valid_for_requested_mapping = False
+                    break
+                nominal_paths.append(nominal_path)
+            if not valid_for_requested_mapping:
                 continue
 
             agents.append(agent)
-            reservation_paths.append(classical_nominal_path)
-            reservation_paths.append(cyclic_nominal_path)
+            reservation_paths.extend(nominal_paths)
             next_spawn_index += 1
             spawned_this_timestep += 1
 
@@ -270,7 +249,7 @@ def serialize_agents(agents: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
 
 
-def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_identifier: str, agents: list[dict[str, Any]], notes: str, map_index: int | None = None, map_number: int | None = None, map_label_value: str = "", agent_number: int | None = None, run_config_tag: str | None = None) -> RefRunConfiguration:
+def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_identifier: str, agents: list[dict[str, Any]], notes: str, map_index: int | None = None, map_number: int | None = None, map_label_value: str = "", agent_number: int | None = None, run_config_tag: str | None = None, paired_source: bool = True) -> RefRunConfiguration:
     resolved_agent_number = int(agent_number if agent_number is not None else case_spec.agent_number)
     suffix = ""
     if map_number is not None:
@@ -285,7 +264,7 @@ def build_run_configuration(*, case_spec: RefCaseSpec, run_index: int, map_ident
         run_index=run_index,
         run_config_id=f"ref_run[{case_spec.case_id}{suffix}.{run_token}]",
         map_identifier=map_identifier,
-        paired_source=True,
+        paired_source=bool(paired_source),
         agents=serialize_agents(agents),
         map_index=map_index,
         map_number=map_number,
@@ -419,7 +398,7 @@ def execute_mapping(*, case_spec: RefCaseSpec, composite_map: list[list[Any]], a
                 ecbs_suboptimality_factor=case_spec.ecbs_suboptimality,
                 true_static_shortest_path_distance=case_spec.true_static_shortest_path_distance,
                 tight_time_horizon=case_spec.tight_time_horizon,
-                agent_cohesion_enabled=case_spec.agent_cohesion_enabled,
+                agent_cohesion_enabled=False,
             )
         elapsed_seconds = time.perf_counter() - start_time
         return solver_result, elapsed_seconds, solver_result.get("status", "unknown_failure")
@@ -512,7 +491,7 @@ def build_mapping_record(
         solver_name=solver_name,
         enhanced_cbs_enabled=(solver_name == "ECBS"),
         solver_suboptimality_factor=suboptimality,
-        paired_run=True,
+        paired_run=bool(run_configuration.paired_source),
         solver_status=resolved_status,
         result_category=result_category,
         counted_run=counted_run,

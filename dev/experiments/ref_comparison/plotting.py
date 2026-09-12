@@ -298,12 +298,12 @@ def _summary_rows_for_map(case_spec: RefCaseSpec, aggregate: RefConditionAggrega
             ["", "Total distance", _display_metric(aggregate.classical_avg_total_path_length), _display_metric(aggregate.cyclic_avg_total_path_length), _percent_reduction_gain(aggregate.classical_avg_total_path_length, aggregate.cyclic_avg_total_path_length)],
         ]
 
-    classical_avg_conflicts = _per_agent(aggregate.classical_avg_conflicts_at_halt, aggregate.agent_number)
-    cyclic_avg_conflicts = _per_agent(aggregate.cyclic_avg_conflicts_at_halt, aggregate.agent_number)
-    classical_avg_turns = _per_agent(aggregate.classical_avg_total_turns, aggregate.agent_number)
-    cyclic_avg_turns = _per_agent(aggregate.cyclic_avg_total_turns, aggregate.agent_number)
-    classical_avg_distance = _per_agent(aggregate.classical_avg_total_path_length, aggregate.agent_number)
-    cyclic_avg_distance = _per_agent(aggregate.cyclic_avg_total_path_length, aggregate.agent_number)
+    classical_avg_conflicts = _per_agent(aggregate.classical_avg_conflicts_at_halt, aggregate.classical_agent_number)
+    cyclic_avg_conflicts = _per_agent(aggregate.cyclic_avg_conflicts_at_halt, aggregate.cyclic_agent_number)
+    classical_avg_turns = _per_agent(aggregate.classical_avg_total_turns, aggregate.classical_agent_number)
+    cyclic_avg_turns = _per_agent(aggregate.cyclic_avg_total_turns, aggregate.cyclic_agent_number)
+    classical_avg_distance = _per_agent(aggregate.classical_avg_total_path_length, aggregate.classical_agent_number)
+    cyclic_avg_distance = _per_agent(aggregate.cyclic_avg_total_path_length, aggregate.cyclic_agent_number)
     return [
         [map_label_value, "Running time", _display_metric(aggregate.classical_avg_time_computation_halted, time_like=True), _display_metric(aggregate.cyclic_avg_time_computation_halted, time_like=True), _percent_reduction_gain(aggregate.classical_avg_time_computation_halted, aggregate.cyclic_avg_time_computation_halted)],
         ["", "Average number of conflicts", _display_metric(classical_avg_conflicts), _display_metric(cyclic_avg_conflicts), _percent_reduction_gain(classical_avg_conflicts, cyclic_avg_conflicts)],
@@ -400,15 +400,15 @@ def generate_reference_graphs(case_spec: RefCaseSpec, aggregate: RefConditionAgg
     graph_paths.append(runtime_path)
 
     conflicts_path = graphs_dir / f"{case_spec.case_id}_average_number_of_conflicts_by_map.png"
-    plot_reference_metric_by_map(map_aggregates=sorted_aggregates, classical_getter=lambda a: _per_agent(a.classical_avg_conflicts_at_halt, a.agent_number), cyclic_getter=lambda a: _per_agent(a.cyclic_avg_conflicts_at_halt, a.agent_number), output_path=conflicts_path, y_label="Average number of conflicts", title=f"{case_spec.display_name}: Average Number of Conflicts", lower_is_better=True)
+    plot_reference_metric_by_map(map_aggregates=sorted_aggregates, classical_getter=lambda a: _per_agent(a.classical_avg_conflicts_at_halt, a.classical_agent_number), cyclic_getter=lambda a: _per_agent(a.cyclic_avg_conflicts_at_halt, a.cyclic_agent_number), output_path=conflicts_path, y_label="Average number of conflicts", title=f"{case_spec.display_name}: Average Number of Conflicts", lower_is_better=True)
     graph_paths.append(conflicts_path)
 
     turns_path = graphs_dir / f"{case_spec.case_id}_average_number_of_turns_by_map.png"
-    plot_reference_metric_by_map(map_aggregates=sorted_aggregates, classical_getter=lambda a: _per_agent(a.classical_avg_total_turns, a.agent_number), cyclic_getter=lambda a: _per_agent(a.cyclic_avg_total_turns, a.agent_number), output_path=turns_path, y_label="Average number of turns", title=f"{case_spec.display_name}: Average Number of Turns", lower_is_better=True)
+    plot_reference_metric_by_map(map_aggregates=sorted_aggregates, classical_getter=lambda a: _per_agent(a.classical_avg_total_turns, a.classical_agent_number), cyclic_getter=lambda a: _per_agent(a.cyclic_avg_total_turns, a.cyclic_agent_number), output_path=turns_path, y_label="Average number of turns", title=f"{case_spec.display_name}: Average Number of Turns", lower_is_better=True)
     graph_paths.append(turns_path)
 
     distance_path = graphs_dir / f"{case_spec.case_id}_average_total_distance_by_map.png"
-    plot_reference_metric_by_map(map_aggregates=sorted_aggregates, classical_getter=lambda a: _per_agent(a.classical_avg_total_path_length, a.agent_number), cyclic_getter=lambda a: _per_agent(a.cyclic_avg_total_path_length, a.agent_number), output_path=distance_path, y_label="Average total distance", title=f"{case_spec.display_name}: Average Total Distance", lower_is_better=True)
+    plot_reference_metric_by_map(map_aggregates=sorted_aggregates, classical_getter=lambda a: _per_agent(a.classical_avg_total_path_length, a.classical_agent_number), cyclic_getter=lambda a: _per_agent(a.cyclic_avg_total_path_length, a.cyclic_agent_number), output_path=distance_path, y_label="Average total distance", title=f"{case_spec.display_name}: Average Total Distance", lower_is_better=True)
     graph_paths.append(distance_path)
 
     table_path = graphs_dir / f"{case_spec.case_id}_ecbs_comparison_table.png"
